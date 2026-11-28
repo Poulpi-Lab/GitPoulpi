@@ -270,7 +270,7 @@ impl Activity {
 
     /// Registers a transfer (push, pull, fetch, LFS transfer) about to be
     /// sent. `Some(what)` when an identical one is already running: the
-    /// caller must not send it and says "already <what>" instead.
+    /// caller must not send it and says "already (what)" instead.
     pub fn claim_transfer(&self, action: &Action) -> Option<TransferKind> {
         let kind = TransferKind::of(action)?;
         let mut inner = self.lock();

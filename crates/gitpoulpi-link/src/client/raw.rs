@@ -10,7 +10,7 @@ use std::sync::Mutex;
 type Slot<T> = Arc<Mutex<Option<GitResult<T>>>>;
 
 /// A request for the link thread.
-pub struct RawRequest {
+pub(crate) struct RawRequest {
     /// The repository to ask about; `None` = the window's own.
     repo: Option<RepoRef>,
     command: OperationKind,

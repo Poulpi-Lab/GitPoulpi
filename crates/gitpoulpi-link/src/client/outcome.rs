@@ -67,7 +67,7 @@ pub(super) fn report<T>(
 /// The status line after a reword. It names the old tip, because that is
 /// the by-hand undo: `reset --soft` to it (also in `ORIG_HEAD` and the
 /// reflog) puts the branch back. Undo (the journal) reverts a reword too.
-pub fn reword_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
+pub(crate) fn reword_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
     use gitpoulpi_i18n::msg::link as l;
     match outcome.replayed {
         0 => l::reword_done(
@@ -86,7 +86,7 @@ pub fn reword_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
 
 /// The status line after an amend: like [`reword_done_message`], it names
 /// the old tip (the by-hand undo) and says Undo reverts it.
-pub fn amend_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
+pub(crate) fn amend_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
     gitpoulpi_i18n::msg::link::amend_done(
         short(commit),
         short(outcome.reworded),
@@ -96,7 +96,7 @@ pub fn amend_done_message(commit: Oid, outcome: &RewordOutcome) -> String {
 
 /// The status line after a split: the journal's own words for it, then the
 /// new tip.
-pub fn split_done_message(commit: Oid, outcome: &SplitOutcome) -> String {
+pub(crate) fn split_done_message(commit: Oid, outcome: &SplitOutcome) -> String {
     use gitpoulpi_i18n::msg::{split_ui, undo_label};
     split_ui::done(
         undo_label::split_commit(outcome.created.len() as u64, short(commit)),

@@ -73,6 +73,12 @@ pub struct RefreshOutcome {
     /// Per-read hashes of the three results the Log layout is built from
     /// (see [`ReadHashes`]).
     pub read_hashes: ReadHashes,
+    /// Which parts of the repository's state this outcome changed compared
+    /// with the one delivered before it (everything it read, on the first).
+    /// Filled in when the link delivers the outcome; all `false` before.
+    pub summary: RefreshSummary,
+    /// The hashes `summary` compares.
+    pub(super) parts: PartHashes,
 }
 
 /// Content hashes of the Log, Refs, Stashes and LFS reads of one refresh, `None`
@@ -172,7 +178,7 @@ pub struct CommitFilesOutcome {
 /// What travels from `DaemonLink` to the link's commit-files worker
 /// (`commit_files_worker`).
 #[derive(Debug, Clone)]
-pub enum CommitFilesRequest {
+pub(crate) enum CommitFilesRequest {
     /// Fetch one commit's files for someone waiting on the answer.
     Fetch(crate::commit_files_cache::QueuedFetch),
     /// Warm the cache for these commits (the selection's neighbors),
@@ -388,14 +394,14 @@ pub struct SplitSourceOutcome {
 
 /// The link-side half of the split-source channel pair (see
 /// [`split_source_worker`]).
-pub struct SplitSourceWorker {
+pub(crate) struct SplitSourceWorker {
     pub(super) rx: tokio::sync::mpsc::UnboundedReceiver<Oid>,
     pub(super) out_tx: std_mpsc::Sender<SplitSourceOutcome>,
 }
 
 /// The link-side half of the commit-stats channel pair (see
 /// [`commit_stats_worker`]).
-pub struct StatsWorker {
+pub(crate) struct StatsWorker {
     pub(super) rx: tokio::sync::mpsc::UnboundedReceiver<Vec<Oid>>,
     pub(super) out_tx: std_mpsc::Sender<CommitStatsOutcome>,
 }

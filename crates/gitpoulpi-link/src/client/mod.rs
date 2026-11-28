@@ -22,6 +22,10 @@
 //! - `file_insight` and [`workers`]: on-demand reads (file content, blame,
 //!   history, commit files, commit stats).
 //! - `conn`: the connection, `LinkConn::call`, and starting the daemon.
+//! - `link_ctx`: the identity ([`LinkId`], [`LinkContext`]) every host hook carries.
+//! - `events`: [`DaemonLink::drain`], every receiver of the link as typed
+//!   [`LinkEvent`]s.
+//! - `summary`: [`RefreshSummary`], what a delivered refresh changed.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -54,10 +58,12 @@ mod branch_sync_summary;
 mod conn;
 mod convert_summary;
 pub mod error_text;
+mod events;
 mod failed_op;
 mod file_insight;
 mod handle;
 pub mod host;
+mod link_ctx;
 mod link_loop;
 mod log_filter;
 mod merge;
@@ -69,18 +75,21 @@ mod reader;
 mod refresh;
 mod refresher;
 mod run_action;
+mod summary;
 mod takeover;
 mod tickets;
 mod workers;
 
 pub use self::action::*;
 pub use self::conn::*;
+pub use self::events::LinkEvent;
 pub use self::file_insight::HISTORY_PAGE;
 use self::file_insight::*;
 pub use self::handle::*;
 pub use self::host::{JobEvent, LinkHost, PushGroupEvent, Report, TimingKind, UndoKey};
+pub use self::link_ctx::{LinkContext, LinkId};
 use self::link_loop::*;
-pub use self::log_filter::LogFilterCell;
+pub(crate) use self::log_filter::LogFilterCell;
 pub use self::merge::*;
 pub use self::messages::*;
 pub use self::outcome::*;
@@ -90,6 +99,8 @@ use self::reader::*;
 pub use self::refresh::*;
 use self::refresher::*;
 use self::run_action::*;
+pub use self::summary::RefreshSummary;
+use self::summary::*;
 use self::takeover::*;
 pub use self::tickets::*;
 use self::workers::*;
@@ -98,6 +109,8 @@ use self::workers::*;
 mod action_requests_tests;
 #[cfg(test)]
 mod commit_files_tests;
+#[cfg(test)]
+mod frontend_api_tests;
 #[cfg(test)]
 mod host_tests;
 #[cfg(test)]

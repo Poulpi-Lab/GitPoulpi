@@ -148,7 +148,7 @@ pub fn arm(ticket: Ticket, accepts: fn(&crate::client::Action) -> bool) {
 
 /// Takes the armed ticket for `action` (`None` when nothing is armed or the
 /// action is not the one waited for).
-pub fn take_armed(action: &crate::client::Action) -> Option<Ticket> {
+pub(crate) fn take_armed(action: &crate::client::Action) -> Option<Ticket> {
     let mut slot = ARMED.lock().unwrap_or_else(|e| e.into_inner());
     match *slot {
         Some((ticket, accepts)) if accepts(action) => {
@@ -199,7 +199,7 @@ pub fn set_origin(ticket: Ticket, origin: gitpoulpi_core::domain::SequenceOrigin
 }
 
 /// The sequence run `ticket` belongs to (`None`: untracked, or not a run's).
-pub fn origin_of(ticket: Option<Ticket>) -> Option<gitpoulpi_core::domain::SequenceOrigin> {
+pub(crate) fn origin_of(ticket: Option<Ticket>) -> Option<gitpoulpi_core::domain::SequenceOrigin> {
     let ticket = ticket?;
     ORIGINS
         .lock()
@@ -237,7 +237,7 @@ pub fn begin(ticket: Ticket, parts: usize, link: u64) {
 }
 
 /// A new id for a link thread.
-pub fn new_link_id() -> u64 {
+pub(crate) fn new_link_id() -> u64 {
     NEXT_LINK.fetch_add(1, Ordering::Relaxed)
 }
 
@@ -245,7 +245,7 @@ pub fn new_link_id() -> u64 {
 /// daemon): what it still had in flight will never be answered to it, so
 /// those tickets fail now instead of hanging a sequence. The action may well
 /// have run on the daemon; only the answer is lost.
-pub fn abandon_link(link: u64) {
+pub(crate) fn abandon_link(link: u64) {
     let lost: Vec<u64> = live(|map| {
         let ids: Vec<u64> = map
             .iter()

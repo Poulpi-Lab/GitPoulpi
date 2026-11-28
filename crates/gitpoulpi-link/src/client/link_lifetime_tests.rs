@@ -78,7 +78,7 @@ fn the_embedded_daemon_outlives_the_window_that_started_it() {
 /// request first matters: it is what leaves the link *waiting* for a
 /// response (rather than failing to write), the state that could hang.
 /// Returns its port; it serves until the process ends.
-fn hang_up_listener() -> u16 {
+pub(super) fn hang_up_listener() -> u16 {
     use std::io::Read;
     let listener = std::net::TcpListener::bind(("127.0.0.1", 0)).unwrap();
     let port = listener.local_addr().unwrap().port();

@@ -210,9 +210,20 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   outcomes. The TUI's `daemon_link` is a re-export (`lib.rs`) plus `daemon_link_host.rs`,
   its `LinkHost` (`wake`, jobs, push group, activity-log reports, the stage-guard
   question, `initial_log_filter`, `undo_key`, `daemon_job_live`,
-  `is_own_hosting_change`). The host is process-wide, installed by `start`.
+  `is_own_hosting_change`). Each link keeps the host it was started with and every
+  event hook receives its `LinkContext` (`LinkId` + repo root, `link_ctx.rs`), which
+  rides on the thread (runtime threads, the link thread, `DaemonLink` methods that
+  raise a hook from the caller's thread); the host of the latest `start` is also the
+  process-wide fallback for a hook raised off every link (the TUI has one link, so one
+  host). `wake_on_journal` (default off, the TUI redraws on the journal cell's poke)
+  lets a frontend ask for a wake on undo/redo changes. `DaemonLink::drain` (`events.rs`)
+  gathers the receivers into `LinkEvent`s for a frontend; the TUI keeps reading them one
+  by one. `RefreshOutcome::summary` (`summary.rs`) is what a delivered refresh changed,
+  from the hashes the link already makes. The crate root re-exports an explicit list,
+  the rest of `client` is private (`commit_files_cache`, `fetch_lock`, `history_rename`
+  are crate-private too); add a name to that list when a frontend needs it.
   The helpers moved with it keep their old TUI paths through re-exports
-  (`activity`, `commit_files_cache`, `binary_hint`, `diff_recode` (the TUI adds
+  (`activity`, `binary_hint`, `diff_recode` (the TUI adds
   `want_of_state`), `wip_view`, `commit_settings`, `redraw`, `rename_pairs`,
   `live_settings`/`lfs_ui`/`undo_ui`/`ui_viewer` (pure halves), `safety_panel/label.rs`
   (the TUI adds `glyph`)). Tests that need a link share `ticket_tests` through the

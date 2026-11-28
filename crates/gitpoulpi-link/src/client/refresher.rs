@@ -28,6 +28,8 @@ pub(super) struct Refresher {
     pub(super) last_delivered: Option<(u64, u64)>,
     /// The hash of the last LFS snapshot an outcome carried.
     pub(super) last_lfs: Option<u64>,
+    /// What the delivered outcomes changed (`RefreshOutcome::summary`).
+    pub(super) summary: SummaryTracker,
 }
 
 impl Refresher {
@@ -89,6 +91,7 @@ impl Refresher {
         self.inflight = self.inflight.saturating_sub(1);
         if started_at == self.activity.generation() && !self.activity.blocking() {
             outcome.generation = started_at;
+            outcome.summary = self.summary.observe(&outcome);
             // Nothing new since the last one (and no mutation in between): the
             // loop takes it whenever it next runs, no frame is due for it.
             let delivered = Some((outcome.fingerprint, started_at));

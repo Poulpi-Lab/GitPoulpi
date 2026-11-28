@@ -14,6 +14,7 @@ pub mod conflict;
 
 pub use action::{Action, Ctx, ACTIONS, STATIC_ACTIONS};
 pub use chord::KeyChord;
+use chord::Mods;
 
 use std::sync::{Arc, RwLock};
 
@@ -270,17 +271,24 @@ impl Keymap {
     /// wins over a lenient one, so a `Ctrl+Shift+N` binding beats a
     /// `Ctrl+N` one for the chord that spells both. A prefix context looks
     /// at the key alone: a Ctrl chord bound after the prefix (`Ctrl+G
-    /// Ctrl+P`) matches exactly first, an unbound one falls back to the
-    /// bare key, so holding Ctrl through the second key still works.
+    /// Ctrl+P`) matches exactly first, an unbound one falls back to the key
+    /// with Shift only. Shift is kept because the bindings tell it apart
+    /// (`Ctrl+G Shift+P` pushes, `Ctrl+G p` pulls; `Ctrl+N Shift+Left` and
+    /// `Ctrl+N Left` are two actions); Ctrl and Alt are dropped, so holding
+    /// Ctrl through the second key still works.
     pub fn action_for(&self, ctx: Ctx, chord: KeyChord) -> Option<Action> {
         if ctx.ignores_modifiers() {
             if chord.mods.ctrl {
-                let exact = self.action_exact(ctx, chord);
+                let exact = self.action_exact(ctx, KeyChord::new(Mods::CTRL, chord.key));
                 if exact.is_some() {
                     return exact;
                 }
             }
-            return self.action_exact(ctx, chord.bare());
+            let mods = Mods {
+                shift: chord.mods.shift,
+                ..Mods::NONE
+            };
+            return self.action_exact(ctx, KeyChord::new(mods, chord.key));
         }
         self.action_exact(ctx, chord).or_else(|| {
             self.entries

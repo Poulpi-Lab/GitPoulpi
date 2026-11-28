@@ -47,7 +47,14 @@ type Opened = (AnyWindowHandle, Entity<Workspace>);
 fn open(cx: &mut TestAppContext, repo: &Path, prefs_dir: &Path) -> Opened {
     let backend = Backend::start(repo).unwrap();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs_dir.to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs_dir)),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     cx.update(|cx| app::open_main_window(backend, cx).unwrap())
 }
 
@@ -196,6 +203,38 @@ fn the_sections_list_the_files_with_counts_and_stage_and_unstage_undo_as_one_ent
     wait_until(cx, "everything unstaged", |_| {
         staged_names(&repo).is_empty()
     });
+}
+
+#[gpui_kit::test]
+fn a_plain_click_opens_the_diff_while_ctrl_and_shift_clicks_only_select(cx: &mut TestAppContext) {
+    let repo = dirty();
+    let (window, ws) = open_dirty(cx, &repo, 3, 0);
+    let diff_open = |cx: &mut TestAppContext| ws.read_with(cx, |ws, _| ws.diff_is_open());
+    assert!(!diff_open(cx));
+    // Ctrl and Shift clicks build a selection without opening anything.
+    click(cx, &ws, StatusSection::Unstaged, 0, CTRL);
+    click(cx, &ws, StatusSection::Unstaged, 1, CTRL);
+    cx.run_until_parked();
+    std::thread::sleep(Duration::from_millis(300));
+    cx.run_until_parked();
+    assert!(!diff_open(cx), "Ctrl+click does not open a diff");
+    let shift = Modifiers {
+        shift: true,
+        ..Default::default()
+    };
+    click(cx, &ws, StatusSection::Unstaged, 2, shift);
+    std::thread::sleep(Duration::from_millis(300));
+    cx.run_until_parked();
+    assert!(!diff_open(cx), "Shift+click does not open a diff");
+    assert!(ws.read_with(cx, |ws, cx| ws.right.read(cx).selection_len()) >= 2);
+    // A plain click selects that one row and opens its diff.
+    click(cx, &ws, StatusSection::Unstaged, 1, NONE);
+    wait_until(cx, "the diff", |cx| diff_open(cx));
+    assert_eq!(
+        ws.read_with(cx, |ws, cx| ws.right.read(cx).selection_len()),
+        1
+    );
+    let _ = window;
 }
 
 #[gpui_kit::test]
@@ -647,8 +686,23 @@ fn the_keyboard_walks_selects_stages_and_opens_the_diff(cx: &mut TestAppContext)
     wait_until(cx, "the row staged by Ctrl+Space", |_| {
         staged_names(&repo) == ["n.txt"]
     });
-    // Enter opens the cursor row's diff.
+    // The pane has to show the staged file in Staged before the cursor is put back: a refresh that lands
+    // after the cursor was set would drop a cursor on a row that just left its list.
+    wait_until(cx, "the pane to list n.txt as staged", |cx| {
+        ws.read_with(cx, |ws, cx| {
+            let right = ws.right.read(cx);
+            !right
+                .row_paths(StatusSection::Unstaged)
+                .contains(&"n.txt".to_string())
+                && right
+                    .row_paths(StatusSection::Staged)
+                    .contains(&"n.txt".to_string())
+        })
+    });
+    // The cursor was on the row that left the list, so it is gone: Down puts it on the first row, and
+    // Enter opens that row's diff.
     run(cx, window, "palette.focus_status");
+    press(cx, window, "down");
     press(cx, window, "enter");
     wait_until(cx, "the diff of the cursor row", |cx| {
         ws.read_with(cx, |ws, _| ws.diff_is_open())

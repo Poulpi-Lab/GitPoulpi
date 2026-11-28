@@ -134,7 +134,7 @@ Trunk-based 프리셋 또는 직접 정의한 베이스, 브랜치 이름 패턴
 
 ## 참조와 도움말
 
-28. **[설정 참조](config-reference.md)**: 모든 `config.toml` 키와 기본값,
+28. **[설정 참조](config-reference.md)**: 모든 `config.toml`과 `tui.toml` 키와 기본값,
     효과, 저장소별 설정, 환경 변수.
 29. **[문제 해결과 FAQ](troubleshooting.md)**: 아이콘, 그래프 렌더링, 도착하지
     않는 키, 멈춘 데몬, 속도, LFS 포인터.

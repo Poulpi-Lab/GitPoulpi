@@ -71,7 +71,7 @@ impl RightPanel {
                 let selected = self.selection.contains(section, &row);
                 let paths = if selected {
                     self.selection
-                        .paths(section)
+                        .paths(section, files)
                         .iter()
                         .map(|p| p.to_string_lossy().into_owned())
                         .collect()
@@ -137,7 +137,9 @@ impl RightPanel {
                             let r = v.row.clone();
                             let (glyph, class) = status_glyph(r.status);
                             let color: Hsla = [success, warning, danger, info][class as usize];
-                            let (me_click, me_button) = (me.clone(), me.clone());
+                            let (me_click, me_button, me_menu) =
+                                (me.clone(), me.clone(), me.clone());
+                            let menu_path = r.path.clone();
                             let (focus, paths) = (focus.clone(), v.drag.paths.clone());
                             let button_label = section.row_label();
                             h_flex()
@@ -212,16 +214,33 @@ impl RightPanel {
                                         cx.new(|_| DragGhost(label))
                                     }
                                 })
+                                .on_mouse_down(gpui_kit::MouseButton::Right, {
+                                    let folder = r.folder;
+                                    move |ev, _, cx| {
+                                        if folder {
+                                            return;
+                                        }
+                                        cx.stop_propagation();
+                                        let (path, at) = (menu_path.clone(), ev.position);
+                                        let side = match section {
+                                            StatusSection::Unstaged => {
+                                                crate::ref_target::FileSide::Unstaged
+                                            }
+                                            StatusSection::Staged => {
+                                                crate::ref_target::FileSide::Staged
+                                            }
+                                        };
+                                        let _ = me_menu.update(cx, |this, cx| {
+                                            this.file_row_menu(path, side, at, cx)
+                                        });
+                                    }
+                                })
                                 .on_click(move |ev, window, cx| {
                                     focus.focus(window, cx);
                                     let mods = ev.modifiers();
-                                    let double = ev.click_count() >= 2;
                                     let ix = i;
                                     let _ = me_click.update(cx, |this, cx| {
                                         this.click_row(section, ix, mods, cx);
-                                        if double && !this.row_is_folder(section, ix) {
-                                            this.open_selected_diff(cx);
-                                        }
                                     });
                                 })
                                 .into_any_element()
@@ -232,13 +251,6 @@ impl RightPanel {
                 .track_scroll(scroll),
             )
             .child(Scrollbar::vertical(scroll))
-    }
-
-    fn row_is_folder(&self, section: StatusSection, ix: usize) -> bool {
-        self.section_view(section)
-            .0
-            .get(ix)
-            .is_some_and(|r| r.folder)
     }
 
     /// One section box: title with count, bulk buttons, the list, and the drop target of the other list.
@@ -316,7 +328,7 @@ impl RightPanel {
         cx: &mut Context<Self>,
     ) -> gpui_kit::Div {
         let conflicts = self.conflict_count();
-        let n = self.status.len() as u64;
+        let n = self.status.files.len() as u64;
         let title = if conflicts > 0 {
             msg::status_list::title_changes_conflicted(n, &self.branch, conflicts as u64)
         } else {

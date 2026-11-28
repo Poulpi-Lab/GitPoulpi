@@ -241,7 +241,7 @@ the page saves.
 
 ## Running a sequence
 
-A sequence is a named list of steps, each one a command of the palette (stage everything, write the commit message with the AI, commit, push...). Run it from the palette (`Sequence: <name>`), with the key you gave it in Settings > Keyboard & mouse (`[keybindings.sequence]` in `config.toml`), or from the command line (`gitpoulpi sequence run`).
+A sequence is a named list of steps, each one a command of the palette (stage everything, write the commit message with the AI, commit, push...). Run it from the palette (`Sequence: <name>`), with the key you gave it in Settings > Keyboard & mouse (`[keybindings.sequence]` in `tui.toml`), or from the command line (`gitpoulpi sequence run`).
 
 While it runs, a strip over the top of the Log shows `<name> k/n`, the step, and what it waits for. The run also shows in the Jobs panel as `Sequence <name> k/n: <step>`. One sequence runs at a time; starting a second says which one is running.
 

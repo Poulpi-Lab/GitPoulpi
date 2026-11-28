@@ -73,14 +73,14 @@ fn reapply_theme(cx: &mut App) {
 pub fn set_theme(slug: &str, cx: &mut App) {
     let spec = theme::find_preset(slug);
     theme::apply(&spec, cx);
-    PrefsStore::update(cx, |p| p.ui.theme = spec.slug.clone());
+    PrefsStore::set_theme(cx, &spec.slug);
     cx.refresh_windows();
 }
 
 /// Switches the UI language and remembers the choice.
 pub fn set_language(lang: Lang, cx: &mut App) {
     gitpoulpi_i18n::set(lang);
-    PrefsStore::update(cx, |p| p.ui.language = lang.code().to_string());
+    PrefsStore::set_language(cx, lang);
     cx.refresh_windows();
 }
 
@@ -92,7 +92,7 @@ pub fn set_lane_theme(slug: &str, cx: &mut App) {
         Some(slug.to_string())
     };
     cx.set_global(LaneTheme(choice.clone()));
-    PrefsStore::update(cx, |p| p.ui.lane_theme = choice);
+    PrefsStore::set_lane_theme(cx, choice.as_deref());
     reapply_theme(cx);
     // The lane colour indices come from the layout, so a repaint is all that is needed.
     cx.refresh_windows();

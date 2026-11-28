@@ -24,11 +24,11 @@ docker run -it --rm \
 | 路径 | 内容 |
 |---|---|
 | `/work` | 工作目录。把你的仓库绑定挂载到这里。 |
-| `/config` | 设置（`config.toml`）、会话，以及作为子文件夹的数据和缓存（`GITPOULPI_CONFIG_DIR=/config`）。请使用具名卷或绑定挂载来保留它们。 |
+| `/config` | 设置（`config.toml`、`tui.toml`）、会话，以及作为子文件夹的数据和缓存（`GITPOULPI_CONFIG_DIR=/config`）。请使用具名卷或绑定挂载来保留它们。 |
 | `/data`、`/cache` | 同样声明为卷，供遵循 XDG 变量的工具使用（`XDG_DATA_HOME=/data`、`XDG_CACHE_HOME=/cache`）。 |
 | `/home/gitpoulpi` | `HOME`。它不是卷：每个容器都是全新的。 |
 
-如果 `/config` 没有卷，每次 `--rm` 运行都从默认设置开始。要从你自己的 `config.toml` 开始，请挂载它：`-v "$PWD/config.toml":/config/config.toml:ro`（只读意味着设置无法保存）。
+如果 `/config` 没有卷，每次 `--rm` 运行都从默认设置开始。要从你自己的 `config.toml` 开始，请挂载它：`-v "$PWD/config.toml":/config/config.toml:ro`（只读意味着设置无法保存）。界面设置在第二个文件 `tui.toml` 中，用同样的方式挂载（`-v "$PWD/tui.toml":/config/tui.toml:ro`）；见[配置参考](config-reference.md#两个文件configtoml-和-tuitoml)。
 
 ## 由其他用户拥有的仓库
 

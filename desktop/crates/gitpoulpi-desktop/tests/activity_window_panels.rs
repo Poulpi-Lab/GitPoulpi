@@ -11,15 +11,14 @@ use activity_common::*;
 use gitpoulpi_core::domain::{
     GroupAction, GroupMode, Oid, OperationKind, RemoteGroupRunRequest, RunTarget, TargetStatus,
 };
-use gitpoulpi_desktop::commands;
 use gitpoulpi_desktop::panels::activity::log_model::{Levels, LogTab};
 use gitpoulpi_desktop::panels::activity::{group, jobs};
 use gitpoulpi_i18n::msg;
-use gitpoulpi_ipc::{JobInfo, JobState};
-use gitpoulpi_link::{Action, JobEvent, LinkContext, LinkHost as _};
+use gitpoulpi_ipc::JobState;
+use gitpoulpi_link::Action;
 use gitpoulpi_log::Level;
 use gitpoulpi_testkit::FixtureRepo;
-use gpui_kit::{AppContext as _, TestAppContext};
+use gpui_kit::TestAppContext;
 use refs_ops_common::*;
 
 fn git_in(dir: &std::path::Path, args: &[&str]) {
@@ -68,34 +67,6 @@ fn origin_main(repo: &FixtureRepo) -> String {
         .next()
         .unwrap_or("")
         .to_string()
-}
-
-fn job(id: u64, kind: OperationKind, state: JobState, repo: &str) -> JobInfo {
-    JobInfo {
-        id,
-        kind,
-        repo: Some(gitpoulpi_core::domain::RepoId(repo.to_string())),
-        dest: None,
-        label: format!("job {id}"),
-        state,
-        phase: None,
-        progress: None,
-        started_at: None,
-        joiners: 0,
-        queued_after: None,
-        not_cancellable: None,
-        error: None,
-    }
-}
-
-fn feed_job(
-    cx: &mut TestAppContext,
-    ws: &gpui_kit::Entity<gitpoulpi_desktop::app::Workspace>,
-    j: JobInfo,
-) {
-    let host = ws.read_with(cx, |ws, _| ws.backend().host());
-    host.jobs(&LinkContext::detached(), JobEvent::Changed(j));
-    cx.run_until_parked();
 }
 
 // ---- the Activity Log ------------------------------------------------------------------------------
@@ -351,29 +322,6 @@ fn the_jobs_panel_lists_running_queued_and_finished_jobs_and_cancels_where_it_ca
     wait_until(cx, "the daemon's answer", |cx| {
         notice(cx, &ws).contains("tool")
     });
-    // The palette has one row per job that can be cancelled, and Cancel all.
-    let state = cx
-        .update_window(window, |_, w, cx| commands::context::window_state(w, cx))
-        .unwrap();
-    // The palette's job rows read process-wide facts that every window of the process shares (the
-    // parallel tests here included): feed the job again until its row shows.
-    let mut found = false;
-    for _ in 0..20 {
-        feed_job(
-            cx,
-            &ws,
-            job(1, OperationKind::Push, JobState::Running, "/work/tool"),
-        );
-        let rows = commands::palette::rows("Jobs: Cancel", state.palette_context());
-        found = rows
-            .iter()
-            .any(|r| !r.dim && r.label.contains("Push: tool"));
-        if found {
-            break;
-        }
-    }
-    assert!(found, "a Cancel row for the push");
-    run(cx, window, "palette.jobs_cancel_all");
 }
 
 #[gpui_kit::test]

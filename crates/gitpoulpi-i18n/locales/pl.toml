@@ -2792,7 +2792,7 @@ hint_conflicts = "konflikty"
 conflicts_of = "Konflikty: {label} - Esc pokazuje wszystkie skróty"
 no_conflicts = "Ten skrót nie ma konfliktów"
 hint_controls = "sterowanie"
-config_issues = { one = "config.toml: {n} wpis zignorowany - {id}: {message}", few = "config.toml: {n} wpisy zignorowane - {id}: {message}", many = "config.toml: {n} wpisów zignorowanych - {id}: {message}", other = "config.toml: {n} wpisu zignorowanego - {id}: {message}" }
+config_issues = { one = "{file}: {n} wpis zignorowany - {id}: {message}", few = "{file}: {n} wpisy zignorowane - {id}: {message}", many = "{file}: {n} wpisów zignorowanych - {id}: {message}", other = "{file}: {n} wpisu zignorowanego - {id}: {message}" }
 no_match = "żaden skrót nie pasuje do filtrów"
 unbound = "(nieprzypisany)"
 none = "(brak)"

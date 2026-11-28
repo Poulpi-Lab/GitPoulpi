@@ -24,11 +24,11 @@ docker run -it --rm \
 | Sökväg | Vad den innehåller |
 |---|---|
 | `/work` | Arbetskatalogen. Bind-montera dina repositories här. |
-| `/config` | Inställningar (`config.toml`), sessioner och, som undermappar, data och cache (`GITPOULPI_CONFIG_DIR=/config`). Använd en namngiven volym eller en bind-montering för att behålla dem. |
+| `/config` | Inställningar (`config.toml`, `tui.toml`), sessioner och, som undermappar, data och cache (`GITPOULPI_CONFIG_DIR=/config`). Använd en namngiven volym eller en bind-montering för att behålla dem. |
 | `/data`, `/cache` | Deklarerade som volymer också, för verktyg som följer XDG-variablerna (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Den är ingen volym: en ny för varje container. |
 
-Utan en volym för `/config` startar varje `--rm`-körning med standardinställningar. För att utgå från din egen `config.toml` monterar du den: `-v "$PWD/config.toml":/config/config.toml:ro` (skrivskyddad betyder att Inställningar inte kan spara).
+Utan en volym för `/config` startar varje `--rm`-körning med standardinställningar. För att utgå från din egen `config.toml` monterar du den: `-v "$PWD/config.toml":/config/config.toml:ro` (skrivskyddad betyder att Inställningar inte kan spara). Gränssnittsinställningarna ligger i en andra fil, `tui.toml`, som monteras på samma sätt (`-v "$PWD/tui.toml":/config/tui.toml:ro`); se [Konfigurationsreferens](config-reference.md#två-filer-configtoml-och-tuitoml).
 
 ## Repositories som ägs av en annan användare
 

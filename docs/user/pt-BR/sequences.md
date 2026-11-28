@@ -241,7 +241,7 @@ a página salva.
 
 ## Executando uma sequência
 
-Uma sequência é uma lista nomeada de passos, cada um um comando da paleta (stage de tudo, escrever a mensagem do commit com a IA, commit, push...). Execute-a pela paleta (`Sequência: <nome>`), com a tecla que você deu a ela em Configurações > Teclado e mouse (`[keybindings.sequence]` no `config.toml`), ou pela linha de comando (`gitpoulpi sequence run`).
+Uma sequência é uma lista nomeada de passos, cada um um comando da paleta (stage de tudo, escrever a mensagem do commit com a IA, commit, push...). Execute-a pela paleta (`Sequência: <nome>`), com a tecla que você deu a ela em Configurações > Teclado e mouse (`[keybindings.sequence]` no `tui.toml`), ou pela linha de comando (`gitpoulpi sequence run`).
 
 Enquanto executa, uma faixa sobre o topo do Log mostra `<nome> k/n`, o passo e o que ela espera. A execução também aparece no painel de Trabalhos como `Sequência <nome> k/n: <passo>`. Uma sequência executa por vez; iniciar uma segunda diz qual está em execução.
 

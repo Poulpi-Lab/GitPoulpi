@@ -12,7 +12,7 @@ değiştirdiğinizde bu yerler yeni tuşu gösterir. Fare için bkz.
 
 **Ayarlar > Klavye ve fare** sayfasını açın. Sayfa
 [Ayarlar](settings.md#klavye-ve-fare) içinde anlatılır. Değişiklikler hemen
-uygulanır ve `config.toml` dosyasının `[keybindings]` tablosuna kaydedilir. Bu
+uygulanır ve `tui.toml` dosyasının (terminal arayüzünün, `config.toml` dosyasının yanındaki arayüz dosyası) `[keybindings]` tablosuna kaydedilir. Bu
 tabloyu elle de düzenleyebilirsiniz:
 
 ```toml
@@ -471,7 +471,9 @@ Etiketler bir kategoriyle başlar; örneğin `Gezinme:`, `Refs:`, `Git:`,
 
 Paletin her satırı bir tuş düğmesiyle (`[k]`) biter ve `Alt+K` vurgulu satırda aynı işi yapar: o komutun kısayoluna göre süzülmüş **Ayarlar > Klavye ve fare** sayfasını açar, yeniden atamaya hazırdır. Kendi kısayolu olmayan bir komut burada bir tane alır: **Palet komutları** altında listelenir, varsayılan olarak atanmamıştır ve ona verdiğiniz tuş, komutu palette seçmekle aynı şekilde çalıştırır (şu an çalıştırılamayan bir komut nedenini söyler). Satır bundan sonra tuşunuzu gösterir.
 
-`config.toml` içinde bu, komutun adını taşıyan `[keybindings.palette]` tablosudur (`toggle_minimap = "Ctrl+Alt+M"`). Başka bir eylemle çakışan tuş kırmızı gösterilir ve satırında `c` tuşu, çakıştığı tüm eylemleri listeler.
+`tui.toml` içinde bu, komutun adını taşıyan `[keybindings.palette]` tablosudur (`toggle_minimap = "Ctrl+Alt+M"`). Başka bir eylemle çakışan tuş kırmızı gösterilir ve satırında `c` tuşu, çakıştığı tüm eylemleri listeler.
+
+Tanımladığınız bir dizi (paletteki komutlardan oluşan adlandırılmış bir zincir) de bir tuşu aynı şekilde alır: `[keybindings.sequence]` dizinin kimliğini alır (`backup = "Ctrl+Alt+B"`), var olmayan bir kimliğe verilen tuş bildirilir ve yok sayılır, tablo da uygulama çalışırken `tui.toml` dosyasını izler. Her dizi ayrıca tuşunu gösteren bir palet satırıdır: `Dizi: <ad>`.
 
 Listenin altındaki ipucu çubuğu bu tuşu gösterir (varsayılan `Alt+K`). Bu, `palette.configure_shortcut` eylemidir; diğerleri gibi yeniden atanabilir.
 

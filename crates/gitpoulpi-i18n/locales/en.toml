@@ -124,7 +124,7 @@ language_help = "The language of the interface. Auto follows your system. Applie
 language_auto = "Auto ({name})"
 # context: suffix of a language in the picker whose translation is not complete yet; the interface stays English
 language_soon = "{name} (soon)"
-# context: suffix of a language shown in the picker that is chosen in config.toml but was left out when this binary was built (custom build); the interface stays English
+# context: suffix of a language shown in the picker that is chosen in the settings file but was left out when this binary was built (custom build); the interface stays English
 language_not_built = "{name} (not built into this binary)"
 # context: Settings row label, a checkbox right below Language
 translate_git_terms = "Translate git terms"
@@ -3676,8 +3676,8 @@ hint_conflicts = "conflicts"
 conflicts_of = "Conflicts of {label} - Esc shows every shortcut"
 no_conflicts = "This shortcut has no conflict"
 hint_controls = "controls"
-# context: {n} entries of config.toml were ignored; {id} is the first one's key, {message} why
-config_issues = { one = "config.toml: {n} entry ignored - {id}: {message}", other = "config.toml: {n} entries ignored - {id}: {message}" }
+# context: {n} entries of a settings file were ignored; {file} is its name (config.toml or tui.toml); {id} is the first one's key, {message} why
+config_issues = { one = "{file}: {n} entry ignored - {id}: {message}", other = "{file}: {n} entries ignored - {id}: {message}" }
 no_match = "no shortcut matches the filters"
 unbound = "(unbound)"
 none = "(none)"

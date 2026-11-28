@@ -249,7 +249,7 @@ behålls när sidan sparar.
 
 ## Köra en sekvens
 
-En sekvens är en namngiven lista med steg, vart och ett ett kommando i paletten (stage allt, skriv commit-meddelandet med AI, commit, push...). Kör den från paletten (`Sekvens: <namn>`), med tangenten du gav den i Inställningar > Tangentbord & mus (`[keybindings.sequence]` i `config.toml`) eller från kommandoraden (`gitpoulpi sequence run`).
+En sekvens är en namngiven lista med steg, vart och ett ett kommando i paletten (stage allt, skriv commit-meddelandet med AI, commit, push...). Kör den från paletten (`Sekvens: <namn>`), med tangenten du gav den i Inställningar > Tangentbord & mus (`[keybindings.sequence]` i `tui.toml`) eller från kommandoraden (`gitpoulpi sequence run`).
 
 Medan den körs visar en remsa överst över Log `<namn> k/n`, steget och vad den väntar på. Körningen visas också i panelen Jobb som `Sekvens <namn> k/n: <steg>`. En sekvens körs åt gången; om du startar en andra anges vilken som körs.
 

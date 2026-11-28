@@ -21,7 +21,6 @@ use crate::graph::{Entry, Palette, RowGraphic, CH};
 use crate::prefs::ColumnLayout;
 use crate::strings;
 use crate::theme::Skin;
-use crate::util::dates;
 
 /// Everything the row closure of the list needs; owned, so the closure can outlive `render`.
 pub(super) struct RowsContext {
@@ -37,6 +36,8 @@ pub(super) struct RowsContext {
     pub query_active: bool,
     pub more: bool,
     pub total: usize,
+    /// The Date column's pattern (`date_time_format`).
+    pub dates: gitpoulpi_app::dates::DateSettings,
 }
 
 /// The cells of one row that differ by kind.
@@ -210,7 +211,7 @@ impl RowsContext {
             graphic: graphic.map(|g| (g, has_pill)),
             message,
             author: node.author_name.clone(),
-            date: dates::iso_date(node.timestamp),
+            date: self.dates.format_time(node.timestamp),
             sha: node.id.to_hex()[..7].to_string(),
         }
     }
@@ -272,7 +273,7 @@ impl RowsContext {
             Some(st) => (
                 st.message.clone(),
                 strings::stash_name(st.id.0),
-                dates::iso_date(st.timestamp),
+                self.dates.format_time(st.timestamp),
                 st.commit
                     .map(|c| c.to_hex()[..7].to_string())
                     .unwrap_or_default(),

@@ -12,6 +12,7 @@
 //! | `form_dialog` | small forms in a dialog (text fields, check boxes, a reason line when the entry is refused): the branch, tag, rename, stash and upstream forms |
 //! | `ref_menu` | the ref context menu: the terminal UI's rows and order for a branch, remote branch, tag or stash, and the view that shows them |
 //! | `ref_target` | what a ref command acts on (a Refs row or a Log pill) and the selection facts the palette reads |
+//! | `repo_menu` | the rows of the worktree, submodule, remote, LFS and file menus |
 //! | `sensitive` | the sensitive-files question a refused stage raises |
 //! | `commands`| the shared command registry in use: key bindings, command palette, the one dispatcher |
 //! | `menu`    | the menu bar generated from the registry |
@@ -40,6 +41,7 @@ pub mod parity;
 pub mod prefs;
 pub mod ref_menu;
 pub mod ref_target;
+pub mod repo_menu;
 pub mod sensitive;
 pub mod strings;
 pub mod theme;

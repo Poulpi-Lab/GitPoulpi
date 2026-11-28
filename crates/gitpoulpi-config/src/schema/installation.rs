@@ -57,6 +57,11 @@ pub struct InstallationEntry {
     /// everyone else the default.
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub look: BTreeMap<String, String>,
+    /// The same colour keys for the desktop frontend (see
+    /// `crate::installation::effective_desktop_look`). An older build keeps
+    /// the table untouched through [`InstallationEntry::extra`].
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub desktop_look: BTreeMap<String, String>,
     #[serde(skip_serializing_if = "String::is_empty")]
     pub command_alias: String,
     #[serde(skip_serializing_if = "String::is_empty")]

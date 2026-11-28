@@ -8,7 +8,9 @@ Einstellungsbildschirm ersetzt das Fenster, solange er offen ist. Schließen Sie
 dem `✕` oben rechts, `Esc` oder `q`. Er fragt nur dann vorher, wenn beim Schließen
 etwas verloren ginge (siehe [Einstellungen schließen](#einstellungen-schließen)).
 
-Änderungen werden sofort in der `config.toml` gespeichert. Die
+Änderungen werden sofort gespeichert: Oberflächeneinstellungen (Design, Layout, Spalten,
+Anzeige von Diff und Bildern, Tastenkürzel ...) in `tui.toml`, alles andere in `config.toml`,
+beide in Ihrem Konfigurationsordner ([warum zwei Dateien](config-reference.md#zwei-dateien-configtoml-und-tuitoml)). Die
 [Konfigurationsreferenz](config-reference.md) beschreibt jeden Schlüssel, seinen
 Standardwert und seine Umgebungsvariable. Diese Seite beschreibt den
 Einstellungsbildschirm.
@@ -154,7 +156,7 @@ Die meisten Einstellungen lassen sich ändern, ohne diesen Bildschirm zu öffnen
 
 ![Die Befehlspalette gefiltert nach Settings: mit einer Zeile je Einstellung und ihrem aktuellen Wert rechts](../images/palette-settings.png)
 
-Ein Wert wird in `config.toml` gespeichert und genau wie auf der Seite angewendet. Die englischen Wörter des Schlüssels (`remember tabs`) finden die Zeile in jeder Sprache.
+Ein Wert wird in seiner Datei (`tui.toml` oder `config.toml`) gespeichert und genau wie auf der Seite angewendet. Die englischen Wörter des Schlüssels (`remember tabs`) finden die Zeile in jeder Sprache.
 
 ## Die Seiten
 
@@ -459,11 +461,11 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 | **Position der Statuszeile** | `ui.statusbar_position`: Wo die Statuszeile (Branch, Zähler, Meldungen, Tastenhinweise) sitzt: Oben, über den Repository-Tabs, oder Unten (Standard). Der Tab Start behält seine eigene Statuszeile unten. Wirkt sofort. |
 | **Position der Tab-Leiste** | `ui.tabs_position`: Wo die Repository-Tabs sitzen: Oben (Standard), Unten oder Links, eine Liste mit einem Tab pro Zeile am linken Fensterrand. Ein Fenster unter 80 Spalten zeichnet sie oben. Neben einer Symbolleiste als Spalte bleiben die Tabs ganz außen. Wirkt sofort. |
 | **Gebietsschema für Datum/Uhrzeit** | **System** (Standard): Monats- und Wochentagsnamen in der Sprache der Oberfläche. **english**: immer englische Namen. |
-| **Datumsformat**, **Datums-/Zeitformat**, **Ausführliches Datumsformat** | Die Datumsmuster der Datumsspalte von Dateiverlauf und Blame, der Spalte Datum des Logs und der Commit-Details. Jedes zeigt eine Live-Vorschau. Die Platzhalter stehen in der [Konfigurationsreferenz](config-reference.md#ui). |
+| **Datumsformat**, **Datums-/Zeitformat**, **Ausführliches Datumsformat** | Die Datumsmuster der Datumsspalte von Dateiverlauf und Blame, der Spalte Datum des Logs und der Commit-Details. Jedes zeigt eine Live-Vorschau. Die Platzhalter stehen in der [Konfigurationsreferenz](config-reference.md#ui-in-tuitoml). |
 
 ![Die Dropdownliste Farbschema des Graphen: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
 
-Das Design und die Graphfarben (das Design, das Farbschema des Graphen, die Einfärbung und der Hintergrund der Spuren, die Stärke der Zeilentönung) gehören zu jeder Installation: Teilen mehrere Installationen eine `config.toml`, ändert eine Änderung in der einen nie die anderen. Nur die primäre Installation schreibt außerdem die gemeinsamen `ui.*`-Schlüssel.
+Das Design und die Graphfarben (das Design, das Farbschema des Graphen, die Einfärbung und der Hintergrund der Spuren, die Stärke der Zeilentönung) gehören zu jeder Installation: Teilen mehrere Installationen einen Konfigurationsordner, ändert eine Änderung in der einen nie die anderen. Nur die primäre Installation schreibt außerdem die gemeinsamen `ui.*`-Schlüssel, in `tui.toml`; die anderen behalten ihre eigenen in ihrem eigenen Eintrag der `config.toml`.
 
 ### Tastatur & Maus
 
@@ -484,7 +486,7 @@ listet jedes Tastenkürzel nach Kontext, mit einem Suchfeld (`/`) und Filtern. I
 
 Nutzen Sie sie, um Kollisionen mit tmux, AutoHotkey, herdr oder Ihrem Terminal zu
 lösen. Dieselben Einstellungen stehen in der Tabelle `[keybindings]` der
-`config.toml`; siehe die [Konfigurationsreferenz](config-reference.md#keybindings) und
+`tui.toml`; siehe die [Konfigurationsreferenz](config-reference.md#keybindings) und
 [Tastenkürzel](keybindings.md).
 
 ![Die Seite Tastatur & Maus nach c auf Quit: die Taste q ist bei Quit und bei Stage or Unstage the Selected Row rot, den beiden kollidierenden Aktionen](../images/settings-keyboard-conflicts.png)
@@ -854,8 +856,10 @@ verwerfen**, und wer die Einstellungen mit ungespeichertem Entwurf schließt, wi
 
 ## Dateien, Umgebungsvariablen und die CLI
 
-- Die Einstellungsdatei ist `config.toml` im Konfigurationsordner Ihres
-  Betriebssystems. `gitpoulpi config path` gibt ihren Ort aus.
+- Die Einstellungsdateien sind `config.toml` (gemeinsame Einstellungen) und `tui.toml`
+  (die Oberflächeneinstellungen der Terminal-UI) im Konfigurationsordner Ihres
+  Betriebssystems. `gitpoulpi config path` gibt ihre Orte aus; `gitpoulpi config get <key>`
+  sagt, in welcher Datei ein Schlüssel steht.
 - Der Zustand pro Repository liegt in `.gitpoulpi/repo-state.toml` im Repository.
 - `gitpoulpi config get <key>` und `gitpoulpi config set <key> <value>` lesen und
   schreiben jede Einstellung.

@@ -3,7 +3,7 @@
 
 use gitpoulpi_app::keymap::Ctx;
 use gitpoulpi_app::palette::vocab::undo::Avail;
-use gitpoulpi_app::palette::PaletteContext;
+use gitpoulpi_app::palette::{PaletteContext, PaletteSummary};
 use gpui_kit::{App, Window};
 
 /// A snapshot of the window, plain data.
@@ -65,19 +65,8 @@ impl Default for WindowState {
 impl WindowState {
     /// The palette's availability context for this window.
     pub fn palette_context(&self) -> PaletteContext {
+        // What the shared summary covers comes from it; the rest is what only the desktop's panes know.
         PaletteContext {
-            workspace_active: false,
-            open_repository_tabs: 1,
-            current_tab_index: 0,
-            in_refs_pane: self.pane == Ctx::Refs,
-            in_diff_view: self.diff_open,
-            selected_commit: self.selected_commit,
-            has_wip: self.has_wip,
-            unstaged_file_selected: self.unstaged_selected,
-            staged_file_selected: self.staged_selected,
-            has_conflicts: self.has_conflicts,
-            in_stageable_diff: self.stageable_diff,
-            diff_stages: self.diff_stages,
             selected_local_branch: self.refs.local_branch,
             selected_remote_branch: self.refs.remote_branch,
             selected_tag: self.refs.tag,
@@ -87,14 +76,28 @@ impl WindowState {
             selected_stash: self.refs.stash,
             selected_folder: self.refs.folder,
             has_stash: self.refs.has_stash,
-            undo: self.undo,
-            redo: self.redo,
             safety_tab: self.safety_tab,
             undo_offer: self.undo_offer,
             undo_sequence: self.undo_sequence,
             group: self.group,
-            lfs_program_ok: true,
-            ..PaletteContext::default()
+            ..PaletteContext::from_summary(PaletteSummary {
+                settings_open: false,
+                in_refs_pane: self.pane == Ctx::Refs,
+                in_diff_view: self.diff_open,
+                in_file_view: false,
+                selected_commit: self.selected_commit,
+                has_wip: self.has_wip,
+                unstaged_file_selected: self.unstaged_selected,
+                staged_file_selected: self.staged_selected,
+                commit_file_selected: false,
+                has_conflicts: self.has_conflicts,
+                in_stageable_diff: self.stageable_diff,
+                diff_stages: self.diff_stages,
+                undo: self.undo,
+                redo: self.redo,
+                open_repository_tabs: 1,
+                current_tab_index: 0,
+            })
         }
     }
 }

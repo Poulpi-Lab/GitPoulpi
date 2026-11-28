@@ -8,7 +8,9 @@ das Definições substitui a janela enquanto está aberto. Feche-o com o `✕` n
 superior direito, com `Esc` ou com `q`. Só pergunta antes quando fechar fizesse
 perder alguma coisa (veja [Fechar as Definições](#fechar-as-definições)).
 
-As alterações são guardadas de imediato em `config.toml`. A
+As alterações são guardadas de imediato: as definições de interface (tema, disposição,
+colunas, apresentação de diffs e imagens, atalhos...) em `tui.toml`, tudo o resto em
+`config.toml`, ambos na sua pasta de configuração ([porquê dois ficheiros](config-reference.md#dois-ficheiros-configtoml-e-tuitoml)). A
 [referência de configuração](config-reference.md) descreve cada chave, o seu
 valor predefinido e a sua variável de ambiente. Esta página descreve o ecrã das
 Definições.
@@ -152,7 +154,7 @@ A maioria das definições pode ser alterada sem abrir este ecrã: escreva `Defi
 
 ![A paleta de comandos filtrada por Settings: com uma linha por definição e o seu valor atual à direita](../images/palette-settings.png)
 
-Um valor é guardado em `config.toml` e aplicado exatamente como a página faz. As palavras inglesas da chave da definição (`remember tabs`) encontram a linha em qualquer idioma.
+Um valor é guardado no seu ficheiro (`tui.toml` ou `config.toml`) e aplicado exatamente como a página faz. As palavras inglesas da chave da definição (`remember tabs`) encontram a linha em qualquer idioma.
 
 ## As páginas
 
@@ -469,11 +471,11 @@ servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Posição da barra de estado** | `ui.statusbar_position`: Onde fica a barra de estado (branch, contagens, mensagens, atalhos): Topo, acima dos separadores de repositório, ou Fundo (predefinição). O separador Início mantém a sua própria barra de estado no fundo. Aplica-se de imediato. |
 | **Posição da barra de separadores** | `ui.tabs_position`: Onde ficam os separadores de repositório: Topo (predefinição), Fundo ou Esquerda, uma lista com um separador por linha na margem esquerda da janela. Uma janela com menos de 80 colunas desenha-os no topo. Junto a uma barra de ferramentas em coluna, os separadores ficam por fora. Aplica-se de imediato. |
 | **Localidade de data/hora** | **sistema** (predefinição): nomes dos meses e dos dias da semana no idioma da interface. **english**: sempre nomes em inglês. |
-| **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data da coluna de data do Histórico do ficheiro e do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma pré-visualização em direto. Veja a [Referência de configuração](config-reference.md#ui) para os tokens. |
+| **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data da coluna de data do Histórico do ficheiro e do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma pré-visualização em direto. Veja a [Referência de configuração](config-reference.md#ui-em-tuitoml) para os tokens. |
 
 ![A lista Tema de cores do grafo: Seguir o tema, depois todas as paletas de faixas com algumas das suas cores](../images/settings-log-graph-lanes.png)
 
-O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade da cor das linhas) pertencem a cada instalação: com várias instalações a partilhar um `config.toml`, alterá-los numa nunca altera as outras. Só a instalação principal escreve também as chaves `ui.*` partilhadas.
+O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade da cor das linhas) pertencem a cada instalação: com várias instalações a partilhar um `config.toml`, alterá-los numa nunca altera as outras. Só a instalação principal escreve também as chaves `ui.*` partilhadas, em `tui.toml`; as outras guardam as suas na sua própria entrada de `config.toml`.
 
 ### Teclado e rato
 
@@ -493,7 +495,7 @@ lista todos os atalhos por contexto, com uma caixa de pesquisa (`/`) e filtros. 
 | `c` ou um clique no `!` da linha | Mostra a ação com todas as ações com que a tecla dela entra em conflito; `Esc` mostra tudo de novo. Uma tecla em conflito com a de outra ação fica vermelha, um aviso só sobre a tecla (o terminal não a consegue enviar) laranja. |
 
 Use-a para resolver choques com o tmux, o AutoHotkey, o herdr ou o seu terminal.
-As mesmas definições vivem na tabela `[keybindings]` do `config.toml`; veja a
+As mesmas definições vivem na tabela `[keybindings]` do `tui.toml`; veja a
 [referência de configuração](config-reference.md#keybindings) e
 [Atalhos de teclado](keybindings.md).
 
@@ -853,8 +855,10 @@ com um rascunho por guardar pergunta primeiro.
 
 ## Ficheiros, variáveis de ambiente e a CLI
 
-- O ficheiro de definições é o `config.toml` na pasta de configuração do seu SO.
-  `gitpoulpi config path` imprime a sua localização.
+- Os ficheiros de definições são `config.toml` (definições comuns) e `tui.toml` (as
+  definições de interface da UI de terminal) na pasta de configuração do seu SO.
+  `gitpoulpi config path` imprime as suas localizações; `gitpoulpi config get <chave>`
+  diz em que ficheiro está uma chave.
 - O estado por repositório vive em `.gitpoulpi/repo-state.toml` dentro do
   repositório.
 - `gitpoulpi config get <key>` e `gitpoulpi config set <key> <value>` leem e

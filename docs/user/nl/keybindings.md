@@ -12,7 +12,8 @@ toets verplaatst, tonen deze plekken de nieuwe toets. Voor de muis, zie
 
 Open **Instellingen > Toetsenbord & muis**. De pagina wordt beschreven in
 [Instellingen](settings.md#toetsenbord--muis). Wijzigingen gelden meteen en worden
-opgeslagen in de tabel `[keybindings]` van `config.toml`. Je kunt die tabel ook
+opgeslagen in de tabel `[keybindings]` van `tui.toml` (het interfacebestand van de terminal-UI, naast
+`config.toml`). Je kunt die tabel ook
 met de hand bewerken:
 
 ```toml
@@ -475,9 +476,9 @@ om de hele groep te zien.
 
 Elke rij van het palet eindigt met een toetsknop (`[k]`), en `Alt+K` doet hetzelfde op de gemarkeerde rij: het opent **Instellingen > Toetsenbord & muis** gefilterd op de sneltoets van die opdracht, klaar om opnieuw toe te wijzen. Een opdracht zonder eigen sneltoets krijgt er hier een: ze staat onder **Palet-opdrachten**, standaard zonder toets, en een toets die je eraan geeft voert de opdracht precies uit zoals het kiezen in het palet (een opdracht die nu niet kan, zegt waarom). De rij toont dan jouw toets.
 
-In `config.toml` is dit de tabel `[keybindings.palette]`, genoemd naar de opdracht (`toggle_minimap = "Ctrl+Alt+M"`). Een toets die botst met een andere actie wordt rood getoond, en `c` op de rij toont alle acties waarmee hij botst.
+In `tui.toml` is dit de tabel `[keybindings.palette]`, genoemd naar de opdracht (`toggle_minimap = "Ctrl+Alt+M"`). Een toets die botst met een andere actie wordt rood getoond, en `c` op de rij toont alle acties waarmee hij botst.
 
-Een reeks die je definieerde (een benoemde keten paletopdrachten) krijgt op dezelfde manier een toets: `[keybindings.sequence]` neemt de id van de reeks (`backup = "Ctrl+Alt+B"`), een toets voor een id die niet bestaat wordt gemeld en genegeerd, en de tabel volgt `config.toml` terwijl de app draait. Elke reeks is ook een paletrij, `Reeks: <naam>`, die haar toets toont.
+Een reeks die je definieerde (een benoemde keten paletopdrachten) krijgt op dezelfde manier een toets: `[keybindings.sequence]` neemt de id van de reeks (`backup = "Ctrl+Alt+B"`), een toets voor een id die niet bestaat wordt gemeld en genegeerd, en de tabel volgt `tui.toml` terwijl de app draait. Elke reeks is ook een paletrij, `Reeks: <naam>`, die haar toets toont.
 
 De hintbalk onder de lijst noemt deze toets (standaard `Alt+K`). Het is de actie `palette.configure_shortcut`, dus hij is net als elke andere opnieuw toe te wijzen.
 

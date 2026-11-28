@@ -198,7 +198,7 @@ impl SafetyView {
             Tab::History => match self.history.lines[ix] {
                 Line::Day(day) => base
                     .text_color(skin.accent)
-                    .child(day_heading(day))
+                    .child(day_heading(day, crate::prefs::PrefsStore::get(cx).dates()))
                     .into_any_element(),
                 Line::Redo => {
                     let n = self

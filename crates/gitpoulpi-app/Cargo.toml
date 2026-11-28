@@ -53,4 +53,5 @@ gitpoulpi-log.workspace = true
 unicode-width = "0.2"
 
 [dev-dependencies]
+gitpoulpi-i18n = { workspace = true, features = ["all-langs"] }
 tempfile.workspace = true

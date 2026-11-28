@@ -227,7 +227,7 @@ diese Dateien an:
 
 | Was | Wo |
 |---|---|
-| Einstellungen (`config.toml`) und Sitzungen | Der Konfigurationsordner Ihres Betriebssystems. `GITPOULPI_CONFIG_DIR` ändert ihn. |
+| Einstellungen (`config.toml` und `tui.toml`) und Sitzungen | Der Konfigurationsordner Ihres Betriebssystems. `GITPOULPI_CONFIG_DIR` ändert ihn. |
 | Zustand pro Repository | Standardmäßig `gitpoulpi/` im `.git`-Ordner des Repositorys (`session.per_repo_state_dir` kann ihn nach `.gitpoulpi/` im Arbeitsverzeichnis oder in den Benutzerdatenordner verlegen). |
 | Caches (Avatare) | Der Cache-Ordner Ihres Betriebssystems. |
 | Tokens und API-Schlüssel | Ihr Credential-Helper. **Einstellungen > SSH & Zugangsdaten > Alle Benutzernamen und Passwörter vergessen** entfernt sie. |

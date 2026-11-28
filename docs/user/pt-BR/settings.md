@@ -8,7 +8,9 @@ Configurações substitui a janela enquanto está aberta. Feche-a com o `✕` no
 superior direito, `Esc` ou `q`. Ela só pergunta antes quando fechar faria você perder
 algo (veja [Fechando as Configurações](#fechando-as-configurações)).
 
-As alterações são salvas no `config.toml` na hora. A
+As alterações são salvas na hora: as configurações de interface (tema, layout, colunas,
+exibição de diff e de imagem, atalhos...) no `tui.toml`, todo o resto no `config.toml`, os dois
+na sua pasta de configuração ([por que dois arquivos](config-reference.md#dois-arquivos-configtoml-e-tuitoml)). A
 [referência de configuração](config-reference.md) descreve cada chave, seu valor
 padrão e sua variável de ambiente. Esta página descreve a tela de Configurações.
 
@@ -149,7 +151,7 @@ A maioria das configurações pode ser alterada sem abrir esta tela: digite `Con
 
 ![A paleta de comandos filtrada por Settings: com uma linha por configuração e seu valor atual à direita](../images/palette-settings.png)
 
-Um valor é salvo em `config.toml` e aplicado exatamente como a página faz. As palavras em inglês da chave da configuração (`remember tabs`) encontram a linha em qualquer idioma.
+Um valor é salvo no arquivo dele (`tui.toml` ou `config.toml`) e aplicado exatamente como a página faz. As palavras em inglês da chave da configuração (`remember tabs`) encontram a linha em qualquer idioma.
 
 ## As páginas
 
@@ -464,11 +466,11 @@ o servidor; veja [MCP e agentes](mcp-and-agents.md).
 | **Posição da linha de status** | `ui.statusbar_position`: Onde fica a linha de status (branch, contagens, mensagens, atalhos): Topo, acima das abas de repositório, ou Base (padrão). A aba Início mantém a própria linha de status na base. Aplicado imediatamente. |
 | **Posição da barra de abas** | `ui.tabs_position`: Onde ficam as abas de repositório: Topo (padrão), Base ou Esquerda, uma lista com uma aba por linha na borda esquerda da janela. Uma janela com menos de 80 colunas as desenha no topo. Ao lado de uma barra de ferramentas em coluna, as abas ficam por fora. Aplicado imediatamente. |
 | **Localidade de data/hora** | **sistema** (padrão): nomes de meses e dias da semana no idioma da interface. **english**: sempre nomes em inglês. |
-| **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data do Histórico do arquivo e da coluna de data do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma prévia ao vivo. Veja a [Referência de configuração](config-reference.md#ui) para os tokens. |
+| **Formato de data**, **Formato de data/hora**, **Formato de data detalhado** | Os padrões de data do Histórico do arquivo e da coluna de data do Blame, da coluna Data do Log, e dos detalhes do commit. Cada um mostra uma prévia ao vivo. Veja a [Referência de configuração](config-reference.md#ui-no-tuitoml) para os tokens. |
 
 ![A lista suspensa Tema de cores do grafo: Seguir o tema, depois cada paleta de faixas com algumas de suas cores](../images/settings-log-graph-lanes.png)
 
-O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade do tom da linha) pertencem a cada instalação: com várias instalações compartilhando um `config.toml`, mudá-los em uma nunca muda as outras. Só a instalação primária também grava as chaves `ui.*` compartilhadas.
+O tema e as cores do grafo (o Tema, o tema de cores do grafo, a colorização e o fundo das faixas, a intensidade do tom da linha) pertencem a cada instalação: com várias instalações compartilhando uma mesma pasta de configurações, mudá-los em uma nunca muda as outras. Só a instalação primária também grava as chaves `ui.*` compartilhadas, no `tui.toml`; as outras mantêm as suas na própria entrada do `config.toml`.
 
 ### Teclado e mouse
 
@@ -488,7 +490,7 @@ lista todos os atalhos por contexto, com uma caixa de busca (`/`) e filtros. Em 
 | `c` ou um clique no `!` da linha | Mostra a ação com todas as ações com que a tecla dela conflita; `Esc` mostra tudo de novo. Uma tecla em conflito com a de outra ação fica vermelha, um aviso só sobre a tecla (o terminal não consegue enviá-la) laranja. |
 
 Use-a para resolver conflitos com o tmux, o AutoHotkey, o herdr ou o seu terminal. As
-mesmas configurações ficam na tabela `[keybindings]` do `config.toml`; veja a
+mesmas configurações ficam na tabela `[keybindings]` do `tui.toml`; veja a
 [referência de configuração](config-reference.md#keybindings) e
 [Atalhos de teclado](keybindings.md).
 
@@ -848,8 +850,10 @@ uma barra fixa no fim da página mostra **● Não salvo** (ou **Sem alteraçõe
 
 ## Arquivos, variáveis de ambiente e a CLI
 
-- O arquivo de configurações é o `config.toml` na pasta de configuração do seu SO.
-  `gitpoulpi config path` imprime sua localização.
+- Os arquivos de configurações são o `config.toml` (configurações comuns) e o `tui.toml` (as
+  configurações de interface da interface de terminal) na pasta de configuração do seu SO.
+  `gitpoulpi config path` imprime a localização deles; `gitpoulpi config get <key>`
+  diz em qual arquivo está uma chave.
 - O estado por repositório fica em `.gitpoulpi/repo-state.toml` dentro do
   repositório.
 - `gitpoulpi config get <key>` e `gitpoulpi config set <key> <value>` leem e gravam

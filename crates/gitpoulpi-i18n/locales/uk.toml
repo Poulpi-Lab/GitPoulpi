@@ -2793,7 +2793,7 @@ hint_conflicts = "конфлікти"
 conflicts_of = "Конфлікти: {label} - Esc показує всі сполучення"
 no_conflicts = "Це сполучення не має конфліктів"
 hint_controls = "керування"
-config_issues = { one = "config.toml: {n} запис проігноровано - {id}: {message}", few = "config.toml: {n} записи проігноровано - {id}: {message}", many = "config.toml: {n} записів проігноровано - {id}: {message}", other = "config.toml: {n} записів проігноровано - {id}: {message}" }
+config_issues = { one = "{file}: {n} запис проігноровано - {id}: {message}", few = "{file}: {n} записи проігноровано - {id}: {message}", many = "{file}: {n} записів проігноровано - {id}: {message}", other = "{file}: {n} записів проігноровано - {id}: {message}" }
 no_match = "жодне скорочення не відповідає фільтрам"
 unbound = "(не призначено)"
 none = "(немає)"

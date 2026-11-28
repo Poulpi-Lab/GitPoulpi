@@ -2,17 +2,49 @@
 
 # Referenční příručka konfigurace
 
-Každý klíč v `config.toml`, jeho výchozí hodnota a co dělá. Soubor je jen
-zřídka potřeba upravovat ručně: [obrazovka Nastavení](settings.md) (`Ctrl+,`) ho
+Každý klíč konfiguračních souborů, jeho výchozí hodnota a co dělá. Soubor je jen
+zřídka potřeba upravovat ručně: [obrazovka Nastavení](settings.md) (`Ctrl+,`) je
 zapisuje při každé vaší změně a totéž dělá `gitpoulpi config set`.
+
+## Dva soubory: `config.toml` a `tui.toml`
+
+Nastavení jsou ve dvou souborech téže složky.
+
+| Soubor | Co obsahuje |
+|---|---|
+| `config.toml` | Vše, co je společné každému způsobu používání GitPoulpi: repozitáře, účty a integrace, chování gitu, AI, MCP, aktualizace, instalace, externí nástroje a těch pár klíčů `[ui]`, které jsou uvedeny v části [`[ui]` v `config.toml`](#ui-v-configtoml). |
+| `tui.toml` | Nastavení rozhraní terminálového UI: většina `[ui]` (motiv, rozvržení, sloupce, zobrazení diffu a obrázků, jazyk, volby myši a terminálu, ...), celá tabulka `[keybindings]` a `merge.side_by_side_min_width`. Jsou uvedeny v částech [`[ui]` v `tui.toml`](#ui-v-tuitoml), [`[keybindings]`](#keybindings) a [`[merge]`](#merge). |
+
+- **Jak `tui.toml` vznikne.** GitPoulpi ho vytvoří samo, jako kopii nastavení
+  rozhraní nalezených v `config.toml`: při spuštění terminálového UI, pokud
+  `config.toml` existuje, nebo při první změně nastavení rozhraní.
+  `config.toml` se tím nikdy nemění.
+- **Jakmile existuje, je jediným zdrojem** pro klíče, které vlastní. Klíč, který
+  neuvádí, má výchozí hodnotu, ne hodnotu, kterou o něm může starý `config.toml`
+  ještě nést. Chcete-li takový klíč vynulovat, odstraňte ho z `tui.toml`.
+- **Starší GitPoulpi** nainstalované vedle tohoto dál čte svůj vlastní úplný
+  `config.toml`. Nastavení, které pak změníte ve starší verzi, novější nepřevezme,
+  a naopak.
+- **V kterém souboru klíč je.** `gitpoulpi config get <key>` vypíše soubor v poli
+  JSON `file` (s `--json`), `gitpoulpi config set <key> <value>` zapisuje do něj
+  a `gitpoulpi config path` vypíše `path` (`config.toml`) a `tui_file`
+  (`tui.toml`). `gitpoulpi config get`, `set` a proměnné `GITPOULPI_UI_*`
+  ponechávají stejné názvy klíčů (`ui.theme`), ať klíč drží kterýkoli soubor;
+  proměnná stále vyhrává nad oběma soubory.
+- **Instalace.** Vzhled jiné než hlavní instalace zůstává v jejím záznamu
+  `[installation.settings.<id>]` v `config.toml` (viz
+  [`[installation]`](#installation-jeden-záznam-na-každé-gitpoulpi-na-tomto-počítači)).
+
+Níže je u každé části uvedeno, ve kterém je souboru. Příklady s tabulkou
+(`[ui]`, `[[ui.open_in]]`) se zapisují do souboru uvedeného v názvu části.
 
 ## Kde je a jak se hodnota vybírá
 
 | | |
 |---|---|
-| Soubor | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` ho vypíše. |
-| Jiná složka | `GITPOULPI_CONFIG_DIR=<dir>` přesune celou konfigurační složku (soubor, `sessions/`, soubory s porty daemona): přenosná instalace, test nebo agent držený stranou od vašeho nastavení. |
-| Přednost | vestavěná výchozí hodnota, pak `config.toml`, pak proměnná `GITPOULPI_*`, pak přepínač příkazové řádky. Vyhrává nejvyšší. Chybná hodnota (překlep ve volbě v souboru, špatná proměnná) je chyba, nikdy se tiše neignoruje. |
+| Soubor | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS) a vedle něj `tui.toml`. `gitpoulpi config path` vypíše oba. |
+| Jiná složka | `GITPOULPI_CONFIG_DIR=<dir>` přesune celou konfigurační složku (soubory, `sessions/`, soubory s porty daemona): přenosná instalace, test nebo agent držený stranou od vašeho nastavení. |
+| Přednost | vestavěná výchozí hodnota, pak `config.toml` (`tui.toml` pro klíče, které vlastní), pak proměnná `GITPOULPI_*`, pak přepínač příkazové řádky. Vyhrává nejvyšší. Chybná hodnota (překlep ve volbě v souboru, špatná proměnná) je chyba, nikdy se tiše neignoruje. |
 | Proměnné | Klíč napište velkými písmeny a tečky změňte na podtržítka: `general.auto_prune` je `GITPOULPI_GENERAL_AUTO_PRUNE`. Jen pro klíče, které GitPoulpi skutečně čte (ne ty označené níže *nepoužívá se*, ani seznamy jako `ui.log_columns_hidden`). |
 | Přepínače | `--backend git2\|system` přebíjí `general.default_backend` pro daemona, kterého tento příkaz spustí. |
 | Tokeny a klíče | Nikdy v tomto souboru. Tokeny hostingu a klíče API AI jdou do systémového credential helperu (Git Credential Manager, libsecret / `pass`, Keychain); soubor obsahuje jen odkaz (`token_ref`). Bez helperu uložení tokenu selže se zprávou a token vydrží jen po dobu relace. |
@@ -84,7 +116,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `[ui]` v `tui.toml`
 
 **Log a graf**
 
@@ -122,7 +154,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` ponechá myš (a výběr textu) terminálu. **Restart.** |
 | `ui.mouse_scroll_lines` | `3` | Řádků Logu na jedno cvaknutí kolečka, 1 až 20. **Restart.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` požádá terminál o klávesnicový protokol kitty (takže dorazí `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`; jen Unix, tmux neodpovídá nikdy: viz [Multiplexery](multiplexers.md#tmux)); `off` nepožádá nikdy. **Restart.** |
-| `ui.logo_color` | `""` | Barevné provedení loga v okně O aplikaci, slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); prázdné nebo neznámé znamená výchozí hodnotu sestavení (`lavender`). Zapisuje se kliknutím na logo nebo výběrem barvy v O aplikaci. |
 
 **Avatary** (ve výchozím stavu vypnuty; jejich zapnutí odešle hash SHA-256
 e-mailů autorů službě Gravatar a zeptá se vašeho připojeného účtu
@@ -131,7 +162,6 @@ GitHub/GitLab)
 | Klíč | Výchozí | Hodnoty a účinek |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph` (v kolečku commitu obrázkového grafu), `author` (ve sloupci Autor), `off`. Starý `ui.show_avatars` (`true`) se čte jako `author`, dokud `ui.avatars` chybí. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | Pořadí vyhledávání: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Hostitel GitLab se dotazuje jen přes připojený profil. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon` (generovaný lokálně) nebo `initials`. Na terminálu bez protokolu obrázků se vždy použije odznak s iniciálami. |
 
 **Zobrazení diffu a editoru**
@@ -144,10 +174,6 @@ GitHub/GitLab)
 | `ui.diff_word_wrap` | `false` | Zalamuje dlouhé řádky diffu (`w`; Nastavení > Diff a editor). |
 | `ui.diff_intraline` | `true` | Vymaluje změněná slova změněného řádku silnějším pozadím (paleta `Diff: Přepnout zvýraznění změněných slov`; Nastavení > Diff a editor). |
 | `ui.minimap` | `false` | Minimapa vedle posuvníku diffu a editoru (`M`). |
-| `ui.mermaid_detail` | `refs` | Úroveň detailu Log: Zkopírovat jako Mermaid gitGraph: `structure`, `refs`, `subjects`, `full` (pamatuje se z vyskakovacího okna; výchozí hodnota `log --format mermaid`). |
-| `ui.mermaid_orientation` | `lr` | Směr tohoto grafu: `lr` (zleva doprava) nebo `tb` (shora dolů). |
-| `ui.mermaid_fence` | `false` | Obalit zkopírovaný skript Mermaid blokem kódu `mermaid`. |
-| `ui.mermaid_subject_width` | `40` | Předměty commitů se v id Mermaid zkrátí na tolik znaků (`subjects`, `full`). |
 | `ui.text_cursor` | `"terminal"` | Kde se ukazuje kurzor aktivního textového pole: `terminal` tam umístí vlastní kurzor terminálu (blikající svislou čárku, takže se jím řídí nastavení kurzoru terminálu i okno s návrhy metody zadávání; skrytý, když klávesnici nemá žádné pole, a při ukončení obnovený na váš vlastní styl kurzoru), `drawn` vykreslí vlastní znak kurzoru GitPoulpi a kurzor terminálu nechá skrytý. Okamžitě. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` nebo `16`: kolika barvami se kreslí. `auto` je truecolor, kromě Apple Terminal (256), konzole Linuxu (16) a terminálů `*-256color` bez `COLORTERM` (256). Živě. Viz [Motivy](themes.md). |
 | `ui.input_color` | `"theme"` | Pozadí textových polí: `theme` (vlastní z motivu), `gray`, `blue`, `slate`, `dark`, `custom`. |
@@ -180,16 +206,40 @@ výchozí, nebo `"english"`) ponechá názvy anglicky bez ohledu na jazyk.
 | `ui.launch` | `"off"` | Zda smí agent otevřít okno GitPoulpi, když žádné není otevřené: `off`, předvolba (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) nebo `custom`. |
 | `ui.launch_command` | `""` | Šablona `custom`: `{repo}`, `{session}`, `{gitpoulpi}`. Rozdělí se na argumenty, bez shellu. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons` (řada karet nabízí *Konec a cd sem*) nebo `auto` (každé ukončení změní složku shellu a nová karta spustí výchozí položku *Otevřít v*). Viz [Sledování složky karty](following-the-tab-folder.md). |
-| `ui.terminal_launch` | `"auto"` | Zastaralé, viz níže a [Otevřít v](open-in.md). Jak starý *Terminál zde* otevíral terminál: `auto` (předvolba `ui.launch`, jinak `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), předvolba, nebo `custom`. |
-| `ui.terminal_launch_command` | `""` | Šablona `custom`; `{repo}` je složka. |
-| `ui.open_in` | *(chybí)* | Seznam [Otevřít v](open-in.md), pole tabulek `[[ui.open_in]]` s `label` a `command`. Chybějící znamená „ještě nenakonfigurováno“: seznam se spočítá ze starých klíčů `ui.terminal_launch*` (hodnota jiná než `auto` se stane první položkou), správce souborů OS, multiplexerů a terminálů zjištěných z prostředí (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) a editorů nalezených na `PATH`. První uložení z Nastavení seznam zapíše. `open_in = []` je prázdný seznam. Nelze nastavit pomocí `config set` (upravte soubor). |
-| `ui.open_in_default` | `""` | Popisek položky, kterou spouští „Otevřít ve výchozím“; prázdný nebo neznámý znamená první položku. |
 | `ui.launch_terminal` | `"auto"` | Terminál, ve kterém zástupce na ploše (Nastavení > Spouštěč) a znovuspuštění ve Windows spouštějí GitPoulpi. `auto` vybírá z nainstalovaných (Windows: Windows Terminal, jinak WezTerm, Alacritty, běžná konzole; Linux: `xdg-terminal-exec`, jinak první nalezený terminál; macOS: iTerm2, Ghostty, WezTerm nebo kitty, jsou-li nainstalovány, jinak Terminal), `default` je terminál systému, nebo id terminálu, například `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
-| `ui.launcher_build` | `"current"` | Jen v režimu vývojáře (viz `general.dev_mode`; jen tehdy se zobrazí v Nastavení > Spouštěč, jinak se ignoruje). `"current"`: zástupci a alias příkazu spouštějí sestavení, které je vytvořilo. `"newest"`: spouštějí naposledy sestavené z `target/dist` a `target/release` v klonu, rozhoduje se při každém kliknutí, a spuštění kteréhokoli sestavení je nikdy nepřepíše. |
-| `ui.command_alias` | `""` | Název příkazu, kterým se GitPoulpi spouští z terminálu, například `gp` (Nastavení > Spouštěč, `gitpoulpi alias create`). Prázdné: žádný. Jen písmena, číslice, `-`, `_` a `.`. Je to jen název, který používá tlačítko **Vytvořit: alias příkazu**; dokud ho nevytvoříte, nic neexistuje. |
-| `ui.command_alias_add` | `""` | Název druhého příkazu, například `gpa`, který spouští `gitpoulpi --add`: otevře aktuální složku jako novou kartu již spuštěného GitPoulpi (Nastavení > Spouštěč, `gitpoulpi alias create gpa --add`). Prázdné: žádný. Stejná pravidla pro název; tlačítko **Vytvořit** ho vytvoří spolu s `ui.command_alias`. |
 | `ui.relaunch_in_terminal` | `true` | Jen Windows: když se exe spustí dvojklikem ve vlastní konzoli, GitPoulpi se znovu otevře v `ui.launch_terminal` a skončí. Terminál, který exe spouští přímo (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`), je také vlastní konzole, ale ne klasické okno konzole: nikdy se znovu nespouští. Vypnuto: zůstane v té konzoli. |
 | `ui.reuse_window` | `true` | Kliknutí na zástupce GitPoulpi (`gitpoulpi launch`) zobrazí okno už otevřeného GitPoulpi místo spuštění dalšího. Vypnuto: každé kliknutí spustí nové okno. |
+
+
+### Obrázky
+
+| Klíč | Výchozí | Význam |
+|---|---|---|
+| `ui.image_view` | `true` | Zobrazí binární soubor, který je obrázkem (PNG, JPEG, GIF, WebP, BMP, ...), jako obrázek v zobrazení Diff a v zobrazení Soubor. Vypnuto: prosté upozornění na binární soubor. |
+| `ui.image_view_max_mib` | `32` | Obrázky větší než tato hodnota (MiB) se nedekódují; místo nich se zobrazí informační karta. |
+| `ui.image_view_max_unit` | `"auto"` | Jednotka, v níž Nastavení ukazuje limit: `mib`, `gib` (1024 MiB) nebo `auto`. Jen zobrazení: limit je vždy `image_view_max_mib` MiB, 1 až 1024. |
+| `ui.image_view_text_fallback` | `"halfblock"` | V terminálu bez protokolu obrázků: `halfblock` (barevné znaky půlbloků) nebo `card` (jen informační karta). |
+| `ui.image_view_pixelated_from` | `"2x"` | Přiblížení, od kterého zvětšení ukazuje čtvercové pixely místo vyhlazení: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | Panely před a po sdílejí jedno přiblížení a jednu polohu posunu. |
+
+**Zatím se nepoužívá** (přijímá se, ukládá se, ale nic je nečte):
+`ui.graph_colorization` (odstraněno z Nastavení;
+při načtení se stále přijímá), `ui.date_word_format` (odstraněno z Nastavení;
+při načtení se stále přijímá). Starý `ui.diff_view_mode`
+se jednou přečte jako `diff_layout` / `diff_hunks_only`.
+
+## `[ui]` v `config.toml`
+
+Několik klíčů `[ui]`, které platí stejně, ať používáte jakékoli rozhraní: externí nástroje tohoto počítače, identita této instalace, které síťové služby se ptají na avatary a výchozí hodnoty `log --format mermaid`. Čtou se jen z `config.toml`; ostatní klíče `[ui]` jsou v [`tui.toml`](#ui-v-tuitoml).
+
+**Otevření složky jinde**
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `ui.open_in` | *(chybí)* | Seznam [Otevřít v](open-in.md), pole tabulek `[[ui.open_in]]` s `label` a `command`. Chybějící znamená „ještě nenakonfigurováno“: seznam se spočítá ze starých klíčů `ui.terminal_launch*` (hodnota jiná než `auto` se stane první položkou), správce souborů OS, multiplexerů a terminálů zjištěných z prostředí (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) a editorů nalezených na `PATH`. První uložení z Nastavení seznam zapíše. `open_in = []` je prázdný seznam. Nelze nastavit pomocí `config set` (upravte soubor). |
+| `ui.open_in_default` | `""` | Popisek položky, kterou spouští „Otevřít ve výchozím“; prázdný nebo neznámý znamená první položku. |
+| `ui.terminal_launch` | `"auto"` | Zastaralé, viz níže a [Otevřít v](open-in.md). Jak starý *Terminál zde* otevíral terminál: `auto` (předvolba `ui.launch`, jinak `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), předvolba, nebo `custom`. |
+| `ui.terminal_launch_command` | `""` | Šablona `custom`; `{repo}` je složka. |
 
 **Příkazy `ui.open_in`** se nejprve rozdělí na argumenty (mezery, `'...'`, `"..."`), pak se uvnitř každého argumentu dosadí proměnné, takže složka s mezerami zůstane jedním argumentem; žádný shell se nepoužívá, pokud ho příkaz sám nespustí (`sh -c '... "$GITPOULPI_CWD"'`). Proměnné: `${cwd}` (složka karty), `${repo}` (kořen repozitáře), `${name}` (základní název složky), `${branch}` (prázdné při odpojeném HEAD), `${web_url}` (webová stránka remote `origin`, je-li to projekt na GitHubu nebo GitLabu, jinak prázdné; položka, která ji používá, se při prázdné hodnotě odmítne spustit), `${env:NAME}` (prázdné, není-li nastaveno). Staré `{repo}` stále znamená `${cwd}`. Jakékoli jiné `${...}` je chyba s jeho názvem. Příklad:
 
@@ -208,16 +258,10 @@ command = "code ${cwd}"
 
 Zastaralé: `ui.terminal_launch` a `ui.terminal_launch_command` se stále čtou (zakládají seznam, dokud `ui.open_in` chybí: `custom` se stane „Terminal (custom)“ s `{repo}` přepsaným na `${cwd}`, id předvolby se stane touto předvolbou), ale jsou nahrazeny `ui.open_in`.
 
-### Obrázky
+**Editory obrázků**
 
-| Klíč | Výchozí | Význam |
+| Klíč | Výchozí | Hodnoty a účinek |
 |---|---|---|
-| `ui.image_view` | `true` | Zobrazí binární soubor, který je obrázkem (PNG, JPEG, GIF, WebP, BMP, ...), jako obrázek v zobrazení Diff a v zobrazení Soubor. Vypnuto: prosté upozornění na binární soubor. |
-| `ui.image_view_max_mib` | `32` | Obrázky větší než tato hodnota (MiB) se nedekódují; místo nich se zobrazí informační karta. |
-| `ui.image_view_max_unit` | `"auto"` | Jednotka, v níž Nastavení ukazuje limit: `mib`, `gib` (1024 MiB) nebo `auto`. Jen zobrazení: limit je vždy `image_view_max_mib` MiB, 1 až 1024. |
-| `ui.image_view_text_fallback` | `"halfblock"` | V terminálu bez protokolu obrázků: `halfblock` (barevné znaky půlbloků) nebo `card` (jen informační karta). |
-| `ui.image_view_pixelated_from` | `"2x"` | Přiblížení, od kterého zvětšení ukazuje čtvercové pixely místo vyhlazení: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | Panely před a po sdílejí jedno přiblížení a jednu polohu posunu. |
 | `ui.image_editors` | *(chybí)* | Editory obrázků pro „Upravit v“, pole tabulek `[[ui.image_editors]]` s `label` a `command`. Chybějící znamená „ještě nenakonfigurováno“: seznam tvoří editory zjištěné v tomto počítači (programy na `PATH`, instalace Flatpak, známé instalační složky ve Windows, `/Applications` v macOS) a poté výchozí aplikace OS. První uložení z Nastavení seznam zapíše. `image_editors = []` je prázdný seznam. Nelze nastavit pomocí `config set` (upravte soubor). |
 | `ui.image_editor_default` | `""` | Popisek editoru, který spouští „Upravit ve výchozím“; prázdný nebo neznámý znamená první položku. |
 
@@ -236,11 +280,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**Zatím se nepoužívá** (přijímá se, ukládá se, ale nic je nečte):
-`ui.graph_colorization` (odstraněno z Nastavení;
-při načtení se stále přijímá), `ui.date_word_format` (odstraněno z Nastavení;
-při načtení se stále přijímá). Starý `ui.diff_view_mode`
-se jednou přečte jako `diff_layout` / `diff_hunks_only`.
+**Spouštěč a identita**
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `ui.logo_color` | `""` | Barevné provedení loga v okně O aplikaci, slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); prázdné nebo neznámé znamená výchozí hodnotu sestavení (`lavender`). Zapisuje se kliknutím na logo nebo výběrem barvy v O aplikaci. |
+| `ui.command_alias` | `""` | Název příkazu, kterým se GitPoulpi spouští z terminálu, například `gp` (Nastavení > Spouštěč, `gitpoulpi alias create`). Prázdné: žádný. Jen písmena, číslice, `-`, `_` a `.`. Je to jen název, který používá tlačítko **Vytvořit: alias příkazu**; dokud ho nevytvoříte, nic neexistuje. |
+| `ui.command_alias_add` | `""` | Název druhého příkazu, například `gpa`, který spouští `gitpoulpi --add`: otevře aktuální složku jako novou kartu již spuštěného GitPoulpi (Nastavení > Spouštěč, `gitpoulpi alias create gpa --add`). Prázdné: žádný. Stejná pravidla pro název; tlačítko **Vytvořit** ho vytvoří spolu s `ui.command_alias`. |
+| `ui.launcher_build` | `"current"` | Jen v režimu vývojáře (viz `general.dev_mode`; jen tehdy se zobrazí v Nastavení > Spouštěč, jinak se ignoruje). `"current"`: zástupci a alias příkazu spouštějí sestavení, které je vytvořilo. `"newest"`: spouštějí naposledy sestavené z `target/dist` a `target/release` v klonu, rozhoduje se při každém kliknutí, a spuštění kteréhokoli sestavení je nikdy nepřepíše. |
+
+**Vyhledávání avatarů**
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | Pořadí vyhledávání: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Hostitel GitLab se dotazuje jen přes připojený profil. |
+
+**Výchozí hodnoty Mermaidu** (`log --format mermaid`; Log: Zkopírovat jako Mermaid gitGraph si pamatuje své volby z vyskakovacího okna)
+
+| Klíč | Výchozí | Hodnoty a účinek |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Úroveň detailu Log: Zkopírovat jako Mermaid gitGraph: `structure`, `refs`, `subjects`, `full` (pamatuje se z vyskakovacího okna; výchozí hodnota `log --format mermaid`). |
+| `ui.mermaid_orientation` | `lr` | Směr tohoto grafu: `lr` (zleva doprava) nebo `tb` (shora dolů). |
+| `ui.mermaid_fence` | `false` | Obalit zkopírovaný skript Mermaid blokem kódu `mermaid`. |
+| `ui.mermaid_subject_width` | `40` | Předměty commitů se v id Mermaid zkrátí na tolik znaků (`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -253,6 +315,8 @@ se jednou přečte jako `diff_layout` / `diff_hunks_only`.
 | `editor.follow_selection` | `true` | Dokud je editor otevřený, výběr jiného souboru v pravém panelu jej otevře i v editoru, a to po dotazu, zda uložit neuložené změny. Soubor, který nelze upravovat, se otevře v obvyklém zobrazení; soubor commitu opustí editor a otevře se v diffu. |
 
 ## `[merge]`
+
+Soubor: `tui.toml`.
 
 Editor konfliktů merge ([Řešení konfliktů merge](merge-conflicts.md)). Zobrazuje ho Nastavení > Diff a editor.
 
@@ -595,6 +659,8 @@ id mezi sekvencemi, které vidíte, se nahlásí. Sekvenci přiřadíte klávesu
 `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+Soubor: `tui.toml`.
 
 Přiřazuje zkratky TUI znovu; upravuje je Nastavení > Klávesnice a myš.
 

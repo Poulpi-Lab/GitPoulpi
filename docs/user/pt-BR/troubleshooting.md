@@ -210,8 +210,25 @@ relatório de desempenho.
 diretório de configuração (`gitpoulpi config path` imprime o arquivo de configurações,
 que fica ali) e anexe-o a uma issue.
 
-**Onde estão minhas configurações?** `gitpoulpi config path`. O estado por repositório
-fica em `.gitpoulpi/repo-state.toml` dentro do repositório.
+**Onde estão minhas configurações?** `gitpoulpi config path` imprime o `config.toml`
+(configurações comuns) e o `tui.toml` (as configurações de interface da interface de
+terminal: tema, layout, colunas, atalhos...), que ficam na mesma pasta.
+`gitpoulpi config get <key>` diz em qual dos dois está uma chave. O estado por
+repositório fica em `.gitpoulpi/repo-state.toml` dentro do repositório. Veja
+[Dois arquivos](config-reference.md#dois-arquivos-configtoml-e-tuitoml).
+
+**Voltei para um GitPoulpi mais antigo e minhas configurações de interface mudaram (ou
+o mais novo ignora o que defini no mais antigo).** O GitPoulpi guarda as configurações
+de interface no `tui.toml`, criado como uma cópia do que o `config.toml` tinha e nunca
+retirado do `config.toml`. Um GitPoulpi mais antigo instalado ao lado do mais novo não
+conhece o `tui.toml`: ele continua lendo e gravando o seu próprio `config.toml`
+completo. Depois que o `tui.toml` existe, o mais novo lê as configurações de interface
+só dele, então um tema ou layout que você muda na versão mais antiga depois disso não
+é adotado, e uma chave ausente do `tui.toml` assume o padrão, em vez do valor antigo
+no `config.toml`. Para alinhar a versão mais nova, mude a configuração nela
+(Configurações, ou `gitpoulpi config set`); para recomeçar as configurações de interface
+a partir do `config.toml`, feche o GitPoulpi e apague o `tui.toml` (ele é criado de
+novo, como uma cópia nova, na próxima inicialização).
 
 **O GitPoulpi envia alguma coisa para algum lugar?** Só o que você pede: operações git
 para os seus remotos, requisições de hospedagem depois que você conecta uma conta,

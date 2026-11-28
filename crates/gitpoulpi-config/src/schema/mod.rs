@@ -43,6 +43,7 @@ macro_rules! config_enum {
 pub(crate) use config_enum;
 
 mod conflict_prevention;
+mod desktop_ui;
 mod editor;
 mod general;
 mod git;
@@ -57,6 +58,7 @@ mod ui;
 mod updates;
 
 pub use conflict_prevention::*;
+pub use desktop_ui::*;
 pub use editor::*;
 pub use general::*;
 pub use git::*;

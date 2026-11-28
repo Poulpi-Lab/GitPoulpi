@@ -151,7 +151,7 @@ skryptami Lua i jednym cofnięciem.
 
 ## Dokumentacja referencyjna i pomoc
 
-28. **[Opis konfiguracji](config-reference.md)**: każdy klucz `config.toml`,
+28. **[Opis konfiguracji](config-reference.md)**: każdy klucz `config.toml` i `tui.toml`,
     jego wartość domyślna i działanie, ustawienia poszczególnych repozytoriów,
     zmienne środowiskowe.
 29. **[Rozwiązywanie problemów i FAQ](troubleshooting.md)**: ikony,

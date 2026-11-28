@@ -12,7 +12,8 @@ places show the new key. For the mouse, see
 
 Open **Settings > Keyboard & mouse**. The page is described in
 [Settings](settings.md#keyboard--mouse). Changes apply at once and are saved
-in the `[keybindings]` table of `config.toml`. You can also edit that table by
+in the `[keybindings]` table of `tui.toml` (the terminal UI's interface file, next
+to `config.toml`). You can also edit that table by
 hand:
 
 ```toml
@@ -469,9 +470,9 @@ group.
 
 Every palette row ends with a key button (`[k]`), and `Alt+K` does the same on the highlighted row: it opens **Settings > Keyboard & mouse** filtered on that command's shortcut, ready to rebind. A command that has no shortcut of its own gets one here: it is listed under **Palette commands**, unbound by default, and a key you give it runs the command exactly as choosing it in the palette does (a command that cannot run now says why). The row then shows your key.
 
-In `config.toml` these are the `[keybindings.palette]` table, named after the command (`toggle_minimap = "Ctrl+Alt+M"`). A key that clashes with another action is shown in red, and `c` on its row lists every action it clashes with.
+In `tui.toml` these are the `[keybindings.palette]` table, named after the command (`toggle_minimap = "Ctrl+Alt+M"`). A key that clashes with another action is shown in red, and `c` on its row lists every action it clashes with.
 
-A sequence you defined (a named chain of palette commands) gets a key the same way: `[keybindings.sequence]` takes the sequence's id (`backup = "Ctrl+Alt+B"`), a key for an id that does not exist is reported and ignored, and the table follows `config.toml` while the app runs. Each sequence is also a palette row, `Sequence: <name>`, showing its key.
+A sequence you defined (a named chain of palette commands) gets a key the same way: `[keybindings.sequence]` takes the sequence's id (`backup = "Ctrl+Alt+B"`), a key for an id that does not exist is reported and ignored, and the table follows `tui.toml` while the app runs. Each sequence is also a palette row, `Sequence: <name>`, showing its key.
 
 The hint band under the list names this key (`Alt+K` by default). It is the action `palette.configure_shortcut`, so it can be rebound like any other.
 

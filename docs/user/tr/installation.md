@@ -227,7 +227,7 @@ Yükleyici kullanmadıysanız çalıştırılabilir dosyaları silin. GitPoulpi 
 
 | Ne | Nerede |
 |---|---|
-| Ayarlar (`config.toml`) ve oturumlar | İşletim sisteminizin yapılandırma klasörü. `GITPOULPI_CONFIG_DIR` bunu değiştirir. |
+| Ayarlar (`config.toml` ve `tui.toml`) ve oturumlar | İşletim sisteminizin yapılandırma klasörü. `GITPOULPI_CONFIG_DIR` bunu değiştirir. |
 | Depo başına durum | Varsayılan olarak deponun `.git` klasörünün içindeki `gitpoulpi/` (`session.per_repo_state_dir` bunu çalışma ağacındaki `.gitpoulpi/` klasörüne ya da kullanıcı veri klasörüne taşıyabilir). |
 | Önbellekler (avatarlar) | İşletim sisteminizin önbellek klasörü. |
 | Token'lar ve API anahtarları | Kimlik bilgisi yardımcınız. **Ayarlar > SSH ve kimlik bilgileri > Tüm Kullanıcı Adlarını ve Parolaları Unut** bunları kaldırır. |

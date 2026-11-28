@@ -204,7 +204,7 @@ backup = "Alt+B"
 ## 시퀀스 실행
 
 시퀀스는 단계의 이름 있는 목록이며, 각 단계는 팔레트의 명령 하나입니다(모두 스테이징, AI로 commit 메시지 작성, commit, push...). 팔레트
-(`시퀀스: <이름>`), 설정 > 키보드 및 마우스에서 지정한 키(`config.toml`의 `[keybindings.sequence]`), 또는 명령줄(`gitpoulpi sequence run`)로
+(`시퀀스: <이름>`), 설정 > 키보드 및 마우스에서 지정한 키(`tui.toml`의 `[keybindings.sequence]`), 또는 명령줄(`gitpoulpi sequence run`)로
 실행합니다.
 
 실행 중에는 Log 위쪽의 띠가 `<이름> k/n`, 단계, 기다리는 것을 보여 줍니다. 실행은 작업 패널에도 `시퀀스 <이름> k/n: <단계>`로

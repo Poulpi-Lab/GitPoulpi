@@ -211,8 +211,26 @@ prestandarapport.
 konfigurationsmappen (`gitpoulpi config path` skriver ut inställningsfilen, som
 ligger där), och bifoga den i ett ärende.
 
-**Var finns mina inställningar?** `gitpoulpi config path`. Tillstånd per
-repository ligger i `.gitpoulpi/repo-state.toml` inuti repositoryt.
+**Var finns mina inställningar?** `gitpoulpi config path` skriver ut `config.toml`
+(gemensamma inställningar) och `tui.toml` (terminalgränssnittets
+gränssnittsinställningar: tema, layout, kolumner, genvägar...), som ligger i samma
+mapp. `gitpoulpi config get <key>` anger vilken av de två en nyckel finns i.
+Tillstånd per repository ligger i `.gitpoulpi/repo-state.toml` inuti repositoryt.
+Se [Två filer](config-reference.md#två-filer-configtoml-och-tuitoml).
+
+**Jag gick tillbaka till en äldre GitPoulpi och mina gränssnittsinställningar
+ändrades (eller så ignorerar den nyare det jag ställde in i den äldre).** GitPoulpi
+håller gränssnittsinställningarna i `tui.toml`, som skapas som en kopia av det
+`config.toml` innehöll och aldrig tas bort ur `config.toml`. En äldre GitPoulpi
+installerad bredvid den nyare känner inte till `tui.toml`: den fortsätter att läsa
+och skriva sin egen fullständiga `config.toml`. När `tui.toml` väl finns läser den
+nyare gränssnittsinställningarna bara därifrån, så ett tema eller en layout du
+ändrar i den äldre versionen efteråt plockas inte upp, och en nyckel som saknas i
+`tui.toml` får sitt standardvärde i stället för det gamla värdet i `config.toml`.
+För att få den nyare versionen att stämma, ändra inställningen där (Inställningar
+eller `gitpoulpi config set`); för att börja om med gränssnittsinställningarna från
+`config.toml`, avsluta GitPoulpi och ta bort `tui.toml` (den skapas på nytt, som en
+ny kopia, vid nästa start).
 
 **Skickar GitPoulpi något någonstans?** Bara det du ber om: git-operationer till
 dina remotes, hosting-förfrågningar efter att du kopplat ett konto, AI-förfrågningar

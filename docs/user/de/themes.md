@@ -217,7 +217,7 @@ Palette in der Liste. Gibt es den konfigurierten Namen nicht mehr (die Datei wur
 umbenannt), verwendet der Graph die Spurfarben des aktiven Designs, und die Einstellungen zeigen
 den Namen als *nicht gefunden* markiert, bis Sie einen anderen wählen. ![Die Dropdownliste Farbschema des Graphen unter Darstellung: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
 
-In der `config.toml`:
+In der `tui.toml`:
 
 ```toml
 [ui]
@@ -286,7 +286,7 @@ fehlerhafte Farbe wird ignoriert, eine unbekannte `base` fällt auf `dark` zurü
 der Statuszeile).
 
 Dateien werden neu gelesen, wenn die Design-Auswahl sich öffnet und wenn die Einstellungen
-schließen. Ein laufendes Fenster bemerkt außerdem, wenn `config.toml` (ein
+schließen. Ein laufendes Fenster bemerkt außerdem, wenn `tui.toml` (ein
 `gitpoulpi config set ui.theme ...` aus einer Shell) oder die Datei des aktiven Designs neu
 geschrieben wird, und wendet die neuen Farben innerhalb von etwa einer Sekunde ohne Neustart an.
 
@@ -356,7 +356,7 @@ Einstellungen zu gehen: **System (folgt dem Terminal)**, die Voreinstellungen un
 eigenen Design-Dateien, jedes mit vier kleinen Farb-Chips. Das aktuelle Design ist
 abgehakt. Tippen Sie, um die Liste einzugrenzen; das Bewegen der Hervorhebung zeigt das
 Design sofort in der Vorschau, **Enter** wendet es an und speichert `ui.theme` in der
-`config.toml`, **Esc** (oder ein Klick außerhalb der Liste) stellt das vorherige Design
+`tui.toml`, **Esc** (oder ein Klick außerhalb der Liste) stellt das vorherige Design
 wieder her und speichert nichts.
 
 Unter dem Filterfeld grenzt ein segmentierter Vorfilter die Liste ein: **Alle**, **Dunkel**,

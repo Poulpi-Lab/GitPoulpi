@@ -5,6 +5,7 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 
+pub use gitpoulpi_app::palette::vocab::undo::Avail;
 use gitpoulpi_core::domain::{Direction, EntrySummary, JournalState, UndoRefusal};
 use gitpoulpi_i18n::msg;
 
@@ -166,6 +167,26 @@ impl JournalCell {
     }
 }
 
+/// What the toolbar and the palette need per direction, from the link's
+/// journal state (`DaemonLink::journal_state`, `DaemonLink::undo_busy`):
+/// `Off` when `general.undo_enabled` is off, `Nothing` when there is no entry
+/// (or one is running, `busy`), `Blocked` when the repository moved under the
+/// entry, `Stuck` when it is blocked for good (undo only: it can be
+/// forgotten), else `Ready`. Any frontend feeds it into `PaletteContext::undo`
+/// / `redo` and its own undo buttons.
+pub fn avail(state: &JournalState, d: Direction, busy: bool) -> Avail {
+    if state.disabled {
+        return Avail::Off;
+    }
+    match side(state, d) {
+        _ if busy => Avail::Nothing,
+        (None, _) => Avail::Nothing,
+        (Some(_), Some(r)) if d == Direction::Undo && r.forgettable() => Avail::Stuck,
+        (Some(_), Some(_)) => Avail::Blocked,
+        (Some(_), None) => Avail::Ready,
+    }
+}
+
 pub fn side(state: &JournalState, d: Direction) -> (Option<&EntrySummary>, Option<&UndoRefusal>) {
     match d {
         Direction::Undo => (state.undo.as_ref(), state.blocked.as_ref()),
@@ -265,4 +286,39 @@ pub fn palette_suffix(state: &JournalState, d: Direction) -> Option<String> {
 /// The id of the entry the user is looking at, for the `expect` guard.
 pub fn top_id(state: &JournalState, d: Direction) -> Option<u64> {
     side(state, d).0.map(|e| e.id)
+}
+
+#[cfg(test)]
+mod avail_tests {
+    use super::*;
+    use gitpoulpi_core::domain::{EntryState, HeadState, OperationKind};
+
+    fn state() -> JournalState {
+        JournalState {
+            undo: Some(EntrySummary {
+                id: 1,
+                kind: OperationKind::Commit,
+                label: "Commit".into(),
+                at: 0,
+                state: EntryState::Done,
+                origin: None,
+            }),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn availability_follows_the_journal_and_the_busy_flag() {
+        let mut s = state();
+        assert_eq!(avail(&s, Direction::Undo, false), Avail::Ready);
+        assert_eq!(avail(&s, Direction::Redo, false), Avail::Nothing);
+        assert_eq!(avail(&s, Direction::Undo, true), Avail::Nothing);
+        s.blocked = Some(UndoRefusal::HeadMoved {
+            expected: HeadState::Branch("main".into()),
+            actual: HeadState::Branch("other".into()),
+        });
+        assert_eq!(avail(&s, Direction::Undo, false), Avail::Stuck);
+        s.disabled = true;
+        assert_eq!(avail(&s, Direction::Undo, false), Avail::Off);
+    }
 }

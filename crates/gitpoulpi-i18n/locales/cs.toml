@@ -2793,7 +2793,7 @@ hint_conflicts = "konflikty"
 conflicts_of = "Konflikty: {label} - Esc zobrazí všechny zkratky"
 no_conflicts = "Tato zkratka nemá žádný konflikt"
 hint_controls = "ovládání"
-config_issues = { one = "config.toml: {n} položka ignorována - {id}: {message}", few = "config.toml: {n} položky ignorovány - {id}: {message}", other = "config.toml: {n} položek ignorováno - {id}: {message}" }
+config_issues = { one = "{file}: {n} položka ignorována - {id}: {message}", few = "{file}: {n} položky ignorovány - {id}: {message}", other = "{file}: {n} položek ignorováno - {id}: {message}" }
 no_match = "filtrům neodpovídá žádná zkratka"
 unbound = "(nepřiřazeno)"
 none = "(žádné)"

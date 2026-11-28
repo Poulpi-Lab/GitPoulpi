@@ -12,8 +12,8 @@ przeniesiesz klawisz, te miejsca pokazują nowy. O myszy przeczytasz w
 
 Otwórz **Ustawienia > Klawiatura i mysz**. Stronę opisują
 [Ustawienia](settings.md#klawiatura-i-mysz). Zmiany działają od razu i są
-zapisywane w tabeli `[keybindings]` pliku `config.toml`. Tę tabelę można też
-edytować ręcznie:
+zapisywane w tabeli `[keybindings]` pliku `tui.toml` (pliku interfejsu terminalowego UI, obok
+`config.toml`). Tę tabelę można też edytować ręcznie:
 
 ```toml
 [keybindings.global]
@@ -470,7 +470,9 @@ kategorię, by zobaczyć całą jej grupę.
 
 Każdy wiersz palety kończy się przyciskiem klawisza (`[k]`), a `Alt+K` robi to samo dla zaznaczonego wiersza: otwiera **Ustawienia > Klawiatura i mysz** przefiltrowane po skrócie tego polecenia, gotowe do zmiany przypisania. Polecenie bez własnego skrótu dostaje go tutaj: jest wymienione w **Polecenia palety**, domyślnie bez klawisza, a przypisany klawisz uruchamia polecenie dokładnie tak, jak jego wybranie w palecie (polecenie, którego teraz nie można uruchomić, podaje powód). Wiersz pokazuje wtedy twój klawisz.
 
-W `config.toml` jest to tabela `[keybindings.palette]`, nazwana od polecenia (`toggle_minimap = "Ctrl+Alt+M"`). Klawisz kolidujący z inną akcją jest pokazany na czerwono, a `c` w jego wierszu wypisuje wszystkie akcje, z którymi koliduje.
+W `tui.toml` jest to tabela `[keybindings.palette]`, nazwana od polecenia (`toggle_minimap = "Ctrl+Alt+M"`). Klawisz kolidujący z inną akcją jest pokazany na czerwono, a `c` w jego wierszu wypisuje wszystkie akcje, z którymi koliduje.
+
+Sekwencja, którą zdefiniowałeś (nazwany łańcuch poleceń palety), dostaje klawisz w ten sam sposób: `[keybindings.sequence]` przyjmuje id sekwencji (`backup = "Ctrl+Alt+B"`), klawisz dla nieistniejącego id jest zgłaszany i ignorowany, a tabela podąża za `tui.toml`, gdy aplikacja działa. Każda sekwencja jest też wierszem palety, `Sekwencja: <nazwa>`, pokazującym jej klawisz.
 
 Pasek podpowiedzi pod listą podaje ten klawisz (domyślnie `Alt+K`). To akcja `palette.configure_shortcut`, więc można ją przypisać na nowo jak każdą inną.
 

@@ -8,7 +8,9 @@ window while it is open. Close it with the `✕` at the top right, `Esc` or
 `q`. It asks first only when closing would lose something (see
 [Closing Settings](#closing-settings)).
 
-Changes are saved to `config.toml` at once. The
+Changes are saved at once: interface settings (theme, layout, columns, diff and
+image display, shortcuts...) to `tui.toml`, everything else to `config.toml`, both
+in your config folder ([why two files](config-reference.md#two-files-configtoml-and-tuitoml)). The
 [configuration reference](config-reference.md) describes every key, its default
 value and its environment variable. This page describes the Settings screen.
 
@@ -154,7 +156,7 @@ Most settings can be changed without opening this screen: type `Settings:` in th
 
 ![The command palette filtered on Settings:, with one row per setting and its current value at the right](images/palette-settings.png)
 
-A value is saved to `config.toml` and applied exactly as the page does. The English words of the setting's key (`remember tabs`) find the row in any language.
+A value is saved to its file (`tui.toml` or `config.toml`) and applied exactly as the page does. The English words of the setting's key (`remember tabs`) find the row in any language.
 
 ## The pages
 
@@ -465,11 +467,11 @@ the server; see [MCP and agents](mcp-and-agents.md).
 | **Status line position** | `ui.statusbar_position`: **Top** (above the repository tabs) or **Bottom** (default). The Home tab keeps its own status line at the bottom. Applies at once. |
 | **Tab bar position** | `ui.tabs_position`: Where the repository tabs sit: Top (default), Bottom, or Left, a list with one tab per row at the window's left edge. A window under 80 columns draws them at the top instead. Beside a column toolbar the tabs stay outermost. Applies at once. |
 | **Date/time locale** | **system** (default): month and weekday names in the interface language. **english**: always English names. |
-| **Date format**, **Date/time format**, **Verbose date format** | The date patterns of the File History and Blame date column, of the Log's Date column, and of the commit details. Each shows a live preview. See [Configuration reference](config-reference.md#ui) for the tokens. |
+| **Date format**, **Date/time format**, **Verbose date format** | The date patterns of the File History and Blame date column, of the Log's Date column, and of the commit details. Each shows a live preview. See [Configuration reference](config-reference.md#ui-in-tuitoml) for the tokens. |
 
 ![The Graph color theme combo: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
 
-The theme and the graph colors (the Theme, the graph color theme, the lane colorization and background, the row tint strength) belong to each installation: with several installations sharing one `config.toml`, changing them in one never changes the others. Only the primary installation also writes the shared `ui.*` keys.
+The theme and the graph colors (the Theme, the graph color theme, the lane colorization and background, the row tint strength) belong to each installation: with several installations sharing one settings folder, changing them in one never changes the others. Only the primary installation also writes the shared `ui.*` keys, in `tui.toml`; the others keep theirs in their own entry of `config.toml`.
 
 ### Keyboard & mouse
 
@@ -489,7 +491,7 @@ lists every shortcut by context, with a search box (`/`) and filters. On a row:
 | `c` or a click on the row's `!` | Lists the action with every action its key clashes with; `Esc` shows them all again. A key that clashes with another action's is red, a warning about the key alone (a terminal that cannot send it) orange. |
 
 Use it to resolve clashes with tmux, AutoHotkey, herdr or your terminal. The
-same settings live in the `[keybindings]` table of `config.toml`; see the
+same settings live in the `[keybindings]` table of `tui.toml`; see the
 [configuration reference](config-reference.md#keybindings) and
 [Keybindings](keybindings.md).
 
@@ -850,8 +852,10 @@ Settings with an unsaved draft asks first.
 
 ## Files, environment variables and the CLI
 
-- The settings file is `config.toml` in your OS config folder.
-  `gitpoulpi config path` prints its location.
+- The settings files are `config.toml` (common settings) and `tui.toml` (the
+  terminal UI's interface settings) in your OS config folder.
+  `gitpoulpi config path` prints their locations; `gitpoulpi config get <key>`
+  says which file a key is in.
 - Per-repository state lives in `.gitpoulpi/repo-state.toml` inside the
   repository.
 - `gitpoulpi config get <key>` and `gitpoulpi config set <key> <value>` read and

@@ -24,11 +24,11 @@ docker run -it --rm \
 | 경로 | 내용 |
 |---|---|
 | `/work` | 작업 디렉터리. 저장소를 여기에 바인드 마운트하세요. |
-| `/config` | 설정(`config.toml`), 세션, 그리고 하위 폴더로 데이터와 캐시(`GITPOULPI_CONFIG_DIR=/config`). 보관하려면 이름 있는 볼륨이나 바인드 마운트를 사용하세요. |
+| `/config` | 설정(`config.toml`, `tui.toml`), 세션, 그리고 하위 폴더로 데이터와 캐시(`GITPOULPI_CONFIG_DIR=/config`). 보관하려면 이름 있는 볼륨이나 바인드 마운트를 사용하세요. |
 | `/data`, `/cache` | XDG 변수를 따르는 도구를 위해 볼륨으로도 선언되어 있습니다(`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. 볼륨이 아니며 컨테이너마다 새로 만들어집니다. |
 
-`/config`에 볼륨이 없으면 `--rm` 실행마다 기본 설정으로 시작합니다. 자신의 `config.toml`로 시작하려면 마운트하세요: `-v "$PWD/config.toml":/config/config.toml:ro` (읽기 전용이면 설정을 저장할 수 없습니다).
+`/config`에 볼륨이 없으면 `--rm` 실행마다 기본 설정으로 시작합니다. 자신의 `config.toml`로 시작하려면 마운트하세요: `-v "$PWD/config.toml":/config/config.toml:ro` (읽기 전용이면 설정을 저장할 수 없습니다). 인터페이스 설정은 두 번째 파일인 `tui.toml`에 있으며 같은 방식으로 마운트합니다(`-v "$PWD/tui.toml":/config/tui.toml:ro`). [설정 참조](config-reference.md#두-파일-configtoml과-tuitoml)를 참고하세요.
 
 ## 다른 사용자가 소유한 저장소
 

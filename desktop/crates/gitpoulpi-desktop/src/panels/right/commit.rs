@@ -19,7 +19,6 @@ use super::widgets::{boxed, ListKind};
 use super::{Mode, RightEvent, RightPanel};
 use crate::daemon::commit_ops::short;
 use crate::theme::Skin;
-use crate::util::dates;
 
 /// Files added, modified and deleted among a commit's diffs.
 fn change_counts(files: &[gitpoulpi_core::domain::FileDiff]) -> (u64, u64, u64) {
@@ -184,7 +183,9 @@ impl RightPanel {
         cx: &mut Context<Self>,
     ) -> gpui_kit::Div {
         let (added, modified, deleted) = change_counts(&self.files);
-        let date = dates::verbose(node.timestamp);
+        let date = crate::prefs::PrefsStore::get(cx)
+            .dates()
+            .format_verbose(node.timestamp);
         let mono = cx.theme().mono_font_family.clone();
         let head = stash
             .clone()

@@ -153,7 +153,7 @@ mod editor_prefs;
 mod external_tools;
 #[cfg(any(all(feature = "hosting", feature = "review"), feature = "ai"))]
 mod file_browse;
-mod file_selection;
+pub(crate) use gitpoulpi_app::file_selection;
 mod file_view;
 mod flow;
 mod fold_mark;
@@ -284,7 +284,7 @@ mod chrome;
 mod commit_detail;
 #[cfg(test)]
 mod commit_files_bench;
-mod compare;
+pub(crate) use gitpoulpi_app::compare;
 mod compare_cards;
 mod compose_ui;
 mod composer;
@@ -316,7 +316,7 @@ mod language_picker;
 mod link_confirm;
 mod log_inline_ref;
 mod log_menu;
-mod log_multiselect;
+pub(crate) use gitpoulpi_app::log_multiselect;
 mod log_pills;
 mod log_table;
 mod md_editor;

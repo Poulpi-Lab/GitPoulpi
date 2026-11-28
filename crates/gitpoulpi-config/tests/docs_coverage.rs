@@ -3,6 +3,7 @@
 //! `docs/user/config-reference.md`, so a new setting cannot ship
 //! undocumented.
 
+use gitpoulpi_config::split::{Home, KEY_HOME};
 use gitpoulpi_config::{Config, LIVE_KEYS};
 
 fn reference() -> String {
@@ -80,5 +81,96 @@ fn every_config_key_is_in_the_config_reference() {
     assert!(
         missing.is_empty(),
         "docs/user/config-reference.md does not document: {missing:?}"
+    );
+}
+
+/// Which file a `##` section of the reference is about: `tui.toml` when its
+/// title says `tui.toml` (`## `[ui]` in `tui.toml``) or its first line says
+/// ``File: `tui.toml`.``; every other section is `config.toml`.
+fn section_file(heading: &str, body: &str) -> &'static str {
+    let first = body.lines().find(|l| !l.trim().is_empty()).unwrap_or("");
+    if heading.contains("`tui.toml`") || first.starts_with("File: `tui.toml`") {
+        "tui.toml"
+    } else {
+        "config.toml"
+    }
+}
+
+/// The files under which `key` is *defined*: a table row whose first cell
+/// names it, or the `**Dates**` paragraph (the date keys are described in
+/// prose). Mentions elsewhere (a cross reference, an example) do not count.
+fn defining_files(doc: &str, key: &str) -> Vec<&'static str> {
+    let needle = format!("`{key}`");
+    let mut files = Vec::new();
+    for section in doc.split("\n## ").skip(1) {
+        let (heading, body) = section.split_once('\n').unwrap_or((section, ""));
+        let defines = body.lines().any(|l| {
+            let first_cell = l
+                .strip_prefix("| ")
+                .map(|r| r.split(" | ").next().unwrap_or(""));
+            first_cell.is_some_and(|c| c.contains(&needle))
+                || (l.starts_with("**Dates**") && body.contains(&needle))
+        });
+        if defines {
+            files.push(section_file(heading, body));
+        }
+    }
+    files
+}
+
+/// Each interface key is documented under the file `KEY_HOME` says holds it:
+/// `Common` keys under `config.toml` sections only, `Tui` and `PerInterface`
+/// keys under `tui.toml` sections only (a key documented under both, or under
+/// the wrong one, sends readers to a file that ignores it).
+#[test]
+fn every_interface_key_is_documented_under_its_file() {
+    let doc = reference();
+    let mut wrong = Vec::new();
+    for (key, home) in KEY_HOME {
+        // `diff_view_mode` is legacy and only named in prose.
+        if *key == "ui.diff_view_mode" || *key == "keybindings" {
+            continue;
+        }
+        let want = match home {
+            Home::Common => "config.toml",
+            Home::Tui | Home::PerInterface => "tui.toml",
+        };
+        let found = defining_files(&doc, key);
+        if found.is_empty() || found.iter().any(|f| *f != want) {
+            wrong.push(format!("{key}: want {want}, found {found:?}"));
+        }
+    }
+    assert!(
+        wrong.is_empty(),
+        "docs/user/config-reference.md documents keys under the wrong file: {wrong:#?}"
+    );
+    // The two whole tables that are not rows.
+    assert_eq!(
+        defining_files(&doc, "merge.side_by_side_min_width"),
+        ["tui.toml"]
+    );
+    let keybindings = doc
+        .split("\n## ")
+        .find(|s| s.starts_with("`[keybindings]`"));
+    let (heading, body) = keybindings.unwrap().split_once('\n').unwrap();
+    assert_eq!(section_file(heading, body), "tui.toml");
+}
+
+/// `desktop.*` keys (the `desktop.toml` of the desktop frontend) are
+/// deliberately NOT required in `docs/user/config-reference.md` yet: their
+/// documentation is a pending wave with native reviewers. This named allowance
+/// keeps the list explicit; when the wave lands, delete it and check
+/// `DESKTOP_LIVE_KEYS` and the `DesktopUiConfig` keys like the test above.
+#[test]
+fn desktop_keys_are_excused_until_the_documentation_wave() {
+    let desktop_keys = gitpoulpi_config::desktop_ui_file::DESKTOP_LIVE_KEYS;
+    assert!(!desktop_keys.is_empty());
+    assert!(
+        desktop_keys.iter().all(|k| k.starts_with("desktop.ui.")),
+        "the allowance covers desktop.ui.* keys only"
+    );
+    assert!(
+        LIVE_KEYS.iter().all(|k| !k.starts_with("desktop.")),
+        "desktop keys have their own list, so the test above never asks for them"
     );
 }

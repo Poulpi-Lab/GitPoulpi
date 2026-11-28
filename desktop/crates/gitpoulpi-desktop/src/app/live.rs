@@ -47,6 +47,8 @@ struct Drained {
     rejected: Vec<gitpoulpi_link::PushRejectedNotice>,
     /// Undos and redos the daemon found risky.
     undo_confirms: Vec<gitpoulpi_link::undo_ui::PendingConfirm>,
+    /// The newest LFS snapshot a refresh carried.
+    lfs: Option<gitpoulpi_link::lfs_ui::LfsSnapshot>,
 }
 
 /// `a` and `b` together: a part changed when it changed in either.
@@ -76,6 +78,9 @@ fn sort(events: Vec<LinkEvent>) -> Drained {
                 // place the window learns an operation another frontend left stopped.
                 if let Ok(state) = &outcome.operation_state_result {
                     d.operation = Some(state.clone());
+                }
+                if let Some(lfs) = &outcome.lfs {
+                    d.lfs = Some(lfs.clone());
                 }
                 // The first outcome only says what the panels loaded themselves just now.
                 if !outcome.summary.first {
@@ -140,9 +145,17 @@ impl Workspace {
         }
         if let Some(state) = drained.operation {
             self.operation = state;
+            let merging = matches!(
+                self.operation,
+                Some(gitpoulpi_core::domain::OperationState::Merge { .. })
+            );
+            self.right.update(cx, |r, cx| r.set_merging(merging, cx));
         }
         if drained.visibility {
             self.refs.update(cx, |r, cx| r.on_visibility_event(cx));
+        }
+        if let Some(lfs) = drained.lfs {
+            self.set_lfs_snapshot(lfs, cx);
         }
         if let Some(changed) = drained.changed {
             self.apply_changes(changed, cx);
@@ -245,6 +258,7 @@ impl Workspace {
     pub(super) fn reset_live(&mut self, cx: &mut Context<Self>) {
         self.live = LiveState::default();
         self.operation = None;
+        self.right.update(cx, |r, cx| r.set_merging(false, cx));
         status::clear(cx);
     }
 }

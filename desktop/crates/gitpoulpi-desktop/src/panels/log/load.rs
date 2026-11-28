@@ -28,7 +28,7 @@ impl LogPanel {
     pub fn reload(&mut self, cx: &mut Context<Self>) {
         let started = Instant::now();
         self.columns.widths = PrefsStore::get(cx).columns_for(&self.repo_key());
-        let (settings, method) = load_settings();
+        let (settings, method) = load_settings(cx);
         self.lazy.apply_settings(settings);
         self.count_method = method;
         self.generation += 1;

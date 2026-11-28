@@ -215,7 +215,7 @@ GitPoulpi는 다음 파일도 보관합니다:
 
 | 항목 | 위치 |
 |---|---|
-| 설정(`config.toml`)과 세션 | OS의 구성 폴더. `GITPOULPI_CONFIG_DIR`로 바꿀 수 있습니다. |
+| 설정(`config.toml`과 `tui.toml`)과 세션 | OS의 구성 폴더. `GITPOULPI_CONFIG_DIR`로 바꿀 수 있습니다. |
 | 저장소별 상태 | 기본적으로 저장소의 `.git` 폴더 안 `gitpoulpi/`(`session.per_repo_state_dir`로 작업 트리의 `.gitpoulpi/`나 사용자 데이터 폴더로 옮길 수 있음). |
 | 캐시(아바타) | OS의 캐시 폴더. |
 | 토큰과 API 키 | credential helper. **설정 > SSH 및 자격 증명 > 모든 사용자 이름과 비밀번호 삭제**로 제거합니다. |

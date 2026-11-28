@@ -2785,7 +2785,7 @@ hint_conflicts = "конфликты"
 conflicts_of = "Конфликты: {label} - Esc показывает все сочетания"
 no_conflicts = "У этого сочетания нет конфликтов"
 hint_controls = "управление"
-config_issues = { one = "config.toml: {n} запись проигнорирована - {id}: {message}", few = "config.toml: {n} записи проигнорированы - {id}: {message}", many = "config.toml: {n} записей проигнорировано - {id}: {message}", other = "config.toml: {n} записей проигнорировано - {id}: {message}" }
+config_issues = { one = "{file}: {n} запись проигнорирована - {id}: {message}", few = "{file}: {n} записи проигнорированы - {id}: {message}", many = "{file}: {n} записей проигнорировано - {id}: {message}", other = "{file}: {n} записей проигнорировано - {id}: {message}" }
 no_match = "нет сочетаний, подходящих под фильтры"
 unbound = "(не назначено)"
 none = "(нет)"

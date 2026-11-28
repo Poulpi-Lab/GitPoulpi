@@ -219,7 +219,7 @@ longer exists (the file was deleted or renamed), the graph uses the active
 theme's lane colors, and Settings shows the name marked *not found* until you
 pick another. ![The Graph color theme combo on Appearance: Follow theme, then every lane palette with a few of its colors](images/settings-log-graph-lanes.png)
 
-In `config.toml`:
+In `tui.toml`:
 
 ```toml
 [ui]
@@ -287,7 +287,7 @@ color is ignored, an unknown `base` falls back to `dark`, and
 them once in the status line).
 
 Files are re-read when the Theme combo opens and when Settings close. A
-running window also notices `config.toml` (a `gitpoulpi config set ui.theme ...`
+running window also notices `tui.toml` (a `gitpoulpi config set ui.theme ...`
 from a shell) and the active theme's file being rewritten, and applies the new
 colors within about a second, without a restart.
 
@@ -356,7 +356,7 @@ row.
 through Settings: **System (follows terminal)**, the presets, then your own
 theme files, each with four small color chips. The current theme is checked.
 Type to narrow the list; moving the highlight previews the theme at once,
-**Enter** applies it and saves `ui.theme` to `config.toml`, **Esc** (or a click
+**Enter** applies it and saves `ui.theme` to `tui.toml`, **Esc** (or a click
 outside the list) puts the previous theme back and saves nothing.
 
 Under the filter field a segmented prefilter narrows the list: **All**,

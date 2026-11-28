@@ -12,7 +12,8 @@ Quando sposti un tasto, questi punti mostrano il tasto nuovo. Per il mouse, vedi
 
 Apri **Impostazioni > Tastiera e mouse**. La pagina è descritta in
 [Impostazioni](settings.md#tastiera-e-mouse). Le modifiche si applicano subito e
-sono salvate nella tabella `[keybindings]` di `config.toml`. Puoi anche
+sono salvate nella tabella `[keybindings]` di `tui.toml` (il file delle
+impostazioni dell'interfaccia del terminale, accanto a `config.toml`). Puoi anche
 modificare quella tabella a mano:
 
 ```toml
@@ -475,9 +476,9 @@ per vederne l'intero gruppo.
 
 Ogni riga della palette termina con un pulsante tasto (`[k]`), e `Alt+K` fa lo stesso sulla riga evidenziata: apre **Impostazioni > Tastiera e mouse** filtrato sulla scorciatoia di quel comando, pronto per essere riassegnato. Un comando senza scorciatoia propria ne riceve una qui: compare in **Comandi della palette**, senza tasto di default, e il tasto che gli assegni esegue il comando esattamente come sceglierlo nella palette (un comando che ora non può partire ne dice il motivo). La riga mostra poi il tuo tasto.
 
-In `config.toml` è la tabella `[keybindings.palette]`, con il nome del comando (`toggle_minimap = "Ctrl+Alt+M"`). Un tasto in conflitto con un'altra azione è mostrato in rosso, e `c` sulla sua riga elenca tutte le azioni con cui è in conflitto.
+In `tui.toml` è la tabella `[keybindings.palette]`, con il nome del comando (`toggle_minimap = "Ctrl+Alt+M"`). Un tasto in conflitto con un'altra azione è mostrato in rosso, e `c` sulla sua riga elenca tutte le azioni con cui è in conflitto.
 
-Una sequenza che hai definito (una catena con nome di comandi della palette) riceve un tasto allo stesso modo: `[keybindings.sequence]` accetta l'id della sequenza (`backup = "Ctrl+Alt+B"`), un tasto per un id che non esiste viene segnalato e ignorato, e la tabella segue `config.toml` mentre l'app è in esecuzione. Ogni sequenza è anche una riga della palette, `Sequenza: <nome>`, che mostra il suo tasto.
+Una sequenza che hai definito (una catena con nome di comandi della palette) riceve un tasto allo stesso modo: `[keybindings.sequence]` accetta l'id della sequenza (`backup = "Ctrl+Alt+B"`), un tasto per un id che non esiste viene segnalato e ignorato, e la tabella segue `tui.toml` mentre l'app è in esecuzione. Ogni sequenza è anche una riga della palette, `Sequenza: <nome>`, che mostra il suo tasto.
 
 La riga di aiuto sotto l'elenco indica questo tasto (`Alt+K` di default). È l'azione `palette.configure_shortcut`, quindi si riassegna come le altre.
 

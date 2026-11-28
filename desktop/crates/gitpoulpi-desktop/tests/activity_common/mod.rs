@@ -3,13 +3,14 @@
 //! repository as its remote, the window, questions and forms).
 #![allow(dead_code)]
 
-use gitpoulpi_core::domain::Oid;
+use gitpoulpi_core::domain::{Oid, OperationKind};
 use gitpoulpi_desktop::app::Workspace;
 use gitpoulpi_desktop::panels::activity::safety::{self, SafetyView};
 use gitpoulpi_desktop::panels::activity::safety_model::Tab;
 use gitpoulpi_desktop::panels::activity::{activity_log, ActivityView};
+use gitpoulpi_ipc::{JobInfo, JobState};
 use gitpoulpi_link::undo_label::entry_text;
-use gitpoulpi_link::Action;
+use gitpoulpi_link::{Action, JobEvent, LinkContext, LinkHost as _};
 use gitpoulpi_testkit::FixtureRepo;
 use gpui_kit::{AnyWindowHandle, Entity, TestAppContext};
 
@@ -106,4 +107,30 @@ pub fn new_tag(cx: &mut TestAppContext, ws: &Entity<Workspace>, repo: &FixtureRe
 
 pub fn has_tag(repo: &FixtureRepo, name: &str) -> bool {
     repo.git(&["tag", "--list", name]).trim() == name
+}
+
+/// A synthetic background job.
+pub fn job(id: u64, kind: OperationKind, state: JobState, repo: &str) -> JobInfo {
+    JobInfo {
+        id,
+        kind,
+        repo: Some(gitpoulpi_core::domain::RepoId(repo.to_string())),
+        dest: None,
+        label: format!("job {id}"),
+        state,
+        phase: None,
+        progress: None,
+        started_at: None,
+        joiners: 0,
+        queued_after: None,
+        not_cancellable: None,
+        error: None,
+    }
+}
+
+/// Tells the window's link host about a job, the way the daemon's events do.
+pub fn feed_job(cx: &mut TestAppContext, ws: &Entity<Workspace>, j: JobInfo) {
+    let host = ws.read_with(cx, |ws, _| ws.backend().host());
+    host.jobs(&LinkContext::detached(), JobEvent::Changed(j));
+    cx.run_until_parked();
 }

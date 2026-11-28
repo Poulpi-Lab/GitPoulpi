@@ -24,11 +24,11 @@ docker run -it --rm \
 | Chemin | Ce qu'il contient |
 |---|---|
 | `/work` | Le dossier de travail. Montez-y vos dépôts. |
-| `/config` | Les paramètres (`config.toml`), les sessions et, en sous-dossiers, les données et le cache (`GITPOULPI_CONFIG_DIR=/config`). Utilisez un volume nommé ou un montage lié pour les conserver. |
+| `/config` | Les paramètres (`config.toml`, `tui.toml`), les sessions et, en sous-dossiers, les données et le cache (`GITPOULPI_CONFIG_DIR=/config`). Utilisez un volume nommé ou un montage lié pour les conserver. |
 | `/data`, `/cache` | Déclarés aussi comme volumes, pour les outils qui suivent les variables XDG (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Ce n'est pas un volume : un neuf par conteneur. |
 
-Sans volume pour `/config`, chaque exécution avec `--rm` repart avec les paramètres par défaut. Pour partir de votre propre `config.toml`, montez-le : `-v "$PWD/config.toml":/config/config.toml:ro` (lecture seule signifie que les Paramètres ne peuvent pas enregistrer).
+Sans volume pour `/config`, chaque exécution avec `--rm` repart avec les paramètres par défaut. Pour partir de votre propre `config.toml`, montez-le : `-v "$PWD/config.toml":/config/config.toml:ro` (lecture seule signifie que les Paramètres ne peuvent pas enregistrer). Les paramètres d'interface sont dans un second fichier, `tui.toml`, qui se monte de la même façon (`-v "$PWD/tui.toml":/config/tui.toml:ro`) ; voir la [Référence de configuration](config-reference.md#deux-fichiers--configtoml-et-tuitoml).
 
 ## Dépôts appartenant à un autre utilisateur
 

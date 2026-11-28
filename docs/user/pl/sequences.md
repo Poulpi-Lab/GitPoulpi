@@ -241,7 +241,7 @@ strona zapisuje.
 
 ## Uruchamianie sekwencji
 
-Sekwencja to nazwana lista kroków, każdy to polecenie palety (stage wszystkiego, opis commita napisany przez AI, commit, push...). Uruchom ją z palety (`Sekwencja: <nazwa>`), klawiszem, który jej nadałeś w Ustawienia > Klawiatura i mysz (`[keybindings.sequence]` w `config.toml`), albo z wiersza poleceń (`gitpoulpi sequence run`).
+Sekwencja to nazwana lista kroków, każdy to polecenie palety (stage wszystkiego, opis commita napisany przez AI, commit, push...). Uruchom ją z palety (`Sekwencja: <nazwa>`), klawiszem, który jej nadałeś w Ustawienia > Klawiatura i mysz (`[keybindings.sequence]` w `tui.toml`), albo z wiersza poleceń (`gitpoulpi sequence run`).
 
 Gdy działa, pasek nad górą Logu pokazuje `<nazwa> k/n`, krok i na co czeka. Uruchomienie widać też w panelu Zadania jako `Sekwencja <nazwa> k/n: <krok>`. Naraz działa jedna sekwencja; uruchomienie drugiej mówi, która już działa.
 

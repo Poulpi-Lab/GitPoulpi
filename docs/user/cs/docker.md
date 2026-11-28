@@ -24,11 +24,11 @@ docker run -it --rm \
 | Cesta | Co obsahuje |
 |---|---|
 | `/work` | Pracovní adresář. Sem připojte (bind mount) své repozitáře. |
-| `/config` | Nastavení (`config.toml`), relace a jako podsložky data a cache (`GITPOULPI_CONFIG_DIR=/config`). Pro uchování použijte pojmenovaný svazek nebo bind mount. |
+| `/config` | Nastavení (`config.toml`, `tui.toml`), relace a jako podsložky data a cache (`GITPOULPI_CONFIG_DIR=/config`). Pro uchování použijte pojmenovaný svazek nebo bind mount. |
 | `/data`, `/cache` | Také deklarované jako svazky, pro nástroje, které se řídí proměnnými XDG (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Není to svazek: pro každý kontejner nový. |
 
-Bez svazku pro `/config` začíná každé spuštění s `--rm` s výchozím nastavením. Chcete-li začít z vlastního `config.toml`, připojte ho: `-v "$PWD/config.toml":/config/config.toml:ro` (jen pro čtení znamená, že Nastavení nemůže ukládat).
+Bez svazku pro `/config` začíná každé spuštění s `--rm` s výchozím nastavením. Chcete-li začít z vlastního `config.toml`, připojte ho: `-v "$PWD/config.toml":/config/config.toml:ro` (jen pro čtení znamená, že Nastavení nemůže ukládat). Nastavení rozhraní jsou ve druhém souboru, `tui.toml`, který se připojí stejně (`-v "$PWD/tui.toml":/config/tui.toml:ro`); viz [Referenční příručka konfigurace](config-reference.md#dva-soubory-configtoml-a-tuitoml).
 
 ## Repozitáře vlastněné jiným uživatelem
 

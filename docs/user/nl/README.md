@@ -146,7 +146,7 @@ herschrijft, met voorbeeld, Lua-scripts en één keer ongedaan maken.
 
 ## Naslag en hulp
 
-28. **[Configuratienaslag](config-reference.md)**: elke `config.toml`-sleutel,
+28. **[Configuratienaslag](config-reference.md)**: elke `config.toml`- en `tui.toml`-sleutel,
     de standaardwaarde en het effect, de instellingen per repository,
     omgevingsvariabelen.
 29. **[Probleemoplossing en FAQ](troubleshooting.md)**: pictogrammen,

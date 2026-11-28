@@ -9,8 +9,7 @@
 
 use std::path::PathBuf;
 
-use gitpoulpi_core::domain::{FileStatus, HunkId, LineSelector, StatusEntry};
-use gitpoulpi_i18n::msg;
+use gitpoulpi_core::domain::{HunkId, LineSelector, StatusEntry};
 use gitpoulpi_link::commit_settings::CommitSettings;
 use gitpoulpi_link::Action;
 
@@ -72,61 +71,6 @@ pub fn part_action(path: PathBuf, hunk: HunkId, lines: Option<Vec<u32>>, op: Par
             }
         }
     }
-}
-
-/// The question before a discard: the count and, when some are untracked, how many.
-pub fn discard_prompt(entries: &[StatusEntry], paths: &[PathBuf]) -> String {
-    let untracked = paths
-        .iter()
-        .filter(|p| {
-            entries
-                .iter()
-                .any(|e| &e.path == *p && e.worktree == Some(FileStatus::Untracked))
-        })
-        .count();
-    let n = paths.len() as u64;
-    if untracked == 0 {
-        msg::status_pane::discard_prompt(n)
-    } else {
-        msg::status_pane::discard_prompt_untracked(n, untracked)
-    }
-}
-
-/// Why the commit button cannot commit yet, in the terminal UI's order: a conflict first, then nothing
-/// staged (unless amending), then an empty summary. The text is the button's own label.
-pub fn commit_readiness(
-    summary: &str,
-    amend: bool,
-    staged: usize,
-    conflicts: usize,
-) -> Result<(), &'static str> {
-    if conflicts > 0 {
-        return Err(msg::conflict_guard::NEED_RESOLVE.get());
-    }
-    if !amend && staged == 0 {
-        return Err(msg::composer::NEED_STAGED.get());
-    }
-    if summary.trim().is_empty() {
-        return Err(msg::composer::NEED_SUMMARY.get());
-    }
-    Ok(())
-}
-
-/// The commit message: summary, a blank line, then the description; the repository's comment lines
-/// removed when that setting is on. `None` when nothing is left.
-pub fn commit_message(
-    summary: &str,
-    description: &str,
-    settings: &CommitSettings,
-) -> Option<String> {
-    let summary = summary.trim_end();
-    let message = if description.trim().is_empty() {
-        summary.to_string()
-    } else {
-        format!("{summary}\n\n{}", description.trim_end())
-    };
-    let message = settings.prepared(&message);
-    (!message.trim().is_empty()).then_some(message)
 }
 
 /// The `Commit` action of the form.
@@ -213,15 +157,6 @@ mod tests {
         PathBuf::from(s)
     }
 
-    fn entry(path: &str, worktree: Option<FileStatus>) -> StatusEntry {
-        StatusEntry {
-            path: p(path),
-            index: None,
-            worktree,
-            renamed_from: None,
-        }
-    }
-
     #[test]
     fn a_selection_is_one_action() {
         assert_eq!(stage_action(&[], true), None);
@@ -272,66 +207,6 @@ mod tests {
             }
             other => panic!("{other:?}"),
         }
-    }
-
-    #[test]
-    fn the_discard_question_counts_untracked_files() {
-        let entries = [
-            entry("a", Some(FileStatus::Modified)),
-            entry("b", Some(FileStatus::Untracked)),
-        ];
-        let plain = discard_prompt(&entries, &[p("a")]);
-        assert!(
-            plain.contains("1 file") && !plain.contains("untracked"),
-            "{plain}"
-        );
-        let both = discard_prompt(&entries, &[p("a"), p("b")]);
-        assert!(
-            both.contains("2 files") && both.contains("1 untracked"),
-            "{both}"
-        );
-    }
-
-    #[test]
-    fn readiness_follows_the_terminal_uis_order() {
-        assert!(commit_readiness("x", false, 1, 0).is_ok());
-        assert_eq!(
-            commit_readiness("x", false, 0, 0),
-            Err(msg::composer::NEED_STAGED.get())
-        );
-        assert!(
-            commit_readiness("x", true, 0, 0).is_ok(),
-            "amend needs nothing staged"
-        );
-        assert_eq!(
-            commit_readiness("  ", false, 1, 0),
-            Err(msg::composer::NEED_SUMMARY.get())
-        );
-        assert_eq!(
-            commit_readiness("x", false, 1, 2),
-            Err(msg::conflict_guard::NEED_RESOLVE.get()),
-            "a conflict blocks everything"
-        );
-    }
-
-    #[test]
-    fn the_message_joins_summary_and_body_and_strips_comments_when_asked() {
-        let mut settings = CommitSettings::default();
-        assert_eq!(
-            commit_message("Fix it", "", &settings).as_deref(),
-            Some("Fix it")
-        );
-        assert_eq!(
-            commit_message("Fix it", "because\n", &settings).as_deref(),
-            Some("Fix it\n\nbecause")
-        );
-        settings.strip_comments = true;
-        let stripped = commit_message("Fix it", "# note\nbody", &settings).unwrap();
-        assert!(
-            !stripped.contains("# note") && stripped.contains("body"),
-            "{stripped}"
-        );
-        assert_eq!(commit_message("# only", "", &settings), None);
     }
 
     #[test]

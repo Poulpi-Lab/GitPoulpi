@@ -188,7 +188,7 @@ Každý vestavěný motiv, na stejném repozitáři s vybraným merge commitem (
 
 Každý motiv přináší vlastní barvy drah pro graf Logu, ale libovolný motiv můžete kombinovat s libovolnou paletou: **Nastavení > Vzhled > Barevný motiv grafu** nabízí **Podle motivu** (výchozí) plus každou paletu drah každého motivu (GitPoulpi Dark, GitPoulpi Light, poté Material, Serie, ... a `graph_palette` vašich vlastních souborů motivů, uvedené za předvolbami pod názvem motivu). Vlastní motiv se objeví při dalším otevření seznamu (soubory se tehdy čtou znovu) a jeho výběr uloží název jeho souboru do `ui.graph_color_theme` (u hlavní instalace v `[ui]`, u ostatních do vlastního záznamu `[installation.settings.<id>]`, stejně jako motiv). Soubor motivu bez `graph_palette` má barvy drah svého `base` (výchozí předvolba, když žádný neuvádí), stejné dědění jako každá jiná barva souboru. Vlastní motiv pojmenovaný jako vestavěná paleta drah (například `gruvbox`) tuto paletu v seznamu nahradí. Pokud nakonfigurovaný název už neexistuje (soubor byl smazán nebo přejmenován), graf použije barvy drah aktivního motivu a Nastavení ukazuje název označený *nenalezeno*, dokud nevyberete jiný. ![Rozbalovací seznam Barevný motiv grafu na stránce Vzhled: Podle motivu, poté každá paleta drah s několika svými barvami](../images/settings-log-graph-lanes.png)
 
-V `config.toml`:
+V `tui.toml`:
 
 ```toml
 [ui]
@@ -241,7 +241,7 @@ by obě pozadí vykreslila stejně, označí slova tučně a podtržením. Viz
 
 Barvy jsou `"#rrggbb"`, `"ansi:N"` (položka N palety terminálu) nebo `"default"` (vlastní barva terminálu). Skupiny a klíče jsou ty z `gitpoulpi theme export <slug>`. Nic není fatální: neznámý klíč nebo špatná barva se ignorují, neznámý `base` se vrátí na `dark` a `gitpoulpi theme list` hlásí každý problém pod `warnings` (aplikace je jednou ukáže ve stavovém řádku).
 
-Soubory se znovu čtou při otevření seznamu Motiv a při zavření Nastavení. Běžící okno si navíc všimne přepsání `config.toml` (například `gitpoulpi config set ui.theme ...` z shellu) i souboru aktivního motivu a nové barvy použije přibližně do jedné sekundy, bez restartu.
+Soubory se znovu čtou při otevření seznamu Motiv a při zavření Nastavení. Běžící okno si navíc všimne přepsání `tui.toml` (například `gitpoulpi config set ui.theme ...` z shellu) i souboru aktivního motivu a nové barvy použije přibližně do jedné sekundy, bez restartu.
 
 ### `ui.border_focused`
 
@@ -278,7 +278,7 @@ V Nastavení > Vzhled uvádí seznam Motiv **Systém (podle terminálu)**, před
 
 ### Změna motivu z palety
 
-**Aplikace: Změnit motiv...** (`Ctrl+P`, nebo `Ctrl+N t`; klávesa jde přemapovat jako `nav_prefix.change_theme`) otevře seznam týchž motivů bez cesty přes Nastavení: **Systém (podle terminálu)**, předvolby a poté vaše vlastní soubory motivů, každý se čtyřmi malými barevnými čipy. Aktuální motiv je zaškrtnutý. Psaním seznam zúžíte; přesun zvýraznění zobrazí náhled motivu okamžitě, **Enter** jej použije a uloží `ui.theme` do `config.toml`, **Esc** (nebo klik mimo seznam) vrátí předchozí motiv a nic neuloží.
+**Aplikace: Změnit motiv...** (`Ctrl+P`, nebo `Ctrl+N t`; klávesa jde přemapovat jako `nav_prefix.change_theme`) otevře seznam týchž motivů bez cesty přes Nastavení: **Systém (podle terminálu)**, předvolby a poté vaše vlastní soubory motivů, každý se čtyřmi malými barevnými čipy. Aktuální motiv je zaškrtnutý. Psaním seznam zúžíte; přesun zvýraznění zobrazí náhled motivu okamžitě, **Enter** jej použije a uloží `ui.theme` do `tui.toml`, **Esc** (nebo klik mimo seznam) vrátí předchozí motiv a nic neuloží.
 
 Pod polem filtru zužuje seznam segmentovaný předfiltr: **Vše**, **Tmavé**, **Světlé** a **Barevné**, plus **Vlastní**, když máte vlastní soubory motivů (klik na segment, `Tab` / `Shift+Tab`, nebo `Alt+1`..`Alt+5`). Tmavé a Světlé se určují podle jasu `ui.bg` motivu; **Barevné** ponechá motivy, jejichž pozadí je zřetelně zabarvené (modré, fialové, žluté, zelené...), a vynechá bílé, téměř bílé, černé a téměř černé šedé, takže Solarized Dark, Dracula nebo Nord jsou barevné, zatímco GitHub Dark a One Light ne. Barevný motiv se zobrazí i pod Tmavé nebo Světlé. **Systém** a průhledné motivy (bez vlastního pozadí) se objeví jen pod Vše. **Vlastní** ponechá jen soubory motivů z vaší složky `themes/` (vlastní motiv je pro tato tlačítka stále Tmavý, Světlý nebo Barevný); tlačítko se nevykreslí a klávesami není dosažitelné, dokud tato složka žádný motiv neobsahuje. Předfiltr se kombinuje s tím, co píšete. Výběr barevného motivu grafu a jazyka zobrazuje náhled stejně: dráhy Logu a celé rozhraní se mění, jak se zvýraznění pohybuje.
 

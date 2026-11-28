@@ -95,12 +95,16 @@ pub const FIELDS: [CommitField; 6] = [
 
 /// What lands on the clipboard: the whole message (not the one-line summary), the date as the details
 /// pane writes it.
-pub fn field_value(field: CommitField, node: &CommitNode) -> String {
+pub fn field_value(
+    field: CommitField,
+    node: &CommitNode,
+    dates: &gitpoulpi_app::dates::DateSettings,
+) -> String {
     match field {
         CommitField::Message => node.message.clone(),
         CommitField::AuthorName => node.author_name.clone(),
         CommitField::AuthorEmail => node.author_email.clone(),
-        CommitField::Date => crate::util::dates::verbose(node.timestamp),
+        CommitField::Date => dates.format_verbose(node.timestamp),
         CommitField::ShortSha => short(node.id),
         CommitField::LongSha => node.id.to_hex(),
     }
@@ -156,11 +160,20 @@ mod tests {
             timestamp: 0,
             refs: vec![],
         };
-        assert_eq!(field_value(CommitField::Message, &node), "one\n\ntwo");
-        assert_eq!(field_value(CommitField::ShortSha, &node), "abababa");
-        assert_eq!(field_value(CommitField::LongSha, &node).len(), 40);
         assert_eq!(
-            field_value(CommitField::AuthorEmail, &node),
+            field_value(CommitField::Message, &node, &Default::default()),
+            "one\n\ntwo"
+        );
+        assert_eq!(
+            field_value(CommitField::ShortSha, &node, &Default::default()),
+            "abababa"
+        );
+        assert_eq!(
+            field_value(CommitField::LongSha, &node, &Default::default()).len(),
+            40
+        );
+        assert_eq!(
+            field_value(CommitField::AuthorEmail, &node, &Default::default()),
             "ada@example.com"
         );
         assert_eq!(FIELDS.len(), 6);

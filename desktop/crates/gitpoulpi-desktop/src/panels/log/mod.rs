@@ -13,7 +13,6 @@ mod columns;
 pub mod compare;
 mod data;
 mod load;
-mod marks;
 pub mod menu;
 pub mod menu_items;
 mod ops;
@@ -46,8 +45,8 @@ use crate::theme::Skin;
 use columns::ColumnState;
 use data::LogData;
 pub use data::Selection;
+use gitpoulpi_app::log_multiselect::LogSelection;
 use gpui_kit::Entity;
-use marks::Marks;
 use search::SearchState;
 
 actions!(
@@ -115,7 +114,7 @@ pub struct LogPanel {
     data: LogData,
     selected: usize,
     /// Several rows selected next to the cursor (Ctrl/Shift+click, Space), and the display rows they are.
-    marks: Marks,
+    marks: LogSelection,
     marked_rows: Arc<HashSet<usize>>,
     /// The two ends of a two-row comparison were traded.
     swapped: bool,
@@ -161,30 +160,34 @@ pub fn commit_count_text(loaded: usize, total: TotalShown) -> String {
     }
 }
 
-/// The log settings of the user's config (defaults when it cannot be read).
-fn load_settings() -> (LogLoadSettings, CommitCountMethod) {
-    match gitpoulpi_config::Settings::resolve_ambient() {
-        Ok(s) => (
-            LogLoadSettings::from_config(&s.config().general),
-            s.config().log.commit_count,
-        ),
-        Err(_) => (LogLoadSettings::default(), CommitCountMethod::default()),
-    }
+/// The log settings of the common config (`config.toml`).
+fn load_settings(cx: &gpui_kit::App) -> (LogLoadSettings, CommitCountMethod) {
+    let config = crate::prefs::PrefsStore::get(cx).common();
+    (
+        LogLoadSettings::from_config(&config.general),
+        config.log.commit_count,
+    )
 }
 
 impl EventEmitter<LogEvent> for LogPanel {}
 
 impl LogPanel {
+    /// The settings files changed: the column widths and the date patterns are taken again.
+    pub fn settings_changed(&mut self, cx: &mut Context<Self>) {
+        self.columns.widths = crate::prefs::PrefsStore::get(cx).columns_for(&self.repo_key());
+        cx.notify();
+    }
+
     pub fn new(backend: Shared, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let (search, subs) = SearchState::new(window, cx);
         let columns = ColumnState::for_repo(&backend.repo_root().to_string_lossy(), cx);
         let (hidden, solo) = gitpoulpi_app::refs_tree::load_ref_visibility(&backend.repo_root());
-        let (settings, count_method) = load_settings();
+        let (settings, count_method) = load_settings(cx);
         let mut this = Self {
             backend,
             data: LogData::default(),
             selected: 0,
-            marks: Marks::default(),
+            marks: LogSelection::default(),
             marked_rows: Arc::default(),
             swapped: false,
             pill: None,
@@ -368,6 +371,7 @@ impl Render for LogPanel {
             query_active: self.search.active(),
             more: !self.lazy.is_exhausted() && !self.lazy.is_at_ceiling(),
             total,
+            dates: crate::prefs::PrefsStore::get(cx).dates().clone(),
         };
         let list = uniform_list("log-rows", total, move |range, _window, cx| {
             rows.render(range, cx)

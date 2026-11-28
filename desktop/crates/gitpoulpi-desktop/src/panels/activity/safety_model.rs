@@ -345,29 +345,19 @@ pub fn history_detail(row: &HistoryRow, state: &RowState) -> Vec<String> {
     lines
 }
 
-/// How long ago, in the language's relative-time words.
+/// How long ago, in the language's relative-time words (the shared wording).
 pub fn age(then: i64) -> String {
-    use gitpoulpi_i18n::msg::reltime as r;
-    let secs = (crate::util::dates::now_secs() - then).max(0) as u64;
-    match secs {
-        0..=59 => r::JUST_NOW.get().to_string(),
-        60..=3599 => r::minutes_ago(secs / 60),
-        3600..=86_399 => r::hours_ago(secs / 3600),
-        86_400..=604_799 => r::days_ago(secs / 86_400),
-        604_800..=2_591_999 => r::weeks_ago(secs / 604_800),
-        2_592_000..=31_535_999 => r::months_ago(secs / 2_592_000),
-        _ => r::years_ago(secs / 31_536_000),
-    }
+    gitpoulpi_app::compare::relative_age(gitpoulpi_core::time::unix_now(), then)
 }
 
-/// The heading of a day group: Today, Yesterday, else the date.
-pub fn day_heading(day: i64) -> String {
+/// The heading of a day group: Today, Yesterday, else the date in the user's short date format.
+pub fn day_heading(day: i64, dates: &gitpoulpi_app::dates::DateSettings) -> String {
     use gitpoulpi_i18n::msg::undo_label as l;
-    let today = crate::util::dates::now_secs().div_euclid(86_400);
+    let today = gitpoulpi_core::time::unix_now().div_euclid(86_400);
     match today - day {
         0 => l::DAY_TODAY.get().to_string(),
         1 => l::DAY_YESTERDAY.get().to_string(),
-        _ => crate::util::dates::iso_date(day * 86_400),
+        _ => dates.format_short(day * 86_400),
     }
 }
 

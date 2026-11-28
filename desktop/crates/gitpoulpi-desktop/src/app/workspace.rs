@@ -13,15 +13,18 @@ use gpui_kit::component::{
 use gpui_kit::{
     div, px, AnyWindowHandle, App, AppContext as _, Context, Entity, Focusable as _, Image,
     ImageFormat, InteractiveElement as _, IntoElement, ParentElement as _, Render, Styled as _,
-    Subscription, Task, Window,
+    Subscription, Task, Window, WindowBounds,
 };
 
 mod autostash;
 mod commit;
 pub use commit::BannerButton;
+mod file_menu;
 mod ref_forms;
 mod ref_menu_host;
 mod refs;
+mod repo;
+mod repo_lfs;
 mod stage;
 
 use super::actions::WorkspaceHandle;
@@ -69,6 +72,8 @@ pub struct Workspace {
     pub(super) operation: Option<gitpoulpi_core::domain::OperationState>,
     /// The ref menu, while one is open.
     ref_menu: Option<ref_menu_host::OpenMenu>,
+    /// What the worktree, remote, LFS and file commands remember (`workspace/repo.rs`).
+    pub(super) repo: repo::RepoState,
     pub(super) summary: Option<Summary>,
     pub(super) live: LiveState,
     pub(super) _pump: Option<Task<()>>,
@@ -81,7 +86,7 @@ pub struct Workspace {
 
 impl Workspace {
     pub fn new(backend: Shared, window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let layout = PrefsStore::get(cx).layout.clone();
+        let layout = PrefsStore::get(cx).layout();
         let refs = cx.new(|cx| RefsPanel::new(backend.clone(), window, cx));
         let log = cx.new(|cx| LogPanel::new(backend.clone(), window, cx));
         let right = cx.new(|cx| RightPanel::new(backend.clone(), window, cx));
@@ -130,6 +135,9 @@ impl Workspace {
                     RightEvent::SelectParent(oid) => {
                         this.log.update(cx, |l, cx| l.select_oid(*oid, cx))
                     }
+                    RightEvent::FileMenu { path, side, at } => {
+                        this.open_file_menu(path.clone(), *side, *at, window, cx)
+                    }
                 },
             ),
             cx.subscribe_in(
@@ -149,7 +157,8 @@ impl Workspace {
         let weak = cx.weak_entity();
         cx.set_global(WorkspaceHandle(weak));
         cx.defer_in(window, |this, window, cx| {
-            this.log.read(cx).focus_handle(cx).focus(window, cx)
+            this.log.read(cx).focus_handle(cx).focus(window, cx);
+            this.refresh_lfs(window, cx);
         });
         let mut this = Self {
             backend,
@@ -165,6 +174,7 @@ impl Workspace {
             selected_commit: false,
             operation: None,
             ref_menu: None,
+            repo: Default::default(),
             summary: None,
             live: LiveState::default(),
             _pump: None,
@@ -300,50 +310,37 @@ impl Workspace {
         let (state, busy) = self
             .backend
             .with_link(|l| (l.journal_state(), l.undo_busy()));
-        let (entry, refusal) = gitpoulpi_link::undo_ui::side(&state, d);
-        if state.disabled {
-            Avail::Off
-        } else if busy || entry.is_none() {
-            Avail::Nothing
-        } else if let Some(r) = refusal {
-            if d == Direction::Undo && r.forgettable() {
-                Avail::Stuck
-            } else {
-                Avail::Blocked
-            }
-        } else {
-            Avail::Ready
-        }
+        gitpoulpi_link::undo_ui::avail(&state, d, busy)
     }
 
     pub fn toggle_left(&mut self, cx: &mut Context<Self>) {
         self.show_left = !self.show_left;
-        let on = self.show_left;
-        PrefsStore::update(cx, |p| p.layout.show_left = on);
+        self.save_panes(cx);
         cx.notify();
     }
 
     pub fn toggle_right(&mut self, cx: &mut Context<Self>) {
         self.show_right = !self.show_right;
-        let on = self.show_right;
-        PrefsStore::update(cx, |p| p.layout.show_right = on);
+        self.save_panes(cx);
         cx.notify();
     }
 
     pub fn open_repo(&mut self, path: &std::path::Path, cx: &mut Context<Self>) {
         if self.backend.set_repo(path) {
             let root = self.backend.repo_root().to_string_lossy().into_owned();
-            PrefsStore::update(cx, |p| p.remember_recent(&root));
+            PrefsStore::remember_recent(cx, &root);
             self.reset_live(cx);
+            self.repo = Default::default();
+            self.apply_lfs_only(cx);
             self.refs.update(cx, |r, cx| r.reload(cx));
             self.log.update(cx, |l, cx| l.reload(cx));
             cx.notify();
         }
     }
 
-    /// Writes the side panes' widths once a resize settles. The panel order is Refs (if shown), the
-    /// centre, the right pane (if shown).
-    fn save_pane_sizes(&mut self, cx: &mut Context<Self>) {
+    /// Writes which side panes are shown and how wide they are. The panel order is Refs (if shown), the
+    /// centre, the right pane (if shown); a width the panes did not report stays what was stored.
+    fn save_panes(&mut self, cx: &mut Context<Self>) {
         let sizes: Vec<f32> = self
             .panes
             .read(cx)
@@ -351,40 +348,61 @@ impl Workspace {
             .iter()
             .map(|s| s.as_f32())
             .collect();
-        let (left_shown, right_shown) = (self.show_left, self.show_right);
-        let left = left_shown.then(|| sizes.first().copied()).flatten();
-        let right = right_shown
+        let stored = PrefsStore::get(cx).layout();
+        let left = self
+            .show_left
+            .then(|| sizes.first().copied())
+            .flatten()
+            .unwrap_or(stored.left_width);
+        let right = self
+            .show_right
             .then(|| sizes.last().copied())
             .flatten()
-            .filter(|_| sizes.len() >= 2);
-        PrefsStore::update(cx, |p| {
-            if let Some(w) = left {
-                p.layout.left_width = w.clamp(LayoutPrefs::LEFT_RANGE.0, LayoutPrefs::LEFT_RANGE.1);
-            }
-            if let Some(w) = right {
-                p.layout.right_width =
-                    w.clamp(LayoutPrefs::RIGHT_RANGE.0, LayoutPrefs::RIGHT_RANGE.1);
-            }
-        });
+            .filter(|_| sizes.len() >= 2)
+            .unwrap_or(stored.right_width);
+        PrefsStore::set_panes(cx, self.show_left, self.show_right, left, right);
     }
 
-    /// Remembers the window size shortly after the user stops resizing.
+    /// Writes the side panes' widths once a resize settles.
+    fn save_pane_sizes(&mut self, cx: &mut Context<Self>) {
+        self.save_panes(cx);
+    }
+
+    /// Remembers the window's size, position and whether it is maximized shortly after the user stops
+    /// moving or resizing it.
     fn window_resized(&mut self, window: &mut Window, cx: &mut Context<Self>) {
-        let size = window.bounds().size;
-        let (width, height) = (size.width.as_f32(), size.height.as_f32());
+        let (bounds, maximized) = match window.window_bounds() {
+            WindowBounds::Maximized(b) => (b, true),
+            WindowBounds::Windowed(b) | WindowBounds::Fullscreen(b) => (b, false),
+        };
+        let saved = WindowPrefs {
+            width: bounds.size.width.as_f32(),
+            height: bounds.size.height.as_f32(),
+            position: Some((bounds.origin.x.as_f32(), bounds.origin.y.as_f32())),
+            maximized,
+        };
         self._save_window = Some(cx.spawn(async move |_this, cx| {
             cx.background_executor().timer(SAVE_WINDOW_AFTER).await;
-            cx.update(|cx| {
-                PrefsStore::update(cx, |p| p.window = WindowPrefs { width, height }.clamped());
-            });
+            cx.update(|cx| PrefsStore::set_window(cx, saved));
         }));
+    }
+
+    /// The settings files changed on disk (or were re-read): what the panels keep from them is taken again.
+    pub fn settings_changed(&mut self, cx: &mut Context<Self>) {
+        self.refs.update(cx, |r, cx| r.reload(cx));
+        self.log.update(cx, |l, cx| l.settings_changed(cx));
+        let ui = PrefsStore::get(cx).ui().clone();
+        self.diff.update(cx, |d, cx| d.apply_settings(&ui, cx));
+        self.right.update(cx, |r, cx| r.settings_changed(cx));
+        self.menu_bar.update(cx, |m, cx| m.refresh(cx));
+        cx.notify();
     }
 }
 
 impl Render for Workspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let skin = cx.global::<Skin>().clone();
-        let layout = PrefsStore::get(cx).layout.clone();
+        let layout = PrefsStore::get(cx).layout();
         let center = match self.center {
             Center::Log => self.log.clone().into_any_element(),
             Center::Diff => self.diff.clone().into_any_element(),
@@ -394,7 +412,7 @@ impl Render for Workspace {
             panes = panes.child(
                 resizable_panel()
                     .size(px(layout.left_width))
-                    .size_range(px(LayoutPrefs::LEFT_RANGE.0)..px(LayoutPrefs::LEFT_RANGE.1))
+                    .size_range(px(LayoutPrefs::left_range().0)..px(LayoutPrefs::left_range().1))
                     .child(self.refs.clone()),
             );
         }
@@ -403,7 +421,7 @@ impl Render for Workspace {
             panes = panes.child(
                 resizable_panel()
                     .size(px(layout.right_width))
-                    .size_range(px(LayoutPrefs::RIGHT_RANGE.0)..px(LayoutPrefs::RIGHT_RANGE.1))
+                    .size_range(px(LayoutPrefs::right_range().0)..px(LayoutPrefs::right_range().1))
                     .child(self.right.clone()),
             );
         }

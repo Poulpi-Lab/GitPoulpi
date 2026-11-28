@@ -2,17 +2,49 @@
 
 # Yapılandırma başvurusu
 
-`config.toml` dosyasının her anahtarı, varsayılan değeri ve ne yaptığı. Dosyayı elle
+Yapılandırma dosyalarının her anahtarı, varsayılan değeri ve ne yaptığı. Bir dosyayı elle
 düzenlemeniz nadiren gerekir: [Ayarlar ekranı](settings.md) (`Ctrl+,`) siz bir şeyleri
-değiştirdikçe dosyayı yazar, `gitpoulpi config set` de öyle.
+değiştirdikçe onları yazar, `gitpoulpi config set` de öyle.
+
+## İki dosya: `config.toml` ve `tui.toml`
+
+Ayarlar aynı klasördeki iki dosyada durur.
+
+| Dosya | İçeriği |
+|---|---|
+| `config.toml` | GitPoulpi'yi kullanmanın her yolunda ortak olan her şey: depolar, hesaplar ve entegrasyonlar, git davranışı, YZ, MCP, güncellemeler, kurulumlar, dış araçlar ve [`config.toml` içinde `[ui]`](#configtoml-içinde-ui) altında listelenen az sayıdaki `[ui]` anahtarı. |
+| `tui.toml` | Terminal arayüzünün arayüz ayarları: `[ui]` anahtarlarının çoğu (tema, yerleşim, sütunlar, diff ve resim görünümü, dil, fare ve terminal seçenekleri, ...), tüm `[keybindings]` tablosu ve `merge.side_by_side_min_width`. [`tui.toml` içinde `[ui]`](#tuitoml-içinde-ui), [`[keybindings]`](#keybindings) ve [`[merge]`](#merge) altında listelenirler. |
+
+- **`tui.toml` nasıl ortaya çıkar.** GitPoulpi onu kendiliğinden, `config.toml` içinde
+  bulunan arayüz ayarlarının bir kopyası olarak oluşturur: terminal arayüzü başladığında ve
+  `config.toml` varsa ya da bir arayüz ayarının ilk değişikliğinde.
+  `config.toml` bundan asla değiştirilmez.
+- **Var olduktan sonra, sahip olduğu anahtarlar için tek kaynaktır.** Onun anmadığı bir
+  anahtar, eski bir `config.toml` dosyasının hâlâ taşıyor olabileceği değeri değil,
+  varsayılanını alır. Böyle bir anahtarı sıfırlamak için onu `tui.toml` içinden kaldırın.
+- **Daha eski bir GitPoulpi** bunun yanına kuruluysa kendi tam `config.toml` dosyasını
+  okumayı sürdürür. Eski sürümde sonradan değiştirilen bir ayar yenisi tarafından
+  alınmaz, tersi de öyle.
+- **Bir anahtarın hangi dosyada olduğu.** `gitpoulpi config get <key>` dosyayı JSON
+  alanı `file` içinde yazdırır (`--json` ile), `gitpoulpi config set <key> <value>` ona
+  yazar ve `gitpoulpi config path` `path` (`config.toml`) ile `tui_file` (`tui.toml`)
+  değerlerini yazdırır. `gitpoulpi config get`, `set` ve `GITPOULPI_UI_*` değişkenleri
+  anahtarı hangi dosya tutarsa tutsun aynı anahtar adlarını (`ui.theme`) korur; bir
+  değişken yine de iki dosyaya da baskın gelir.
+- **Kurulumlar.** Birincil olmayan bir kurulumun görünümü, `config.toml` içindeki
+  kendi `[installation.settings.<id>]` girdisinde kalır (bkz.
+  [`[installation]`](#installation-bu-makinedeki-her-gitpoulpi-için-bir-girdi)).
+
+Aşağıdaki bölümler her birinin hangi dosyada olduğunu söyler. Bir tabloyu gösteren
+örnekler (`[ui]`, `[[ui.open_in]]`) bölüm başlığında adı geçen dosyaya yazılır.
 
 ## Nerede bulunur ve bir değer nasıl seçilir
 
 | | |
 |---|---|
-| Dosya | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` bunu yazdırır. |
-| Başka bir klasör | `GITPOULPI_CONFIG_DIR=<dir>` tüm yapılandırma klasörünü (dosyayı, `sessions/` klasörünü, daemon port dosyalarını) taşır: taşınabilir bir kurulum, bir test ya da kendi ayarlarınızdan uzak tutulan bir ajan için. |
-| Öncelik | yerleşik varsayılan, sonra `config.toml`, sonra `GITPOULPI_*` değişkeni, sonra bir komut satırı bayrağı. En yüksek olan kazanır. Yanlış bir değer (dosyada yanlış yazılmış bir seçenek, hatalı bir değişken) bir hatadır, asla sessizce yok sayılmaz. |
+| Dosya | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS) ve yanında `tui.toml`. `gitpoulpi config path` ikisini de yazdırır. |
+| Başka bir klasör | `GITPOULPI_CONFIG_DIR=<dir>` tüm yapılandırma klasörünü (dosyaları, `sessions/` klasörünü, daemon port dosyalarını) taşır: taşınabilir bir kurulum, bir test ya da kendi ayarlarınızdan uzak tutulan bir ajan için. |
+| Öncelik | yerleşik varsayılan, sonra `config.toml` (sahip olduğu anahtarlar için `tui.toml`), sonra `GITPOULPI_*` değişkeni, sonra bir komut satırı bayrağı. En yüksek olan kazanır. Yanlış bir değer (dosyada yanlış yazılmış bir seçenek, hatalı bir değişken) bir hatadır, asla sessizce yok sayılmaz. |
 | Değişkenler | Anahtarı büyük harfe çevirin ve noktaları alt çizgiye dönüştürün: `general.auto_prune` anahtarı `GITPOULPI_GENERAL_AUTO_PRUNE` olur. Yalnızca GitPoulpi'nin gerçekten okuduğu anahtarlar için (aşağıda *kullanılmıyor* olarak işaretlenenler ve `ui.log_columns_hidden` gibi listeler için değil). |
 | Bayraklar | `--backend git2\|system`, o komutun başlattığı bir daemon için `general.default_backend` değerini geçersiz kılar. |
 | Token'lar ve anahtarlar | Asla bu dosyada değil. Barındırma token'ları ve YZ API anahtarları sisteminizin kimlik bilgisi yardımcısına (Git Credential Manager, libsecret / `pass`, Keychain) gider; dosya yalnızca bir başvuru (`token_ref`) tutar. Yardımcı yoksa bir token'ı kaydetmek bir mesajla başarısız olur ve token yalnızca oturum boyunca kalır. |
@@ -85,7 +117,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `tui.toml` içinde `[ui]`
 
 **Log ve grafik**
 
@@ -123,7 +155,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` fareyi (ve metin seçimini) terminale bırakır. **Yeniden başlatma.** |
 | `ui.mouse_scroll_lines` | `3` | Tekerlek adımı başına Log satırı, 1 ila 20. **Yeniden başlatma.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` terminalden kitty klavye protokolünü ister (böylece `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` ulaşır; yalnızca Unix, tmux asla yanıt vermez: bkz. [Çoklayıcılar](multiplexers.md#tmux)); `off` hiç istemez. **Yeniden başlatma.** |
-| `ui.logo_color` | `""` | About penceresindeki logonun renk düzeni, bir slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); boş ya da bilinmeyen, derlemenin varsayılanı (`lavender`) anlamına gelir. Logoya tıkladığınızda ya da About içinde bir renk seçtiğinizde yazılır. |
 
 **Avatarlar** (varsayılan olarak kapalı; açmak yazar e-postalarının SHA-256 özetini
 Gravatar'a gönderir ve bağlı GitHub/GitLab hesabınıza sorar)
@@ -131,7 +162,6 @@ Gravatar'a gönderir ve bağlı GitHub/GitLab hesabınıza sorar)
 | Anahtar | Varsayılan | Değerler ve etki |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph` (resimli grafın commit dairesinde), `author` (Yazar sütununda), `off`. Eski `ui.show_avatars` (`true`), `ui.avatars` yokken hâlâ `author` olarak okunur. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | Arama sırası: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Bir GitLab sunucusuna yalnızca bağlı bir profil üzerinden sorulur. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon` (yerelde üretilir) ya da `initials`. Resim protokolü olmayan bir terminalde her zaman baş harf rozeti kullanılır. |
 
 **Diff ve düzenleyici görünümü**
@@ -144,10 +174,6 @@ Gravatar'a gönderir ve bağlı GitHub/GitLab hesabınıza sorar)
 | `ui.diff_word_wrap` | `false` | Uzun diff satırlarını kaydırır (`w`; Ayarlar > Diff ve düzenleyici). |
 | `ui.diff_intraline` | `true` | Değişen bir satırın değişen sözcüklerini daha güçlü bir arka planla boyar (palet `Fark: Değişen Sözcük Vurgusunu Aç/Kapat`; Ayarlar > Diff ve düzenleyici). |
 | `ui.minimap` | `false` | Diff'in ve düzenleyicinin kaydırma çubuğunun yanında bir minimap (`M`). |
-| `ui.mermaid_detail` | `refs` | Log'un Mermaid gitGraph olarak kopyala özelliğinin ayrıntı düzeyi: `structure`, `refs`, `subjects`, `full` (pencereden hatırlanır; `log --format mermaid` komutunun varsayılanı). |
-| `ui.mermaid_orientation` | `lr` | O grafiğin yönü: `lr` (soldan sağa) veya `tb` (yukarıdan aşağıya). |
-| `ui.mermaid_fence` | `false` | Kopyalanan Mermaid betiğini bir `mermaid` kod çiti içine alır. |
-| `ui.mermaid_subject_width` | `40` | Commit başlıkları Mermaid kimliklerinde bu kadar karaktere kısaltılır (`subjects`, `full`). |
 | `ui.text_cursor` | `"terminal"` | Odaktaki bir metin alanının imlecinin nerede gösterileceği: `terminal` terminalin kendi imlecini oraya koyar (yanıp sönen bir çubuk; böylece terminalin imleç ayarları ve bir giriş yönteminin aday penceresi onu izler; hiçbir alan klavyeyi almadığında gizlenir ve çıkışta kendi imleç biçiminize geri yüklenir), `drawn` GitPoulpi'nin kendi imleç simgesini çizer ve terminal imlecini gizli tutar. Canlı. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` ya da `16`: kaç renkle çizileceği. `auto`, Apple Terminal (256), Linux konsolu (16) ve `COLORTERM` olmayan `*-256color` terminaller (256) dışında truecolor'dur. Canlı. Bkz. [Temalar](themes.md). |
 | `ui.input_color` | `"theme"` | Metin alanı arka planı: `theme` (temanın kendisi), `gray`, `blue`, `slate`, `dark`, `custom`. |
@@ -180,16 +206,39 @@ ne olursa olsun İngilizce tutar.
 | `ui.launch` | `"off"` | Hiçbir pencere açık değilken bir ajanın bir GitPoulpi penceresi açıp açamayacağı: `off`, bir hazır ayar (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) ya da `custom`. |
 | `ui.launch_command` | `""` | `custom` şablonu: `{repo}`, `{session}`, `{gitpoulpi}`. Argümanlara bölünür, kabuk yok. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons` (sekme satırı *Çık ve cd yap* düğmesini sunar) ya da `auto` (her çıkış kabuğun klasörünü değiştirir ve yeni bir sekme varsayılan *Şurada aç* girişini çalıştırır). Bkz. [Etkin sekmenin klasörünü izlemek](following-the-tab-folder.md). |
-| `ui.terminal_launch` | `"auto"` | Eski, aşağıya ve [Şurada aç](open-in.md) sayfasına bakın. Eski *Burada terminal* işlevinin bir terminali nasıl açtığı: `auto` (`ui.launch` hazır ayarı, yoksa `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), bir hazır ayar ya da `custom`. |
-| `ui.terminal_launch_command` | `""` | `custom` şablonu; `{repo}` klasördür. |
-| `ui.open_in` | *(yok)* | [Şurada aç](open-in.md) listesi, `label` ve `command` içeren `[[ui.open_in]]` tablolarından oluşan bir dizi. Yok olması "henüz yapılandırılmadı" demektir: liste eski `ui.terminal_launch*` anahtarlarından (`auto` olmayan bir değer ilk giriş olur), işletim sistemi dosya gezgininden, ortamdan algılanan çoklayıcılardan ve terminallerden (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) ve `PATH` üzerinde bulunan düzenleyicilerden hesaplanır. Ayarlar'dan ilk kayıt listeyi yazar. `open_in = []` boş bir listedir. `config set` ile ayarlanamaz (dosyayı düzenleyin). |
-| `ui.open_in_default` | `""` | "Varsayılanda aç"ın çalıştırdığı girişin etiketi; boş ya da bilinmeyen, ilk giriş anlamına gelir. |
 | `ui.launch_terminal` | `"auto"` | Masaüstü kısayollarının (Ayarlar > Başlatıcı) ve Windows'taki yeniden başlatmanın GitPoulpi'yi açtığı terminal. `auto` kurulu olanlardan seçer (Windows: Windows Terminal, yoksa WezTerm, Alacritty, düz konsol; Linux: `xdg-terminal-exec`, yoksa bulunan ilk terminal; macOS: kuruluysa iTerm2, Ghostty, WezTerm veya kitty, yoksa Terminal), `default` işletim sisteminin kendi terminalidir; ya da `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal` gibi bir terminal kimliği. |
-| `ui.launcher_build` | `"current"` | Yalnızca geliştirici modunda (bkz. `general.dev_mode`; yalnızca o zaman Ayarlar > Başlatıcı'da görünür, aksi halde yok sayılır). `"current"`: kısayollar ve komut takma adı onları oluşturan derlemeyi başlatır. `"newest"`: checkout'un `target/dist` ve `target/release` derlemelerinden en son derleneni başlatırlar, her tıklamada karar verilir ve iki derlemeden birini başlatmak onları asla yeniden yazmaz. |
-| `ui.command_alias` | `""` | GitPoulpi'yi bir terminalden başlatan komutun adı, örneğin `gp` (Ayarlar > Başlatıcı, `gitpoulpi alias create`). Boş: yok. Yalnızca harf, rakam, `-`, `_` ve `.`. Bu yalnızca **Oluştur: komut takma adı** düğmesinin kullandığı addır; siz oluşturana kadar hiçbir şey var olmaz. |
-| `ui.command_alias_add` | `""` | `gitpoulpi --add` çalıştıran ikinci komutun adı, örneğin `gpa`: geçerli klasörü zaten çalışan GitPoulpi'de yeni sekme olarak açar (Ayarlar > Başlatıcı, `gitpoulpi alias create gpa --add`). Boş: yok. Ad kuralları aynıdır; **Oluştur** düğmesi onu `ui.command_alias` ile birlikte oluşturur. |
 | `ui.relaunch_in_terminal` | `true` | Yalnızca Windows: exe çift tıklamayla kendi konsolunda başlatıldığında GitPoulpi kendini `ui.launch_terminal` içinde yeniden açar ve çıkar. Exe'yi doğrudan çalıştıran bir terminal (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) de kendi konsoludur ama klasik bir konsol penceresi değildir: asla yeniden başlatılmaz. Kapalı: o konsolda kalır. |
 | `ui.reuse_window` | `true` | Bir GitPoulpi kısayoluna tıklamak (`gitpoulpi launch`), yenisini başlatmak yerine zaten açık olan GitPoulpi'nin penceresini gösterir. Kapalı: her tıklama yeni bir pencere başlatır. |
+
+### Görseller
+
+| Anahtar | Varsayılan | Anlam |
+|---|---|---|
+| `ui.image_view` | `true` | Görsel olan (PNG, JPEG, GIF, WebP, BMP, ...) bir ikili dosyayı Diff Görünümü'nde ve Dosya Görünümü'nde resim olarak gösterir. Kapalı: düz ikili dosya bildirimi. |
+| `ui.image_view_max_mib` | `32` | Bundan büyük görseller (MiB) çözülmez; bunun yerine bir bilgi kartı görünür. |
+| `ui.image_view_max_unit` | `"auto"` | Ayarlar'ın sınırı hangi birimle gösterdiği: `mib`, `gib` (1024 MiB) veya `auto`. Yalnızca görüntüleme içindir: sınır her zaman `image_view_max_mib` MiB'dir, 1 ile 1024 arası. |
+| `ui.image_view_text_fallback` | `"halfblock"` | Görsel protokolü olmayan bir terminalde: `halfblock` (renkli yarım blok karakterler) ya da `card` (yalnızca bilgi kartı). |
+| `ui.image_view_pixelated_from` | `"2x"` | Büyütmenin yumuşatma yerine kare pikseller gösterdiği yakınlaştırma: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | Önce ve sonra panelleri tek bir yakınlaştırmayı ve kaydırma konumunu paylaşır. |
+
+**Henüz kullanılmıyor** (kabul edilir, kaydedilir, ancak hiçbir şey onları okumaz):
+`ui.graph_colorization` (de Ayarlar'dan kaldırıldı;
+yüklemede hâlâ kabul edilir), `ui.date_word_format` (Ayarlar'dan kaldırıldı; yüklemede
+hâlâ kabul edilir). Eski `ui.diff_view_mode`
+bir kez `diff_layout` / `diff_hunks_only` olarak okunur.
+
+## `config.toml` içinde `[ui]`
+
+Hangi arayüzü kullanırsanız kullanın aynı olan az sayıdaki `[ui]` anahtarı: bu makinenin dış araçları, bu kurulumun kimliği, avatarlar için hangi ağ hizmetlerine sorulduğu ve `log --format mermaid` varsayılanları. Yalnızca `config.toml` içinden okunurlar; diğer `[ui]` anahtarları [`tui.toml`](#tuitoml-içinde-ui) içindedir.
+
+**Bir klasörü başka yerde açma**
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `ui.open_in` | *(yok)* | [Şurada aç](open-in.md) listesi, `label` ve `command` içeren `[[ui.open_in]]` tablolarından oluşan bir dizi. Yok olması "henüz yapılandırılmadı" demektir: liste eski `ui.terminal_launch*` anahtarlarından (`auto` olmayan bir değer ilk giriş olur), işletim sistemi dosya gezgininden, ortamdan algılanan çoklayıcılardan ve terminallerden (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) ve `PATH` üzerinde bulunan düzenleyicilerden hesaplanır. Ayarlar'dan ilk kayıt listeyi yazar. `open_in = []` boş bir listedir. `config set` ile ayarlanamaz (dosyayı düzenleyin). |
+| `ui.open_in_default` | `""` | "Varsayılanda aç"ın çalıştırdığı girişin etiketi; boş ya da bilinmeyen, ilk giriş anlamına gelir. |
+| `ui.terminal_launch` | `"auto"` | Eski, aşağıya ve [Şurada aç](open-in.md) sayfasına bakın. Eski *Burada terminal* işlevinin bir terminali nasıl açtığı: `auto` (`ui.launch` hazır ayarı, yoksa `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), bir hazır ayar ya da `custom`. |
+| `ui.terminal_launch_command` | `""` | `custom` şablonu; `{repo}` klasördür. |
 
 **`ui.open_in` komutları** önce argümanlara bölünür (boşluk, `'...'`, `"..."`), ardından
 değişkenler her argümanın içinde yerine konur, böylece boşluk içeren bir klasör tek bir
@@ -210,16 +259,10 @@ command = "code ${cwd}"
 
 Eski: `ui.terminal_launch` ve `ui.terminal_launch_command` hâlâ okunur (`ui.open_in` yokken listeyi tohumlarlar: `custom`, `{repo}` değeri `${cwd}` olarak yeniden yazılmış "Terminal (custom)" olur, bir hazır ayar kimliği o hazır ayar olur) ancak yerlerini `ui.open_in` almıştır.
 
-### Görseller
+**Görsel düzenleyiciler**
 
-| Anahtar | Varsayılan | Anlam |
+| Anahtar | Varsayılan | Değerler ve etki |
 |---|---|---|
-| `ui.image_view` | `true` | Görsel olan (PNG, JPEG, GIF, WebP, BMP, ...) bir ikili dosyayı Diff Görünümü'nde ve Dosya Görünümü'nde resim olarak gösterir. Kapalı: düz ikili dosya bildirimi. |
-| `ui.image_view_max_mib` | `32` | Bundan büyük görseller (MiB) çözülmez; bunun yerine bir bilgi kartı görünür. |
-| `ui.image_view_max_unit` | `"auto"` | Ayarlar'ın sınırı hangi birimle gösterdiği: `mib`, `gib` (1024 MiB) veya `auto`. Yalnızca görüntüleme içindir: sınır her zaman `image_view_max_mib` MiB'dir, 1 ile 1024 arası. |
-| `ui.image_view_text_fallback` | `"halfblock"` | Görsel protokolü olmayan bir terminalde: `halfblock` (renkli yarım blok karakterler) ya da `card` (yalnızca bilgi kartı). |
-| `ui.image_view_pixelated_from` | `"2x"` | Büyütmenin yumuşatma yerine kare pikseller gösterdiği yakınlaştırma: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | Önce ve sonra panelleri tek bir yakınlaştırmayı ve kaydırma konumunu paylaşır. |
 | `ui.image_editors` | *(yok)* | "Şununla düzenle" görsel düzenleyicileri, `label` ve `command` içeren `[[ui.image_editors]]` tablolarından oluşan bir dizi. Yok olması "henüz yapılandırılmadı" demektir: liste bu makinede algılanan düzenleyicilerdir (`PATH` üzerindeki programlar, Flatpak kurulumları, Windows'ta bilinen kurulum klasörleri, macOS'ta `/Applications`), ardından işletim sisteminin varsayılan uygulaması. Ayarlar'dan ilk kayıt listeyi yazar. `image_editors = []` boş bir listedir. `config set` ile ayarlanamaz (dosyayı düzenleyin). |
 | `ui.image_editor_default` | `""` | "Varsayılan olarak Şununla düzenle"nin çalıştırdığı düzenleyicinin etiketi; boş ya da bilinmeyen, ilk giriş anlamına gelir. |
 
@@ -238,11 +281,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**Henüz kullanılmıyor** (kabul edilir, kaydedilir, ancak hiçbir şey onları okumaz):
-`ui.graph_colorization` (de Ayarlar'dan kaldırıldı;
-yüklemede hâlâ kabul edilir), `ui.date_word_format` (Ayarlar'dan kaldırıldı; yüklemede
-hâlâ kabul edilir). Eski `ui.diff_view_mode`
-bir kez `diff_layout` / `diff_hunks_only` olarak okunur.
+**Başlatıcı ve kimlik**
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `ui.logo_color` | `""` | About penceresindeki logonun renk düzeni, bir slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); boş ya da bilinmeyen, derlemenin varsayılanı (`lavender`) anlamına gelir. Logoya tıkladığınızda ya da About içinde bir renk seçtiğinizde yazılır. |
+| `ui.command_alias` | `""` | GitPoulpi'yi bir terminalden başlatan komutun adı, örneğin `gp` (Ayarlar > Başlatıcı, `gitpoulpi alias create`). Boş: yok. Yalnızca harf, rakam, `-`, `_` ve `.`. Bu yalnızca **Oluştur: komut takma adı** düğmesinin kullandığı addır; siz oluşturana kadar hiçbir şey var olmaz. |
+| `ui.command_alias_add` | `""` | `gitpoulpi --add` çalıştıran ikinci komutun adı, örneğin `gpa`: geçerli klasörü zaten çalışan GitPoulpi'de yeni sekme olarak açar (Ayarlar > Başlatıcı, `gitpoulpi alias create gpa --add`). Boş: yok. Ad kuralları aynıdır; **Oluştur** düğmesi onu `ui.command_alias` ile birlikte oluşturur. |
+| `ui.launcher_build` | `"current"` | Yalnızca geliştirici modunda (bkz. `general.dev_mode`; yalnızca o zaman Ayarlar > Başlatıcı'da görünür, aksi halde yok sayılır). `"current"`: kısayollar ve komut takma adı onları oluşturan derlemeyi başlatır. `"newest"`: checkout'un `target/dist` ve `target/release` derlemelerinden en son derleneni başlatırlar, her tıklamada karar verilir ve iki derlemeden birini başlatmak onları asla yeniden yazmaz. |
+
+**Avatar araması**
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | Arama sırası: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Bir GitLab sunucusuna yalnızca bağlı bir profil üzerinden sorulur. |
+
+**Mermaid varsayılanları** (`log --format mermaid`; Log'un Mermaid gitGraph olarak kopyala işlevi seçimlerini açılır pencereden hatırlar)
+
+| Anahtar | Varsayılan | Değerler ve etki |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Log'un Mermaid gitGraph olarak kopyala özelliğinin ayrıntı düzeyi: `structure`, `refs`, `subjects`, `full` (pencereden hatırlanır; `log --format mermaid` komutunun varsayılanı). |
+| `ui.mermaid_orientation` | `lr` | O grafiğin yönü: `lr` (soldan sağa) veya `tb` (yukarıdan aşağıya). |
+| `ui.mermaid_fence` | `false` | Kopyalanan Mermaid betiğini bir `mermaid` kod çiti içine alır. |
+| `ui.mermaid_subject_width` | `40` | Commit başlıkları Mermaid kimliklerinde bu kadar karaktere kısaltılır (`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -255,6 +316,8 @@ bir kez `diff_layout` / `diff_hunks_only` olarak okunur.
 | `editor.follow_selection` | `true` | Düzenleyici açıkken sağ panelde başka bir dosya seçmek onu düzenleyicide de açar (önce kaydetmeyi sorar); bir commit'in dosyası düzenleyiciden çıkıp kendi diff'ini gösterir. |
 
 ## `[merge]`
+
+Dosya: `tui.toml`.
 
 Merge çakışma düzenleyicisi ([Merge çakışmalarını çözmek](merge-conflicts.md)). Ayarlar > Diff ve düzenleyici bunu gösterir.
 
@@ -595,6 +658,8 @@ Görebildiğiniz diziler arasındaki yinelenen kimlikler bildirilir. Birini
 `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+Dosya: `tui.toml`.
 
 TUI'nin kısayollarını yeniden atar; Ayarlar > Klavye ve fare bunu düzenler.
 

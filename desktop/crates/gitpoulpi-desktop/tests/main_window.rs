@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 
 use gitpoulpi_desktop::app::{self, Overrides, Workspace};
 use gitpoulpi_desktop::daemon::Backend;
-use gitpoulpi_desktop::prefs::{Col, DesktopPrefs, MESSAGE_MIN};
+use gitpoulpi_desktop::prefs::{Col, MESSAGE_MIN};
 use gitpoulpi_testkit::{isolate_process_env, FixtureRepo, FixtureRepoBuilder};
 use gpui_kit::{AnyWindowHandle, AppContext as _, Entity, TestAppContext};
 
@@ -32,7 +32,14 @@ fn open(
     let backend = Backend::start(repo).unwrap();
     // The daemon runs on its own runtime: let the executor wait for it instead of declaring a deadlock.
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs_dir.to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs_dir)),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     cx.update(|cx| app::open_main_window(backend, cx).unwrap())
 }
 
@@ -77,10 +84,13 @@ fn a_detached_head_without_any_branch_still_lists_its_history(cx: &mut TestAppCo
 fn at_1280_px_every_log_column_keeps_room(cx: &mut TestAppContext) {
     let repo = fixture();
     let prefs = tempfile::tempdir().unwrap();
-    let mut stored = DesktopPrefs::default();
-    stored.window.width = 1280.0;
-    stored.window.height = 800.0;
-    stored.save(prefs.path()).unwrap();
+    gitpoulpi_config::DesktopConfig::set_window(
+        &gitpoulpi_config::ConfigPaths::for_dir(prefs.path()),
+        (1280, 800),
+        None,
+        false,
+    )
+    .unwrap();
     let (window, ws) = open(cx, repo.root(), prefs.path());
     assert_eq!(wait_for_commits(cx, &ws, 3), 3);
     // Draw a few frames so the Log measures its header.

@@ -12,8 +12,9 @@ tangent visar alla dessa platser den nya tangenten. För musen, se
 
 Öppna **Inställningar > Tangentbord & mus**. Sidan beskrivs i
 [Inställningar](settings.md#tangentbord--mus). Ändringar gäller direkt och
-sparas i tabellen `[keybindings]` i `config.toml`. Du kan också redigera den
-tabellen för hand:
+sparas i tabellen `[keybindings]` i `tui.toml` (terminalgränssnittets
+gränssnittsfil, bredvid `config.toml`). Du kan också redigera den tabellen för
+hand:
 
 ```toml
 [keybindings.global]
@@ -473,7 +474,9 @@ under listan. Etiketterna börjar med en kategori, som `Navigering:`, `Refs:`,
 
 Varje rad i paletten slutar med en tangentknapp (`[k]`), och `Alt+K` gör detsamma på den markerade raden: den öppnar **Inställningar > Tangentbord & mus** filtrerat på kommandots genväg, redo att ändras. Ett kommando utan egen genväg får en här: det står under **Palettkommandon**, utan tangent som standard, och en tangent du ger det kör kommandot precis som när du väljer det i paletten (ett kommando som inte kan köras nu anger varför). Raden visar sedan din tangent.
 
-I `config.toml` är det tabellen `[keybindings.palette]`, uppkallad efter kommandot (`toggle_minimap = "Ctrl+Alt+M"`). En tangent som kolliderar med en annan åtgärd visas i rött, och `c` på dess rad listar alla åtgärder den kolliderar med.
+I `tui.toml` är det tabellen `[keybindings.palette]`, uppkallad efter kommandot (`toggle_minimap = "Ctrl+Alt+M"`). En tangent som kolliderar med en annan åtgärd visas i rött, och `c` på dess rad listar alla åtgärder den kolliderar med.
+
+En sekvens du definierat (en namngiven kedja av palettkommandon) får en tangent på samma sätt: `[keybindings.sequence]` tar sekvensens id (`backup = "Ctrl+Alt+B"`), en tangent för ett id som inte finns rapporteras och ignoreras, och tabellen följer `tui.toml` medan appen körs. Varje sekvens är också en paletträd, `Sekvens: <namn>`, som visar sin tangent.
 
 Hjälpraden under listan anger den här tangenten (`Alt+K` som standard). Det är åtgärden `palette.configure_shortcut`, så den kan ändras som alla andra.
 

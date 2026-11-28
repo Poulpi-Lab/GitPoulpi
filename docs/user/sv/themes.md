@@ -221,7 +221,7 @@ Inställningar visar namnet markerat *hittades inte* tills du väljer ett annat.
 
 ![Kombolistan Färgtema för grafen under Utseende: Följ temat, sedan varje spårpalett med några av sina färger](../images/settings-log-graph-lanes.png)
 
-I `config.toml`:
+I `tui.toml`:
 
 ```toml
 [ui]
@@ -289,7 +289,7 @@ en felaktig färg ignoreras, en okänd `base` faller tillbaka på `dark`, och
 dem en gång på statusraden).
 
 Filerna läses om när Tema-kombolistan öppnas och när Inställningar stängs. Ett
-körande fönster märker också när `config.toml` (ett `gitpoulpi config set ui.theme ...`
+körande fönster märker också när `tui.toml` (ett `gitpoulpi config set ui.theme ...`
 från ett skal) och det aktiva temats fil skrivs om, och tillämpar de nya
 färgerna inom ungefär en sekund, utan omstart.
 
@@ -358,7 +358,7 @@ under dig; **Enter** behåller det (det sparas), **Esc** eller ett klick utanfö
 Inställningar: **System (följer terminalen)**, förinställningarna och sedan dina
 egna temafiler, var och en med fyra små färgchips. Det aktuella temat är
 kryssat. Skriv för att snäva in listan; när du flyttar markeringen förhandsvisas
-temat direkt, **Enter** tillämpar det och sparar `ui.theme` i `config.toml`,
+temat direkt, **Enter** tillämpar det och sparar `ui.theme` i `tui.toml`,
 **Esc** (eller ett klick utanför listan) sätter tillbaka det förra temat och
 sparar ingenting.
 

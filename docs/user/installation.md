@@ -229,7 +229,7 @@ GitPoulpi also keeps these files:
 
 | What | Where |
 |---|---|
-| Settings (`config.toml`) and sessions | Your OS configuration folder. `GITPOULPI_CONFIG_DIR` changes it. |
+| Settings (`config.toml` and `tui.toml`) and sessions | Your OS configuration folder. `GITPOULPI_CONFIG_DIR` changes it. |
 | Per-repository state | `gitpoulpi/` inside the repository's `.git` folder by default (`session.per_repo_state_dir` can move it to `.gitpoulpi/` in the work tree or to the user data folder). |
 | Caches (avatars) | Your OS cache folder. |
 | Tokens and API keys | Your credential helper. **Settings > SSH & credentials > Forget all usernames and passwords** removes them. |

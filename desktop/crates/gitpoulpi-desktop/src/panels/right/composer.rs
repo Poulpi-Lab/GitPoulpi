@@ -6,6 +6,7 @@
 //! lines are dropped from the message. The form clears only once the commit succeeded; a refusal (a hook,
 //! nothing staged) keeps what was typed and shows the daemon's message in the status line.
 
+use gitpoulpi_app::commit_form::{self, CommitPlan};
 use gitpoulpi_app::palette::vocab::status_pane::StatusSection;
 use gitpoulpi_i18n::msg;
 use gpui_kit::component::{
@@ -108,15 +109,28 @@ impl RightPanel {
         self.summary.read(cx).focus_handle(cx).focus(window, cx);
     }
 
-    /// Why the button cannot commit yet (`None`: it can), the terminal UI's order.
-    pub fn commit_blocker(&self, cx: &gpui_kit::App) -> Option<&'static str> {
-        staging::commit_readiness(
+    /// Whether a stopped merge is being committed (it needs nothing staged).
+    pub fn set_merging(&mut self, merging: bool, cx: &mut Context<Self>) {
+        if self.merging != merging {
+            self.merging = merging;
+            cx.notify();
+        }
+    }
+
+    /// Whether the form is ready to commit, the shared rule (`gitpoulpi_app::commit_form`).
+    fn readiness(&self, cx: &gpui_kit::App) -> Result<(), gitpoulpi_i18n::M> {
+        commit_form::commit_readiness(
             self.summary.read(cx).value().as_ref(),
             self.amend,
             self.section_len(StatusSection::Staged),
+            self.merging,
             self.conflict_count(),
         )
-        .err()
+    }
+
+    /// Why the button cannot commit yet (`None`: it can), the terminal UI's order.
+    pub fn commit_blocker(&self, cx: &gpui_kit::App) -> Option<&'static str> {
+        self.readiness(cx).err().map(|m| m.get())
     }
 
     // ---- the repository's settings -----------------------------------------------------------------
@@ -193,16 +207,17 @@ impl RightPanel {
         }
         let summary = self.summary_text(cx);
         let description = self.description_text(cx);
-        let Some(message) = staging::commit_message(&summary, &description, &self.settings) else {
-            return self.say(msg::composer::ERR_EMPTY_SUMMARY.get(), cx);
-        };
+        let strip = self
+            .settings
+            .strip_comments
+            .then_some(self.settings.comment_char);
+        let (message, sent) =
+            match commit_form::plan_commit(&summary, &description, self.amend, strip) {
+                CommitPlan::Rejected(error) => return self.say(error, cx),
+                CommitPlan::Commit { message, status } => (message, status),
+            };
         let action = staging::commit_action(message, self.amend, self.skip_hooks, &self.settings);
         self.commit_ticket = Some(self.backend.submit_tracked(action));
-        let sent = if self.amend {
-            format!("Amending: {}", summary.trim())
-        } else {
-            msg::input::committing(summary.trim())
-        };
         self.say(sent, cx);
         cx.notify();
     }
@@ -259,11 +274,8 @@ impl RightPanel {
         let staged = self.section_len(StatusSection::Staged);
         let blocker = self.commit_blocker(cx);
         let ready = blocker.is_none() && self.commit_ticket.is_none();
-        let label = match blocker {
-            Some(why) => why.to_string(),
-            None if self.amend => msg::composer::AMEND.get().to_string(),
-            None => msg::composer::commit_files(staged as u64),
-        };
+        let label =
+            commit_form::commit_button_label(self.amend, staged, self.merging, self.readiness(cx));
         let remaining = summary_remaining(self.summary_len);
         let counter_color = if remaining < 0 {
             skin.danger

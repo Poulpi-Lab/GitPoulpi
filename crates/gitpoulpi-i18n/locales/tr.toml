@@ -2794,7 +2794,7 @@ hint_conflicts = "çakışmalar"
 conflicts_of = "{label} çakışmaları - Esc tüm kısayolları gösterir"
 no_conflicts = "Bu kısayolun çakışması yok"
 hint_controls = "denetimler"
-config_issues = { one = "config.toml: {n} girdi yok sayıldı - {id}: {message}", other = "config.toml: {n} girdi yok sayıldı - {id}: {message}" }
+config_issues = { one = "{file}: {n} girdi yok sayıldı - {id}: {message}", other = "{file}: {n} girdi yok sayıldı - {id}: {message}" }
 no_match = "filtrelerle eşleşen kısayol yok"
 unbound = "(atanmamış)"
 none = "(yok)"

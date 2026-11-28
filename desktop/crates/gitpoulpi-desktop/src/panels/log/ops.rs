@@ -8,12 +8,12 @@ use gitpoulpi_core::domain::{CommitNode, Oid, ResetMode};
 use gitpoulpi_i18n::msg;
 use gpui_kit::{point, px, AppContext as _, ClipboardItem, Context, Pixels, Point, Window};
 
-use super::data::RowKey;
 use super::menu::CommitMenu;
 use super::menu_items::{build, MenuCtx};
 use super::{LogEvent, LogPanel};
 use crate::daemon::commit_ops::{self as ops, short};
 use crate::dialogs::{self, Choice, Spec};
+use gitpoulpi_app::log_multiselect::RowKey as MarkKey;
 
 /// A one-line echo of what was copied, so the confirmation is verifiable.
 fn preview(value: &str) -> String {
@@ -40,13 +40,14 @@ impl LogPanel {
         if self.marks.is_empty() {
             return self.selected_commit().into_iter().collect();
         }
-        let display = self.data.display_keys();
+        let display = self.data.display_marks();
+        // Stashes and the WIP row are not commits to apply: only a commit of the graph counts.
         let mut commits: Vec<Oid> = self
             .marks
             .in_display_order(&display)
             .into_iter()
             .filter_map(|k| match k {
-                RowKey::Commit(oid) => Some(oid),
+                MarkKey::Id(oid) if self.node(oid).is_some() => Some(oid),
                 _ => None,
             })
             .collect();
@@ -235,7 +236,7 @@ impl LogPanel {
         };
         let label = ops::field_label(field);
         let text = match self.node(commit) {
-            Some(node) => ops::field_value(field, node),
+            Some(node) => ops::field_value(field, node, crate::prefs::PrefsStore::get(cx).dates()),
             // The ids are still copyable once the commit has left the loaded page.
             None => match field {
                 CommitField::ShortSha => short(commit),
@@ -258,7 +259,7 @@ impl LogPanel {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        let key = self.data.key_at(ix);
+        let key = self.data.mark_at(ix);
         if !key.as_ref().is_some_and(|k| self.marks.contains(k)) {
             self.select(ix, cx);
             self.marks.reset_to(key);

@@ -8,7 +8,10 @@ remplace la fenêtre tant qu'il est ouvert. Fermez-le avec le `✕` en haut à d
 `q`. Il ne demande confirmation que si la fermeture ferait perdre quelque chose (voir
 [Fermer les Paramètres](#fermer-les-paramètres)).
 
-Les changements sont enregistrés aussitôt dans `config.toml`. La
+Les changements sont enregistrés aussitôt : les paramètres d'interface (thème, disposition,
+colonnes, affichage des diffs et des images, raccourcis...) dans `tui.toml`, tout le reste
+dans `config.toml`, tous deux dans votre dossier de configuration
+([pourquoi deux fichiers](config-reference.md#deux-fichiers--configtoml-et-tuitoml)). La
 [référence de configuration](config-reference.md) décrit chaque clé, sa valeur
 par défaut et sa variable d'environnement. Cette page décrit l'écran des
 Paramètres.
@@ -149,7 +152,7 @@ La plupart des paramètres se changent sans ouvrir cet écran : tapez `Paramèt
 
 ![La palette de commandes filtrée sur Settings: avec une ligne par paramètre et sa valeur actuelle à droite](../images/palette-settings.png)
 
-Une valeur est enregistrée dans `config.toml` et appliquée exactement comme la page le fait. Les mots anglais de la clé du paramètre (`remember tabs`) trouvent la ligne dans toutes les langues.
+Une valeur est enregistrée dans son fichier (`tui.toml` ou `config.toml`) et appliquée exactement comme la page le fait. Les mots anglais de la clé du paramètre (`remember tabs`) trouvent la ligne dans toutes les langues.
 
 ## Les pages
 
@@ -453,11 +456,11 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 | **Position de la ligne d'état** | `ui.statusbar_position` : où se place la ligne d'état (branche, compteurs, messages, aide des touches) : **Haut** (au-dessus des onglets de dépôt) ou **Bas** (par défaut). L'onglet Accueil garde sa propre ligne d'état en bas. S'applique immédiatement. |
 | **Position de la barre d'onglets** | `ui.tabs_position` : où se placent les onglets de dépôt : **Haut** (par défaut), **Bas** ou **Gauche**, une liste d'un onglet par ligne au bord gauche de la fenêtre. Une fenêtre de moins de 80 colonnes les dessine en haut. À côté d'une barre d'outils en colonne, les onglets restent à l'extérieur. S'applique immédiatement. |
 | **Locale de date/heure** | **système** (par défaut) : noms de mois et de jours dans la langue de l'interface. **english** : toujours des noms anglais. |
-| **Format de date**, **Format de date/heure**, **Format de date détaillé** | Les motifs de date de la colonne de date de l'Historique du fichier et du Blame, de la colonne Date du Log, et des détails du commit. Chacun montre un aperçu en direct. Voir la [référence de configuration](config-reference.md#ui) pour les jetons. |
+| **Format de date**, **Format de date/heure**, **Format de date détaillé** | Les motifs de date de la colonne de date de l'Historique du fichier et du Blame, de la colonne Date du Log, et des détails du commit. Chacun montre un aperçu en direct. Voir la [référence de configuration](config-reference.md#ui-dans-tuitoml) pour les jetons. |
 
 ![La liste Thème de couleurs du graphe : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
 
-Le thème et les couleurs du graphe (le Thème, le thème de couleurs du graphe, la colorisation et le fond des voies, l'intensité de la teinte de ligne) appartiennent à chaque installation : quand plusieurs installations partagent un même `config.toml`, en modifier une ne change jamais les autres. Seule l'installation principale écrit aussi les clés `ui.*` partagées.
+Le thème et les couleurs du graphe (le Thème, le thème de couleurs du graphe, la colorisation et le fond des voies, l'intensité de la teinte de ligne) appartiennent à chaque installation : quand plusieurs installations partagent un même dossier de paramètres, en modifier une ne change jamais les autres. Seule l'installation principale écrit aussi les clés `ui.*` partagées, dans `tui.toml` ; les autres conservent les leurs dans leur propre entrée de `config.toml`.
 
 ### Clavier et souris
 
@@ -478,7 +481,7 @@ liste chaque raccourci par contexte, avec une zone de recherche (`/`) et des fil
 
 Servez-vous-en pour résoudre les conflits avec tmux, AutoHotkey, herdr ou votre
 terminal. Les mêmes paramètres vivent dans la table `[keybindings]` de
-`config.toml` ; voir la [référence de configuration](config-reference.md#keybindings) et
+`tui.toml` ; voir la [référence de configuration](config-reference.md#keybindings) et
 [Raccourcis clavier](keybindings.md).
 
 ![La page Clavier et souris après c sur Quit : la touche q est en rouge sur Quit et sur Stage or Unstage the Selected Row, les deux actions en conflit](../images/settings-keyboard-conflicts.png)
@@ -841,8 +844,10 @@ d'abord confirmation.
 
 ## Fichiers, variables d'environnement et CLI
 
-- Le fichier de paramètres est `config.toml` dans le dossier de configuration de
-  votre OS. `gitpoulpi config path` affiche son emplacement.
+- Les fichiers de paramètres sont `config.toml` (paramètres communs) et `tui.toml` (les
+  paramètres d'interface de l'interface terminal) dans le dossier de configuration de
+  votre OS. `gitpoulpi config path` affiche leurs emplacements ; `gitpoulpi config get <key>`
+  dit dans quel fichier se trouve une clé.
 - L'état par dépôt vit dans `.gitpoulpi/repo-state.toml` à l'intérieur du dépôt.
 - `gitpoulpi config get <key>` et `gitpoulpi config set <key> <value>` lisent et
   écrivent chaque paramètre.

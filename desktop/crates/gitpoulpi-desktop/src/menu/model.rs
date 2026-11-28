@@ -258,7 +258,7 @@ pub fn build(ctx: PaletteContext, km: &Keymap, recent: &[String]) -> Vec<Menu> {
             continue;
         };
         let command = Command::Palette(entry.command);
-        let (category, body) = split_category(&entry.display_label()).to_owned_pair();
+        let (category, body) = display_parts(entry);
         let (category, body) = if entry.command == PaletteCommand::Quit {
             (strings::MENU_FILE.to_string(), body)
         } else {
@@ -334,12 +334,24 @@ pub fn build(ctx: PaletteContext, km: &Keymap, recent: &[String]) -> Vec<Menu> {
     menus
 }
 
-trait OwnedPair {
-    fn to_owned_pair(self) -> (String, String);
-}
-impl OwnedPair for (&str, &str) {
-    fn to_owned_pair(self) -> (String, String) {
-        (self.0.to_string(), self.1.to_string())
+/// The category and the rest of an entry's label as the menu shows them. The category is the shared
+/// registry's (`PaletteEntry::category`); only a label that spells its colon the full-width way (the
+/// Japanese and Chinese catalogs) is split here, because the registry looks for `": "`.
+fn display_parts(entry: &gitpoulpi_app::palette::PaletteEntry) -> (String, String) {
+    let label = entry.display_label();
+    match entry.category() {
+        "" => {
+            let (category, body) = split_category(&label);
+            (category.to_string(), body.to_string())
+        }
+        category => {
+            // An AI command's label carries its sparkle in front of the name.
+            let lead = label.strip_suffix(entry.name()).unwrap_or("");
+            let body = entry.name()[category.len()..]
+                .trim_start_matches(':')
+                .trim_start();
+            (format!("{lead}{category}"), body.to_string())
+        }
     }
 }
 

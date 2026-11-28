@@ -2793,7 +2793,7 @@ hint_conflicts = "conflitti"
 conflicts_of = "Conflitti di {label} - Esc mostra tutte le scorciatoie"
 no_conflicts = "Questa scorciatoia non ha conflitti"
 hint_controls = "controlli"
-config_issues = { one = "config.toml: {n} voce ignorata - {id}: {message}", other = "config.toml: {n} voci ignorate - {id}: {message}" }
+config_issues = { one = "{file}: {n} voce ignorata - {id}: {message}", other = "{file}: {n} voci ignorate - {id}: {message}" }
 no_match = "nessuna scorciatoia corrisponde ai filtri"
 unbound = "(non assegnata)"
 none = "(nessuna)"

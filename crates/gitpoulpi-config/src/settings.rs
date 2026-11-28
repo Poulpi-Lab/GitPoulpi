@@ -300,7 +300,10 @@ pub struct Overrides {
 pub struct Settings {
     config: Config,
     file: Option<PathBuf>,
-    /// The file layer as raw TOML, kept so `source_of` can distinguish
+    /// The sibling `tui.toml`, set only when it existed and was merged in.
+    tui_file: Option<PathBuf>,
+    /// The file layer as raw TOML (`config.toml` merged with `tui.toml` when
+    /// there is one), kept so `source_of` can distinguish
     /// "the file sets this key to the default" from "the file is silent".
     /// Comparing values instead would misreport the former.
     raw_file: Option<toml::Value>,
@@ -333,18 +336,22 @@ impl Settings {
         env: impl Fn(&str) -> Option<String>,
         overrides: &Overrides,
     ) -> Result<Self> {
-        let (config, raw_file) = match file {
-            Some(path) if path.exists() => {
-                let raw = std::fs::read_to_string(path)?;
-                let (config, doc) = Config::from_toml_str(&raw)?;
-                (config, Some(doc))
+        let merged = match file {
+            Some(path) => crate::split::read_merged(path)?,
+            None => None,
+        };
+        let (config, raw_file, tui_file) = match merged {
+            Some((doc, tui_file)) => {
+                let (config, doc) = Config::from_document(doc)?;
+                (config, Some(doc), tui_file)
             }
-            _ => (Config::default(), None),
+            None => (Config::default(), None, None),
         };
 
         let mut settings = Self {
             config,
             file: file.map(Path::to_path_buf),
+            tui_file,
             raw_file,
             overridden: BTreeMap::new(),
         };
@@ -385,6 +392,25 @@ impl Settings {
     /// The `config.toml` this resolved against, whether or not it exists.
     pub fn file(&self) -> Option<&Path> {
         self.file.as_deref()
+    }
+
+    /// The `tui.toml` that was merged into this view, `None` when there is
+    /// none (every value then comes from `config.toml` alone).
+    pub fn tui_file(&self) -> Option<&Path> {
+        self.tui_file.as_deref()
+    }
+
+    /// The file `key` lives in for the terminal UI view: `tui.toml` for a key
+    /// it owns while that file exists, else `config.toml` (which is then the
+    /// one the value is read from). `None` only when there is no file layer
+    /// at all.
+    pub fn file_of(&self, key: &str) -> Option<&Path> {
+        match (&self.tui_file, crate::split::home_of(key)) {
+            (Some(tui), crate::split::Home::Tui | crate::split::Home::PerInterface) => {
+                Some(tui.as_path())
+            }
+            _ => self.file.as_deref(),
+        }
     }
 
     /// Which layer the value in force for `key` came from.
@@ -609,5 +635,69 @@ mod tests {
         assert!(Settings::key_is_implemented("ui.diff_hunks_only"));
         assert!(Settings::key_is_implemented("ui.diff_show_whitespace"));
         assert!(Settings::key_is_implemented("ui.diff_word_wrap"));
+    }
+
+    fn write_tui(dir: &tempfile::TempDir, body: &str) -> PathBuf {
+        let path = dir.path().join("tui.toml");
+        std::fs::write(&path, body).unwrap();
+        path
+    }
+
+    #[test]
+    fn a_tui_toml_wins_for_the_keys_it_owns_and_source_of_stays_truthful() {
+        let dir = tempfile::tempdir().unwrap();
+        let config = write(
+            &dir,
+            "[ui]\ntheme = \"old\"\nmouse_enabled = false\nlogo_color = \"red\"\n",
+        );
+        let tui = write_tui(&dir, "[ui]\ntheme = \"new\"\n");
+        let settings =
+            Settings::resolve_from(Some(&config), no_env, &Overrides::default()).unwrap();
+        assert_eq!(settings.config().ui.theme, "new");
+        // Not said by tui.toml: the default, not the stale config.toml value.
+        assert!(settings.config().ui.mouse_enabled);
+        assert_eq!(settings.config().ui.logo_color, "red");
+        assert_eq!(settings.source_of("ui.theme"), Source::File);
+        assert_eq!(settings.source_of("ui.mouse_enabled"), Source::Default);
+        assert_eq!(settings.source_of("ui.logo_color"), Source::File);
+        assert_eq!(settings.tui_file(), Some(tui.as_path()));
+        assert_eq!(settings.file_of("ui.theme"), Some(tui.as_path()));
+        assert_eq!(settings.file_of("ui.logo_color"), Some(config.as_path()));
+        assert_eq!(
+            settings.file_of("general.undo_depth"),
+            Some(config.as_path())
+        );
+    }
+
+    #[test]
+    fn without_a_tui_toml_every_key_lives_in_config_toml() {
+        let dir = tempfile::tempdir().unwrap();
+        let config = write(&dir, "[ui]\ntheme = \"old\"\n");
+        let settings =
+            Settings::resolve_from(Some(&config), no_env, &Overrides::default()).unwrap();
+        assert_eq!(settings.tui_file(), None);
+        assert_eq!(settings.file_of("ui.theme"), Some(config.as_path()));
+        assert_eq!(settings.source_of("ui.theme"), Source::File);
+    }
+
+    #[test]
+    fn env_beats_both_files() {
+        let dir = tempfile::tempdir().unwrap();
+        let config = write(&dir, "[ui]\nmouse_enabled = true\n");
+        write_tui(&dir, "[ui]\nmouse_enabled = true\ntheme = \"new\"\n");
+        let settings = Settings::resolve_from(
+            Some(&config),
+            |name| match name {
+                "GITPOULPI_UI_MOUSE_ENABLED" => Some("false".to_string()),
+                "GITPOULPI_UI_THEME" => Some("fromenv".to_string()),
+                _ => None,
+            },
+            &Overrides::default(),
+        )
+        .unwrap();
+        assert!(!settings.config().ui.mouse_enabled);
+        assert_eq!(settings.config().ui.theme, "fromenv");
+        assert_eq!(settings.source_of("ui.theme"), Source::Env);
+        assert_eq!(settings.source_of("ui.mouse_enabled"), Source::Env);
     }
 }

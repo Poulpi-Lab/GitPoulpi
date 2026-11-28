@@ -168,6 +168,22 @@ impl ConfigPaths {
         self.config_dir.join("config.toml")
     }
 
+    /// The terminal UI's interface settings, next to `config.toml`. See
+    /// [`crate::split`].
+    pub fn tui_file(&self) -> PathBuf {
+        self.config_dir.join(crate::split::TUI_FILE_NAME)
+    }
+
+    /// The desktop UI's interface settings, next to `config.toml`.
+    pub fn desktop_file(&self) -> PathBuf {
+        self.config_dir.join(crate::split::DESKTOP_FILE_NAME)
+    }
+
+    /// The settings file of one interface.
+    pub fn interface_file(&self, interface: crate::split::Interface) -> PathBuf {
+        self.config_dir.join(interface.file_name())
+    }
+
     /// Where a daemon's discovery files and the tab lists live: the one seam
     /// every consumer goes through. `<config>/sessions` in the flat layout,
     /// `<config>/sessions/env/<env>` in the environment layout.

@@ -21,6 +21,7 @@ pub mod secure_fs;
 pub mod sequences;
 mod session_name;
 mod settings;
+pub mod split;
 pub mod theme;
 pub mod update_lock;
 
@@ -202,12 +203,15 @@ impl Config {
     /// (defaults -> file -> `GITPOULPI_*` env -> CLI flags) is
     /// [`Settings::resolve`]; call that rather than this from anything
     /// user-facing, or the upper layers silently stop applying.
+    ///
+    /// When `path` is a `config.toml` with a sibling `tui.toml`, the keys that
+    /// file owns (see [`split`]) come from it; without one the result is the
+    /// `config.toml` alone, as before the split.
     pub fn load(path: &Path) -> Result<Self> {
-        if !path.exists() {
-            return Ok(Self::default());
+        match split::read_merged(path)? {
+            None => Ok(Self::default()),
+            Some((doc, _)) => Ok(Self::from_document(doc)?.0),
         }
-        let raw = std::fs::read_to_string(path)?;
-        Ok(Self::from_toml_str(&raw)?.0)
     }
 
     /// Parses a `config.toml` body and applies the legacy-key migrations
@@ -215,7 +219,12 @@ impl Config {
     /// callers that need to know what the file itself said. Every loader
     /// goes through here, so no consumer ever sees a pre-migration value.
     pub fn from_toml_str(raw: &str) -> Result<(Self, toml::Value)> {
-        let doc: toml::Value = toml::from_str(raw)?;
+        Self::from_document(toml::from_str(raw)?)
+    }
+
+    /// [`Self::from_toml_str`] for a document already parsed (and, when a
+    /// `tui.toml` exists, already merged).
+    pub(crate) fn from_document(doc: toml::Value) -> Result<(Self, toml::Value)> {
         let mut migrated = doc.clone();
         AiConfig::migrate_document(&mut migrated);
         let mut config: Config = migrated.try_into()?;

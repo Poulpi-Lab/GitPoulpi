@@ -126,8 +126,8 @@ fn the_review_diff_has_split_the_whole_file_whitespace_the_ruler_and_comments_in
     let (c, r) = screen.find("WS").unwrap();
     term.click(c, r).expect("WS");
     // All of it is remembered the way the Diff view's own toggles are.
-    wait_until("the toggles were written to config.toml", || {
-        let text = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    wait_until("the toggles were written to tui.toml", || {
+        let text = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
         text.contains("diff_layout = \"split\"")
             && text.contains("diff_hunks_only = false")
             && text.contains("diff_show_whitespace = true")

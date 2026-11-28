@@ -81,6 +81,7 @@ pub mod activity;
 pub mod binary_hint;
 pub mod commit_settings;
 pub mod diff_recode;
+pub mod external_tools;
 pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;

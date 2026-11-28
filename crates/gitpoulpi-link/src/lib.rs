@@ -79,6 +79,8 @@ mod client;
 
 pub mod activity;
 pub mod binary_hint;
+pub mod blame_pending;
+pub mod blame_runs;
 pub mod commit_settings;
 #[cfg(all(feature = "conversation", feature = "hosting"))]
 pub mod conversation_cache;

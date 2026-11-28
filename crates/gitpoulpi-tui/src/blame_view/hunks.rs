@@ -21,44 +21,28 @@ pub(crate) struct Hunk {
     pub(crate) heat: f32,
 }
 
-/// The hunks of `lines` and, for every line, the index of its hunk.
+/// The hunks of `lines` and, for every line, the index of its hunk: the shared
+/// runs plus the author's colour.
 pub(crate) fn build(lines: &[BlameLine]) -> (Vec<Hunk>, Vec<u32>) {
-    let mut hunks: Vec<Hunk> = Vec::new();
-    let mut hunk_of = Vec::with_capacity(lines.len());
+    let (runs, hunk_of) = gitpoulpi_link::blame_runs::build(lines);
     let mut colors: HashMap<&str, Color> = HashMap::new();
-    let (mut oldest, mut newest) = (i64::MAX, i64::MIN);
-    for (i, line) in lines.iter().enumerate() {
-        let uncommitted = crate::wip_view::is_uncommitted(line.commit);
-        if !uncommitted {
-            oldest = oldest.min(line.timestamp);
-            newest = newest.max(line.timestamp);
-        }
-        match hunks.last_mut() {
-            Some(last) if last.commit == line.commit => last.end = i + 1,
-            _ => {
-                let color = *colors.entry(line.author_email.as_str()).or_insert_with(|| {
-                    crate::avatar::badge(&line.author_name, &line.author_email).color
-                });
-                hunks.push(Hunk {
-                    start: i,
-                    end: i + 1,
-                    commit: line.commit,
-                    uncommitted,
-                    color,
-                    heat: 0.5,
-                });
+    let hunks = runs
+        .into_iter()
+        .map(|r| {
+            let line = &lines[r.start];
+            let color = *colors.entry(line.author_email.as_str()).or_insert_with(|| {
+                crate::avatar::badge(&line.author_name, &line.author_email).color
+            });
+            Hunk {
+                start: r.start,
+                end: r.end,
+                commit: r.commit,
+                uncommitted: r.uncommitted,
+                color,
+                heat: r.heat,
             }
-        }
-        hunk_of.push((hunks.len() - 1) as u32);
-    }
-    if newest > oldest {
-        let span = (newest - oldest) as f32;
-        for h in &mut hunks {
-            if !h.uncommitted {
-                h.heat = (lines[h.start].timestamp - oldest) as f32 / span;
-            }
-        }
-    }
+        })
+        .collect();
     (hunks, hunk_of)
 }
 

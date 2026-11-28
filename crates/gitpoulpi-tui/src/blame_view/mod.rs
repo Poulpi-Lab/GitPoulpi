@@ -31,7 +31,6 @@ mod hunks;
 mod layout;
 mod ops;
 mod paint;
-mod pending;
 
 #[cfg(test)]
 mod tests;
@@ -49,11 +48,11 @@ use crate::editor_highlight::Highlight;
 use crate::file_view::{FileInsight, FileInsightData};
 use crate::keymap::Keymap;
 
+pub(crate) use gitpoulpi_link::blame_pending::{settle, waiting, want_diff, Ready};
 pub(crate) use hunks::Hunk;
 pub(crate) use layout::MIN_MAP_BODY;
 pub(crate) use ops::{BlameHit, BlameOp};
 pub(crate) use paint::{legend, legend_width, paint_minimap, render, BlameEnv};
-pub(crate) use pending::{settle, waiting, want_diff, Ready};
 
 /// How long the pointer rests on an annotation before its card opens.
 pub(crate) const HOVER_DELAY: Duration = Duration::from_millis(450);

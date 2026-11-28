@@ -2,17 +2,51 @@
 
 # Konfigurationsreferenz
 
-Jeder Schlüssel der `config.toml`, sein Standardwert und was er bewirkt. Sie müssen die
-Datei selten von Hand bearbeiten: Der [Einstellungsbildschirm](settings.md) (`Ctrl+,`)
+Jeder Schlüssel der Konfigurationsdateien, sein Standardwert und was er bewirkt. Sie müssen
+eine Datei selten von Hand bearbeiten: Der [Einstellungsbildschirm](settings.md) (`Ctrl+,`)
 schreibt sie beim Ändern, und `gitpoulpi config set` ebenfalls.
+
+## Zwei Dateien: `config.toml` und `tui.toml`
+
+Die Einstellungen liegen in zwei Dateien desselben Ordners.
+
+| Datei | Enthält |
+|---|---|
+| `config.toml` | Alles, was für jede Art, GitPoulpi zu benutzen, gleich ist: Repositories, Konten und Integrationen, Git-Verhalten, KI, MCP, Updates, Installationen, externe Werkzeuge und die wenigen `[ui]`-Schlüssel unter [`[ui]` in `config.toml`](#ui-in-configtoml). |
+| `tui.toml` | Die Oberflächeneinstellungen der Terminal-UI: den größten Teil von `[ui]` (Theme, Layout, Spalten, Anzeige von Diff und Bildern, Sprache, Maus- und Terminaloptionen, ...), die ganze Tabelle `[keybindings]` und `merge.side_by_side_min_width`. Sie stehen unter [`[ui]` in `tui.toml`](#ui-in-tuitoml), [`[keybindings]`](#keybindings) und [`[merge]`](#merge). |
+
+- **Wie `tui.toml` entsteht.** GitPoulpi legt sie selbst an, als Kopie der
+  Oberflächeneinstellungen aus `config.toml`: wenn die Terminal-UI startet und
+  `config.toml` existiert, oder bei der ersten Änderung einer Oberflächeneinstellung.
+  `config.toml` wird dadurch nie verändert.
+- **Sobald sie existiert, ist sie die einzige Quelle** für die Schlüssel, die sie
+  besitzt. Ein Schlüssel, den sie nicht nennt, nimmt seinen Standardwert, nicht den
+  Wert, den eine alte `config.toml` dafür noch enthält. Um einen solchen Schlüssel
+  zurückzusetzen, entfernen Sie ihn aus `tui.toml`.
+- **Ein älteres GitPoulpi**, das neben diesem installiert ist, liest weiter seine
+  eigene vollständige `config.toml`. Eine Einstellung, die danach in der älteren
+  Version geändert wird, übernimmt die neuere nicht, und umgekehrt.
+- **In welcher Datei ein Schlüssel steht.** `gitpoulpi config get <key>` gibt die
+  Datei im JSON-Feld `file` aus (mit `--json`), `gitpoulpi config set <key> <value>`
+  schreibt in sie, und `gitpoulpi config path` gibt `path` (`config.toml`) und
+  `tui_file` (`tui.toml`) aus. `gitpoulpi config get`, `set` und die Variablen
+  `GITPOULPI_UI_*` behalten dieselben Schlüsselnamen (`ui.theme`), egal welche Datei
+  den Schlüssel enthält; eine Variable gewinnt weiterhin über beide Dateien.
+- **Installationen.** Das Aussehen einer Installation, die nicht die primäre ist,
+  bleibt in ihrem Eintrag `[installation.settings.<id>]` der `config.toml` (siehe
+  [`[installation]`](#installation-ein-eintrag-pro-gitpoulpi-auf-diesem-rechner)).
+
+Die folgenden Abschnitte sagen, in welcher Datei jeder steht. Beispiele, die eine
+Tabelle zeigen (`[ui]`, `[[ui.open_in]]`), werden in die Datei geschrieben, die im
+Abschnittstitel steht.
 
 ## Wo sie liegt und wie ein Wert gewählt wird
 
 | | |
 |---|---|
-| Datei | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` gibt sie aus. |
-| Ein anderer Ordner | `GITPOULPI_CONFIG_DIR=<dir>` verschiebt den ganzen Konfigurationsordner (die Datei, `sessions/`, die Port-Dateien des Daemons): eine portable Installation, ein Test oder ein Agent, der von Ihren eigenen Einstellungen ferngehalten wird. |
-| Vorrang | eingebauter Standard, dann `config.toml`, dann die Variable `GITPOULPI_*`, dann eine Kommandozeilenoption. Der höchste gewinnt. Ein falscher Wert (eine falsch geschriebene Auswahl in der Datei, eine fehlerhafte Variable) ist ein Fehler, nie still ignoriert. |
+| Datei | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS), und daneben `tui.toml`. `gitpoulpi config path` gibt beide aus. |
+| Ein anderer Ordner | `GITPOULPI_CONFIG_DIR=<dir>` verschiebt den ganzen Konfigurationsordner (die Dateien, `sessions/`, die Port-Dateien des Daemons): eine portable Installation, ein Test oder ein Agent, der von Ihren eigenen Einstellungen ferngehalten wird. |
+| Vorrang | eingebauter Standard, dann `config.toml` (`tui.toml` für die Schlüssel, die sie besitzt), dann die Variable `GITPOULPI_*`, dann eine Kommandozeilenoption. Der höchste gewinnt. Ein falscher Wert (eine falsch geschriebene Auswahl in der Datei, eine fehlerhafte Variable) ist ein Fehler, nie still ignoriert. |
 | Variablen | Schlüssel großschreiben und Punkte in Unterstriche verwandeln: `general.auto_prune` wird zu `GITPOULPI_GENERAL_AUTO_PRUNE`. Nur für Schlüssel, die GitPoulpi tatsächlich liest (nicht die unten als *nicht genutzt* markierten, auch keine Listen wie `ui.log_columns_hidden`). |
 | Optionen | `--backend git2\|system` überschreibt `general.default_backend` für einen Daemon, den dieser Befehl startet. |
 | Tokens und Schlüssel | Nie in dieser Datei. Hosting-Tokens und KI-API-Schlüssel gehen an den Credential-Helper Ihres Systems (Git Credential Manager, libsecret / `pass`, Keychain); die Datei enthält nur eine Referenz (`token_ref`). Ohne Helper schlägt das Speichern eines Tokens mit einer Meldung fehl, und das Token hält nur für die Sitzung. |
@@ -85,7 +119,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `[ui]` in `tui.toml`
 
 **Log und Graph**
 
@@ -123,7 +157,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` überlässt die Maus (und die Textauswahl) dem Terminal. **Neustart.** |
 | `ui.mouse_scroll_lines` | `3` | Log-Zeilen pro Mausrad-Raste, 1 bis 20. **Neustart.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` fragt das Terminal nach dem Kitty-Tastaturprotokoll (damit `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` ankommen; nur Unix, tmux antwortet nie: siehe [Multiplexer](multiplexers.md#tmux)); `off` fragt nie. **Neustart.** |
-| `ui.logo_color` | `""` | Farbvariante des Logos im Info-Fenster, ein Slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); leer oder unbekannt bedeutet den Standard des Builds (`lavender`). Geschrieben, wenn Sie auf das Logo klicken oder im Info-Fenster eine Farbe wählen. |
 
 **Avatare** (standardmäßig aus; sie einzuschalten sendet einen SHA-256-Hash der
 Autoren-E-Mails an Gravatar und fragt Ihr verbundenes GitHub/GitLab-Konto)
@@ -131,7 +164,6 @@ Autoren-E-Mails an Gravatar und fragt Ihr verbundenes GitHub/GitLab-Konto)
 | Schlüssel | Standard | Werte und Wirkung |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph` (im Commit-Kreis des Bildgraphen), `author` (in der Spalte Autor), `off`. Das alte `ui.show_avatars` (`true`) wird weiterhin als `author` gelesen, solange `ui.avatars` fehlt. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | Suchreihenfolge: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Ein GitLab-Host wird nur über ein verbundenes Profil gefragt. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon` (lokal erzeugt) oder `initials`. Auf einem Terminal ohne Bildprotokoll wird immer das Initialen-Abzeichen verwendet. |
 
 **Anzeige von Diff und Editor**
@@ -144,10 +176,6 @@ Autoren-E-Mails an Gravatar und fragt Ihr verbundenes GitHub/GitLab-Konto)
 | `ui.diff_word_wrap` | `false` | Lange Diff-Zeilen umbrechen (`w`; Einstellungen > Diff & Editor). |
 | `ui.diff_intraline` | `true` | Die geänderten Wörter einer geänderten Zeile mit einem stärkeren Hintergrund hervorheben (Palette `Diff: Hervorhebung geänderter Wörter umschalten`; Einstellungen > Diff & Editor). |
 | `ui.minimap` | `false` | Eine Minimap neben der Bildlaufleiste von Diff und Editor (`M`). |
-| `ui.mermaid_detail` | `refs` | Detail von „Als Mermaid gitGraph kopieren“ im Log: `structure`, `refs`, `subjects`, `full` (wird vom Popup gemerkt; der Standard von `log --format mermaid`). |
-| `ui.mermaid_orientation` | `lr` | Richtung dieses Graphen: `lr` (von links nach rechts) oder `tb` (von oben nach unten). |
-| `ui.mermaid_fence` | `false` | Das kopierte Mermaid-Skript mit einem `mermaid`-Codeblock umschließen. |
-| `ui.mermaid_subject_width` | `40` | Commit-Betreffzeilen werden in den Mermaid-IDs auf so viele Zeichen gekürzt (`subjects`, `full`). |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` oder `16`: mit wie vielen Farben gezeichnet wird. `auto` ist Truecolor, außer auf Apple Terminal (256), der Linux-Konsole (16) und `*-256color`-Terminals ohne `COLORTERM` (256). Live. Siehe [Designs](themes.md). |
 | `ui.input_color` | `"theme"` | Hintergrund von Textfeldern: `theme` (der des Designs), `gray`, `blue`, `slate`, `dark`, `custom`. |
 | `ui.input_color_custom` | `"#2a2a2a"` | Die Farbe `custom`, `#rrggbb`. |
@@ -179,16 +207,39 @@ der Standard, oder `"english"`) hält die Namen unabhängig von der Sprache auf 
 | `ui.launch` | `"off"` | Ob ein Agent ein GitPoulpi-Fenster öffnen darf, wenn keines offen ist: `off`, eine Voreinstellung (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) oder `custom`. |
 | `ui.launch_command` | `""` | Die Vorlage `custom`: `{repo}`, `{session}`, `{gitpoulpi}`. In Argumente zerlegt, keine Shell. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons` (die Tab-Leiste bietet *Beenden & cd hierher* an) oder `auto` (jedes Beenden ändert den Ordner der Shell, und ein neuer Tab führt den Standardeintrag von *Öffnen in* aus). Siehe [Dem Ordner des Tabs folgen](following-the-tab-folder.md). |
-| `ui.terminal_launch` | `"auto"` | Veraltet, siehe unten und [Öffnen in](open-in.md). Wie das alte *Terminal hier* ein Terminal öffnete: `auto` (die Voreinstellung `ui.launch`, sonst `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), eine Voreinstellung oder `custom`. |
-| `ui.terminal_launch_command` | `""` | Die Vorlage `custom`; `{repo}` ist der Ordner. |
-| `ui.open_in` | *(fehlt)* | Die Liste [Öffnen in](open-in.md), ein Array von Tabellen `[[ui.open_in]]` mit `label` und `command`. Fehlend bedeutet „noch nicht konfiguriert“: Die Liste wird berechnet aus den alten Schlüsseln `ui.terminal_launch*` (ein Wert ungleich `auto` wird der erste Eintrag), dem Datei-Explorer des Betriebssystems, den aus der Umgebung erkannten Multiplexern und Terminals (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) und den im `PATH` gefundenen Editoren. Das erste Speichern aus den Einstellungen schreibt die Liste. `open_in = []` ist eine leere Liste. Mit `config set` nicht setzbar (die Datei bearbeiten). |
-| `ui.open_in_default` | `""` | Bezeichnung des Eintrags, den „Im Standardeintrag öffnen“ ausführt; leer oder unbekannt bedeutet den ersten Eintrag. |
 | `ui.launch_terminal` | `"auto"` | Das Terminal, in dem die Desktop-Verknüpfungen (Einstellungen > Starter) und der Neustart unter Windows GitPoulpi starten. `auto` wählt unter dem Installierten (Windows: Windows Terminal, sonst WezTerm, Alacritty, die einfache Konsole; Linux: `xdg-terminal-exec`, sonst das erste gefundene Terminal; macOS: iTerm2, Ghostty, WezTerm oder kitty, falls installiert, sonst Terminal), `default` ist das des Betriebssystems, oder eine Terminal-ID wie `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
-| `ui.launcher_build` | `"current"` | Nur im Entwicklermodus (siehe `general.dev_mode`; nur dann unter Einstellungen > Starter gezeigt, sonst ignoriert). `"current"`: Verknüpfungen und der Befehls-Alias starten den Build, der sie angelegt hat. `"newest"`: Sie starten den zuletzt gebauten von `target/dist` und `target/release` des Checkouts, bei jedem Klick neu entschieden, und das Starten eines der beiden Builds schreibt sie nie neu. |
-| `ui.command_alias` | `""` | Der Name des Befehls, der GitPoulpi in einem Terminal startet, zum Beispiel `gp` (Einstellungen > Starter, `gitpoulpi alias create`). Leer: keiner. Nur Buchstaben, Ziffern, `-`, `_` und `.`. Es ist lediglich der Name, den die Schaltfläche **Erstellen: Befehlsalias** verwendet; es existiert nichts, bis Sie ihn erstellen. |
-| `ui.command_alias_add` | `""` | Der Name des zweiten Befehls, zum Beispiel `gpa`, der `gitpoulpi --add` ausführt: Er öffnet den aktuellen Ordner als neuen Tab im bereits laufenden GitPoulpi (Einstellungen > Starter, `gitpoulpi alias create gpa --add`). Leer: keiner. Dieselben Namensregeln; wird von der Schaltfläche **Erstellen** zusammen mit `ui.command_alias` angelegt. |
 | `ui.relaunch_in_terminal` | `true` | Nur Windows: Wird die exe per Doppelklick in einer eigenen Konsole gestartet, öffnet GitPoulpi sich in `ui.launch_terminal` neu und beendet sich. Ein Terminal, das die exe direkt startet (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`), ist ebenfalls eine eigene Konsole, aber kein klassisches Konsolenfenster: dort wird nie neu gestartet. Aus: Es bleibt in dieser Konsole. |
 | `ui.reuse_window` | `true` | Ein Klick auf eine GitPoulpi-Verknüpfung (`gitpoulpi launch`) zeigt das Fenster eines bereits geöffneten GitPoulpi, statt ein weiteres zu starten. Aus: Jeder Klick startet ein neues Fenster. |
+
+### Bilder
+
+| Schlüssel | Standard | Bedeutung |
+|---|---|---|
+| `ui.image_view` | `true` | Eine Binärdatei, die ein Bild ist (PNG, JPEG, GIF, WebP, BMP, ...), in der Diff-Ansicht und der Dateiansicht als Bild anzeigen. Aus: der einfache Binärhinweis. |
+| `ui.image_view_max_mib` | `32` | Größere Bilder (in MiB) werden nicht dekodiert; stattdessen erscheint eine Infokarte. |
+| `ui.image_view_max_unit` | `"auto"` | Die Einheit, in der Einstellungen die Grenze zeigt: `mib`, `gib` (1024 MiB) oder `auto`. Nur Anzeige: Die Grenze sind immer `image_view_max_mib` MiB, 1 bis 1024. |
+| `ui.image_view_text_fallback` | `"halfblock"` | Auf einem Terminal ohne Bildprotokoll: `halfblock` (farbige Halbblock-Zeichen) oder `card` (nur Infokarte). |
+| `ui.image_view_pixelated_from` | `"2x"` | Zoom, ab dem das Vergrößern eckige Pixel zeigt statt zu glätten: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | Die Vorher- und Nachher-Bereiche teilen sich einen Zoom und eine Scroll-Position. |
+
+**Noch nicht genutzt** (akzeptiert, gespeichert, aber nichts liest sie):
+`ui.graph_colorization` (aus den Einstellungen entfernt; beim
+Laden weiterhin akzeptiert), `ui.date_word_format` (aus den Einstellungen entfernt; beim
+Laden weiterhin akzeptiert). Das alte
+`ui.diff_view_mode` wird einmal als `diff_layout` / `diff_hunks_only` gelesen.
+
+## `[ui]` in `config.toml`
+
+Die wenigen `[ui]`-Schlüssel, die für jede Oberfläche gleich sind: externe Werkzeuge dieses Rechners, die Identität dieser Installation, welche Netzwerkdienste nach Avataren gefragt werden, und die Standardwerte von `log --format mermaid`. Sie werden nur aus `config.toml` gelesen; die übrigen `[ui]`-Schlüssel stehen in [`tui.toml`](#ui-in-tuitoml).
+
+**Einen Ordner anderswo öffnen**
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `ui.open_in` | *(fehlt)* | Die Liste [Öffnen in](open-in.md), ein Array von Tabellen `[[ui.open_in]]` mit `label` und `command`. Fehlend bedeutet „noch nicht konfiguriert“: Die Liste wird berechnet aus den alten Schlüsseln `ui.terminal_launch*` (ein Wert ungleich `auto` wird der erste Eintrag), dem Datei-Explorer des Betriebssystems, den aus der Umgebung erkannten Multiplexern und Terminals (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) und den im `PATH` gefundenen Editoren. Das erste Speichern aus den Einstellungen schreibt die Liste. `open_in = []` ist eine leere Liste. Mit `config set` nicht setzbar (die Datei bearbeiten). |
+| `ui.open_in_default` | `""` | Bezeichnung des Eintrags, den „Im Standardeintrag öffnen“ ausführt; leer oder unbekannt bedeutet den ersten Eintrag. |
+| `ui.terminal_launch` | `"auto"` | Veraltet, siehe unten und [Öffnen in](open-in.md). Wie das alte *Terminal hier* ein Terminal öffnete: `auto` (die Voreinstellung `ui.launch`, sonst `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), eine Voreinstellung oder `custom`. |
+| `ui.terminal_launch_command` | `""` | Die Vorlage `custom`; `{repo}` ist der Ordner. |
 
 Die **Befehle von `ui.open_in`** werden zuerst in Argumente zerlegt (Leerraum, `'...'`, `"..."`), dann werden die Variablen in jedem Argument ersetzt, sodass ein Ordner mit Leerzeichen ein Argument bleibt; es ist keine Shell beteiligt, außer der Befehl startet eine (`sh -c '... "$GITPOULPI_CWD"'`). Variablen: `${cwd}` (der Ordner des Tabs), `${repo}` (Repository-Wurzel), `${name}` (Basisname des Ordners), `${branch}` (leer bei losgelöstem HEAD), `${web_url}` (die Webseite des Remotes `origin`, wenn es ein GitHub- oder GitLab-Projekt ist, sonst leer; ein Eintrag, der sie nutzt, weigert sich zu laufen, wenn sie leer ist), `${env:NAME}` (leer, wenn nicht gesetzt). Das alte `{repo}` bedeutet weiterhin `${cwd}`. Jedes andere `${...}` ist ein Fehler, der es nennt. Beispiel:
 
@@ -207,16 +258,10 @@ command = "code ${cwd}"
 
 Veraltet: `ui.terminal_launch` und `ui.terminal_launch_command` werden weiterhin gelesen (sie bestücken die Liste, solange `ui.open_in` fehlt: `custom` wird zu „Terminal (custom)“ mit `{repo}` umgeschrieben zu `${cwd}`, eine Voreinstellungs-ID wird zu dieser Voreinstellung), sind aber durch `ui.open_in` ersetzt.
 
-### Bilder
+**Bildeditoren**
 
-| Schlüssel | Standard | Bedeutung |
+| Schlüssel | Standard | Werte und Wirkung |
 |---|---|---|
-| `ui.image_view` | `true` | Eine Binärdatei, die ein Bild ist (PNG, JPEG, GIF, WebP, BMP, ...), in der Diff-Ansicht und der Dateiansicht als Bild anzeigen. Aus: der einfache Binärhinweis. |
-| `ui.image_view_max_mib` | `32` | Größere Bilder (in MiB) werden nicht dekodiert; stattdessen erscheint eine Infokarte. |
-| `ui.image_view_max_unit` | `"auto"` | Die Einheit, in der Einstellungen die Grenze zeigt: `mib`, `gib` (1024 MiB) oder `auto`. Nur Anzeige: Die Grenze sind immer `image_view_max_mib` MiB, 1 bis 1024. |
-| `ui.image_view_text_fallback` | `"halfblock"` | Auf einem Terminal ohne Bildprotokoll: `halfblock` (farbige Halbblock-Zeichen) oder `card` (nur Infokarte). |
-| `ui.image_view_pixelated_from` | `"2x"` | Zoom, ab dem das Vergrößern eckige Pixel zeigt statt zu glätten: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | Die Vorher- und Nachher-Bereiche teilen sich einen Zoom und eine Scroll-Position. |
 | `ui.image_editors` | *(fehlt)* | Die Bildeditoren für „Bearbeiten in“, ein Array von Tabellen `[[ui.image_editors]]` mit `label` und `command`. Fehlend bedeutet „noch nicht konfiguriert“: Die Liste sind die auf diesem Rechner erkannten Editoren (Programme im `PATH`, Flatpak-Installationen, bekannte Installationsordner unter Windows, `/Applications` unter macOS), dann die Standard-App des Betriebssystems. Das erste Speichern aus den Einstellungen schreibt die Liste. `image_editors = []` ist eine leere Liste. Mit `config set` nicht setzbar (die Datei bearbeiten). |
 | `ui.image_editor_default` | `""` | Bezeichnung des Editors, den „Im Standardeditor bearbeiten“ ausführt; leer oder unbekannt bedeutet den ersten Eintrag. |
 
@@ -235,11 +280,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**Noch nicht genutzt** (akzeptiert, gespeichert, aber nichts liest sie):
-`ui.graph_colorization` (aus den Einstellungen entfernt; beim
-Laden weiterhin akzeptiert), `ui.date_word_format` (aus den Einstellungen entfernt; beim
-Laden weiterhin akzeptiert). Das alte
-`ui.diff_view_mode` wird einmal als `diff_layout` / `diff_hunks_only` gelesen.
+**Starter und Identität**
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `ui.logo_color` | `""` | Farbvariante des Logos im Info-Fenster, ein Slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); leer oder unbekannt bedeutet den Standard des Builds (`lavender`). Geschrieben, wenn Sie auf das Logo klicken oder im Info-Fenster eine Farbe wählen. |
+| `ui.command_alias` | `""` | Der Name des Befehls, der GitPoulpi in einem Terminal startet, zum Beispiel `gp` (Einstellungen > Starter, `gitpoulpi alias create`). Leer: keiner. Nur Buchstaben, Ziffern, `-`, `_` und `.`. Es ist lediglich der Name, den die Schaltfläche **Erstellen: Befehlsalias** verwendet; es existiert nichts, bis Sie ihn erstellen. |
+| `ui.command_alias_add` | `""` | Der Name des zweiten Befehls, zum Beispiel `gpa`, der `gitpoulpi --add` ausführt: Er öffnet den aktuellen Ordner als neuen Tab im bereits laufenden GitPoulpi (Einstellungen > Starter, `gitpoulpi alias create gpa --add`). Leer: keiner. Dieselben Namensregeln; wird von der Schaltfläche **Erstellen** zusammen mit `ui.command_alias` angelegt. |
+| `ui.launcher_build` | `"current"` | Nur im Entwicklermodus (siehe `general.dev_mode`; nur dann unter Einstellungen > Starter gezeigt, sonst ignoriert). `"current"`: Verknüpfungen und der Befehls-Alias starten den Build, der sie angelegt hat. `"newest"`: Sie starten den zuletzt gebauten von `target/dist` und `target/release` des Checkouts, bei jedem Klick neu entschieden, und das Starten eines der beiden Builds schreibt sie nie neu. |
+
+**Avatar-Suche**
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | Suchreihenfolge: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Ein GitLab-Host wird nur über ein verbundenes Profil gefragt. |
+
+**Mermaid-Standardwerte** (`log --format mermaid`; „Als Mermaid gitGraph kopieren“ im Log merkt sich seine Auswahl aus dem Popup)
+
+| Schlüssel | Standard | Werte und Wirkung |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Detail von „Als Mermaid gitGraph kopieren“ im Log: `structure`, `refs`, `subjects`, `full` (wird vom Popup gemerkt; der Standard von `log --format mermaid`). |
+| `ui.mermaid_orientation` | `lr` | Richtung dieses Graphen: `lr` (von links nach rechts) oder `tb` (von oben nach unten). |
+| `ui.mermaid_fence` | `false` | Das kopierte Mermaid-Skript mit einem `mermaid`-Codeblock umschließen. |
+| `ui.mermaid_subject_width` | `40` | Commit-Betreffzeilen werden in den Mermaid-IDs auf so viele Zeichen gekürzt (`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -252,6 +315,8 @@ Laden weiterhin akzeptiert). Das alte
 | `editor.follow_selection` | `true` | Solange der Editor offen ist, öffnet die Auswahl einer anderen Datei im rechten Bereich diese ebenfalls im Editor, nachdem gefragt wurde, ob ungespeicherte Änderungen gespeichert werden sollen. Eine Datei, die sich nicht bearbeiten lässt, öffnet sich in ihrer gewohnten Ansicht. Eine Datei eines Commits verlässt den Editor für ihren Diff. |
 
 ## `[merge]`
+
+Datei: `tui.toml`.
 
 Der Editor für Merge-Konflikte ([Merge-Konflikte lösen](merge-conflicts.md)). Einstellungen > Diff & Editor zeigt ihn.
 
@@ -599,6 +664,8 @@ gemeldet. Binden Sie eine mit `[keybindings.sequence] <id> = "<Tastenfolge>"`, z
 Beispiel `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+Datei: `tui.toml`.
 
 Belegt die Tastenkürzel der TUI neu; Einstellungen > Tastatur & Maus bearbeitet sie.
 

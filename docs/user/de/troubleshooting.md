@@ -209,8 +209,25 @@ Leistungsbericht.
 Konfigurationsordner (`gitpoulpi config path` gibt die Einstellungsdatei aus, die dort liegt)
 und hängen Sie sie an ein Issue an.
 
-**Wo sind meine Einstellungen?** `gitpoulpi config path`. Der Zustand pro Repository liegt in
-`.gitpoulpi/repo-state.toml` im Repository.
+**Wo sind meine Einstellungen?** `gitpoulpi config path` gibt `config.toml` (gemeinsame
+Einstellungen) und `tui.toml` (die Oberflächeneinstellungen der Terminal-UI: Design, Layout,
+Spalten, Tastenkürzel ...) aus, die im selben Ordner liegen. `gitpoulpi config get <key>`
+sagt, in welcher der beiden ein Schlüssel steht. Der Zustand pro Repository liegt in
+`.gitpoulpi/repo-state.toml` im Repository. Siehe
+[Zwei Dateien](config-reference.md#zwei-dateien-configtoml-und-tuitoml).
+
+**Ich bin zu einem älteren GitPoulpi zurückgekehrt und meine Oberflächeneinstellungen haben
+sich geändert (oder das neuere ignoriert, was ich im älteren eingestellt habe).** GitPoulpi
+führt die Oberflächeneinstellungen in `tui.toml`, angelegt als Kopie dessen, was `config.toml`
+enthielt, und nie aus `config.toml` entfernt. Ein älteres GitPoulpi, das neben dem neueren
+installiert ist, kennt `tui.toml` nicht: Es liest und schreibt weiter seine eigene vollständige
+`config.toml`. Sobald `tui.toml` existiert, liest das neuere die Oberflächeneinstellungen nur
+noch daraus; ein Design oder Layout, das Sie danach in der älteren Version ändern, wird also
+nicht übernommen, und ein Schlüssel, der in `tui.toml` fehlt, nimmt seinen Standardwert statt
+des alten Werts in `config.toml`. Um die neuere Version anzugleichen, ändern Sie die Einstellung
+dort (Einstellungen oder `gitpoulpi config set`); um die Oberflächeneinstellungen aus
+`config.toml` neu zu beginnen, beenden Sie GitPoulpi und löschen Sie `tui.toml` (sie wird beim
+nächsten Start erneut angelegt, als frische Kopie).
 
 **Sendet GitPoulpi irgendetwas irgendwohin?** Nur, was Sie anfordern: Git-Operationen an Ihre
 Remotes, Hosting-Anfragen, nachdem Sie ein Konto verbunden haben, KI-Anfragen, nachdem Sie eine

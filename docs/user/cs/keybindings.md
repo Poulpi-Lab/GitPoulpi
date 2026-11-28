@@ -12,8 +12,8 @@ přesunete, tato místa ukážou novou klávesu. K myši viz
 
 Otevřete **Nastavení > Klávesnice a myš**. Stránka je popsána v
 [Nastavení](settings.md#klávesnice-a-myš). Změny se použijí okamžitě a uloží se
-do tabulky `[keybindings]` v `config.toml`. Tuto tabulku můžete také upravit
-ručně:
+do tabulky `[keybindings]` v `tui.toml` (souboru rozhraní terminálového UI vedle
+`config.toml`). Tuto tabulku můžete také upravit ručně:
 
 ```toml
 [keybindings.global]
@@ -471,7 +471,9 @@ skupinu.
 
 Každý řádek palety končí tlačítkem klávesy (`[k]`) a `Alt+K` dělá totéž na zvýrazněném řádku: otevře **Nastavení > Klávesnice a myš** filtrované podle zkratky daného příkazu, připravené k přeřazení. Příkaz bez vlastní zkratky ji tu dostane: je uveden v **Příkazy palety**, ve výchozím stavu bez klávesy, a klávesa, kterou mu přiřadíte, spustí příkaz přesně jako jeho výběr v paletě (příkaz, který teď nelze spustit, uvede důvod). Řádek pak ukazuje vaši klávesu.
 
-V `config.toml` jde o tabulku `[keybindings.palette]` pojmenovanou podle příkazu (`toggle_minimap = "Ctrl+Alt+M"`). Klávesa, která koliduje s jinou akcí, je zobrazena červeně a `c` na jejím řádku vypíše všechny akce, se kterými koliduje.
+V `tui.toml` jde o tabulku `[keybindings.palette]` pojmenovanou podle příkazu (`toggle_minimap = "Ctrl+Alt+M"`). Klávesa, která koliduje s jinou akcí, je zobrazena červeně a `c` na jejím řádku vypíše všechny akce, se kterými koliduje.
+
+Sekvence, kterou jste definovali (pojmenovaný řetěz příkazů palety), dostane klávesu stejným způsobem: `[keybindings.sequence]` bere id sekvence (`backup = "Ctrl+Alt+B"`), klávesa pro neexistující id se ohlásí a ignoruje a tabulka za běhu aplikace sleduje `tui.toml`. Každá sekvence je také řádkem palety, `Sekvence: <název>`, který ukazuje její klávesu.
 
 Řádek nápovědy pod seznamem uvádí tuto klávesu (výchozí `Alt+K`). Je to akce `palette.configure_shortcut`, takže ji lze přeřadit jako kteroukoli jinou.
 

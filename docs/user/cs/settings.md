@@ -8,7 +8,9 @@ otevření nahrazuje okno. Zavřete ji tlačítkem `✕` vpravo nahoře, kláves
 nebo `q`. Zeptá se jen tehdy, když by zavření něco ztratilo (viz
 [Zavření Nastavení](#zavření-nastavení)).
 
-Změny se ukládají do `config.toml` okamžitě. [Referenční příručka
+Změny se ukládají okamžitě: nastavení rozhraní (motiv, rozvržení, sloupce, zobrazení
+diffu a obrázků, zkratky...) do `tui.toml`, vše ostatní do `config.toml`, oba
+soubory ve vaší konfigurační složce ([proč dva soubory](config-reference.md#dva-soubory-configtoml-a-tuitoml)). [Referenční příručka
 konfigurace](config-reference.md) popisuje každý klíč, jeho výchozí hodnotu a
 proměnnou prostředí. Tato stránka popisuje obrazovku Nastavení.
 
@@ -143,7 +145,7 @@ Většinu nastavení lze změnit bez otevření této obrazovky: napište `Nasta
 
 ![Paleta příkazů filtrovaná na Settings: s jedním řádkem pro každé nastavení a jeho aktuální hodnotou vpravo](../images/palette-settings.png)
 
-Hodnota se uloží do `config.toml` a použije se přesně jako na stránce. Anglická slova klíče nastavení (`remember tabs`) najdou řádek v jakémkoli jazyce.
+Hodnota se uloží do svého souboru (`tui.toml` nebo `config.toml`) a použije se přesně jako na stránce. Anglická slova klíče nastavení (`remember tabs`) najdou řádek v jakémkoli jazyce.
 
 ## Stránky
 
@@ -445,11 +447,11 @@ obsahují; viz [MCP a agenti](mcp-and-agents.md).
 | **Umístění stavového řádku** | `ui.statusbar_position`: Kde je stavový řádek (větev, počty, zprávy, nápověda kláves): Nahoře, nad kartami repozitářů, nebo Dole (výchozí). Karta Domů si ponechává vlastní stavový řádek dole. Projeví se hned. |
 | **Umístění lišty karet** | `ui.tabs_position`: Kde jsou karty repozitářů: Nahoře (výchozí), Dole nebo Vlevo, seznam s jednou kartou na řádek u levého okraje okna. V okně užším než 80 sloupců se kreslí nahoře. Vedle panelu nástrojů jako sloupce zůstávají karty nejvíc vně. Projeví se hned. |
 | **Národní prostředí data/času** | **systémový** (výchozí): názvy měsíců a dnů v jazyce rozhraní. **english**: vždy anglické názvy. |
-| **Formát data**, **Formát data a času**, **Podrobný formát data** | Vzory data pro sloupec s datem v Historii souboru a Blame, pro sloupec Datum v Logu a pro podrobnosti commitu. Každý ukazuje živý náhled. Tokeny viz [Referenční příručka konfigurace](config-reference.md#ui). |
+| **Formát data**, **Formát data a času**, **Podrobný formát data** | Vzory data pro sloupec s datem v Historii souboru a Blame, pro sloupec Datum v Logu a pro podrobnosti commitu. Každý ukazuje živý náhled. Tokeny viz [Referenční příručka konfigurace](config-reference.md#ui-v-tuitoml). |
 
 ![Rozbalený seznam Barevný motiv grafu: Podle motivu, poté každá paleta drah s několika svými barvami](../images/settings-log-graph-lanes.png)
 
-Motiv a barvy grafu (Motiv, barevný motiv grafu, zabarvení a pozadí drah, síla podbarvení řádku) patří každé instalaci: když několik instalací sdílí jeden `config.toml`, změna v jedné nikdy nezmění ostatní. Sdílené klíče `ui.*` zapisuje jen hlavní instalace.
+Motiv a barvy grafu (Motiv, barevný motiv grafu, zabarvení a pozadí drah, síla podbarvení řádku) patří každé instalaci: když několik instalací sdílí jeden `config.toml`, změna v jedné nikdy nezmění ostatní. Sdílené klíče `ui.*` v `tui.toml` zapisuje jen hlavní instalace; ostatní si své drží ve vlastním záznamu v `config.toml`.
 
 ### Klávesnice a myš
 
@@ -469,7 +471,7 @@ uvádí každou zkratku podle kontextu s vyhledávacím polem (`/`) a filtry. Na
 | `c` nebo klik na `!` řádku | Zobrazí akci se všemi akcemi, se kterými její klávesa koliduje; `Esc` znovu zobrazí vše. Klávesa kolidující s jinou akcí je červená, varování jen ke klávese (terminál ji neumí poslat) oranžové. |
 
 Použijte ji k vyřešení kolizí s tmux, AutoHotkey, herdr nebo vaším terminálem.
-Stejná nastavení jsou v tabulce `[keybindings]` souboru `config.toml`; viz
+Stejná nastavení jsou v tabulce `[keybindings]` souboru `tui.toml`; viz
 [referenční příručka konfigurace](config-reference.md#keybindings) a
 [Klávesové zkratky](keybindings.md).
 
@@ -816,8 +818,10 @@ vrátí všechny zpět. Ukládají se do `repo-state.toml` tohoto repozitáře.
 
 ## Soubory, proměnné prostředí a CLI
 
-- Soubor s nastavením je `config.toml` ve složce konfigurace vašeho OS.
-  `gitpoulpi config path` vypíše jeho umístění.
+- Soubory s nastavením jsou `config.toml` (společná nastavení) a `tui.toml`
+  (nastavení rozhraní terminálového UI) ve složce konfigurace vašeho OS.
+  `gitpoulpi config path` vypíše jejich umístění; `gitpoulpi config get <key>`
+  řekne, ve kterém souboru klíč je.
 - Stav jednotlivých repozitářů je v `.gitpoulpi/repo-state.toml` uvnitř
   repozitáře.
 - `gitpoulpi config get <key>` a `gitpoulpi config set <key> <value>` čtou a

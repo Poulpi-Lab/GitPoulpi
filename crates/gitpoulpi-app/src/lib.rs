@@ -11,4 +11,6 @@
 //!
 //! `tests/dependency_guard.rs` fails if a UI crate ever becomes a dependency.
 
+pub mod flow;
 pub mod graph;
+pub mod refs_tree;

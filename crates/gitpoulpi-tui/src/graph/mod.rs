@@ -32,7 +32,6 @@ mod raster_tests;
 #[cfg(test)]
 mod tests;
 mod total;
-mod walk_filter;
 
 use ratatui::style::Color;
 
@@ -49,6 +48,7 @@ pub(crate) use connector::{banded_graph_cell, node_column, with_ref_connector};
 pub(crate) use ghost_ref::GhostRef;
 pub use gitpoulpi_app::graph::LogLoadSettings;
 pub(crate) use gitpoulpi_app::graph::StashSlot;
+pub(crate) use gitpoulpi_app::graph::{load_walk_filter, refs_key, walk_filter, TotalShown};
 pub(crate) use gitpoulpi_app::graph::{place_stashes, GraphStash, LogEntry, LogRows};
 pub(crate) use gitpoulpi_app::graph::{LazyLog, LogPageRequest};
 pub(crate) use inline_image::GraphImage;
@@ -60,8 +60,7 @@ pub use part::{LaneBackground, NodeSet};
 #[cfg(test)]
 pub(crate) use part::{NodeKind, Sides, TreeCell, TreePart};
 pub(crate) use raster::{avatar_picture_px, NodeAvatar, RasterRow};
-pub(crate) use total::{refs_key, CommitTotal, TotalShown};
-pub(crate) use walk_filter::{load_walk_filter, walk_filter};
+pub(crate) use total::CommitTotal;
 
 /// `ui.graph_lane_background` as this module's own enum.
 ///

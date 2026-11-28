@@ -81,6 +81,8 @@ pub mod activity;
 pub mod binary_hint;
 pub mod commit_settings;
 pub mod diff_recode;
+#[cfg(feature = "hosting")]
+pub mod hosting_task;
 pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;

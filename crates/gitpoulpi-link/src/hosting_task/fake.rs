@@ -1,14 +1,14 @@
 //! A `HostingClient` that answers from memory, for this module's and
 //! `hosting_ui`'s tests.
 
+use super::TokenMemo;
 use super::*;
-use crate::hosting_task::TokenMemo;
 use gitpoulpi_hosting::{
     CreatedPullRequest, HostedProject, HostedSshKey, NewPullRequest, PullRequestState,
 };
 use std::sync::Mutex;
 
-pub(crate) fn pr(number: u64, branch: &str, state: PullRequestState) -> PullRequestSummary {
+pub fn pr(number: u64, branch: &str, state: PullRequestState) -> PullRequestSummary {
     PullRequestSummary {
         number,
         iid_label: format!("!{number}"),
@@ -28,7 +28,7 @@ pub(crate) fn pr(number: u64, branch: &str, state: PullRequestState) -> PullRequ
     }
 }
 
-pub(crate) fn issue(number: u64) -> IssueSummary {
+pub fn issue(number: u64) -> IssueSummary {
     IssueSummary {
         number,
         id: number.to_string(),
@@ -45,7 +45,7 @@ pub(crate) fn issue(number: u64) -> IssueSummary {
     }
 }
 
-pub(crate) fn project(full_name: &str) -> HostedProject {
+pub fn project(full_name: &str) -> HostedProject {
     HostedProject {
         integration_id: "corp".into(),
         id: full_name.into(),
@@ -60,30 +60,30 @@ pub(crate) fn project(full_name: &str) -> HostedProject {
     }
 }
 
-pub(crate) struct FakeClient {
-    pub(crate) projects: Vec<HostedProject>,
-    pub(crate) integration: Integration,
-    pub(crate) prs: Vec<PullRequestSummary>,
-    pub(crate) issues: Vec<IssueSummary>,
-    pub(crate) head: Option<PullRequestSummary>,
-    pub(crate) fail: Option<fn() -> HostingError>,
-    pub(crate) seen: Arc<Mutex<Vec<String>>>,
-    pub(crate) mentioned_prs: Vec<PullRequestSummary>,
-    pub(crate) mentioned_issues: Vec<IssueSummary>,
-    pub(crate) wire: Wire,
+pub struct FakeClient {
+    pub projects: Vec<HostedProject>,
+    pub integration: Integration,
+    pub prs: Vec<PullRequestSummary>,
+    pub issues: Vec<IssueSummary>,
+    pub head: Option<PullRequestSummary>,
+    pub fail: Option<fn() -> HostingError>,
+    pub seen: Arc<Mutex<Vec<String>>>,
+    pub mentioned_prs: Vec<PullRequestSummary>,
+    pub mentioned_issues: Vec<IssueSummary>,
+    pub wire: Wire,
     /// What `account_items` answers, and how it fails.
-    pub(crate) account: gitpoulpi_hosting::account::AccountItems,
-    pub(crate) account_fail: Option<fn() -> HostingError>,
+    pub account: gitpoulpi_hosting::account::AccountItems,
+    pub account_fail: Option<fn() -> HostingError>,
 }
 
 /// The cost of the network, for the Radar's timing tests: every list call
 /// waits `latency` (a timer, so calls joined on one runtime overlap) and
 /// `live` / `peak` count the calls in flight.
 #[derive(Clone, Default)]
-pub(crate) struct Wire {
-    pub(crate) latency: std::time::Duration,
-    pub(crate) live: Arc<std::sync::atomic::AtomicUsize>,
-    pub(crate) peak: Arc<std::sync::atomic::AtomicUsize>,
+pub struct Wire {
+    pub latency: std::time::Duration,
+    pub live: Arc<std::sync::atomic::AtomicUsize>,
+    pub peak: Arc<std::sync::atomic::AtomicUsize>,
 }
 
 impl Wire {
@@ -199,32 +199,32 @@ impl HostingClient for FakeClient {
 }
 
 /// Hands out a [`FakeClient`] per call, built from a template.
-pub(crate) struct FakeFactory {
-    pub(crate) projects: Vec<HostedProject>,
-    pub(crate) prs: Vec<PullRequestSummary>,
-    pub(crate) issues: Vec<IssueSummary>,
-    pub(crate) head: Option<PullRequestSummary>,
-    pub(crate) fail: Option<fn() -> HostingError>,
-    pub(crate) no_token: bool,
-    pub(crate) seen: Arc<Mutex<Vec<String>>>,
-    pub(crate) mentioned_prs: Vec<PullRequestSummary>,
-    pub(crate) mentioned_issues: Vec<IssueSummary>,
-    pub(crate) wire: Wire,
-    pub(crate) account: gitpoulpi_hosting::account::AccountItems,
-    pub(crate) account_fail: Option<fn() -> HostingError>,
+pub struct FakeFactory {
+    pub projects: Vec<HostedProject>,
+    pub prs: Vec<PullRequestSummary>,
+    pub issues: Vec<IssueSummary>,
+    pub head: Option<PullRequestSummary>,
+    pub fail: Option<fn() -> HostingError>,
+    pub no_token: bool,
+    pub seen: Arc<Mutex<Vec<String>>>,
+    pub mentioned_prs: Vec<PullRequestSummary>,
+    pub mentioned_issues: Vec<IssueSummary>,
+    pub wire: Wire,
+    pub account: gitpoulpi_hosting::account::AccountItems,
+    pub account_fail: Option<fn() -> HostingError>,
     /// What building a client costs (production: a credential-helper
     /// subprocess to read the token), and how many were built.
-    pub(crate) client_cost: std::time::Duration,
-    pub(crate) built: Arc<std::sync::atomic::AtomicUsize>,
+    pub client_cost: std::time::Duration,
+    pub built: Arc<std::sync::atomic::AtomicUsize>,
     /// Read the token once per round, as the Radar's factory does: the
     /// cost is paid inside the memo.
-    pub(crate) memoize: bool,
-    pub(crate) tokens: TokenMemo,
-    pub(crate) rounds: Arc<std::sync::atomic::AtomicUsize>,
+    pub memoize: bool,
+    pub tokens: TokenMemo,
+    pub rounds: Arc<std::sync::atomic::AtomicUsize>,
 }
 
 impl FakeFactory {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             projects: Vec::new(),
             prs: Vec::new(),

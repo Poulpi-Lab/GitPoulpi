@@ -1,0 +1,132 @@
+## linear (palette 1)
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/-
+## linear (palette 3)
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/-
+## linear (palette 8)
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/-
+## merges (palette 1)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- BranchOutRight/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c2 lane=1 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- Crossing/Lane(0)/- Horizontal/Lane(0)/- BranchOutRight/Lane(0)/- Empty/None/-
+c4 lane=1 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c5 lane=2 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c6 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c7 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- Horizontal/Lane(0)/- Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/-
+## merges (palette 3)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- BranchOutRight/Lane(1)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/-
+c2 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(2)/- Crossing/Lane(1)/- Horizontal/Lane(2)/- BranchOutRight/Lane(2)/- Empty/None/-
+c4 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/-
+c5 lane=2 color=Lane(2) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(2)/- Empty/None/-
+c6 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/-
+c7 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(2)/- Horizontal/Lane(2)/- Horizontal/Lane(2)/- MergeInRight/Lane(2)/- Empty/None/-
+## merges (palette 8)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- BranchOutRight/Lane(1)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/-
+c2 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(2)/- Crossing/Lane(1)/- Horizontal/Lane(2)/- BranchOutRight/Lane(2)/- Empty/None/-
+c4 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/-
+c5 lane=2 color=Lane(2) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(2)/- Empty/None/-
+c6 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/-
+c7 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(2)/- Horizontal/Lane(2)/- Horizontal/Lane(2)/- MergeInRight/Lane(2)/- Empty/None/-
+## octopus (palette 1)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- BranchOutCrossed/Lane(0)/- Horizontal/Lane(0)/- BranchOutCrossed/Lane(0)/- Horizontal/Lane(0)/- BranchOutRight/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c2 lane=1 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c3 lane=2 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c4 lane=3 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c5 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- MergeInCrossed/Lane(0)/- Horizontal/Lane(0)/- MergeInCrossed/Lane(0)/- Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/-
+## octopus (palette 3)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- BranchOutCrossed/Lane(1)/- Horizontal/Lane(2)/- BranchOutCrossed/Lane(2)/- Horizontal/Lane(0)/- BranchOutRight/Lane(0)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c2 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c3 lane=2 color=Lane(2) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(2)/- Empty/None/- Vertical/Lane(0)/- Empty/None/-
+c4 lane=3 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+c5 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInCrossed/Lane(1)/- Horizontal/Lane(2)/- MergeInCrossed/Lane(2)/- Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/-
+## octopus (palette 8)
+c0 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- BranchOutCrossed/Lane(1)/- Horizontal/Lane(2)/- BranchOutCrossed/Lane(2)/- Horizontal/Lane(3)/- BranchOutRight/Lane(3)/- Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Vertical/Lane(3)/- Empty/None/-
+c2 lane=1 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Vertical/Lane(3)/- Empty/None/-
+c3 lane=2 color=Lane(2) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(2)/- Empty/None/- Vertical/Lane(3)/- Empty/None/-
+c4 lane=3 color=Lane(3) | Vertical/Lane(0)/- Empty/None/- Vertical/Lane(1)/- Empty/None/- Vertical/Lane(2)/- Empty/None/- Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(3)/- Empty/None/-
+c5 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInCrossed/Lane(1)/- Horizontal/Lane(2)/- MergeInCrossed/Lane(2)/- Horizontal/Lane(3)/- MergeInRight/Lane(3)/- Empty/None/-
+## stashes (palette 1)
+s0 lane=1 color=Stash | Empty/None/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+s2 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- Crossing/Stash/ud Horizontal/Lane(0)/- BranchOutRight/Lane(0)/- Empty/None/-
+s1 lane=3 color=Stash | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr Crossing/Stash/udlr Horizontal/Stash/lr Crossing/Lane(0)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c3 lane=2 color=Lane(0) | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+c4 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- MergeInCrossed/Stash/u Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+## stashes (palette 3)
+s0 lane=1 color=Stash | Empty/None/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+s2 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- Crossing/Stash/ud Horizontal/Lane(1)/- BranchOutRight/Lane(1)/- Empty/None/-
+s1 lane=3 color=Stash | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr Crossing/Stash/udlr Horizontal/Stash/lr Crossing/Lane(1)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c3 lane=2 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+c4 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInCrossed/Stash/u Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+## stashes (palette 8)
+s0 lane=1 color=Stash | Empty/None/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+s2 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Merge, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- Crossing/Stash/ud Horizontal/Lane(1)/- BranchOutRight/Lane(1)/- Empty/None/-
+s1 lane=3 color=Stash | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr Crossing/Stash/udlr Horizontal/Stash/lr Crossing/Lane(1)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c3 lane=2 color=Lane(1) | Vertical/Lane(0)/- Empty/None/- Vertical/Stash/ud Empty/None/- Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+c4 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInCrossed/Stash/u Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+## wip_on_branch_tip (palette 1)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/u Empty/None/-
+s0 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+## wip_on_branch_tip (palette 3)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/u Empty/None/-
+s0 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+## wip_on_branch_tip (palette 8)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=0 color=Lane(0) | Node { kind: Ref, sides: Sides { up: true, down: true, left: false, right: false } }/Lane(0)/u Empty/None/-
+s0 lane=1 color=Stash | Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/r Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+## detached_head_wip (palette 1)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=1 color=Lane(0) | Vertical/Lane(0)/ud Empty/None/- Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/- Empty/None/-
+s0 lane=2 color=Stash | Vertical/Lane(0)/ud Empty/None/- Vertical/Lane(0)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/ur Horizontal/Stash/lr Crossing/Lane(0)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(0)/- MergeInRight/Lane(0)/- Empty/None/- Empty/None/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/- Empty/None/- Empty/None/-
+## detached_head_wip (palette 3)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=1 color=Lane(1) | Vertical/Lane(0)/ud Empty/None/- Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(1)/- Empty/None/-
+s0 lane=2 color=Stash | Vertical/Lane(0)/ud Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/ur Horizontal/Stash/lr Crossing/Lane(1)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/- Empty/None/- Empty/None/-
+## detached_head_wip (palette 8)
+wip lane=0 color=Lane(0) | Node { kind: Wip, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(0)/d Empty/None/-
+c0 lane=1 color=Lane(1) | Vertical/Lane(0)/ud Empty/None/- Node { kind: Ref, sides: Sides { up: false, down: true, left: false, right: false } }/Lane(1)/- Empty/None/-
+s0 lane=2 color=Stash | Vertical/Lane(0)/ud Empty/None/- Vertical/Lane(1)/- Empty/None/- Node { kind: Stash, sides: Sides { up: false, down: true, left: false, right: false } }/Stash/d Empty/None/-
+c1 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/ur Horizontal/Stash/lr Crossing/Lane(1)/lr Horizontal/Stash/lr MergeInRight/Stash/ul Empty/None/-
+c2 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: true, left: false, right: true } }/Lane(0)/- Horizontal/Lane(1)/- MergeInRight/Lane(1)/- Empty/None/- Empty/None/- Empty/None/-
+c3 lane=0 color=Lane(0) | Node { kind: Commit, sides: Sides { up: true, down: false, left: false, right: false } }/Lane(0)/- Empty/None/- Empty/None/- Empty/None/- Empty/None/- Empty/None/-
+## empty_dirty (palette 1)
+wip lane=0 color=Wip | Node { kind: Wip, sides: Sides { up: false, down: false, left: false, right: false } }/Wip/- Empty/None/-
+## empty_dirty (palette 3)
+wip lane=0 color=Wip | Node { kind: Wip, sides: Sides { up: false, down: false, left: false, right: false } }/Wip/- Empty/None/-
+## empty_dirty (palette 8)
+wip lane=0 color=Wip | Node { kind: Wip, sides: Sides { up: false, down: false, left: false, right: false } }/Wip/- Empty/None/-

@@ -1,0 +1,40 @@
+//! GitPoulpi desktop frontend: a native window over the same daemon the terminal UI, the CLI and the
+//! MCP server use.
+//!
+//! Layout of the crate:
+//!
+//! | Module    | Role |
+//! |-----------|------|
+//! | `app`     | startup, the main window, chrome (title bar, tabs, toolbar, status line), palette, actions |
+//! | `daemon`  | the link to the session daemon (`gitpoulpi-link`): typed reads, the link host, Fetch/Pull/Push/Undo/Redo, the Log's page fetching (paging itself is `gitpoulpi_app::graph::LazyLog`) |
+//! | `panels`  | Refs sidebar, Log, right pane, diff view |
+//! | `dialogs` | question dialogs (a title, lines, numbered answers): the discard confirmation, the sensitive-files question |
+//! | `sensitive` | the sensitive-files question a refused stage raises |
+//! | `commands`| the shared command registry in use: key bindings, command palette, the one dispatcher |
+//! | `menu`    | the menu bar generated from the registry |
+//! | `help`    | the keybindings view |
+//! | `parity`  | the generated table of what the desktop covers compared with the terminal UI |
+//! | `graph`   | commit graph layout and painter behind a small interface |
+//! | `theme`   | GitPoulpi themes mapped onto the toolkit and the app's own colour set |
+//! | `prefs`   | `desktop.toml` (desktop-only settings) and the column layout rule |
+//! | `fonts`   | the bundled UI and monospace fonts |
+//! | `cli`     | the command line |
+//! | `strings` | the few texts that are not catalog strings |
+//! | `util`    | dates and the diff patch bridge |
+
+pub mod app;
+pub mod cli;
+pub mod commands;
+pub mod daemon;
+pub mod dialogs;
+pub mod fonts;
+pub mod graph;
+pub mod help;
+pub mod menu;
+pub mod panels;
+pub mod parity;
+pub mod prefs;
+pub mod sensitive;
+pub mod strings;
+pub mod theme;
+pub mod util;

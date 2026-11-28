@@ -307,7 +307,7 @@ fn the_annotation_column_widens_with_its_key_and_by_dragging_its_border() {
         annotation_author(s).is_some_and(|(c, _)| c == x1 - 8)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("blame_width = 42"), "{saved}");
     term.stop().unwrap();
 }

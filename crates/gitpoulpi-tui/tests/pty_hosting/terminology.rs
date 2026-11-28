@@ -90,7 +90,13 @@ fn the_terminology_combo_in_settings_persists_and_relabels_the_window() {
                 && s.contains("Pull request")
         })
         .unwrap_or_else(|e| panic!("{e}"));
-    let on_disk = || std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    // tui.toml appears with the first interface write; until then the seeded
+    // config.toml is the file in force.
+    let on_disk = || {
+        std::fs::read_to_string(config.path().join("tui.toml"))
+            .or_else(|_| std::fs::read_to_string(config.path().join("config.toml")))
+            .unwrap_or_default()
+    };
     assert!(
         on_disk().contains("pr_terminology = \"auto\""),
         "opening must not change it: {}",

@@ -415,7 +415,7 @@ fn the_minimap_is_off_by_default_and_the_palette_and_m_toggle_and_save_it() {
         s.contains("minimap on") && Block::of(s).is_some_and(|b| braille(s, b) > 5)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("minimap = true"), "{saved}");
 
     // The key.
@@ -424,7 +424,7 @@ fn the_minimap_is_off_by_default_and_the_palette_and_m_toggle_and_save_it() {
         s.contains("minimap off") && Block::of(s).is_some_and(|b| braille(s, b) == 0)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("minimap = false"), "{saved}");
 }
 
@@ -579,7 +579,7 @@ fn the_editor_toggles_the_minimap_from_its_bar_and_with_alt_m() {
         idle_bg,
         "the button shows its state"
     );
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("minimap = true"), "{saved}");
 
     // The key: off again, and nothing typed into the file.
@@ -590,7 +590,7 @@ fn the_editor_toggles_the_minimap_from_its_bar_and_with_alt_m() {
             && Block::of(s).is_some_and(|b| braille(s, b) == 0)
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("minimap = false"), "{saved}");
 }
 
@@ -621,7 +621,7 @@ fn the_bar_s_map_button_toggles_the_minimap_by_mouse_and_shows_its_state() {
         idle_bg,
         "the button shows its active state"
     );
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("minimap = true"), "{saved}");
 
     term.click(c + 2, r).unwrap();

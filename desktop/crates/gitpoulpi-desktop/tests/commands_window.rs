@@ -74,7 +74,7 @@ fn a_command_that_is_not_implemented_answers_in_the_status_line(cx: &mut TestApp
     let (window, _ws) = open(cx, repo.root(), dir.path());
     let outcome = cx
         .update_window(window, |_, w, cx| {
-            commands::run_id("git_prefix.new_branch", w, cx)
+            commands::run_id("git_prefix.pull_all_branches", w, cx)
         })
         .unwrap();
     assert_eq!(outcome, Outcome::NotAvailable);
@@ -92,7 +92,7 @@ fn the_git_prefix_chord_reaches_the_command_and_says_it_is_not_there_yet(cx: &mu
     let (window, _ws) = open(cx, repo.root(), dir.path());
     press(cx, window, "ctrl-g");
     assert!(status_text(cx).is_some(), "the prefix key shows a hint");
-    press(cx, window, "b");
+    press(cx, window, "shift-k");
     let text = status_text(cx).expect("a message");
     assert!(text.contains("not available yet"), "{text}");
 }

@@ -41,6 +41,8 @@ struct Drained {
     failure: Option<String>,
     /// Another frontend hid, showed or soloed refs.
     visibility: bool,
+    /// Local changes are in the way of an action and auto-stash is `ask`.
+    autostash: Vec<gitpoulpi_link::AutoStashNeeded>,
 }
 
 /// `a` and `b` together: a part changed when it changed in either.
@@ -83,6 +85,7 @@ fn sort(events: Vec<LinkEvent>) -> Drained {
             LinkEvent::PushRejected(notice) => d.errors.push(rejection_text(&notice.rejection)),
             LinkEvent::ActionMessage(text) => d.messages.push(text),
             LinkEvent::RefVisibilityChanged => d.visibility = true,
+            LinkEvent::AutoStashNeeded(needed) => d.autostash.push(needed),
             LinkEvent::Failed(why) => d.failure = Some(why),
             // The journal moving is the wake itself: the toolbar asks the link when it draws. The
             // other events (auto-stash, file insight, merge, ...) have no desktop surface yet.
@@ -138,6 +141,9 @@ impl Workspace {
         }
         // What became of the commit that was sent, and the stages the guard refused.
         self.right.update(cx, |r, cx| r.settle(cx));
+        if !drained.autostash.is_empty() {
+            self.ask_autostash(drained.autostash, cx);
+        }
         let prompts = host.take_prompts();
         if !prompts.is_empty() {
             self.ask_sensitive(prompts, cx);

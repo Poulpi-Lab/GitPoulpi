@@ -5,12 +5,12 @@ Generated from the shared registry (`gitpoulpi_app::registry::parity_rows`, ever
 `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` from `desktop/` to rewrite it.
 The branch merges when `parity_is_complete` passes (see `desktop/parity/README.md`).
 
-**976 rows: 104 done, 8 terminal only, 864 to do.**
+**976 rows: 133 done, 8 terminal only, 835 to do.**
 
 | Kind | Rows | Done | Terminal only | To do |
 |---|---:|---:|---:|---:|
-| action | 375 | 61 | 0 | 314 |
-| palette command | 588 | 43 | 0 | 545 |
+| action | 375 | 70 | 0 | 305 |
+| palette command | 588 | 63 | 0 | 525 |
 | family | 13 | 0 | 8 | 5 |
 
 A palette command that is the only twin of a key action shares that action's row.
@@ -50,7 +50,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `git_prefix.commit_now` | git_prefix | Commit Staged Changes Now | Enter / Ctrl+G Enter | done |
 | `git_prefix.ai_compose` | git_prefix | AI: Split Changes into Commits | Shift+C | to do |
 | `git_prefix.ai_explain` | git_prefix | AI: Explain Changes | w | to do |
-| `git_prefix.stash_message` | git_prefix | Stash with Message | m / Ctrl+G m | to do |
+| `git_prefix.stash_message` | git_prefix | Stash with Message | m / Ctrl+G m | done |
 | `git_prefix.ai_commit_message` | git_prefix | AI: Write Commit Message | i | to do |
 | `git_prefix.stage_all` | git_prefix | Stage All Changes | a / Ctrl+G a | done |
 | `git_prefix.discard_all` | git_prefix | Discard All Changes | x / Ctrl+G x | done |
@@ -60,20 +60,20 @@ A palette command that is the only twin of a key action shares that action's row
 | `git_prefix.pull_all_branches` | git_prefix | Pull All Branches | Ctrl+P / Ctrl+G Ctrl+P | to do |
 | `git_prefix.push` | git_prefix | Push | Shift+P / Ctrl+G P | done |
 | `git_prefix.open_linked_pr` | git_prefix | Open Linked Pull Request | g | to do |
-| `git_prefix.push_tags` | git_prefix | Push All Tags | Shift+U / Ctrl+G U | to do |
+| `git_prefix.push_tags` | git_prefix | Push All Tags | Shift+U / Ctrl+G U | done |
 | `git_prefix.fetch_all` | git_prefix | Fetch All Remotes | f / Ctrl+G f | done |
-| `git_prefix.new_tag` | git_prefix | New Tag | t / Ctrl+G t | to do |
-| `git_prefix.new_branch` | git_prefix | New Branch | b / Ctrl+G b | to do |
-| `git_prefix.stash_push` | git_prefix | Stash Changes | Shift+T / Ctrl+G T | to do |
+| `git_prefix.new_tag` | git_prefix | New Tag | t / Ctrl+G t | done |
+| `git_prefix.new_branch` | git_prefix | New Branch | b / Ctrl+G b | done |
+| `git_prefix.stash_push` | git_prefix | Stash Changes | Shift+T / Ctrl+G T | done |
 | `git_prefix.cherry_pick` | git_prefix | Cherry-Pick Selected Commit | y / Ctrl+G y | done |
 | `git_prefix.revert` | git_prefix | Revert Selected Commit | v / Ctrl+G v | done |
 | `git_prefix.edit_message` | git_prefix | Edit Commit Message | e / Ctrl+G e | to do |
 | `git_prefix.amend` | git_prefix | Amend Selected Commit | Shift+E / Ctrl+G E | to do |
 | `git_prefix.edit_author` | git_prefix | Amend Selected Commit Author | Shift+A / Ctrl+G A | to do |
 | `git_prefix.reset_mixed` | git_prefix | Reset (Mixed) to Selected Commit | Shift+R / Ctrl+G R | done |
-| `git_prefix.rebase_onto` | git_prefix | Rebase onto Selected Branch | r / Ctrl+G r | to do |
-| `git_prefix.stash_pop` | git_prefix | Pop Stash | o / Ctrl+G o | to do |
-| `git_prefix.delete_ref` | git_prefix | Delete Selected Ref or Drop Stash | d / Ctrl+G d | to do |
+| `git_prefix.rebase_onto` | git_prefix | Rebase onto Selected Branch | r / Ctrl+G r | done |
+| `git_prefix.stash_pop` | git_prefix | Pop Stash | o / Ctrl+G o | done |
+| `git_prefix.delete_ref` | git_prefix | Delete Selected Ref or Drop Stash | d / Ctrl+G d | done |
 | `git_prefix.lfs_menu` | git_prefix | Open the LFS Menu | l | to do |
 | `git_prefix.flow_menu` | git_prefix | Open the Flow Menu | Shift+W | to do |
 | `git_prefix.lfs_fetch_all` | git_prefix | LFS: Fetch All Objects | Shift+F | to do |
@@ -114,7 +114,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `refs.clear_solo` | refs | Stop Soloing | Shift+O | done |
 | `refs.toggle_hierarchy` | refs | Toggle Branch Hierarchy View | y | to do |
 | `refs.show_all` | refs | Show All Hidden Refs | Shift+H | done |
-| `refs.reveal` | refs | Reveal in Graph | g | to do |
+| `refs.reveal` | refs | Reveal in Graph | g | done |
 | `refs.mark_drop` | refs | Mark as Drop Source | m | to do |
 | `refs.drop_marked` | refs | Drop the Marked Ref Here | Shift+M | to do |
 | `refs.expand_all` | refs | Expand All Folders | = | done |
@@ -426,15 +426,15 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.scroll_commit_message_up` | palette | Commit Details: Scroll Message Up |  | to do |
 | `palette.open_message_link` | palette | Commit Details: Open Link in Message... |  | to do |
 | `palette.toggle_commit_file_sort` | palette | Files: Toggle Commit File Sort (A-Z / Z-A) |  | to do |
-| `palette.checkout_selected_ref` | palette | Refs: Check Out Selected Ref |  | to do |
-| `palette.copy_ref_field_name` | palette | Refs: Copy Ref Name |  | to do |
-| `palette.copy_ref_field_full_ref` | palette | Refs: Copy Full Ref (refs/heads/...) |  | to do |
-| `palette.copy_ref_field_target_sha` | palette | Refs: Copy Ref Target SHA |  | to do |
-| `palette.merge_selected_ref` | palette | Refs: Merge Selected Branch into Current |  | to do |
-| `palette.drop_selected_ref_on_current` | palette | Refs: Drop Selected Ref on Checked-Out Branch... |  | to do |
-| `palette.rename_selected_branch` | palette | Refs: Rename Selected Branch... |  | to do |
-| `palette.fast_forward_selected_to_current` | palette | Refs: Fast-Forward Selected Branch to Current |  | to do |
-| `palette.fast_forward_current_to_selected` | palette | Refs: Fast-Forward Current Branch to Selected |  | to do |
+| `palette.checkout_selected_ref` | palette | Refs: Check Out Selected Ref |  | done |
+| `palette.copy_ref_field_name` | palette | Refs: Copy Ref Name |  | done |
+| `palette.copy_ref_field_full_ref` | palette | Refs: Copy Full Ref (refs/heads/...) |  | done |
+| `palette.copy_ref_field_target_sha` | palette | Refs: Copy Ref Target SHA |  | done |
+| `palette.merge_selected_ref` | palette | Refs: Merge Selected Branch into Current |  | done |
+| `palette.drop_selected_ref_on_current` | palette | Refs: Drop Selected Ref on Checked-Out Branch... |  | done |
+| `palette.rename_selected_branch` | palette | Refs: Rename Selected Branch... |  | done |
+| `palette.fast_forward_selected_to_current` | palette | Refs: Fast-Forward Selected Branch to Current |  | done |
+| `palette.fast_forward_current_to_selected` | palette | Refs: Fast-Forward Current Branch to Selected |  | done |
 | `palette.create_worktree_from_selected_ref` | palette | Refs: Create Worktree from Selected Branch or Tag... |  | to do |
 | `palette.reflog_selected_branch` | palette | Refs: Reflog of the Selected Branch... |  | to do |
 | `palette.start_pull_request_from_selected_branch` | palette | Refs: Start a Pull Request from Selected Branch... |  | to do |
@@ -495,17 +495,17 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.lfs_lock_selected_file` | palette | LFS: Lock Selected File |  | to do |
 | `palette.lfs_unlock_selected_file` | palette | LFS: Unlock Selected File |  | to do |
 | `palette.lfs_force_unlock_selected_file` | palette | LFS: Force Unlock Selected File |  | to do |
-| `palette.delete_selected_remote_branch` | palette | Refs: Delete Selected Branch from Its Remote... |  | to do |
-| `palette.delete_selected_branch_and_remote` | palette | Refs: Delete Selected Branch Locally and on Its Remote... |  | to do |
+| `palette.delete_selected_remote_branch` | palette | Refs: Delete Selected Branch from Its Remote... |  | done |
+| `palette.delete_selected_branch_and_remote` | palette | Refs: Delete Selected Branch Locally and on Its Remote... |  | done |
 | `palette.copy_selected_branch_link` | palette | Refs: Copy Link to Selected Branch on Remote |  | to do |
 | `palette.copy_selected_commit_link` | palette | Git: Copy Link to Selected Commit on Remote |  | to do |
-| `palette.create_annotated_tag_at_selected_commit` | palette | Git: Annotated Tag at Selected Commit... |  | to do |
-| `palette.push_selected_tag` | palette | Refs: Push Selected Tag to Default Remote |  | to do |
-| `palette.delete_selected_tag_from_remote` | palette | Refs: Delete Selected Tag from Its Remote... |  | to do |
+| `palette.create_annotated_tag_at_selected_commit` | palette | Git: Annotated Tag at Selected Commit... |  | done |
+| `palette.push_selected_tag` | palette | Refs: Push Selected Tag to Default Remote |  | done |
+| `palette.delete_selected_tag_from_remote` | palette | Refs: Delete Selected Tag from Its Remote... |  | done |
 | `palette.fetch_selected_tag` | palette | Git: Fetch Selected Tag |  | to do |
 | `palette.take_remote_selected_tag` | palette | Git: Use the Remote's Version of the Selected Tag |  | to do |
 | `palette.force_push_selected_tag` | palette | Git: Force Push the Selected Tag to Its Remote |  | to do |
-| `palette.annotate_selected_tag` | palette | Refs: Annotate Selected Tag... |  | to do |
+| `palette.annotate_selected_tag` | palette | Refs: Annotate Selected Tag... |  | done |
 | `palette.move_selected_tag_to_selected_commit` | palette | Refs: Move Selected Tag to Selected Commit... |  | to do |
 | `palette.toggle_hide_in_graph` | palette | Refs: Toggle Hide in Graph |  | done |
 | `palette.toggle_solo` | palette | Refs: Toggle Solo on Selected Ref | o | done |
@@ -554,7 +554,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.abort_grouped_push` | palette | Git: Abort Grouped Push |  | to do |
 | `palette.retry_failed_pushes` | palette | Git: Retry Failed Pushes |  | to do |
 | `palette.force_push_with_lease` | palette | Git: Force Push (with lease)... |  | to do |
-| `palette.set_upstream` | palette | Git: Remotes of Branch... |  | to do |
+| `palette.set_upstream` | palette | Git: Remotes of Branch... |  | done |
 | `palette.add_remote` | palette | Remote: Add Remote... |  | to do |
 | `palette.remove_remote` | palette | Remote: Remove Remote... |  | to do |
 | `palette.edit_remote` | palette | Remote: Edit Remote... |  | to do |
@@ -579,11 +579,11 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.flow_settings` | palette | Flow: Workflow Settings... |  | to do |
 | `palette.hide_remote_in_graph` | palette | Remote: Hide Remote in Graph... |  | to do |
 | `palette.show_remote_in_graph` | palette | Remote: Show Remote in Graph... |  | to do |
-| `palette.stash_apply` | palette | Git: Stash Apply |  | to do |
-| `palette.stash_drop` | palette | Git: Stash Drop... |  | to do |
+| `palette.stash_apply` | palette | Git: Stash Apply |  | done |
+| `palette.stash_drop` | palette | Git: Stash Drop... |  | done |
 | `palette.checkout_selected_commit` | palette | Git: Check Out Selected Commit (detached HEAD) |  | done |
-| `palette.create_branch_at_selected_commit` | palette | Git: Create Branch at Selected Commit... |  | to do |
-| `palette.create_tag_at_selected_commit` | palette | Git: Create Tag at Selected Commit... |  | to do |
+| `palette.create_branch_at_selected_commit` | palette | Git: Create Branch at Selected Commit... |  | done |
+| `palette.create_tag_at_selected_commit` | palette | Git: Create Tag at Selected Commit... |  | done |
 | `palette.copy_commit_field_message` | palette | Commit: Copy Message |  | done |
 | `palette.copy_commit_field_author_name` | palette | Commit: Copy Author Name |  | done |
 | `palette.copy_commit_field_author_email` | palette | Commit: Copy Author Email |  | done |

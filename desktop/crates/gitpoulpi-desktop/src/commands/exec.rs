@@ -185,6 +185,7 @@ pub fn execute(op: Op, window: &mut Window, cx: &mut App) {
                 .update(cx, |r, cx| staging::run_status(r, op, window, cx))
         }),
         Op::Commit(op) => super::commit_ops::run(op, window, cx),
+        Op::Refs(op) => super::refs_ops::run(op, window, cx),
         Op::DiffPart(op) => with_workspace(window, cx, move |ws, _, cx| {
             if !ws.diff_is_open() {
                 let why = gitpoulpi_i18n::msg::palette::WHY_THE_DIFF_VIEW_ISN_T_OPEN.get();

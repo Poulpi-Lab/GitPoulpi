@@ -16,8 +16,12 @@ use gpui_kit::{
     Subscription, Task, Window,
 };
 
+mod autostash;
 mod commit;
 pub use commit::BannerButton;
+mod ref_forms;
+mod ref_menu_host;
+mod refs;
 mod stage;
 
 use super::actions::WorkspaceHandle;
@@ -63,6 +67,8 @@ pub struct Workspace {
     selected_commit: bool,
     /// The merge, cherry-pick, revert or rebase stopped in the repository (from the last refresh).
     pub(super) operation: Option<gitpoulpi_core::domain::OperationState>,
+    /// The ref menu, while one is open.
+    ref_menu: Option<ref_menu_host::OpenMenu>,
     pub(super) summary: Option<Summary>,
     pub(super) live: LiveState,
     pub(super) _pump: Option<Task<()>>,
@@ -85,17 +91,28 @@ impl Workspace {
         crate::menu::register(&menu_bar, cx);
         let subs = vec![
             cx.subscribe(&log, |this, _, ev: &LogEvent, cx| this.on_log_event(ev, cx)),
-            cx.subscribe(&refs, |this, _, ev: &RefsEvent, cx| match ev {
-                RefsEvent::Selected(oid) => {
-                    this.show_log(cx);
-                    this.log.update(cx, |l, cx| l.select_oid(*oid, cx));
-                }
-                RefsEvent::VisibilityChanged { hidden, solo } => {
-                    let (hidden, solo) = (hidden.clone(), solo.clone());
-                    this.log
-                        .update(cx, |l, cx| l.set_visibility(hidden, solo, cx));
-                }
-            }),
+            cx.subscribe_in(
+                &refs,
+                window,
+                |this, _, ev: &RefsEvent, window, cx| match ev {
+                    RefsEvent::Selected(oid) => {
+                        this.show_log(cx);
+                        this.log.update(cx, |l, cx| l.select_oid(*oid, cx));
+                    }
+                    RefsEvent::Menu { target, at } => {
+                        this.open_ref_menu(target.clone(), *at, window, cx)
+                    }
+                    RefsEvent::Open(target) => this.open_ref_row(target.clone(), window, cx),
+                    RefsEvent::Dropped { source, target, at } => {
+                        this.open_drop_menu(source.clone(), target.clone(), *at, window, cx)
+                    }
+                    RefsEvent::VisibilityChanged { hidden, solo } => {
+                        let (hidden, solo) = (hidden.clone(), solo.clone());
+                        this.log
+                            .update(cx, |l, cx| l.set_visibility(hidden, solo, cx));
+                    }
+                },
+            ),
             cx.subscribe_in(
                 &right,
                 window,
@@ -147,6 +164,7 @@ impl Workspace {
             menu_bar,
             selected_commit: false,
             operation: None,
+            ref_menu: None,
             summary: None,
             live: LiveState::default(),
             _pump: None,
@@ -263,6 +281,7 @@ impl Workspace {
             diff_open,
             selected_commit: self.selected_commit,
             has_wip: self.summary.as_ref().is_some_and(|s| !s.status.is_empty()),
+            refs: self.refs.read(cx).selection_facts(),
             undo: self.undo_avail(Direction::Undo),
             redo: self.undo_avail(Direction::Redo),
         }
@@ -387,5 +406,6 @@ impl Render for Workspace {
             )
             .child(self.toolbar(cx))
             .child(self.status_line(cx))
+            .children(self.menu_overlay(cx))
     }
 }

@@ -33,9 +33,31 @@ pub enum BannerButton {
     Abort,
 }
 
-/// Whether a banner is shown for `state` (a rebase and a `git am` keep their own strips).
+/// Whether a banner is shown for `state` (a `git am` keeps its own strip).
 pub fn has_banner(state: &OperationState) -> bool {
-    !matches!(state, OperationState::Rebase(_) | OperationState::Am { .. })
+    !matches!(state, OperationState::Am { .. })
+}
+
+/// The rebase strip's words, as the terminal UI draws them.
+fn rebase_text(state: &gitpoulpi_core::domain::RebaseState) -> String {
+    use msg::rebase_banner as rb;
+    let head = state.head_name.as_deref().unwrap_or("HEAD");
+    let onto = short(state.onto);
+    match state.stopped_at {
+        Some(at) => rb::stopped(
+            head,
+            onto,
+            state.step,
+            state.total,
+            short(at),
+            if state.conflicted {
+                rb::KIND_CONFLICT
+            } else {
+                rb::KIND_EDIT
+            },
+        ),
+        None => rb::running(head, onto, state.step, state.total),
+    }
 }
 
 /// The banner's words: the operation and what is left to resolve.
@@ -48,7 +70,8 @@ pub fn banner_text(state: &OperationState, conflicts: usize) -> String {
         OperationState::Merge { their_label, .. } => tr::banner_merge_detached(their_label),
         OperationState::CherryPick { commit } => tr::banner_pick(short(*commit)),
         OperationState::Revert { commit } => tr::banner_revert(short(*commit)),
-        OperationState::Rebase(_) | OperationState::Am { .. } => String::new(),
+        OperationState::Rebase(rebase) => rebase_text(rebase),
+        OperationState::Am { .. } => String::new(),
     };
     let tail = if conflicts == 0 {
         tr::BANNER_ALL_RESOLVED.get().to_string()
@@ -76,7 +99,9 @@ pub fn banner_buttons(state: &OperationState, conflicts: usize) -> Vec<(BannerBu
     }
     if matches!(
         state,
-        OperationState::CherryPick { .. } | OperationState::Revert { .. }
+        OperationState::CherryPick { .. }
+            | OperationState::Revert { .. }
+            | OperationState::Rebase(_)
     ) {
         out.push((BannerButton::Skip, tr::BANNER_SKIP.get().to_string()));
     }
@@ -137,14 +162,28 @@ impl Workspace {
         }
     }
 
-    /// The menu key: the focused pane's context menu. Only the Log's commit menu exists so far.
+    /// The menu key: the context menu of the pane that has the keyboard. In the Refs it is the ref menu
+    /// of the selected row; in the Log, the ref menu when a ref pill of the selected commit was picked
+    /// (a click on it), else the commit menu. This is the one place the key is dispatched.
     fn open_context_menu(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        if self
+            .refs
+            .read(cx)
+            .focus_handle(cx)
+            .contains_focused(window, cx)
+        {
+            return self.open_menu_for_selection(window, cx);
+        }
         if self
             .log
             .read(cx)
             .focus_handle(cx)
             .contains_focused(window, cx)
         {
+            if let Some(target) = self.log.read(cx).picked_pill() {
+                let at = self.log.read(cx).selected_row_origin();
+                return self.open_ref_menu(target, at, window, cx);
+            }
             let palette = self.command_state(window, cx).palette_context();
             self.log
                 .update(cx, |l, cx| l.open_menu(palette, window, cx));
@@ -165,12 +204,15 @@ impl Workspace {
             (OperationState::Merge { .. }, true) => tr::ABORT_CONFIRM_MERGE.get(),
             (OperationState::CherryPick { .. }, true) => tr::ABORT_CONFIRM_PICK.get(),
             (OperationState::Revert { .. }, true) => tr::ABORT_CONFIRM_REVERT.get(),
+            (OperationState::Rebase(_), true) => msg::input::ABORT_REBASE_CONFIRM.get(),
             (OperationState::CherryPick { .. }, false) => tr::SKIP_CONFIRM_PICK.get(),
             (OperationState::Revert { .. }, false) => tr::SKIP_CONFIRM_REVERT.get(),
+            (OperationState::Rebase(_), false) => msg::rebase_banner::SKIP.get(),
             (_, false) => return self.say(tr::REASON_NOT_SKIPPABLE.get(), cx),
-            // A rebase and `git am` have their own abort.
+            // `git am` has its own abort.
             _ => return self.say(strings::not_available_yet(tr::BANNER_ABORT.get()), cx),
         };
+        let rebase = matches!(state, OperationState::Rebase(_));
         let backend = self.backend.clone();
         let label = if abort {
             tr::BANNER_ABORT.get()
@@ -193,7 +235,12 @@ impl Workspace {
             },
             move |ix, _| {
                 if ix == 0 {
-                    backend.submit(if abort { abort_action() } else { skip_action() });
+                    backend.submit(match (rebase, abort) {
+                        (true, true) => gitpoulpi_link::Action::RebaseAbort,
+                        (true, false) => gitpoulpi_link::Action::RebaseSkip,
+                        (false, true) => abort_action(),
+                        (false, false) => skip_action(),
+                    });
                 }
             },
             || {},
@@ -210,6 +257,10 @@ impl Workspace {
         match button {
             BannerButton::Resolve => {
                 self.say(strings::not_available_yet(tr::BANNER_RESOLVE.get()), cx)
+            }
+            BannerButton::Continue if matches!(self.operation, Some(OperationState::Rebase(_))) => {
+                self.backend.submit(gitpoulpi_link::Action::RebaseContinue);
+                self.say(msg::input::CONTINUING_REBASE.get(), cx);
             }
             BannerButton::Continue => {
                 // Committing concludes a merge, a cherry-pick and a revert alike: the WIP row's commit

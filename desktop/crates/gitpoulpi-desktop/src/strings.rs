@@ -55,6 +55,24 @@ pub fn not_available_yet(what: &str) -> String {
     }
 }
 
+// Branch, tag and stash forms.
+/// The check box of the New branch form.
+pub const CHECKOUT_AFTER_CREATE: &str = "Check out the new branch";
+/// The message field of the New tag form (a message makes the tag annotated).
+pub const TAG_MESSAGE_OPTIONAL: &str = "Message (optional: a message makes it an annotated tag)";
+/// The message field of an annotated tag.
+pub const TAG_MESSAGE: &str = "Message";
+/// The upstream field of the Set upstream form.
+pub const UPSTREAM_LABEL: &str = "Upstream (a remote branch, for example origin/main)";
+/// The line under the upstream field.
+pub const UPSTREAM_EMPTY_UNSETS: &str = "Leave the field empty to remove the upstream.";
+/// The message field of the Stash form.
+pub const STASH_MESSAGE_LABEL: &str = "Message (optional)";
+/// Show changes of a stash that holds none.
+pub const STASH_EMPTY: &str = "This stash has no changes to show";
+/// The name field of the forms.
+pub const NAME_LABEL: &str = "Name";
+
 // Menu bar headings that have no catalog string.
 pub const MENU_FILE: &str = "File";
 pub const MENU_EDIT: &str = "Edit";

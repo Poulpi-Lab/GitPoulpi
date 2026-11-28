@@ -19,6 +19,8 @@ pub enum PillKind {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pill {
     pub name: String,
+    /// The ref's full name as the Refs sidebar spells it (`remote/name` for a remote branch).
+    pub full: String,
     pub kind: PillKind,
     pub checked_out: bool,
     /// A local branch whose remote twin points at the same commit shares its pill.
@@ -50,6 +52,7 @@ pub fn pills_for(refs: &[Ref], idxs: &[usize]) -> Vec<Pill> {
             None => false,
         };
         out.push(Pill {
+            full: name.clone(),
             name,
             kind: PillKind::Local,
             checked_out: head,
@@ -57,8 +60,9 @@ pub fn pills_for(refs: &[Ref], idxs: &[usize]) -> Vec<Pill> {
             tag_remote: false,
         });
     }
-    for (_, name) in remotes {
+    for (remote, name) in remotes {
         out.push(Pill {
+            full: format!("{remote}/{name}"),
             name,
             kind: PillKind::Remote,
             checked_out: false,
@@ -68,6 +72,7 @@ pub fn pills_for(refs: &[Ref], idxs: &[usize]) -> Vec<Pill> {
     }
     for (name, on_remote) in tags {
         out.push(Pill {
+            full: name.clone(),
             name,
             kind: PillKind::Tag,
             checked_out: false,

@@ -80,6 +80,10 @@ mod client;
 pub mod activity;
 pub mod binary_hint;
 pub mod commit_settings;
+#[cfg(all(feature = "conversation", feature = "hosting"))]
+pub mod conversation_cache;
+#[cfg(all(feature = "conversation", feature = "hosting"))]
+pub mod conversation_write;
 pub mod diff_recode;
 #[cfg(feature = "hosting")]
 pub mod hosting_rows;

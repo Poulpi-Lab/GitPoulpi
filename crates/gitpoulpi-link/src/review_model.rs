@@ -155,3 +155,55 @@ pub enum Focus {
     List,
     Diff,
 }
+
+// -- AI suggestions ----------------------------------------------------------------
+
+/// How much a suggestion matters (a frontend's own copy of the AI crate's
+/// severity, so a build without the `ai` feature has it too).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Sev {
+    Info,
+    Warning,
+    Issue,
+}
+
+impl Sev {
+    /// The translated word a card shows for it.
+    pub fn word(self) -> &'static str {
+        use gitpoulpi_i18n::msg::review_ai as ra;
+        match self {
+            Self::Info => ra::SEV_INFO,
+            Self::Warning => ra::SEV_WARNING,
+            Self::Issue => ra::SEV_ISSUE,
+        }
+        .get()
+    }
+}
+
+/// Where an accepted suggestion becomes a comment.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Place {
+    pub side: gitpoulpi_hosting::DiffSide,
+    pub line: u32,
+    /// For a context line, its number on the other side (GitLab).
+    pub other_line: Option<u32>,
+    pub start_line: Option<u32>,
+}
+
+/// One suggested review comment, waiting for the reviewer.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Item {
+    pub id: u64,
+    pub path: String,
+    /// The line the model named; `0` when it named none.
+    pub line: u32,
+    pub severity: Sev,
+    pub body: String,
+    /// `line` is a line of the diff: the suggestion is drawn under it.
+    /// Otherwise it is listed as about the file.
+    pub anchored: bool,
+    /// Where accepting puts it; `None` when the file is not in the diff.
+    pub place: Option<Place>,
+    /// Text put before the body when accepted ("(about line 40) ").
+    pub prefix: String,
+}

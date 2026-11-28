@@ -14,9 +14,9 @@ use gitpoulpi_hosting::conversation::{ItemKey, ItemKind, TimelinePage};
 use serde::{Deserialize, Serialize};
 
 /// The largest file written.
-pub(crate) const MAX_BYTES: usize = 2 * 1024 * 1024;
+pub const MAX_BYTES: usize = 2 * 1024 * 1024;
 /// Files kept across all items of one repository.
-pub(crate) const KEEP: usize = 50;
+pub const KEEP: usize = 50;
 
 #[derive(Serialize, Deserialize)]
 struct Saved {
@@ -24,7 +24,7 @@ struct Saved {
     page: TimelinePage,
 }
 
-pub(crate) fn now() -> i64 {
+pub fn now() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |d| d.as_secs() as i64)
@@ -50,7 +50,7 @@ fn slug(text: &str) -> String {
 }
 
 /// Where item `key` of `project` on `integration` is saved under `dir`.
-pub(crate) fn file_for(dir: &Path, integration: &str, project: &str, key: &ItemKey) -> PathBuf {
+pub fn file_for(dir: &Path, integration: &str, project: &str, key: &ItemKey) -> PathBuf {
     let kind = match key.kind {
         ItemKind::Issue => "issue",
         ItemKind::PullRequest => "request",
@@ -67,14 +67,14 @@ pub(crate) fn file_for(dir: &Path, integration: &str, project: &str, key: &ItemK
 }
 
 /// The saved page and when it was saved (unix seconds).
-pub(crate) fn read(file: &Path) -> Option<(TimelinePage, i64)> {
+pub fn read(file: &Path) -> Option<(TimelinePage, i64)> {
     let text = std::fs::read_to_string(file).ok()?;
     let saved: Saved = serde_json::from_str(&text).ok()?;
     Some((saved.page, saved.saved_at))
 }
 
 /// Saves `page`; failures are silent (a missing copy is only a slower open).
-pub(crate) fn write(file: &Path, page: &TimelinePage) {
+pub fn write(file: &Path, page: &TimelinePage) {
     let Ok(text) = serde_json::to_string(&Saved {
         saved_at: now(),
         page: page.clone(),

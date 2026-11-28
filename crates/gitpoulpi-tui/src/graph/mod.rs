@@ -10,7 +10,9 @@
 //!   connects to, and the single function that turns a part into styled
 //!   characters. **Read its header before touching the glyphs**; it carries
 //!   the font measurements behind the choice and what broke on Windows.
-//! - [`layout`] -- lane assignment: history in, a grid of parts out.
+//! - [`layout`] -- the terminal's reading of the frontend-neutral lane
+//!   assignment (`gitpoulpi_app::graph`): neutral colour references resolved
+//!   against the lane palette, rows turned into `Line`s.
 //! - `tests` -- including the exhaustive connectivity check that made
 //!   "is every node joined to its lanes?" a property instead of a hope.
 
@@ -23,12 +25,10 @@ mod connector;
 mod ghost_ref;
 mod inline_image;
 mod layout;
-mod paging;
 mod part;
 mod raster;
 #[cfg(test)]
 mod raster_tests;
-mod stash;
 #[cfg(test)]
 mod tests;
 mod total;
@@ -47,19 +47,19 @@ pub(crate) use compact::{
 };
 pub(crate) use connector::{banded_graph_cell, node_column, with_ref_connector};
 pub(crate) use ghost_ref::GhostRef;
+pub use gitpoulpi_app::graph::LogLoadSettings;
+pub(crate) use gitpoulpi_app::graph::StashSlot;
+pub(crate) use gitpoulpi_app::graph::{place_stashes, GraphStash, LogEntry, LogRows};
+pub(crate) use gitpoulpi_app::graph::{LazyLog, LogPageRequest};
 pub(crate) use inline_image::GraphImage;
 #[cfg(test)]
 pub(crate) use layout::build_graph_lines;
 pub(crate) use layout::{build_graph_lines_with, text_line, GraphRow, WipAnchor};
-pub(crate) use paging::{LazyLog, LogPageRequest};
 pub(crate) use part::ref_connector_span;
 pub use part::{LaneBackground, NodeSet};
 #[cfg(test)]
 pub(crate) use part::{NodeKind, Sides, TreeCell, TreePart};
 pub(crate) use raster::{avatar_picture_px, NodeAvatar, RasterRow};
-#[cfg(test)]
-pub(crate) use stash::StashSlot;
-pub(crate) use stash::{place_stashes, GraphStash, LogEntry, LogRows};
 pub(crate) use total::{refs_key, CommitTotal, TotalShown};
 pub(crate) use walk_filter::{load_walk_filter, walk_filter};
 
@@ -81,9 +81,11 @@ impl From<gitpoulpi_config::GraphLaneBackground> for LaneBackground {
 /// rather than `Color::Red`/`Green`/..., because palette-relative ANSI colors
 /// read as washed-out on a custom dark theme. The colors live in the config
 /// crate's lane-palette registry (`gitpoulpi_config::theme::lane_palettes`).
+#[cfg(test)]
 pub(crate) static LANE_PALETTE: std::sync::LazyLock<Vec<Color>> =
     std::sync::LazyLock::new(|| registry_palette("gitpoulpi"));
 
+#[cfg(test)]
 fn registry_palette(slug: &str) -> Vec<Color> {
     gitpoulpi_config::theme::lane_palette(slug)
         .map(|p| p.colors.into_iter().map(crate::theme::color_of).collect())
@@ -350,88 +352,6 @@ pub(crate) fn attach_node_avatars(
                 key: author.to_string(),
                 bitmap: std::sync::Arc::clone(bitmap),
             });
-        }
-    }
-}
-
-/// How much history the Log asks the daemon for. `pub` and defaulted here;
-/// [`daemon_link`](crate::daemon_link) is the only consumer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct LogLoadSettings {
-    /// How many commits to fetch for the graph up front ("Initial Commits in
-    /// Graph").
-    pub initial_commits: usize,
-    /// "Lazy load commits in graph": additional commits are loaded
-    /// when you reach the earliest commit in the graph. Off, you get
-    /// [`initial_commits`] and nothing more.
-    ///
-    /// [`initial_commits`]: LogLoadSettings::initial_commits
-    pub lazy_load: bool,
-    /// How many commits one lazily-loaded page fetches. Only consulted
-    /// when [`lazy_load`](LogLoadSettings::lazy_load) is on.
-    pub page_commits: usize,
-    /// The ceiling on how many commits the client will ever hold, or
-    /// `None` for no ceiling. `general.max_commits_in_graph`.
-    pub max_commits: Option<usize>,
-}
-
-// The numbers live in `gitpoulpi-config`, which the Preferences screen reads
-// and writes, and are aliased here rather than restated so there is one
-// default of each in the workspace.
-impl LogLoadSettings {
-    /// The "Initial commits in graph" default (5000, minimum 500): far
-    /// more than any window shows, so scrolling always has somewhere to go,
-    /// while staying bounded on huge repositories. 5000 `CommitNode`s are a few
-    /// megabytes per session; later pages load as the scroll nears the end.
-    pub const DEFAULT_INITIAL_COMMITS: usize =
-        gitpoulpi_config::DEFAULT_INITIAL_COMMITS_IN_GRAPH as usize;
-
-    /// The floor a configured value is clamped to: a window can be 200+ rows
-    /// on a large display, and the initial page must still fill it without
-    /// knowing the window size at request time.
-    #[cfg(test)]
-    pub const MIN_INITIAL_COMMITS: usize = gitpoulpi_config::MIN_INITIAL_COMMITS_IN_GRAPH as usize;
-
-    /// One lazily-loaded page; lives in `gitpoulpi-config` like the two above.
-    pub const DEFAULT_PAGE_COMMITS: usize =
-        gitpoulpi_config::DEFAULT_COMMITS_PER_LAZY_PAGE as usize;
-
-    /// Lazy loading is **on** by default: history is
-    /// effectively unbounded up to [`max_commits`](LogLoadSettings::max_commits)
-    /// while only the initial page is paid for up front.
-    pub const DEFAULT_LAZY_LOAD: bool = true;
-
-    /// The shipped ceiling; see [`gitpoulpi_config::DEFAULT_MAX_COMMITS_IN_GRAPH`].
-    pub const DEFAULT_MAX_COMMITS: usize = gitpoulpi_config::DEFAULT_MAX_COMMITS_IN_GRAPH as usize;
-
-    /// Clamps a configured count into the supported range.
-    #[cfg(test)]
-    pub fn with_initial_commits(count: usize) -> LogLoadSettings {
-        LogLoadSettings {
-            initial_commits: count.max(Self::MIN_INITIAL_COMMITS),
-            ..LogLoadSettings::default()
-        }
-    }
-
-    /// Everything this module needs from the user's config. The clamping is
-    /// `gitpoulpi-config`'s, not a second copy.
-    pub fn from_config(general: &gitpoulpi_config::GeneralConfig) -> LogLoadSettings {
-        LogLoadSettings {
-            initial_commits: general.initial_commits_in_graph_clamped() as usize,
-            lazy_load: general.lazy_load_commits_in_graph,
-            page_commits: general.commits_per_lazy_page_clamped() as usize,
-            max_commits: general.max_commits_in_graph_effective().map(|n| n as usize),
-        }
-    }
-}
-
-impl Default for LogLoadSettings {
-    fn default() -> LogLoadSettings {
-        LogLoadSettings {
-            initial_commits: Self::DEFAULT_INITIAL_COMMITS,
-            lazy_load: Self::DEFAULT_LAZY_LOAD,
-            page_commits: Self::DEFAULT_PAGE_COMMITS,
-            max_commits: Some(Self::DEFAULT_MAX_COMMITS),
         }
     }
 }

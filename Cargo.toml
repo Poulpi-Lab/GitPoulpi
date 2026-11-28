@@ -9,6 +9,7 @@ members = [
     "crates/gitpoulpi-log",
     "crates/gitpoulpi-secrets",
     "crates/gitpoulpi-session",
+    "crates/gitpoulpi-app",
     "crates/gitpoulpi-hosting",
     "crates/gitpoulpi-update",
     "crates/gitpoulpi-pty",
@@ -63,6 +64,7 @@ gitpoulpi-config = { version = "1.3.0", path = "crates/gitpoulpi-config" }
 gitpoulpi-log = { version = "1.3.0", path = "crates/gitpoulpi-log" }
 gitpoulpi-secrets = { version = "1.3.0", path = "crates/gitpoulpi-secrets" }
 gitpoulpi-session = { version = "1.3.0", path = "crates/gitpoulpi-session" }
+gitpoulpi-app = { version = "1.3.0", path = "crates/gitpoulpi-app" }
 gitpoulpi-hosting = { version = "1.3.0", path = "crates/gitpoulpi-hosting", default-features = false }
 gitpoulpi-pty = { version = "1.3.0", path = "crates/gitpoulpi-pty" }
 gitpoulpi-ai = { version = "1.3.0", path = "crates/gitpoulpi-ai", default-features = false }

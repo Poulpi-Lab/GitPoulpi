@@ -34,7 +34,7 @@ use gitpoulpi_core::domain::{CommitNode, Oid};
 /// A stash, as the graph needs it: its own commit, the commit it was made
 /// on, when, and its `stash@{n}` index to find it again.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct GraphStash {
+pub struct GraphStash {
     /// `stash@{n}`'s `n`.
     pub id: u32,
     pub commit: Oid,
@@ -46,7 +46,7 @@ impl GraphStash {
     /// The stashes the graph can draw: the ones whose commit and base the
     /// backend reported (always, from a current daemon; see
     /// `gitpoulpi_core::domain::Stash`).
-    pub(crate) fn from_stashes(stashes: &[gitpoulpi_core::domain::Stash]) -> Vec<GraphStash> {
+    pub fn from_stashes(stashes: &[gitpoulpi_core::domain::Stash]) -> Vec<GraphStash> {
         stashes
             .iter()
             .filter_map(|s| {
@@ -64,14 +64,14 @@ impl GraphStash {
 /// One placed stash row: it sits directly above commit `before`, and it is
 /// `stashes[stash]` of the slice handed to [`place_stashes`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct StashSlot {
+pub struct StashSlot {
     pub before: usize,
     pub stash: usize,
 }
 
 /// Where each stash row goes. Sorted by `before`, then by the stash list's
 /// own order, which is display order. See the module header for the rule.
-pub(crate) fn place_stashes(nodes: &[CommitNode], stashes: &[GraphStash]) -> Vec<StashSlot> {
+pub fn place_stashes(nodes: &[CommitNode], stashes: &[GraphStash]) -> Vec<StashSlot> {
     let mut slots: Vec<StashSlot> = stashes
         .iter()
         .enumerate()
@@ -90,7 +90,7 @@ pub(crate) fn place_stashes(nodes: &[CommitNode], stashes: &[GraphStash]) -> Vec
 
 /// What one Log display index shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum LogEntry {
+pub enum LogEntry {
     /// The WIP row, display index 0 on a dirty tree.
     Wip,
     /// `nodes[i]`. Not bounds-checked: past the end of the history is
@@ -103,7 +103,7 @@ pub(crate) enum LogEntry {
 /// The Log's display order: the WIP row (if any), then the commits with
 /// the stash rows between them.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct LogRows {
+pub struct LogRows {
     wip: bool,
     slots: Vec<StashSlot>,
     /// Under Solo the Log shows a subset of the held commits: the held
@@ -114,7 +114,7 @@ pub(crate) struct LogRows {
 }
 
 impl LogRows {
-    pub(crate) fn new(wip: bool, slots: Vec<StashSlot>) -> LogRows {
+    pub fn new(wip: bool, slots: Vec<StashSlot>) -> LogRows {
         LogRows {
             wip,
             slots,
@@ -124,28 +124,28 @@ impl LogRows {
 
     /// The same rows over a Solo-filtered list: `shown` is the held index of
     /// each commit the Log draws, ascending.
-    pub(crate) fn with_shown(mut self, shown: Option<std::sync::Arc<Vec<usize>>>) -> LogRows {
+    pub fn with_shown(mut self, shown: Option<std::sync::Arc<Vec<usize>>>) -> LogRows {
         self.shown = shown;
         self
     }
 
     /// Whether the WIP row is the first row.
-    pub(crate) fn has_wip(&self) -> bool {
+    pub fn has_wip(&self) -> bool {
         self.wip
     }
 
     /// The placed stash rows, in display order.
-    pub(crate) fn slots(&self) -> &[StashSlot] {
+    pub fn slots(&self) -> &[StashSlot] {
         &self.slots
     }
 
     /// How many rows the Log has for `commits` commits.
-    pub(crate) fn len(&self, commits: usize) -> usize {
+    pub fn len(&self, commits: usize) -> usize {
         let commits = self.shown.as_ref().map_or(commits, |shown| shown.len());
         usize::from(self.wip) + self.slots.len() + commits
     }
 
-    pub(crate) fn entry(&self, display: usize) -> LogEntry {
+    pub fn entry(&self, display: usize) -> LogEntry {
         match self.shown_entry(display) {
             LogEntry::Commit(i) => LogEntry::Commit(match &self.shown {
                 // Past the shown list: an index no held list has.
@@ -182,7 +182,7 @@ impl LogRows {
 
     /// The display index of the held commit `nodes[i]`; a commit Solo hides
     /// answers where it would sit.
-    pub(crate) fn commit_display_index(&self, i: usize) -> usize {
+    pub fn commit_display_index(&self, i: usize) -> usize {
         let shown_index = match &self.shown {
             Some(shown) => shown.partition_point(|&held| held < i),
             None => i,
@@ -191,7 +191,7 @@ impl LogRows {
     }
 
     /// Whether the Log draws the held commit `nodes[i]`.
-    pub(crate) fn is_shown(&self, i: usize) -> bool {
+    pub fn is_shown(&self, i: usize) -> bool {
         self.shown
             .as_ref()
             .is_none_or(|shown| shown.binary_search(&i).is_ok())
@@ -199,12 +199,12 @@ impl LogRows {
 
     /// The display index of the `i`-th commit the Log draws (what a search
     /// hit, an index of the drawn list, is).
-    pub(crate) fn shown_display_index(&self, i: usize) -> usize {
+    pub fn shown_display_index(&self, i: usize) -> usize {
         usize::from(self.wip) + i + self.slots.iter().filter(|s| s.before <= i).count()
     }
 
     /// The display index of stash row `k`.
-    pub(crate) fn stash_display_index(&self, k: usize) -> Option<usize> {
+    pub fn stash_display_index(&self, k: usize) -> Option<usize> {
         let slot = self.slots.get(k)?;
         Some(usize::from(self.wip) + slot.before + k)
     }

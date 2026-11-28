@@ -12,6 +12,7 @@ use super::diffrows::{code_line, RowKind};
 use super::draw::Hit;
 use super::load::Call;
 use super::model::Focus;
+use super::model::ReviewTargetExt as _;
 use super::popups::{
     ComposeBox, ComposeFor, ComposeOutcome, Confirm, ConfirmOutcome, FinishOutcome,
 };

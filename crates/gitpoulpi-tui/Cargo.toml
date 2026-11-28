@@ -76,7 +76,7 @@ mermaid = ["gitpoulpi-app/mermaid"]
 board = ["gitpoulpi-app/board"]
 review = ["conversation", "gitpoulpi-app/review", "gitpoulpi-link/review"]
 # The read-only conversation view of an issue or a request (`item_view`).
-conversation = ["gitpoulpi-app/conversation"]
+conversation = ["gitpoulpi-app/conversation", "gitpoulpi-link/conversation"]
 history-rewrite = ["gitpoulpi-app/history-rewrite"]
 global-search = ["gitpoulpi-app/global-search"]
 workspaces = ["gitpoulpi-app/workspaces"]

@@ -223,6 +223,7 @@ pub struct FakeFactory {
     pub rounds: Arc<std::sync::atomic::AtomicUsize>,
 }
 
+#[allow(clippy::new_without_default)]
 impl FakeFactory {
     pub fn new() -> Self {
         Self {

@@ -65,7 +65,7 @@ use crate::meta_picker::{MetaEdit, MetaEditOutcome, MetaField, MetaTarget};
 use crate::review_cmd::{ReviewAvail, Tab};
 use load::{Call, Done};
 pub(crate) use model::ReviewTarget;
-use model::{DraftStore, Focus, GitData, HostData};
+use model::{DraftStore, Focus, GitData, HostData, ReviewTargetExt as _};
 use pane::DiffPane;
 use popups::{ComposeBox, Confirm, FinishDialog};
 use source::{ApiCode, CodeSource, Pending};

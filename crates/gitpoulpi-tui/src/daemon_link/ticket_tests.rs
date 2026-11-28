@@ -21,7 +21,12 @@ pub(crate) struct Harness {
 pub(crate) fn harness(name: &str, fixture: &gitpoulpi_testkit::FixtureRepo) -> Harness {
     let config = tempfile::tempdir().unwrap();
     let port_file = config.path().join("sessions").join(format!("{name}.port"));
-    let link = start_at(name.into(), fixture.repo_ref(), Some(port_file));
+    let link = start_at(
+        name.into(),
+        fixture.repo_ref(),
+        Some(port_file),
+        crate::daemon_link_host::host(),
+    );
     link.outcome_rx
         .recv_timeout(WAIT)
         .expect("the first refresh");

@@ -136,6 +136,7 @@ mod conflict_popup;
 mod context_menu;
 mod cursor;
 mod daemon_link;
+mod daemon_link_host;
 pub mod desktop_shortcuts;
 mod dialog_kit;
 mod diff_content;

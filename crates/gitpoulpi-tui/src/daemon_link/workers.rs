@@ -1,5 +1,5 @@
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 
 /// The commit-files worker's cache. Shared (rather than owned by the
 /// worker) because a prefetch task fills it too, and so a test can look

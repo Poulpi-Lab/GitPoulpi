@@ -1,6 +1,6 @@
+use super::host::NotifySend as _;
 use super::tickets::report_ticket as tell;
 use super::*;
-use crate::redraw::NotifySend as _;
 use gitpoulpi_i18n::msg::link as l;
 
 #[allow(clippy::too_many_arguments)]
@@ -41,12 +41,12 @@ pub(super) async fn run_action(
         .await;
     match result {
         Err(CoreError::PushRejected(rejection)) => {
-            crate::activity_log::report_rejection(
-                &original,
-                &rejection,
-                &conn.repo.root,
-                started.elapsed(),
-            );
+            super::host::report(super::host::Report::Rejection {
+                action: &original,
+                rejection: &rejection,
+                repo: &conn.repo.root,
+                elapsed: started.elapsed(),
+            });
             tell(ticket, StepOutcome::NeedsUser(UserWait::PushRejected));
             let _ = push_rejected_tx.send_notify(PushRejectedNotice { rejection, ticket });
             false
@@ -69,7 +69,7 @@ pub(super) async fn run_action(
             if !matches!(original, Action::AllowSensitive(_)) =>
         {
             tell(ticket, StepOutcome::NeedsUser(UserWait::SensitiveStage));
-            crate::stage_guard_dialog::ask(conn.repo.root.clone(), original, files, ticket);
+            super::host::ask_sensitive_stage(conn.repo.root.clone(), original, files, ticket);
             false
         }
         // A pending auto-stash: point at the banner, not at CLI commands.
@@ -86,12 +86,13 @@ pub(super) async fn run_action(
         // next interval.
         Err(e)
             if crate::event_loop::fetch_policy::skip_silently(
-                matches!(original, Action::FetchAll)
-                    && crate::activity_log::background_fetch_pending(),
+                matches!(original, Action::FetchAll) && super::host::background_fetch_pending(),
                 &e.to_string(),
             ) =>
         {
-            crate::activity_log::background_fetch_skipped(&conn.repo.root);
+            super::host::report(super::host::Report::BackgroundFetchSkipped {
+                repo: &conn.repo.root,
+            });
             tell(
                 ticket,
                 StepOutcome::Failed {
@@ -102,13 +103,13 @@ pub(super) async fn run_action(
         }
         Err(e) => {
             let context = failed_op.unwrap_or_else(|| original.op_context());
-            crate::activity_log::report_failure(
-                &original,
-                &e,
-                &conn.repo.root,
-                started.elapsed(),
+            super::host::report(super::host::Report::Failure {
+                action: &original,
+                error: &e,
+                repo: &conn.repo.root,
+                elapsed: started.elapsed(),
                 context,
-            );
+            });
             let text = error_text::error_text(&e);
             tell(ticket, super::tickets::outcome_of_error(&e, &text));
             let _ = action_error_tx.send_notify(text);
@@ -116,7 +117,11 @@ pub(super) async fn run_action(
         }
         Ok(()) => {
             tell(ticket, StepOutcome::Ok(payload));
-            crate::activity_log::report_success(&original, &conn.repo.root, started.elapsed());
+            super::host::report(super::host::Report::Success {
+                action: &original,
+                repo: &conn.repo.root,
+                elapsed: started.elapsed(),
+            });
             // Say, every time, that it can be taken back.
             if let Some(done) = original.undoable_done_text() {
                 let _ = action_message_tx.send_notify(done);
@@ -386,7 +391,7 @@ async fn dispatch(
                     });
                     // The window's own fetch: the daemon skips it while the
                     // repository is busy with a transfer.
-                    if crate::activity_log::background_fetch_pending() {
+                    if super::host::background_fetch_pending() {
                         args["auto"] = serde_json::json!(true);
                     }
                     args
@@ -414,7 +419,10 @@ async fn dispatch(
                 |outcome| {
                     // One Activity Log line per branch, then the status line.
                     for line in super::branch_sync_summary::lines(&outcome) {
-                        crate::activity_log::note_message(&line, &conn.repo.root);
+                        super::host::report(super::host::Report::Message {
+                            text: &line,
+                            repo: &conn.repo.root,
+                        });
                     }
                     super::branch_sync_summary::text(outcome)
                 },
@@ -459,7 +467,10 @@ async fn dispatch(
         | Action::RemoteGroupRetry { .. } => {
             let request = action.group_request().unwrap_or_default();
             let args = serde_json::to_value(&request).unwrap_or_default();
-            crate::push_group_ui::on_started(&conn.repo.root, &request);
+            super::host::push_group(super::host::PushGroupEvent::Started {
+                root: &conn.repo.root,
+                request: &request,
+            });
             match conn
                 .call::<gitpoulpi_core::domain::RemoteGroupOutcome>(
                     OperationKind::RemoteGroupRun,
@@ -468,12 +479,19 @@ async fn dispatch(
                 .await
             {
                 Ok(outcome) => {
-                    crate::push_group_ui::on_outcome(&conn.repo.root, &outcome);
+                    super::host::push_group(super::host::PushGroupEvent::Outcome {
+                        root: &conn.repo.root,
+                        outcome: &outcome,
+                    });
                     let _ = action_message_tx.send_notify(outcome.message.clone());
                     Ok(())
                 }
                 Err(e) => {
-                    crate::push_group_ui::on_failed(&conn.repo.root, &error_text::error_text(&e));
+                    let why = error_text::error_text(&e);
+                    super::host::push_group(super::host::PushGroupEvent::Failed {
+                        root: &conn.repo.root,
+                        why: &why,
+                    });
                     Err(e)
                 }
             }

@@ -277,7 +277,11 @@ pub(super) fn init(
     let tab_hits: Vec<repo_switcher::TabHit> = Vec::new();
     // `mut`: a stopped link is replaced by a fresh one on Retry (`r`
     // while `link_failure` is set), never left for the window to wait on.
-    let link: DaemonLink = daemon_link::start(session.to_string(), repo.clone());
+    let link: DaemonLink = daemon_link::start(
+        session.to_string(),
+        repo.clone(),
+        crate::daemon_link_host::host(),
+    );
     open_trace("daemon link started", open_t0);
     // The TUI as a viewer for an agent's `ui` intents (`ui_viewer`).
     let ui_viewer = crate::ui_viewer::UiViewer::new(settings.config().ui.allow_agent_view_control);

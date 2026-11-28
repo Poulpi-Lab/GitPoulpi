@@ -68,6 +68,7 @@ fn an_idle_daemon_of_another_build_is_replaced_by_this_window() {
         "takeover".into(),
         fixture.repo_ref(),
         Some(port_file.clone()),
+        crate::daemon_link_host::host(),
     );
     let outcome = link.outcome_rx.recv_timeout(WAIT).unwrap_or_else(|e| {
         panic!(
@@ -139,6 +140,7 @@ fn a_daemon_of_another_build_with_a_running_job_is_left_alone() {
         "takeover".into(),
         fixture.repo_ref(),
         Some(port_file.clone()),
+        crate::daemon_link_host::host(),
     );
     let reason = link.failure_rx.recv_timeout(WAIT).expect("a failure");
     assert!(reason.contains("jobs"), "says jobs are running: {reason}");

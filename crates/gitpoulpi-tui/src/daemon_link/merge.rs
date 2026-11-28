@@ -4,8 +4,8 @@
 //! refusal (`ConflictRefusal::Stale` ...) reaches the editor instead of
 //! becoming a status-line string.
 
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 use gitpoulpi_core::domain::{MergeDocument, ResolveOptions, WorktreeFileState};
 
 /// What the editor asks the link for.

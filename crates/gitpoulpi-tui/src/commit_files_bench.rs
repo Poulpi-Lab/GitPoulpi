@@ -184,6 +184,7 @@ fn commit_files_bench() {
         "commit-files-bench".to_string(),
         repo.clone(),
         Some(dir.path().join("port")),
+        crate::daemon_link_host::host(),
     );
     let started = Instant::now();
     while link.outcome_rx.try_recv().is_err() {

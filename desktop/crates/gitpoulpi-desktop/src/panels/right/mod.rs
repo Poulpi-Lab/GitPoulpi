@@ -23,7 +23,7 @@ mod wip;
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use gitpoulpi_core::domain::{CommitNode, FileDiff, Oid, StatusEntry};
+use gitpoulpi_core::domain::{CommitNode, FileDiff, Oid, StatusEntry, WorkingTree};
 use gitpoulpi_i18n::msg;
 use gitpoulpi_link::commit_settings::CommitSettings;
 use gpui_kit::component::input::{InputEvent, InputState, TextareaState};
@@ -80,9 +80,9 @@ pub struct RightPanel {
     mode: Mode,
     files: Arc<Vec<FileDiff>>,
     rows: Vec<FileRow>,
-    status: Vec<StatusEntry>,
+    status: WorkingTree,
     /// The working tree as the daemon sent it; `status` is this minus what "LFS only" hides.
-    raw_status: Vec<StatusEntry>,
+    raw_status: WorkingTree,
     /// "LFS only": the files (repository-relative, `/`) the working-changes lists keep.
     lfs_only: Option<std::collections::HashSet<String>>,
     branch: String,
@@ -94,6 +94,8 @@ pub struct RightPanel {
     description: Entity<TextareaState>,
     summary_len: usize,
     amend: bool,
+    /// A merge is stopped: its commit needs nothing staged.
+    merging: bool,
     skip_hooks: bool,
     /// The repository's commit settings and the identity the commit is made as.
     settings: CommitSettings,
@@ -168,8 +170,8 @@ impl RightPanel {
             mode: Mode::Empty,
             files: Arc::default(),
             rows: Vec::new(),
-            status: Vec::new(),
-            raw_status: Vec::new(),
+            status: WorkingTree::default(),
+            raw_status: WorkingTree::default(),
             lfs_only: None,
             branch: String::new(),
             tree: false,
@@ -180,6 +182,7 @@ impl RightPanel {
             description,
             summary_len: 0,
             amend: false,
+            merging: false,
             skip_hooks: false,
             settings: CommitSettings::default(),
             author: None,
@@ -245,6 +248,11 @@ impl RightPanel {
         cx.notify();
     }
 
+    /// The settings files changed: dates and the other displayed settings are read again.
+    pub fn settings_changed(&mut self, cx: &mut Context<Self>) {
+        cx.notify();
+    }
+
     pub fn update_status(&mut self, status: &[StatusEntry], cx: &mut Context<Self>) {
         self.set_status(status);
         if matches!(self.mode, Mode::Wip) {
@@ -256,15 +264,15 @@ impl RightPanel {
     /// Takes a fresh working tree: the selection drops what left its list, and the link learns which
     /// files are one rename.
     fn set_status(&mut self, status: &[StatusEntry]) {
-        self.raw_status = status.to_vec();
+        self.raw_status = WorkingTree {
+            files: status.to_vec(),
+            ..WorkingTree::default()
+        };
         self.apply_status_filter();
-        self.backend.set_rename_pairs(&self.raw_status);
+        self.backend.set_rename_pairs(&self.raw_status.files);
         let status = &self.status;
-        self.selection.retain(|section, path| {
-            status::section_paths(status, section)
-                .iter()
-                .any(|p| p == path)
-        });
+        self.selection
+            .retain(|section| status::section_paths(status, section));
     }
 
     fn load_commit(&mut self, oid: Oid, mode: Mode, cx: &mut Context<Self>) {

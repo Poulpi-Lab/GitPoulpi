@@ -16,7 +16,6 @@ use gitpoulpi_app::keymap::conflict::{install_transport, KeyTransport};
 use gitpoulpi_app::keymap::{self, Action, Ctx, Keymap, KeymapIssue};
 use gpui_kit::component::WindowExt as _;
 use gpui_kit::{App, Global, Keystroke, KeystrokeEvent, Window};
-use std::path::Path;
 
 use super::catalog::Command;
 use super::context::window_state;
@@ -125,23 +124,6 @@ fn take_prefix(cx: &mut App) -> Option<Ctx> {
     Some(pending)
 }
 
-/// The action the second key of a prefix chord triggers. A prefix table looks at the key, not at the
-/// modifiers: `Shift+H` (an uppercase letter) and `Shift+Left` are bound as such, a plain key is
-/// looked up bare, and a Ctrl chord bound after the prefix matches exactly first.
-pub fn prefix_action(km: &Keymap, prefix: Ctx, chord: KeyChord) -> Option<Action> {
-    let shifted = KeyChord::new(
-        Mods {
-            ctrl: false,
-            alt: false,
-            shift: chord.mods.shift,
-        },
-        chord.key,
-    );
-    [chord, shifted, chord.bare()]
-        .into_iter()
-        .find_map(|c| km.action_exact(prefix, c))
-}
-
 /// What a keystroke resolves to.
 #[derive(Debug, PartialEq)]
 pub enum Resolved {
@@ -219,7 +201,7 @@ fn on_keystroke(event: &KeystrokeEvent, window: &mut Window, cx: &mut App) {
         if chord.key == Key::Esc {
             return;
         }
-        if let Some(action) = prefix_action(&keymap::current(), prefix, chord) {
+        if let Some(action) = keymap::current().action_for(prefix, chord) {
             exec::run(Command::Action(action), window, cx);
         }
         return;
@@ -245,20 +227,17 @@ fn on_keystroke(event: &KeystrokeEvent, window: &mut Window, cx: &mut App) {
     }
 }
 
-/// Builds the keymap from `config.toml` in `config_dir` (the defaults without one) and installs it.
-/// The entries that could not be honoured come back as the startup message.
-pub fn install_keymap(config_dir: Option<&Path>) -> Vec<KeymapIssue> {
-    let config = config_dir
-        .and_then(|dir| gitpoulpi_config::Config::load(&dir.join("config.toml")).ok())
-        .unwrap_or_default();
-    keymap::install_from_config_with(&config, "gitpoulpi-desktop", Vec::new())
+/// Builds the keymap from `config` (the common config with the desktop's own `[keybindings]`, see
+/// `PrefsStore::keymap_config`) and installs it. The entries that could not be honoured come back.
+pub fn install_keymap(config: &gitpoulpi_config::Config) -> Vec<KeymapIssue> {
+    keymap::install_from_config_with(config, "gitpoulpi-desktop", Vec::new())
 }
 
-/// Installs the keymap, how keys reach this frontend and the keystroke interceptor.
-pub fn install(config_dir: Option<&Path>, cx: &mut App) {
+/// Installs the keymap, how keys reach this frontend and the keystroke interceptor. The keymap itself
+/// is built from the settings (`PrefsStore::install`), which also reports what it could not honour.
+pub fn install(issues: &[KeymapIssue], cx: &mut App) {
     install_transport(|| KeyTransport::Desktop);
-    let issues = install_keymap(config_dir);
-    if let Some(text) = keymap::issues_message(&issues) {
+    if let Some(text) = keymap::issues_message(issues) {
         status::set(cx, text);
     }
     cx.set_global(PendingPrefix(None));
@@ -326,19 +305,19 @@ mod tests {
     fn the_second_key_of_a_prefix_keeps_its_shift() {
         let km = Keymap::defaults();
         assert_eq!(
-            prefix_action(&km, Ctx::NavPrefix, want("Shift+H")),
+            km.action_for(Ctx::NavPrefix, want("Shift+H")),
             Some(Action::NavCollapseLeft)
         );
         assert_eq!(
-            prefix_action(&km, Ctx::NavPrefix, want("t")),
+            km.action_for(Ctx::NavPrefix, want("t")),
             Some(Action::NavChangeTheme)
         );
         // Ctrl held through the second key still works for a plain key.
         assert_eq!(
-            prefix_action(&km, Ctx::NavPrefix, want("Ctrl+T")),
+            km.action_for(Ctx::NavPrefix, want("Ctrl+T")),
             Some(Action::NavChangeTheme)
         );
-        assert_eq!(prefix_action(&km, Ctx::NavPrefix, want("Ctrl+Alt+Q")), None);
+        assert_eq!(km.action_for(Ctx::NavPrefix, want("Ctrl+Alt+Q")), None);
     }
 
     #[test]

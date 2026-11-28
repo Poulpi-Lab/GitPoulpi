@@ -47,7 +47,14 @@ type Opened = (AnyWindowHandle, Entity<Workspace>);
 fn open(cx: &mut TestAppContext, repo: &Path, prefs_dir: &Path) -> Opened {
     let backend = Backend::start(repo).unwrap();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs_dir.to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs_dir)),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     cx.update(|cx| app::open_main_window(backend, cx).unwrap())
 }
 

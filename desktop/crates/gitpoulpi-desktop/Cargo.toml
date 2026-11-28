@@ -30,6 +30,7 @@ gitpoulpi-i18n = { path = "../../../crates/gitpoulpi-i18n" }
 gitpoulpi-ipc = { path = "../../../crates/gitpoulpi-ipc" }
 gitpoulpi-link = { path = "../../../crates/gitpoulpi-link", features = ["worktree", "submodule", "lfs"] }
 gitpoulpi-log = { path = "../../../crates/gitpoulpi-log" }
+gitpoulpi-session = { path = "../../../crates/gitpoulpi-session" }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 toml = "1.2"

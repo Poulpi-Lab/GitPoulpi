@@ -105,17 +105,14 @@ impl LogPanel {
     pub(super) fn persist_columns(&self, cx: &mut Context<Self>) {
         let repo = self.repo_key();
         let widths = self.columns.widths;
-        PrefsStore::update(cx, |p| p.set_columns_for(&repo, widths));
+        PrefsStore::set_columns(cx, Some(&repo), widths);
     }
 
     /// Forgets this repository's own widths: back to the shared default.
     pub fn reset_widths(&mut self, cx: &mut Context<Self>) {
         let repo = self.repo_key();
-        let shared = PrefsStore::update(cx, |p| {
-            p.reset_columns_for(&repo);
-            p.columns
-        });
-        self.columns.widths = shared;
+        PrefsStore::reset_columns_for(cx, &repo);
+        self.columns.widths = PrefsStore::get(cx).columns_for(&repo);
         cx.notify();
     }
 

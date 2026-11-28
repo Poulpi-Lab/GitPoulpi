@@ -30,7 +30,14 @@ fn open(
 ) -> (AnyWindowHandle, Entity<Workspace>) {
     let backend = Backend::start(repo).unwrap();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(config_dir.to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(config_dir)),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     let opened = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
     cx.run_until_parked();
     opened
@@ -102,7 +109,7 @@ fn the_navigation_prefix_toggles_the_refs_pane(cx: &mut TestAppContext) {
     let repo = fixture();
     let dir = tempfile::tempdir().unwrap();
     let (window, _ws) = open(cx, repo.root(), dir.path());
-    let shown = |cx: &mut TestAppContext| cx.update(|cx| PrefsStore::get(cx).layout.show_left);
+    let shown = |cx: &mut TestAppContext| cx.update(|cx| PrefsStore::get(cx).layout().show_left);
     let before = shown(cx);
     press(cx, window, "ctrl-n");
     press(cx, window, "shift-h");

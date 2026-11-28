@@ -10,7 +10,7 @@ generated table is [docs/parity.md](docs/parity.md).
 ## Commands, keys and menus
 
 Commands come from the shared registry in `gitpoulpi-app`, the same one the terminal UI uses: key
-bindings (`[keybindings]` of `config.toml` overrides them), the command palette (Ctrl+P) with its
+bindings (`[keybindings]` of `desktop.toml` overrides them), the command palette (Ctrl+P) with its
 shortcuts, fuzzy matching and availability reasons, and the menu bar (File, Edit, View, Repository,
 Branch, Git, Hosting, Tools, Help; F10 or Alt + the underlined letter). Everything runs through one
 dispatcher (`src/commands/`): a command the desktop does not implement yet says so in the status line,
@@ -121,8 +121,15 @@ cargo run -- [REPO] [--theme SLUG] [--lane-theme SLUG] [--lang CODE]
 
 `REPO` is a repository or a folder inside one; it defaults to the current directory.
 
-Interface settings (theme, language, layout, column widths, window size) are stored in `desktop.toml`
-inside the GitPoulpi config directory. `GITPOULPI_CONFIG_DIR` points the program at another directory.
+The interface settings are `desktop.toml` in the GitPoulpi config directory, the shared schema
+`gitpoulpi_config::DesktopConfig`: theme, language, graph colours, window size and position, pane
+widths, Log column widths (shared and per repository), every per-interface `[ui]` key the desktop reads
+(`diff_layout`, `diff_show_whitespace`, `diff_word_wrap`, the date patterns, `sidebar_sections_hidden`,
+...) and `[keybindings]`. What both interfaces share stays in `config.toml`. `gitpoulpi config set
+desktop.ui.<key> <value>` writes it and `GITPOULPI_DESKTOP_UI_<KEY>` overrides it for a run. The window
+follows an edit made while it runs (a text editor, the CLI, another frontend), within a second. The
+recent repositories are the list the terminal UI and the CLI share. `GITPOULPI_CONFIG_DIR` points the
+program at another directory.
 
 ## Checks
 

@@ -117,19 +117,33 @@ pub fn expand_template(template: &str, vars: &[(&str, &str)]) -> Result<Vec<Stri
         .collect())
 }
 
-fn general() -> (String, String) {
-    gitpoulpi_config::Settings::resolve_ambient()
-        .map(|s| {
-            let g = &s.config().general;
-            (g.external_editor.clone(), g.file_explorer.clone())
-        })
-        .unwrap_or_default()
+/// The user's choice of external programs, read from the common config (`general.external_editor`,
+/// `general.file_explorer`, `ui.open_in`).
+#[derive(Clone, Debug, Default)]
+pub struct External {
+    pub editor: String,
+    pub explorer: String,
+    pub open_in: Option<Vec<OpenInEntry>>,
+}
+
+impl External {
+    pub fn of(config: &gitpoulpi_config::Config) -> Self {
+        Self {
+            editor: config.general.external_editor.clone(),
+            explorer: config.general.file_explorer.clone(),
+            open_in: config.ui.open_in.clone(),
+        }
+    }
+
+    /// The settings of the running application.
+    pub fn current(cx: &gpui_kit::App) -> Self {
+        Self::of(crate::prefs::PrefsStore::get(cx).common())
+    }
 }
 
 /// The name the menu's "Open in" row shows: the configured editor's program, `None` when there is none.
-pub fn editor_name() -> Option<String> {
-    let (editor, _) = general();
-    let word = gitpoulpi_config::launch::split_argv(&editor)
+pub fn editor_name(ext: &External) -> Option<String> {
+    let word = gitpoulpi_config::launch::split_argv(&ext.editor)
         .ok()?
         .into_iter()
         .next()?;
@@ -150,14 +164,14 @@ pub fn default_program_argv(path: &Path) -> Vec<String> {
 }
 
 /// Opens `file` in the configured external editor, else in the default program.
-pub fn open_in_editor(file: &Path) -> Result<String, String> {
-    let (editor, _) = general();
+pub fn open_in_editor(ext: &External, file: &Path) -> Result<String, String> {
+    let editor = &ext.editor;
     let file_text = file.to_string_lossy().into_owned();
     if editor.trim().is_empty() {
         spawn(&default_program_argv(file), None)?;
         return Ok(file_text);
     }
-    let argv = expand_template(&editor, &[("file", &file_text), ("path", &file_text)])?;
+    let argv = expand_template(editor, &[("file", &file_text), ("path", &file_text)])?;
     spawn(&argv, None)?;
     Ok(argv[0].clone())
 }
@@ -169,8 +183,8 @@ pub fn open_in_default(file: &Path) -> Result<String, String> {
 }
 
 /// Shows `file` in the operating system's file manager (`general.file_explorer`).
-pub fn show_in_folder(file: &Path) -> Result<String, String> {
-    let (_, explorer) = general();
+pub fn show_in_folder(ext: &External, file: &Path) -> Result<String, String> {
+    let explorer = &ext.explorer;
     let path = file.to_string_lossy().into_owned();
     let dir = file
         .parent()
@@ -181,10 +195,7 @@ pub fn show_in_folder(file: &Path) -> Result<String, String> {
         spawn(&default_program_argv(target), None)?;
         return Ok(dir);
     }
-    let argv = expand_template(
-        &explorer,
-        &[("path", &path), ("dir", &dir), ("file", &path)],
-    )?;
+    let argv = expand_template(explorer, &[("path", &path), ("dir", &dir), ("file", &path)])?;
     spawn(&argv, None)?;
     Ok(dir)
 }
@@ -202,11 +213,8 @@ fn on_path(program: &str) -> bool {
 
 /// The "Open in" entries the worktree menu offers: the configured list (`ui.open_in`), else the detected
 /// one, keeping those marked "Can open a worktree".
-pub fn open_in_entries() -> Vec<OpenInEntry> {
-    let configured = gitpoulpi_config::Settings::resolve_ambient()
-        .ok()
-        .and_then(|s| s.config().ui.open_in.clone());
-    let all = configured.unwrap_or_else(|| {
+pub fn open_in_entries(ext: &External) -> Vec<OpenInEntry> {
+    let all = ext.open_in.clone().unwrap_or_else(|| {
         let d = open_in::detect(&|k| std::env::var(k).ok(), Os::current(), &on_path);
         open_in::effective_list(None, &d, Os::current())
     });

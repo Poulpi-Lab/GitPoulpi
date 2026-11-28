@@ -77,10 +77,19 @@ impl MenuBar {
             Some(w) => window_state(w, cx),
             None => Default::default(),
         };
-        let recent = crate::prefs::PrefsStore::get(cx).recent.clone();
+        let recent = crate::prefs::PrefsStore::get(cx).recent().to_vec();
         self.menus = model::build(state.palette_context(), &keymap::current(), &recent);
         self.epoch = gitpoulpi_i18n::epoch();
         self.relayout();
+    }
+
+    /// The settings changed (key bindings, language, recent repositories): the menus are built again,
+    /// unless one is open (it rebuilds when it closes).
+    pub fn refresh(&mut self, cx: &mut Context<Self>) {
+        if self.open.is_none() {
+            self.rebuild(None, cx);
+            cx.notify();
+        }
     }
 
     /// Recomputes which headings fit and folds the rest.

@@ -39,7 +39,14 @@ fn open(cx: &mut TestAppContext, repo: &Path) -> Opened {
     let backend = Backend::start(repo).unwrap();
     let session = backend.session().to_string();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs.path())),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     let (window, ws) = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
     Opened {
         window,

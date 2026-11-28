@@ -8,6 +8,8 @@ use gitpoulpi_core::domain::{CommitNode, Oid, Ref, RefKind, Stash, StatusEntry};
 
 use std::collections::HashSet;
 
+use gitpoulpi_app::log_multiselect::RowKey as MarkKey;
+
 use crate::daemon::Walk;
 use crate::graph::{Entry, GraphInput, GraphLayout};
 
@@ -148,6 +150,21 @@ impl LogData {
                 }
             })
             .collect()
+    }
+
+    /// What the multi-select knows about the row at `ix`: the WIP row, or a commit (a stash is its stash
+    /// commit). `None` for a stash whose commit is unknown.
+    pub fn mark_at(&self, ix: usize) -> Option<MarkKey> {
+        match *self.layout.entries().get(ix)? {
+            Entry::Wip => Some(MarkKey::Wip),
+            Entry::Commit(i) => self.nodes.get(i).map(|n| MarkKey::Id(n.id)),
+            Entry::Stash(i) => self.stashes.get(i)?.commit.map(MarkKey::Id),
+        }
+    }
+
+    /// [`LogData::mark_at`] for every row, in display order.
+    pub fn display_marks(&self) -> Vec<Option<MarkKey>> {
+        (0..self.entry_count()).map(|ix| self.mark_at(ix)).collect()
     }
 
     /// Display index of the row `key` names, if it is still there.

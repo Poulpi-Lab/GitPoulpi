@@ -229,13 +229,9 @@ impl RefsPanel {
             let worktrees = worktrees.await.unwrap_or_default();
             let submodules = submodules.await.unwrap_or_default();
             let _ = this.update(cx, |this, cx| {
-                let ui = gitpoulpi_config::Settings::resolve_ambient()
-                    .ok()
-                    .map(|s| s.config().ui.clone());
-                this.hierarchical = ui.as_ref().is_none_or(|ui| ui.ref_tree);
-                this.hidden_sections = ui
-                    .map(|ui| hidden_from_names(&ui.sidebar_sections_hidden))
-                    .unwrap_or_default();
+                let ui = crate::prefs::PrefsStore::get(cx).ui();
+                this.hierarchical = ui.ref_tree;
+                this.hidden_sections = hidden_from_names(&ui.sidebar_sections_hidden);
                 this.tags = Arc::new(snapshot_of(&refs));
                 this.refs = refs;
                 this.stashes = stashes;

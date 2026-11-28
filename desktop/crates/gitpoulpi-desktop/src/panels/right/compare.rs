@@ -14,7 +14,6 @@ use super::widgets::boxed;
 use super::{Mode, RightEvent, RightPanel};
 use crate::panels::log::compare::{CardKind, CompareSpec, EndMark};
 use crate::theme::Skin;
-use crate::util::dates;
 
 impl RightPanel {
     /// Shows the comparison of the selected rows.
@@ -38,7 +37,7 @@ impl RightPanel {
         skin: &Skin,
         cx: &mut Context<Self>,
     ) -> gpui_kit::Div {
-        let now = dates::now_secs();
+        let now = gitpoulpi_core::time::unix_now();
         let swappable = spec.can_swap;
         let swap = div()
             .id("compare-swap")
@@ -66,7 +65,7 @@ impl RightPanel {
             });
             let age = match c.kind {
                 CardKind::Wip => String::new(),
-                _ => dates::relative_date(c.timestamp, now),
+                _ => gitpoulpi_app::compare::relative_age(now, c.timestamp),
             };
             v_flex()
                 .id(("compare-card", row))
@@ -81,12 +80,12 @@ impl RightPanel {
                     h_flex()
                         .gap(px(6.0))
                         .items_center()
-                        .child(
-                            div()
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .truncate()
-                                .child(c.who.clone()),
-                        )
+                        .child(div().font_weight(FontWeight::SEMIBOLD).truncate().child(
+                            match c.kind {
+                                CardKind::Wip => msg::compare::WORKING_TREE.get().to_string(),
+                                _ => c.author_name.clone(),
+                            },
+                        ))
                         .child(div().text_xs().text_color(skin.muted).child(age))
                         .child(div().flex_1())
                         .when_some(tag, |d, t| {
@@ -109,6 +108,9 @@ impl RightPanel {
                         .child(match c.id {
                             Some(id) if c.kind == CardKind::Commit => {
                                 format!("{} {}", crate::daemon::commit_ops::short(id), c.summary)
+                            }
+                            _ if c.kind == CardKind::Wip => {
+                                msg::compare::UNCOMMITTED.get().to_string()
                             }
                             _ => c.summary.clone(),
                         }),

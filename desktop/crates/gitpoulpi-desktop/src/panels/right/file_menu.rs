@@ -5,7 +5,7 @@
 use std::collections::HashSet;
 
 use gitpoulpi_app::palette::vocab::status_pane::StatusSection;
-use gitpoulpi_core::domain::FileStatus;
+use gitpoulpi_core::domain::{FileStatus, WorkingTree};
 use gpui_kit::{Context, Pixels, Point};
 
 use super::status::{section_paths, ListView};
@@ -46,11 +46,13 @@ impl RightPanel {
         match side {
             FileSide::Unstaged => self
                 .status
+                .files
                 .iter()
                 .find(|e| e.path.to_string_lossy() == path)
                 .and_then(|e| e.worktree),
             FileSide::Staged => self
                 .status
+                .files
                 .iter()
                 .find(|e| e.path.to_string_lossy() == path)
                 .and_then(|e| e.index),
@@ -129,12 +131,16 @@ impl RightPanel {
     /// `status` is `raw_status` minus what "LFS only" hides.
     pub(super) fn apply_status_filter(&mut self) {
         self.status = match &self.lfs_only {
-            Some(only) => self
-                .raw_status
-                .iter()
-                .filter(|e| only.contains(&e.path.to_string_lossy().replace('\\', "/")))
-                .cloned()
-                .collect(),
+            Some(only) => WorkingTree {
+                files: self
+                    .raw_status
+                    .files
+                    .iter()
+                    .filter(|e| only.contains(&e.path.to_string_lossy().replace('\\', "/")))
+                    .cloned()
+                    .collect(),
+                ..self.raw_status.clone()
+            },
             None => self.raw_status.clone(),
         };
     }

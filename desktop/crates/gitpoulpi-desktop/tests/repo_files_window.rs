@@ -81,6 +81,39 @@ fn gitignore(repo: &FixtureRepo) -> String {
 // -- the menu -----------------------------------------------------------------------------------------
 
 #[gpui_kit::test]
+fn the_menu_key_opens_the_menu_of_the_pane_that_has_the_keyboard(cx: &mut TestAppContext) {
+    use gpui_kit::Focusable as _;
+    let repo = dirty_repo();
+    let (window, ws) = open(cx, &repo);
+    wait_listed(cx, &ws, "a.txt");
+    // The right pane, a file under the cursor: the key opens that file's menu.
+    cx.update_window(window, |_, w, cx| {
+        ws.update(cx, |ws, cx| {
+            ws.right
+                .update(cx, |r, cx| r.select_file("a.txt", FileSide::Unstaged, cx));
+            ws.right.read(cx).focus_handle(cx).focus(w, cx);
+        })
+    })
+    .unwrap();
+    press(cx, window, "shift-f10");
+    let labels = menu_labels(cx, &ws);
+    assert!(
+        labels.iter().any(|l| l.contains("Copy file path")),
+        "the file menu opened: {labels:?}"
+    );
+    press(cx, window, "escape");
+    assert!(ws.read_with(cx, |ws, _| ws.ref_menu().is_none()));
+
+    // A remote's folder in the Refs: its own menu, not a file's.
+    open_menu(cx, window, &ws, RefTarget::RemoteNode("origin".into()));
+    let labels = menu_labels(cx, &ws);
+    assert!(
+        !labels.iter().any(|l| l.contains("Copy file path")),
+        "{labels:?}"
+    );
+}
+
+#[gpui_kit::test]
 fn a_file_menu_lists_the_terminal_uis_rows_and_dims_what_has_no_operation(cx: &mut TestAppContext) {
     let repo = dirty_repo();
     let (window, ws) = open(cx, &repo);

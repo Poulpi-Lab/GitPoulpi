@@ -83,6 +83,9 @@ pub struct DiffPane {
     selected: usize,
     opts: Opts,
     wrap: bool,
+    /// What the settings said last (`diff_layout`, `diff_show_whitespace`, `diff_word_wrap`).
+    defaults: Opts,
+    wrap_default: bool,
     rows: Arc<Rows>,
     list: ListState,
     hscroll: ScrollHandle,
@@ -103,11 +106,14 @@ impl EventEmitter<DiffPaneEvent> for DiffPane {}
 
 impl DiffPane {
     pub fn new(_window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let ui = crate::prefs::PrefsStore::get(cx).ui();
         Self {
             files: Arc::default(),
             selected: 0,
-            opts: Opts::default(),
-            wrap: false,
+            opts: Opts::of(ui),
+            wrap: ui.diff_word_wrap,
+            defaults: Opts::of(ui),
+            wrap_default: ui.diff_word_wrap,
             rows: Arc::default(),
             list: ListState::new(0, ListAlignment::Top, px(400.0)),
             hscroll: ScrollHandle::new(),
@@ -187,6 +193,23 @@ impl DiffPane {
             .saturating_add_signed(d)
             .min(self.files.len() - 1);
         self.select(ix, cx);
+    }
+
+    /// The settings files changed: the layout, whitespace and wrap defaults are taken again when one of
+    /// them moved (a toggle made in this window stays until then).
+    pub fn apply_settings(
+        &mut self,
+        ui: &gitpoulpi_config::DesktopUiConfig,
+        cx: &mut Context<Self>,
+    ) {
+        let (opts, wrap) = (Opts::of(ui), ui.diff_word_wrap);
+        if opts != self.defaults || wrap != self.wrap_default {
+            self.defaults = opts;
+            self.wrap_default = wrap;
+            self.opts = opts;
+            self.wrap = wrap;
+            self.rebuild(cx);
+        }
     }
 
     /// `m`: Side by side or Inline.

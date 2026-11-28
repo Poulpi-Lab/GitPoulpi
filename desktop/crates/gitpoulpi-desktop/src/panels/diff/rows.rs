@@ -22,6 +22,17 @@ pub struct Opts {
     pub line_numbers: bool,
 }
 
+impl Opts {
+    /// The pane's starting choices: `diff_layout` and `diff_show_whitespace` of the desktop's `[ui]`.
+    pub fn of(ui: &gitpoulpi_config::DesktopUiConfig) -> Self {
+        Self {
+            split: ui.diff_layout == gitpoulpi_config::DiffLayout::Split,
+            show_whitespace: ui.diff_show_whitespace,
+            line_numbers: true,
+        }
+    }
+}
+
 impl Default for Opts {
     fn default() -> Self {
         Self {

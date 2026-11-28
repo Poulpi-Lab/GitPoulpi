@@ -48,7 +48,14 @@ fn open(
 ) -> (AnyWindowHandle, Entity<Workspace>) {
     let backend = Backend::start(repo).unwrap();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs_dir.to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs_dir)),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     cx.update(|cx| app::open_main_window(backend, cx).unwrap())
 }
 
@@ -232,7 +239,14 @@ fn hiding_a_ref_from_another_frontend_updates_the_refs_panel_and_the_log(cx: &mu
     let backend = Backend::start(repo.root()).unwrap();
     let session = backend.session().to_string();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs.path())),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     let (_window, ws) = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
     wait_until(cx, "four commits", |cx| shown_commits(cx, &ws) == 4);
 
@@ -329,16 +343,8 @@ fn the_keyboard_walks_the_rows_and_enter_reveals_the_ref_in_the_log(cx: &mut Tes
     );
 }
 
-/// The config directory is process-wide: tests that write `config.toml` take turns.
-static CONFIG: std::sync::Mutex<()> = std::sync::Mutex::new(());
-
-fn config_turn() -> std::sync::MutexGuard<'static, ()> {
-    CONFIG.lock().unwrap_or_else(|e| e.into_inner())
-}
-
-fn write_config(text: &str) {
-    let dir = isolate_process_env().join("config");
-    std::fs::create_dir_all(&dir).unwrap();
+/// Writes the common `config.toml` of a settings folder (the one the window under test is given).
+fn write_config(dir: &Path, text: &str) {
     std::fs::write(dir.join("config.toml"), text).unwrap();
 }
 
@@ -355,14 +361,14 @@ fn long_history() -> FixtureRepo {
 
 #[gpui_kit::test]
 fn the_log_pages_by_the_configured_sizes_and_shows_the_total(cx: &mut TestAppContext) {
-    let _turn = config_turn();
     isolate_process_env();
+    let prefs = tempfile::tempdir().unwrap();
     write_config(
+        prefs.path(),
         "[general]\ninitial_commits_in_graph = 500\ncommits_per_lazy_page = 50\n\
          lazy_load_commits_in_graph = true\n",
     );
     let repo = long_history();
-    let prefs = tempfile::tempdir().unwrap();
     let (window, ws) = open(cx, repo.root(), prefs.path());
     wait_until(cx, "the first page", |cx| shown_commits(cx, &ws) >= 500);
     assert_eq!(
@@ -390,16 +396,17 @@ fn the_log_pages_by_the_configured_sizes_and_shows_the_total(cx: &mut TestAppCon
         ws.read_with(cx, |ws, cx| ws.log.read(cx).commit_total()),
         TotalShown::Whole
     );
-    write_config("");
 }
 
 #[gpui_kit::test]
 fn with_lazy_loading_off_the_log_stops_at_the_first_page(cx: &mut TestAppContext) {
-    let _turn = config_turn();
     isolate_process_env();
-    write_config("[general]\ninitial_commits_in_graph = 500\nlazy_load_commits_in_graph = false\n");
-    let repo = long_history();
     let prefs = tempfile::tempdir().unwrap();
+    write_config(
+        prefs.path(),
+        "[general]\ninitial_commits_in_graph = 500\nlazy_load_commits_in_graph = false\n",
+    );
+    let repo = long_history();
     let (window, ws) = open(cx, repo.root(), prefs.path());
     wait_until(cx, "the first page", |cx| shown_commits(cx, &ws) >= 500);
     ws.update(cx, |ws, cx| ws.log.update(cx, |l, cx| l.select(499, cx)));
@@ -412,7 +419,6 @@ fn with_lazy_loading_off_the_log_stops_at_the_first_page(cx: &mut TestAppContext
         500,
         "nothing past the first page without lazy loading"
     );
-    write_config("");
 }
 
 // -- the diff pane -----------------------------------------------------------
@@ -448,8 +454,26 @@ fn file_with(lines: Vec<DiffLine>) -> FileDiff {
 }
 
 fn open_diff(cx: &mut TestAppContext) -> (AnyWindowHandle, Entity<DiffPane>) {
+    open_diff_with(cx, "split")
+}
+
+/// A diff pane in a window whose `desktop.toml` says `diff_layout = <layout>`.
+fn open_diff_with(cx: &mut TestAppContext, layout: &str) -> (AnyWindowHandle, Entity<DiffPane>) {
     let prefs = tempfile::tempdir().unwrap();
-    cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
+    gitpoulpi_config::DesktopConfig::set_in_file(
+        &gitpoulpi_config::ConfigPaths::for_dir(prefs.path()),
+        "ui.diff_layout",
+        layout,
+    )
+    .unwrap();
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs.path())),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     cx.update(|cx| {
         gpui_kit::open_window(app::window_options(cx), cx, |window, cx| {
             cx.new(|cx| DiffPane::new(window, cx))

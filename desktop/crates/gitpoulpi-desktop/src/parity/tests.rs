@@ -213,6 +213,28 @@ fn status_toml_accepts_only_done_and_no_duplicates() {
     .is_err());
 }
 
+/// The table drops nothing the dispatcher implements: an implemented id that has no row of its own is
+/// a palette command merged into the row of its key action, and that row is counted done.
+#[test]
+fn every_implemented_id_is_counted_in_the_table() {
+    let implemented = crate::commands::implemented_ids();
+    let rows: BTreeSet<String> = base_rows().into_iter().map(|r| r.id).collect();
+    let done = dispatcher_done();
+    let all = parity_rows();
+    for id in implemented.difference(&rows) {
+        let action = all
+            .iter()
+            .find(|r| &r.id == id)
+            .and_then(|r| r.bound_action.clone())
+            .unwrap_or_else(|| panic!("{id} is implemented but is in no row of the table"));
+        assert!(
+            done.contains(&action),
+            "{id} is merged into {action}, which is not counted done"
+        );
+    }
+    assert_eq!(done.len(), rows.intersection(&implemented).count());
+}
+
 #[test]
 fn the_generated_status_file_round_trips() {
     let done: BTreeSet<String> = ["global.quit".to_string(), "global.palette".to_string()].into();

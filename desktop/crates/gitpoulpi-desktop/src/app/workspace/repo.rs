@@ -72,7 +72,7 @@ impl Workspace {
             },
             RepoOp::WorktreeOpenInMenu => match self.worktree_of(&target, cx) {
                 Some(w) => {
-                    let entries = file_ops::open_in_entries();
+                    let entries = file_ops::open_in_entries(&file_ops::External::current(cx));
                     let at = self.menu_origin(cx);
                     let key = RefTarget::Worktree(w.path.to_string_lossy().into_owned());
                     self.show_items(repo_menu::open_in_rows(&entries), key, at, window, cx);
@@ -81,7 +81,9 @@ impl Workspace {
             },
             RepoOp::WorktreeOpenIn(i) => match self.worktree_of(&target, cx) {
                 Some(w) => {
-                    let entry = file_ops::open_in_entries().into_iter().nth(i as usize);
+                    let entry = file_ops::open_in_entries(&file_ops::External::current(cx))
+                        .into_iter()
+                        .nth(i as usize);
                     let branch = w.branch.clone().unwrap_or_default();
                     let said = match entry {
                         Some(e) => file_ops::run_open_in(&e, &w.path, &branch)
@@ -178,9 +180,12 @@ impl Workspace {
         cx: &gpui_kit::App,
     ) -> Option<Vec<Item>> {
         match target {
-            RefTarget::Worktree(_) => self
-                .worktree_of(&Some(target.clone()), cx)
-                .map(|w| repo_menu::worktree_items(&w, &file_ops::open_in_entries())),
+            RefTarget::Worktree(_) => self.worktree_of(&Some(target.clone()), cx).map(|w| {
+                repo_menu::worktree_items(
+                    &w,
+                    &file_ops::open_in_entries(&file_ops::External::current(cx)),
+                )
+            }),
             RefTarget::Submodule(p) => {
                 let refs = self.refs.read(cx);
                 rules::find_submodule(refs.submodules(), p).map(repo_menu::submodule_items)

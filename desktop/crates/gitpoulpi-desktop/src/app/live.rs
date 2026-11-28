@@ -145,6 +145,11 @@ impl Workspace {
         }
         if let Some(state) = drained.operation {
             self.operation = state;
+            let merging = matches!(
+                self.operation,
+                Some(gitpoulpi_core::domain::OperationState::Merge { .. })
+            );
+            self.right.update(cx, |r, cx| r.set_merging(merging, cx));
         }
         if drained.visibility {
             self.refs.update(cx, |r, cx| r.on_visibility_event(cx));
@@ -253,6 +258,7 @@ impl Workspace {
     pub(super) fn reset_live(&mut self, cx: &mut Context<Self>) {
         self.live = LiveState::default();
         self.operation = None;
+        self.right.update(cx, |r, cx| r.set_merging(false, cx));
         status::clear(cx);
     }
 }

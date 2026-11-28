@@ -52,7 +52,7 @@ impl Workspace {
             .unwrap_or_default();
         let cur_lang = gitpoulpi_i18n::current();
         let path = self.backend.repo_root().to_string_lossy().into_owned();
-        let recent = PrefsStore::get(cx).recent.clone();
+        let recent = PrefsStore::get(cx).recent().to_vec();
         TitleBar::new()
             .child(
                 h_flex()

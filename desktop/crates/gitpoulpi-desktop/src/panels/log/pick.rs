@@ -2,13 +2,25 @@
 //! Space toggle a row, Shift+click and Shift+Up / Down take a range, Esc (or a plain click) goes back to
 //! the single row. Two or more rows turn the right pane into a comparison.
 
+use std::collections::HashSet;
 use std::sync::Arc;
 
+use gitpoulpi_app::log_multiselect::{LogSelection, RowKey as MarkKey};
 use gitpoulpi_i18n::msg;
 use gpui_kit::{Context, Modifiers, ScrollStrategy, Window};
 
 use super::compare::{self, CompareSpec};
 use super::{LogEvent, LogPanel};
+
+/// The display indices of the selected rows.
+fn marked_rows(marks: &LogSelection, display: &[Option<MarkKey>]) -> HashSet<usize> {
+    display
+        .iter()
+        .enumerate()
+        .filter(|(_, k)| k.as_ref().is_some_and(|k| marks.contains(k)))
+        .map(|(i, _)| i)
+        .collect()
+}
 
 impl LogPanel {
     /// A click on row `ix` with the keys held: Ctrl toggles, Shift takes a range, nothing selects it alone.
@@ -22,12 +34,12 @@ impl LogPanel {
         self.focus.focus(window, cx);
         let toggle = mods.control || (cfg!(target_os = "macos") && mods.platform);
         if toggle || mods.shift {
-            let Some(key) = self.data.key_at(ix) else {
+            let Some(key) = self.data.mark_at(ix) else {
                 return;
             };
-            let cursor = self.data.key_at(self.selected);
+            let cursor = self.data.mark_at(self.selected);
             if mods.shift {
-                let display = self.data.display_keys();
+                let display = self.data.display_marks();
                 self.marks.extend_to(&display, ix, Some(self.selected));
             } else {
                 self.marks.toggle(key, cursor);
@@ -35,7 +47,7 @@ impl LogPanel {
             self.move_cursor(ix);
             self.marks_changed(cx);
         } else {
-            let key = self.data.key_at(ix);
+            let key = self.data.mark_at(ix);
             self.select(ix, cx);
             self.marks.reset_to(key);
         }
@@ -43,10 +55,10 @@ impl LogPanel {
 
     /// Space: flips the cursor row in the selection.
     pub fn toggle_mark(&mut self, cx: &mut Context<Self>) {
-        let Some(key) = self.data.key_at(self.selected) else {
+        let Some(key) = self.data.mark_at(self.selected) else {
             return;
         };
-        self.marks.toggle(key.clone(), Some(key));
+        self.marks.toggle(key, Some(key));
         self.marks_changed(cx);
     }
 
@@ -57,7 +69,7 @@ impl LogPanel {
             return;
         }
         let to = self.selected.saturating_add_signed(delta).min(total - 1);
-        let display = self.data.display_keys();
+        let display = self.data.display_marks();
         self.marks.extend_to(&display, to, Some(self.selected));
         self.move_cursor(to);
         self.marks_changed(cx);
@@ -93,8 +105,8 @@ impl LogPanel {
 
     /// Display rows of the marks, after the selection or the rows changed.
     pub(super) fn recompute_marks(&mut self) {
-        let display = self.data.display_keys();
-        self.marked_rows = Arc::new(self.marks.rows(&display));
+        let display = self.data.display_marks();
+        self.marked_rows = Arc::new(marked_rows(&self.marks, &display));
     }
 
     /// Tells the right pane what to show: the comparison when two rows or more are selected, else the
@@ -130,9 +142,8 @@ impl LogPanel {
 
     /// `n` / a click on a card: the cursor goes to the next compared row (wrapping); the selection stays.
     pub fn next_compared(&mut self, cx: &mut Context<Self>) {
-        let display = self.data.display_keys();
-        let rows: Vec<usize> = self.marks.rows(&display).into_iter().collect::<Vec<_>>();
-        let mut rows = rows;
+        let display = self.data.display_marks();
+        let mut rows: Vec<usize> = marked_rows(&self.marks, &display).into_iter().collect();
         rows.sort_unstable();
         if rows.len() < 2 {
             return self.say(msg::compare::SELECT_MORE.get(), cx);

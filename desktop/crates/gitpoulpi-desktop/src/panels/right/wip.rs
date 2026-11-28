@@ -71,7 +71,7 @@ impl RightPanel {
                 let selected = self.selection.contains(section, &row);
                 let paths = if selected {
                     self.selection
-                        .paths(section)
+                        .paths(section, files)
                         .iter()
                         .map(|p| p.to_string_lossy().into_owned())
                         .collect()
@@ -328,7 +328,7 @@ impl RightPanel {
         cx: &mut Context<Self>,
     ) -> gpui_kit::Div {
         let conflicts = self.conflict_count();
-        let n = self.status.len() as u64;
+        let n = self.status.files.len() as u64;
         let title = if conflicts > 0 {
             msg::status_list::title_changes_conflicted(n, &self.branch, conflicts as u64)
         } else {

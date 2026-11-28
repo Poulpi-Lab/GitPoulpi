@@ -6,12 +6,11 @@
 //! every column has a minimum, Ref and Graph give way first (proportionally), then Author, Date and
 //! SHA, and Message always keeps a usable minimum.
 
-use serde::{Deserialize, Serialize};
+use gitpoulpi_config::{DesktopColumn, DesktopColumnWidths};
 
 /// The user's preferred width of each fixed column, in logical pixels. Message is not listed: it takes
 /// whatever the others leave.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
-#[serde(default)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ColumnWidths {
     pub ref_w: f32,
     pub graph_w: f32,
@@ -22,13 +21,37 @@ pub struct ColumnWidths {
 
 impl Default for ColumnWidths {
     fn default() -> Self {
+        DesktopColumnWidths::default().into()
+    }
+}
+
+/// The stored widths (whole logical pixels, `desktop.toml`) as the layout works with them.
+impl From<DesktopColumnWidths> for ColumnWidths {
+    fn from(w: DesktopColumnWidths) -> Self {
         Self {
-            ref_w: 190.0,
-            graph_w: 180.0,
-            author_w: 130.0,
-            date_w: 132.0,
-            sha_w: 72.0,
+            ref_w: w.ref_w as f32,
+            graph_w: w.graph_w as f32,
+            author_w: w.author_w as f32,
+            date_w: w.date_w as f32,
+            sha_w: w.sha_w as f32,
         }
+    }
+}
+
+/// The widths to store: rounded to whole pixels and kept inside each column's limits.
+impl From<ColumnWidths> for DesktopColumnWidths {
+    fn from(w: ColumnWidths) -> Self {
+        let mut out = DesktopColumnWidths::default();
+        for col in Col::ALL {
+            let px = w.get(col);
+            let px = if px.is_finite() {
+                px.round().max(0.0) as u32
+            } else {
+                0
+            };
+            out.set(col.shared(), px);
+        }
+        out
     }
 }
 
@@ -49,26 +72,25 @@ impl Col {
         self as usize
     }
 
+    /// The shared schema's name for this column (its limits live there).
+    pub const fn shared(self) -> DesktopColumn {
+        match self {
+            Col::Ref => DesktopColumn::Ref,
+            Col::Graph => DesktopColumn::Graph,
+            Col::Author => DesktopColumn::Author,
+            Col::Date => DesktopColumn::Date,
+            Col::Sha => DesktopColumn::Sha,
+        }
+    }
+
     /// Smallest width the column can be dragged to; also the floor of narrow layouts.
     pub const fn min(self) -> f32 {
-        match self {
-            Col::Ref => 64.0,
-            Col::Graph => 48.0,
-            Col::Author => 72.0,
-            Col::Date => 124.0,
-            Col::Sha => 72.0,
-        }
+        self.shared().min() as f32
     }
 
     /// Largest width a drag or an auto-fit may give the column.
     pub const fn max(self) -> f32 {
-        match self {
-            Col::Ref => 420.0,
-            Col::Graph => 700.0,
-            Col::Author => 400.0,
-            Col::Date => 240.0,
-            Col::Sha => 160.0,
-        }
+        self.shared().max() as f32
     }
 }
 

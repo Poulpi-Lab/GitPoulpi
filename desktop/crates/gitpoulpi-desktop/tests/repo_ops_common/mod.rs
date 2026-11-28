@@ -18,7 +18,14 @@ pub fn open_plain(cx: &mut TestAppContext, repo: &FixtureRepo) -> Opened {
     let prefs = tempfile::tempdir().unwrap();
     let backend = Backend::start(repo.root()).unwrap();
     cx.executor().allow_parking();
-    cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
+    cx.update(|cx| {
+        app::init(
+            cx,
+            Some(gitpoulpi_config::ConfigPaths::for_dir(prefs.path())),
+            &Overrides::default(),
+        )
+        .unwrap()
+    });
     std::mem::forget(prefs);
     let opened = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
     let ws = opened.1.clone();

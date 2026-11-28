@@ -69,7 +69,8 @@ impl RightPanel {
         if !self.shows_working_changes() {
             return Vec::new();
         }
-        self.selection.paths(section)
+        self.selection
+            .paths(section, &section_paths(&self.status, section))
     }
 
     /// What the palette needs to know: is a file of each section selected.
@@ -273,7 +274,7 @@ impl RightPanel {
         if !self.need_working(cx) {
             return;
         }
-        let paths = self.selection.paths(StatusSection::Unstaged);
+        let paths = self.selected_paths(StatusSection::Unstaged);
         if paths.is_empty() {
             return self.say(msg::input::SELECT_UNSTAGED_FILE.get(), cx);
         }
@@ -285,7 +286,7 @@ impl RightPanel {
         if !self.need_working(cx) {
             return;
         }
-        let paths = self.selection.paths(StatusSection::Staged);
+        let paths = self.selected_paths(StatusSection::Staged);
         if paths.is_empty() {
             return self.say(msg::input::SELECT_STAGED_FILE.get(), cx);
         }
@@ -341,7 +342,7 @@ impl RightPanel {
         if !self.need_working(cx) {
             return;
         }
-        let paths = self.selection.paths(StatusSection::Unstaged);
+        let paths = self.selected_paths(StatusSection::Unstaged);
         if paths.is_empty() {
             return self.say(msg::input::SELECT_UNSTAGED_FILE.get(), cx);
         }
@@ -370,7 +371,7 @@ impl RightPanel {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        let prompt = staging::discard_prompt(&self.status, &paths);
+        let prompt = gitpoulpi_app::status_rows::discard_confirmation_prompt(&self.status, &paths);
         let me = cx.weak_entity();
         let spec = Spec {
             title: prompt,

@@ -35,7 +35,7 @@ impl Workspace {
             side,
             status,
             lfs: self.lfs_rows_for(&path, side),
-            editor_name: file_ops::editor_name(),
+            editor_name: file_ops::editor_name(&file_ops::External::current(cx)),
         };
         let items = repo_menu::file_items(&input);
         self.show_items(items, RefTarget::File(path, side), at, window, cx);
@@ -133,10 +133,11 @@ impl Workspace {
                 if !file.exists() {
                     return self.say(strings::FILE_NOT_ON_DISK, cx);
                 }
+                let ext = file_ops::External::current(cx);
                 let started = match op {
-                    FileOp::OpenInEditor => file_ops::open_in_editor(&file),
+                    FileOp::OpenInEditor => file_ops::open_in_editor(&ext, &file),
                     FileOp::OpenInDefault => file_ops::open_in_default(&file),
-                    _ => file_ops::show_in_folder(&file),
+                    _ => file_ops::show_in_folder(&ext, &file),
                 };
                 match started {
                     Ok(what) => self.say(strings::launched(&what), cx),
@@ -184,6 +185,7 @@ impl Workspace {
         cx: &mut Context<Self>,
     ) {
         use crate::dialogs::{self, Choice, Spec};
+        let dates = crate::prefs::PrefsStore::get(cx).dates().clone();
         let lines: Vec<String> = page
             .entries
             .iter()
@@ -191,7 +193,7 @@ impl Workspace {
                 format!(
                     "{}  {}  {}  {}",
                     gitpoulpi_core::domain::short(e.commit),
-                    crate::util::dates::iso_date(e.timestamp),
+                    dates.format_short(e.timestamp),
                     e.author_name,
                     e.summary
                 )

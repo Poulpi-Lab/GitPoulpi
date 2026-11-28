@@ -26,13 +26,13 @@ fn main() {
     gpui_kit::application()
         .with_assets(gpui_kit::assets::AllAssets)
         .run(move |cx| {
-            if let Err(e) = app::init(cx, PrefsStore::default_dir(), &overrides) {
+            if let Err(e) = app::init(cx, gitpoulpi_config::ConfigPaths::discover(), &overrides) {
                 eprintln!("gitpoulpi-desktop: cannot initialise: {e}");
                 cx.quit();
                 return;
             }
             let root = backend.repo_root().to_string_lossy().into_owned();
-            PrefsStore::update(cx, |p| p.remember_recent(&root));
+            PrefsStore::remember_recent(cx, &root);
             if let Err(e) = app::open_main_window(backend, cx) {
                 eprintln!("gitpoulpi-desktop: cannot open the window: {e}");
                 cx.quit();

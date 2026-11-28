@@ -5,35 +5,7 @@
 use super::*;
 use crate::commit_column::Side;
 
-/// What the Log column keys and palette commands do to the picked column.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum LogColumnCmd {
-    /// Starts picking: the first visible column, or the one already picked.
-    Pick,
-    NextColumn,
-    PrevColumn,
-    /// Moves the picked column one place among the visible ones (the twin of
-    /// dragging its header).
-    Move(Side),
-    /// Widens or narrows the picked column (the twin of dragging its
-    /// boundary).
-    Wider,
-    Narrower,
-    /// Every column back to its automatic width (the commit column's `0`).
-    ResetWidth,
-    /// Opens the columns chooser (the header's right-click menu).
-    Chooser,
-    /// Fits the picked column to its content (the twin of double-clicking its
-    /// boundary).
-    FitToContent,
-    /// Fits every visible column to its content.
-    FitAllToContent,
-    /// Scrolls the columns sideways by one key step (`scroll` layout).
-    ScrollLeft,
-    ScrollRight,
-    /// Switches between the `fit` and `scroll` layouts.
-    ToggleLayout,
-}
+pub(crate) use super::vocab::LogColumnCmd;
 
 /// One row of the Log columns chooser (right-click the header, or the
 /// palette): the column checkboxes, then the actions below a separator.

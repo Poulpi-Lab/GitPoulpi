@@ -57,32 +57,7 @@ impl RuleGroup {
     }
 }
 
-/// One kind the Add menu offers.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum RuleTemplate {
-    Identity,
-    Mailmap,
-    Anonymise,
-    DateShift,
-    DateTimezone,
-    DateWindow,
-    CommitterFromAuthor,
-    MessageReplace,
-    MessageDeleteLines,
-    Trailer,
-    ContentReplace,
-    RemovePaths,
-    RemoveBlobsOver,
-    MovePaths,
-    LfsImport,
-    LfsExport,
-    Script,
-    RemoveSignatures,
-    LineEndings,
-    StripExec,
-    Reencode,
-    MessageEncoding,
-}
+pub(crate) use super::vocab::RuleTemplate;
 
 impl RuleTemplate {
     pub(crate) const ALL: [RuleTemplate; 22] = [

@@ -70,12 +70,8 @@ const REFLOG_AHEAD: usize = 10;
 /// How many lost commits one request fetches.
 const LOST_PAGE: usize = 200;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Tab {
-    History,
-    Reflog,
-    Lost,
-}
+mod vocab;
+pub(crate) use vocab::Tab;
 
 /// Everything a row, button or menu entry can do. One list so the
 /// buttons, the right-click menu and the keys cannot drift apart.

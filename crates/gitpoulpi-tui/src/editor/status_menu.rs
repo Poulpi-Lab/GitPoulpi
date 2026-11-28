@@ -15,18 +15,7 @@ use crate::combo::{Combo, ComboOption, ComboOutcome};
 use crate::editor_charset::{self as charset, Charset, Eol};
 use crossterm::event::MouseEvent;
 
-/// Which menu: also the palette's `Editor: ...` commands.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum StatusMenu {
-    /// Reopen with an encoding, or convert to one.
-    Encoding,
-    /// Read the file's bytes again in the chosen encoding.
-    Reopen,
-    /// Keep the text, save it in the chosen encoding.
-    Convert,
-    LineEndings,
-    Indentation,
-}
+pub(crate) use super::vocab::StatusMenu;
 
 /// The open menu.
 pub(super) struct OpenMenu {

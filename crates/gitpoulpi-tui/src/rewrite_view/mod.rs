@@ -97,26 +97,8 @@ const PAGE: usize = 200;
 /// A row cursor this close to the end of what is loaded asks for more.
 const LOOKAHEAD: usize = 40;
 
-/// What a palette row or a menu entry asks the workbench to open with.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum RewriteEntry {
-    /// The workbench as the chord opens it.
-    Workbench,
-    /// With one rule of this kind added and its fields focused.
-    Rule(RuleTemplate),
-    /// With the Log's selected commits as the scope.
-    SelectedCommits,
-    /// With the selected commit and everything after it as the scope.
-    FromSelectedCommit,
-    /// On the purge screen: delete the old history of a rewrite for good.
-    Purge,
-    /// On the Identities tab: merge names and emails through `.mailmap`.
-    Identities,
-    /// A new Script rule, its editor and the ✦ "Write with AI" dialog.
-    ScriptAi,
-    /// The ✦ "Create Rules with AI" dialog over the workbench.
-    RulesAi,
-}
+mod vocab;
+pub(crate) use vocab::RewriteEntry;
 
 /// The pane that has the keyboard (`Tab` cycles them).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

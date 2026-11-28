@@ -20,6 +20,7 @@
 //! file side of the log is the `gitpoulpi-log` crate.
 
 mod capabilities;
+mod cmd;
 mod feed;
 pub(crate) mod friendly;
 pub(crate) mod identity;

@@ -154,25 +154,8 @@ impl RewordPart {
     }
 }
 
-/// Which entry point opened the popup. `Message` is the Edit commit
-/// message popup (summary + description only); every other scope opens the
-/// complete Amend dialog (`GitBackend::amend_commit`, every field shown) and
-/// only decides which field the caret starts in.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum AmendScope {
-    /// The Amend dialog, caret in the summary.
-    All,
-    /// Summary and description only: the message popup.
-    Message,
-    /// The Amend dialog, caret in the summary.
-    Summary,
-    /// The Amend dialog, caret in the description.
-    Description,
-    /// The Amend dialog, caret in the author's name.
-    Author,
-    /// The Amend dialog, caret in the author's date.
-    Date,
-}
+mod vocab;
+pub(crate) use vocab::AmendScope;
 
 impl AmendScope {
     /// The fields shown, in Tab order.

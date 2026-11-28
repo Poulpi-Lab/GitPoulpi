@@ -25,6 +25,7 @@
 
 mod render;
 mod status_menu;
+mod vocab;
 
 pub(crate) use status_menu::StatusMenu;
 use status_menu::{OpenMenu, Then};

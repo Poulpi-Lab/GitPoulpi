@@ -1,0 +1,40 @@
+# GitPoulpi desktop
+
+A native desktop frontend for GitPoulpi. It shows the same repository views as the terminal UI (refs
+sidebar, commit log with graph, commit and working-tree details, diff) and talks to the same daemon, so
+changes made from the terminal UI, the CLI or MCP show up here too.
+
+This frontend is under development on the `desktop` branch. It currently reads a repository and does not
+yet run git operations.
+
+## Layout
+
+`desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The
+crate is `crates/gitpoulpi-desktop` (binary `gitpoulpi-desktop`) and depends on the shared crates by path.
+
+## Build and run
+
+From this folder:
+
+```sh
+cargo build
+cargo run -- [REPO] [--theme SLUG] [--lane-theme SLUG] [--lang CODE]
+```
+
+`REPO` is a repository or a folder inside one; it defaults to the current directory.
+
+Interface settings (theme, language, layout, column widths, window size) are stored in `desktop.toml`
+inside the GitPoulpi config directory. `GITPOULPI_CONFIG_DIR` points the program at another directory.
+
+## Checks
+
+```sh
+scripts/check-desktop.sh   # from the repository root: fmt, clippy -D warnings, tests
+```
+
+The first build compiles the UI toolkit and takes several minutes.
+
+## Fonts
+
+The UI and monospace fonts are compiled into the binary. Their licences are in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

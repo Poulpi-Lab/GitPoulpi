@@ -22,6 +22,14 @@ pub(super) fn init(
     // never enabled).
     let open_t0 = Instant::now();
     open_trace(&format!("window opening: {}", repo.root.display()), open_t0);
+    // The terminal UI's own settings file: copied from `config.toml` the first
+    // time (never moved). A read-only config directory or a racing window is
+    // not a reason to stop: the loader derives the same values in memory.
+    if let Some(paths) = gitpoulpi_config::ConfigPaths::discover() {
+        if paths.config_file().exists() {
+            let _ = gitpoulpi_config::split::ensure_tui_file(&paths);
+        }
+    }
     let settings = gitpoulpi_config::Settings::resolve_ambient()
         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))?;
     // This installation's own colours (theme, graph colours), not the shared

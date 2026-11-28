@@ -165,7 +165,7 @@ fn the_launch_rows_are_a_dropdown_of_presets_and_a_text_template() {
     assert_eq!(state.config.ui.launch, "custom");
     state.commit_text(launch + 1, "my-term {repo} {gitpoulpi}");
     assert_eq!(state.config.ui.launch_command, "my-term {repo} {gitpoulpi}");
-    let raw = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
+    let raw = std::fs::read_to_string(dir.path().join("tui.toml")).unwrap();
     assert!(raw.contains("launch = \"custom\""), "{raw}");
 }
 

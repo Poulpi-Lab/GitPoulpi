@@ -223,7 +223,7 @@ fn switch(term: &mut Terminal, config: &std::path::Path, from: &str, to: &str, b
     let deadline = std::time::Instant::now() + STEP;
     let stored_ok = |cfg: &str| cfg.contains(&format!("column_resize = \"{want}\""));
     loop {
-        let stored = std::fs::read_to_string(config.join("config.toml")).unwrap_or_default();
+        let stored = std::fs::read_to_string(config.join("tui.toml")).unwrap_or_default();
         if stored_ok(&stored) {
             break;
         }

@@ -673,7 +673,9 @@ mod tests {
         picker.draft = "english".into();
         picker.selected = 0;
         assert_eq!(picker.commit(), "ui.language = en");
-        assert!(std::fs::read_to_string(&path).unwrap().contains("\"en\""));
+        assert!(std::fs::read_to_string(dir.path().join("tui.toml"))
+            .unwrap()
+            .contains("\"en\""));
         let mut none = LanguagePicker::with_parts(UiLanguage::Auto, None);
         none.draft = "english".into();
         assert_ne!(none.commit(), "ui.language = en");

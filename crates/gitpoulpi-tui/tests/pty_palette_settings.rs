@@ -37,7 +37,13 @@ fn fixture() -> gitpoulpi_testkit::FixtureRepo {
 }
 
 fn config_text(dir: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(dir.path().join("config.toml")).unwrap_or_default()
+    // Both files: the common keys stay in config.toml, the terminal UI's own
+    // settings (and key bindings) are in tui.toml.
+    ["config.toml", "tui.toml"]
+        .iter()
+        .map(|f| std::fs::read_to_string(dir.path().join(f)).unwrap_or_default())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn wait_config(dir: &tempfile::TempDir, what: &str, ok: impl Fn(&str) -> bool) {

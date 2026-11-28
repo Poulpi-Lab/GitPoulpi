@@ -62,7 +62,7 @@ fn launch_sized(
 }
 
 fn stored(config: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default()
 }
 
 /// Opens Settings on the General page: `Language` is its first row.

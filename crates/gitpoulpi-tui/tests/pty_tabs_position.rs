@@ -148,7 +148,7 @@ fn wait_title(term: &mut Terminal, name: &str) {
 }
 
 fn config_text(dir: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(dir.path().join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(dir.path().join("tui.toml")).unwrap_or_default()
 }
 
 fn wait_config(dir: &tempfile::TempDir, what: &str) {
@@ -159,7 +159,7 @@ fn wait_config(dir: &tempfile::TempDir, what: &str) {
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    panic!("config.toml never showed {what}: {}", config_text(dir));
+    panic!("tui.toml never showed {what}: {}", config_text(dir));
 }
 
 /// Picks `Settings: <label>: <choice>` from the palette.

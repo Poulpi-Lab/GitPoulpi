@@ -1445,7 +1445,7 @@ fn run_palette(term: &mut Terminal, text: &str) {
 /// The `[ui]` table of the config file (the column's parts are global
 /// settings there, beside the Log's columns).
 fn config_ui(config: &Path) -> toml::Table {
-    let text = std::fs::read_to_string(config.join("config.toml")).unwrap_or_default();
+    let text = std::fs::read_to_string(config.join("tui.toml")).unwrap_or_default();
     let doc: toml::Table = toml::from_str(&text).unwrap_or_default();
     doc.get("ui")
         .and_then(|u| u.as_table())

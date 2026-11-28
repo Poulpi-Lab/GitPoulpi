@@ -176,7 +176,7 @@ fn the_hunks_toggle_draws_the_whole_file_in_both_layouts_and_is_saved() {
         s.contains("row 01") && s.contains("row 05") && s.contains("row 20 changed")
     })
     .unwrap_or_else(|e| panic!("{e}"));
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
     assert!(saved.contains("diff_hunks_only = false"), "{saved}");
 
     // Split, still the whole file: an unchanged row on both sides.

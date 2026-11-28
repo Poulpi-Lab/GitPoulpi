@@ -62,7 +62,7 @@ fn search(term: &mut Terminal, text: &str, expect: &str) {
 }
 
 fn config_text(dir: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(dir.path().join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(dir.path().join("tui.toml")).unwrap_or_default()
 }
 
 fn wait_config(dir: &tempfile::TempDir, what: &str, ok: impl Fn(&str) -> bool) {
@@ -73,7 +73,7 @@ fn wait_config(dir: &tempfile::TempDir, what: &str, ok: impl Fn(&str) -> bool) {
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    panic!("config.toml never showed {what}: {}", config_text(dir));
+    panic!("tui.toml never showed {what}: {}", config_text(dir));
 }
 
 /// Rebind `Stage Selected File` to `e` (a clash with `Edit Commit

@@ -1023,3 +1023,50 @@ mod sequences {
         assert!(line.contains("128") && line.contains("'x'"), "{line}");
     }
 }
+
+/// The neutral lookup (`Keymap::action_for`, what a desktop frontend calls with
+/// a chord) and the terminal adapter agree on every binding of every prefix
+/// context, with the key as the terminal sends it: Shift kept where the
+/// bindings tell it apart (`Ctrl+G Shift+P` pushes, `Ctrl+G p` pulls).
+#[test]
+fn the_neutral_prefix_lookup_equals_the_terminal_adapter_on_every_binding() {
+    let km = Keymap::defaults();
+    let mut checked = 0;
+    for def in ACTIONS.iter().filter(|d| d.ctx.ignores_modifiers()) {
+        for text in def.defaults {
+            let chord = KeyChord::parse(text).unwrap();
+            let code = match chord.key {
+                Key::Char(c) if chord.mods.shift => KeyCode::Char(c.to_ascii_uppercase()),
+                Key::Char(c) => KeyCode::Char(c),
+                Key::Enter => KeyCode::Enter,
+                Key::Backspace => KeyCode::Backspace,
+                Key::Left => KeyCode::Left,
+                Key::Right => KeyCode::Right,
+                Key::Tab => KeyCode::Tab,
+                other => panic!("unexpected {other:?}"),
+            };
+            let mods = if chord.mods.ctrl {
+                KeyModifiers::CONTROL
+            } else if chord.mods.shift {
+                KeyModifiers::SHIFT
+            } else {
+                KeyModifiers::NONE
+            };
+            // What the adapter's callers do: the chrome keeps Shift on the
+            // navigation prefix's second key, the Git prefix reads the event.
+            let adapter = km.action_in_code_mods(def.ctx, code, mods);
+            let from_event = term::chord_of_parts(code, mods).unwrap();
+            assert_eq!(
+                km.action_for(def.ctx, from_event),
+                adapter,
+                "{}",
+                def.config_id()
+            );
+            assert_eq!(adapter, Some(def.action), "{}", def.config_id());
+            // The same chord parsed from its text, as a desktop builds it.
+            assert_eq!(km.action_for(def.ctx, chord), Some(def.action));
+            checked += 1;
+        }
+    }
+    assert!(checked > 30, "only {checked} bindings checked");
+}

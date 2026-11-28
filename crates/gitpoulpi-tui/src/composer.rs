@@ -54,50 +54,7 @@ pub(crate) fn composer_height_for(available: u16) -> u16 {
     }
 }
 
-/// Whether the composer is ready to commit, and if not, the reason to
-/// show as the (disabled) button's own label - the same
-/// register-a-hit-target-and-say-why convention as
-/// `DiffBarButton::pending_reason`.
-pub(crate) fn commit_readiness(
-    summary: &str,
-    amend: bool,
-    staged_count: usize,
-    merging: bool,
-    conflicts: usize,
-) -> Result<(), gitpoulpi_i18n::M> {
-    // Git refuses to commit unmerged files, whatever else is staged.
-    if conflicts > 0 {
-        return Err(gitpoulpi_i18n::msg::conflict_guard::NEED_RESOLVE);
-    }
-    // `merging`: a merge is stopped, and its commit needs nothing staged
-    // (the resolved result may equal HEAD, "take ours" everywhere).
-    if !amend && !merging && staged_count == 0 {
-        return Err(msg::NEED_STAGED);
-    }
-    if summary.trim().is_empty() {
-        return Err(msg::NEED_SUMMARY);
-    }
-    Ok(())
-}
-
-/// The Commit button's own label: the reason it's disabled, "Amend
-/// previous commit" in amend mode, or "Commit changes to N files"
-/// otherwise.
-pub(crate) fn commit_button_label(
-    amend: bool,
-    staged_count: usize,
-    merging: bool,
-    ready: Result<(), gitpoulpi_i18n::M>,
-) -> String {
-    match ready {
-        Err(reason) => reason.get().to_string(),
-        Ok(()) if amend => msg::AMEND.get().to_string(),
-        Ok(()) if merging && staged_count == 0 => gitpoulpi_i18n::msg::merge::BANNER_COMMIT_MERGE
-            .get()
-            .to_string(),
-        Ok(()) => msg::commit_files(staged_count as u64),
-    }
-}
+pub(crate) use gitpoulpi_app::commit_form::{commit_button_label, commit_readiness};
 
 /// Submits the composer's contents as a commit.
 ///
@@ -112,22 +69,15 @@ pub(crate) fn submit_commit(
     settings: &crate::commit_settings::CommitSettings,
     last_message: &mut Option<String>,
 ) {
-    if summary.trim().is_empty() {
-        *last_message = Some(msg::ERR_EMPTY_SUMMARY.get().into());
-        return;
-    }
-    let message = if description.trim().is_empty() {
-        summary.to_string()
-    } else {
-        format!("{summary}\n\n{description}")
-    };
-    // "Drop comment lines when making a commit": the commit is made with `-m`,
-    // which git does not clean up, so the comment lines go here.
-    let message = settings.prepared(&message);
-    if message.trim().is_empty() {
-        *last_message = Some(msg::ERR_EMPTY_SUMMARY.get().into());
-        return;
-    }
+    let strip = settings.strip_comments.then_some(settings.comment_char);
+    let (message, status) =
+        match gitpoulpi_app::commit_form::plan_commit(summary, description, amend, strip) {
+            gitpoulpi_app::commit_form::CommitPlan::Rejected(error) => {
+                *last_message = Some(error);
+                return;
+            }
+            gitpoulpi_app::commit_form::CommitPlan::Commit { message, status } => (message, status),
+        };
     // An agent's proposed message the user is committing (unchanged or
     // edited): its record says so.
     crate::ui_intent::proposal::confirmed(
@@ -140,11 +90,7 @@ pub(crate) fn submit_commit(
         no_verify,
         push: settings.push_after_commit,
     });
-    *last_message = Some(if amend {
-        format!("Amending: {summary}")
-    } else {
-        format!("Committing: {summary}")
-    });
+    *last_message = Some(status);
 }
 
 /// Which composer field is taking keystrokes, if any. `None` means the

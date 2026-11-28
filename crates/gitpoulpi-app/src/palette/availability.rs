@@ -195,6 +195,98 @@ pub struct PaletteContext {
     pub lfs_program_ok: bool,
 }
 
+/// The few facts a frontend that does not model every pane knows about its
+/// window; [`PaletteContext::from_summary`] turns it into the full context
+/// with the defaults documented there. The terminal UI fills every
+/// [`PaletteContext`] field itself and does not use this.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PaletteSummary {
+    /// The Settings screen is open.
+    pub settings_open: bool,
+    pub in_refs_pane: bool,
+    pub in_diff_view: bool,
+    /// File View / Blame / History is open in the central column.
+    pub in_file_view: bool,
+    /// The Log's selection is on a real commit (not the WIP row or a stash).
+    pub selected_commit: bool,
+    /// The working tree has uncommitted changes.
+    pub has_wip: bool,
+    /// A file of the Unstaged / Staged list is selected.
+    pub unstaged_file_selected: bool,
+    pub staged_file_selected: bool,
+    /// A changed-file row is selected in the commit-detail pane.
+    pub commit_file_selected: bool,
+    /// Some file is conflicted: git refuses to commit.
+    pub has_conflicts: bool,
+    /// The open diff is one of the two working-tree halves (its hunks can be
+    /// staged), and whether it is the Unstaged half.
+    pub in_stageable_diff: bool,
+    pub diff_stages: bool,
+    /// What the journal offers (`gitpoulpi_link::undo_ui::avail`).
+    pub undo: crate::palette::vocab::undo::Avail,
+    pub redo: crate::palette::vocab::undo::Avail,
+    /// How many repositories are open as tabs.
+    pub open_repository_tabs: usize,
+    /// The current tab's index.
+    pub current_tab_index: usize,
+}
+
+impl Default for PaletteSummary {
+    /// A window with one repository tab and nothing selected or open; the
+    /// journal offers nothing.
+    fn default() -> Self {
+        Self {
+            settings_open: false,
+            in_refs_pane: false,
+            in_diff_view: false,
+            in_file_view: false,
+            selected_commit: false,
+            has_wip: false,
+            unstaged_file_selected: false,
+            staged_file_selected: false,
+            commit_file_selected: false,
+            has_conflicts: false,
+            in_stageable_diff: false,
+            diff_stages: false,
+            undo: crate::palette::vocab::undo::Avail::Nothing,
+            redo: crate::palette::vocab::undo::Avail::Nothing,
+            open_repository_tabs: 1,
+            current_tab_index: 0,
+        }
+    }
+}
+
+impl PaletteContext {
+    /// The context for a frontend that knows only a [`PaletteSummary`].
+    /// Everything the summary does not carry takes the all-off default (no
+    /// workspace, no review, board, conversation or text box open, no ref
+    /// selected, no remotes, no AI, no submodules, no operation in progress)
+    /// except `lfs_program_ok`, which is `true`: git-lfs is not known to be
+    /// missing, so its commands are not grayed out with the install link.
+    pub fn from_summary(summary: PaletteSummary) -> Self {
+        Self {
+            settings_open: summary.settings_open,
+            in_refs_pane: summary.in_refs_pane,
+            in_diff_view: summary.in_diff_view,
+            in_file_view: summary.in_file_view,
+            selected_commit: summary.selected_commit,
+            has_wip: summary.has_wip,
+            unstaged_file_selected: summary.unstaged_file_selected,
+            staged_file_selected: summary.staged_file_selected,
+            commit_file_selected: summary.commit_file_selected,
+            has_conflicts: summary.has_conflicts,
+            in_stageable_diff: summary.in_stageable_diff,
+            diff_stages: summary.diff_stages,
+            undo: summary.undo,
+            redo: summary.redo,
+            open_repository_tabs: summary.open_repository_tabs,
+            current_tab_index: summary.current_tab_index,
+            lfs_program_ok: true,
+            ..Self::default()
+        }
+    }
+}
+
 impl PaletteContext {
     fn selected_any_ref(self) -> bool {
         self.selected_local_branch || self.selected_remote_branch || self.selected_tag
@@ -1245,5 +1337,26 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::Setting(..) => None,
         // A sequence is gated by its own validation only.
         C::Sequence(op) => sequences::unavailable(op),
+    }
+}
+
+#[cfg(test)]
+mod summary_tests {
+    use super::*;
+    use crate::palette::vocab::undo::Avail;
+
+    #[test]
+    fn a_summary_fills_what_it_knows_and_defaults_the_rest() {
+        let ctx = PaletteContext::from_summary(PaletteSummary {
+            has_wip: true,
+            undo: Avail::Ready,
+            ..PaletteSummary::default()
+        });
+        assert!(ctx.has_wip && !ctx.selected_commit && !ctx.in_refs_pane);
+        assert_eq!(ctx.undo, Avail::Ready);
+        assert_eq!(ctx.redo, Avail::Nothing);
+        assert_eq!(ctx.open_repository_tabs, 1);
+        assert!(ctx.lfs_program_ok, "git-lfs is not known to be missing");
+        assert!(!ctx.workspace_active && !ctx.ai_enabled && !ctx.has_remotes);
     }
 }

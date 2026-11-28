@@ -978,6 +978,15 @@ impl PaletteEntry {
         self.text_en.unwrap_or_else(|| self.label.english())
     }
 
+    /// The part of the label before `: `, in the current language
+    /// ("Git" of `Git: Fetch`): what a frontend groups or filters the
+    /// commands by. Empty for a label with no category.
+    pub fn category(&self) -> &'static str {
+        self.name()
+            .split_once(": ")
+            .map_or("", |(category, _)| category)
+    }
+
     /// Tags the entry with the feature it needs.
     #[allow(dead_code)] // first used by the slices that gate each feature
     pub const fn requires(mut self, feature: crate::features::Feature) -> Self {
@@ -1509,10 +1518,37 @@ pub mod families;
 pub mod matching;
 pub mod sequences;
 
-pub use availability::{unavailable_reason, PaletteContext};
+pub use availability::{unavailable_reason, PaletteContext, PaletteSummary};
 pub use bindings::command_id;
 pub use bindings::{palette_action_defs, palette_entry};
 pub use catalog::PALETTE_COMMANDS;
 pub use families::{install_families, Families};
 pub use matching::{needs_repository, palette_matches, score, score_lower, PaletteMatch};
 pub use sequences::SeqOp;
+
+#[cfg(test)]
+mod category_tests {
+    use super::*;
+
+    #[test]
+    fn the_category_is_the_label_part_before_the_colon() {
+        let with: Vec<_> = PALETTE_COMMANDS
+            .iter()
+            .filter(|e| !e.category().is_empty())
+            .collect();
+        assert!(with.len() > 100, "only {} categorized rows", with.len());
+        for e in &with {
+            assert_eq!(
+                e.name().split_once(": ").unwrap().0,
+                e.category(),
+                "{}",
+                e.name()
+            );
+        }
+        let git = PALETTE_COMMANDS
+            .iter()
+            .find(|e| e.english().starts_with("Git: "))
+            .map(|e| e.category());
+        assert_eq!(git, Some("Git"));
+    }
+}

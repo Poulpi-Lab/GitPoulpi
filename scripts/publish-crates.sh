@@ -28,6 +28,7 @@ CRATES=(
   gitpoulpi-ipc
   gitpoulpi-log
   gitpoulpi-session
+  gitpoulpi-app
   gitpoulpi-update
   gitpoulpi-ai
   gitpoulpi-daemon

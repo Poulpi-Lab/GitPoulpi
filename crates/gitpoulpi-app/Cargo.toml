@@ -1,0 +1,18 @@
+[package]
+name = "gitpoulpi-app"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+exclude.workspace = true
+description = "Frontend-neutral application logic shared by the terminal UI and the desktop UI: the commit-graph lane model, stash rows, lazy log paging."
+
+[dependencies]
+gitpoulpi-config.workspace = true
+gitpoulpi-core.workspace = true

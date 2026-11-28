@@ -84,9 +84,14 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
 - `keymap/` (one registry of key -> action per context), `kitty_keyboard.rs`.
 
 **Log and graph**
-- `graph/`: layout into `TreePart`s (`part.rs`, `layout.rs`), the raster
-  picture (`raster*.rs`, `inline_image.rs`), stash rows and the display order
-  `LogRows` (`stash.rs`), lazy paging (`paging.rs`), ref connector, cache.
+- `graph/`: the terminal's reading of the graph: glyphs and colours
+  (`part.rs`), the neutral layout resolved against the lane palette and turned
+  into `Line`s (`layout.rs`), the raster picture (`raster*.rs`,
+  `inline_image.rs`), ref connector, cache. The frontend-neutral model lives in
+  **`crates/gitpoulpi-app/src/graph/`**: `TreePart`/`TreeCell` with `ColorRef`
+  (`part.rs`), the lane fold (`layout.rs`), stash rows and the display order
+  `LogRows` (`stash.rs`), lazy paging (`paging.rs`), `LogLoadSettings`
+  (`load.rs`). Both frontends share it; no toolkit type may enter that crate.
 - `log_table/`: commit rows, columns, the Log row arithmetic (`geometry.rs`),
   the WIP row (`wip.rs`). `log_pills.rs`, `log_menu/`, `pill_menu.rs`,
   `log_search.rs`, `log_multiselect.rs`, `log_inline_ref.rs`.
@@ -966,7 +971,7 @@ What happened when one got onto the loop:
 So: `repo_probe` and `folder_listing` run on threads and the row draws at once
 with "still looking"; a directory listing is capped (`LISTING_LIMIT`); graph
 pages are fire-and-forget requests (`DaemonLink::request_log_page`, at most one
-per frame, one in flight, `graph/paging.rs`); network `Action`s are spawned
+per frame, one in flight, `gitpoulpi-app` `graph/paging.rs`); network `Action`s are spawned
 (`Action::is_network`); never add an LFS read to the refresh unconditionally
 (`LfsGate`). `GITPOULPI_TIMING=1` writes `gitpoulpi-timing.log` (temp dir) and a
 `tui-stall` trace; `docs/developer/open-time.md` and `perf-budgets.md` hold the

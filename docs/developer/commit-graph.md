@@ -1,9 +1,12 @@
 # The commit graph: glyphs, pixels, and the traps
 
-Code: `crates/gitpoulpi-tui/src/graph/` (`part.rs` vocabulary and glyphs,
-`layout.rs` lane fold, `stash.rs` stash placement and `LogRows`,
+Code: `crates/gitpoulpi-app/src/graph/` (the frontend-neutral model shared
+with the desktop UI: `part.rs` vocabulary and `ColorRef`, `layout.rs` lane
+fold, `stash.rs` stash placement and `LogRows`, `paging.rs` lazy loading) and
+`crates/gitpoulpi-tui/src/graph/` (`part.rs` glyphs and colours, `layout.rs`
+resolves the neutral colours and builds the lines,
 `raster.rs` + `raster/` pixels, `inline_image.rs` the column as a picture,
-`paging.rs` lazy loading, `cache.rs` per-change layout cache,
+`cache.rs` per-change layout cache,
 `connector.rs` ref-to-commit line) and `terminal_image/` (protocol
 detection, encoders, Kitty). Module headers carry the detail; this page is
 the evidence and the decisions that are not guessable from the code. Read
@@ -348,7 +351,7 @@ paid once; synthetic faces, real photos up to ~2x the bytes. Guarded by
 
 `general.initial_commits_in_graph` default 5000, floor 500 (more
 than any window, bounded on huge repos), then lazy pages
-(`graph/paging.rs`, one request in flight, fire-and-forget off the input
+(`gitpoulpi-app` `graph/paging.rs`, one request in flight, fire-and-forget off the input
 loop) up to `general.max_commits_in_graph`. It was once a hard-coded 50,
 which left the pane half empty with nothing to scroll to.
 `a_full_page_of_history_lays_out_quickly` catches a quadratic lane walk.

@@ -25,6 +25,8 @@ The release ships these three frontends as one program, `gitpoulpi` (no subcomma
 
 `gitpoulpi-config`, `gitpoulpi-secrets`, `gitpoulpi-session`, `gitpoulpi-hosting` and `gitpoulpi-ai` are secondary adapters consumed by the daemon (and, where relevant, directly by the CLI for local-only concerns like `gitpoulpi config path`) - never duplicated between frontends. `gitpoulpi-commands` holds the clap tree and its one `execute` mapping shared by the CLI and the MCP server; `gitpoulpi-i18n` holds the compiled-in UI catalogs (`../developer/i18n.md`).
 
+`gitpoulpi-app` holds the frontend-neutral application logic the terminal UI and the desktop UI share (`decisions/0011-a-second-native-desktop-frontend.md`): the commit-graph lane model, stash rows and the Log row arithmetic, lazy log paging. It depends only on `gitpoulpi-core` and `gitpoulpi-config` and never on a UI toolkit; each frontend resolves its neutral colour references against its own theme and draws the parts its own way.
+
 Pure logic that more than one adapter needs lives in `gitpoulpi-core` as plain functions, not behind the trait: `textconv` (encodings, line breaks, indentation: the editor and the daemon's file conversion) and `domain::rules` (where an ignore or attribute rule is written, and its exact line: both backends, the TUI picker and the CLI). `gitpoulpi-config::os_apps` parses what the OS registers for a file type (the "Open with" list) from a file system or registry handed in, so it never reads the real desktop in a test.
 
 ## Why hexagonal

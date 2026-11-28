@@ -465,7 +465,7 @@ den Server enthalten; siehe [MCP und Agenten](mcp-and-agents.md).
 
 ![Die Dropdownliste Farbschema des Graphen: Design folgen, dann jede Spurpalette mit einigen ihrer Farben](../images/settings-log-graph-lanes.png)
 
-Das Design und die Graphfarben (das Design, das Farbschema des Graphen, die Einfärbung und der Hintergrund der Spuren, die Stärke der Zeilentönung) gehören zu jeder Installation: Teilen mehrere Installationen eine `config.toml`, ändert eine Änderung in der einen nie die anderen. Nur die primäre Installation schreibt außerdem die gemeinsamen `ui.*`-Schlüssel.
+Das Design und die Graphfarben (das Design, das Farbschema des Graphen, die Einfärbung und der Hintergrund der Spuren, die Stärke der Zeilentönung) gehören zu jeder Installation: Teilen mehrere Installationen einen Konfigurationsordner, ändert eine Änderung in der einen nie die anderen. Nur die primäre Installation schreibt außerdem die gemeinsamen `ui.*`-Schlüssel, in `tui.toml`; die anderen behalten ihre eigenen in ihrem eigenen Eintrag der `config.toml`.
 
 ### Tastatur & Maus
 

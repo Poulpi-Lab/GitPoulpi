@@ -239,18 +239,7 @@ pub(crate) enum AiOutcome {
     Canceled(AiRequest),
 }
 
-/// How a finished request ended, for whoever waits on it (a sequence step).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum AiEnd {
-    Ok,
-    Failed(String),
-    Canceled,
-}
-
-/// The ends nobody has taken yet, by kind of request. Process-wide: the
-/// window that polled the answer may not be the one that asked, and a tab
-/// switch rebuilds it.
-static FINISHED: std::sync::Mutex<Vec<(AiAction, AiEnd)>> = std::sync::Mutex::new(Vec::new());
+pub(crate) use gitpoulpi_app::ai_state::AiEnd;
 
 /// What `outcome` means to a waiter; read from the outcome the window
 /// applies (`event_loop::window::tick`), never from a second poll.
@@ -262,22 +251,7 @@ pub(crate) fn finished_of(outcome: &AiOutcome) -> (AiAction, AiEnd) {
     }
 }
 
-/// Makes the end of a request visible to [`take_finished`]; called once the
-/// window has applied the answer. Only the newest end of a kind is kept.
-pub(crate) fn record_finished((kind, end): (AiAction, AiEnd)) {
-    let mut ends = FINISHED.lock().unwrap_or_else(|e| e.into_inner());
-    ends.retain(|(k, _)| *k != kind);
-    ends.push((kind, end));
-}
-
-/// The end of the last finished request of `kind`, once. `None` while it
-/// runs (or nothing of that kind finished since the last call).
-#[allow(dead_code)] // the sequence runner (a later slice) is the reader
-pub(crate) fn take_finished(kind: AiAction) -> Option<AiEnd> {
-    let mut ends = FINISHED.lock().unwrap_or_else(|e| e.into_inner());
-    let at = ends.iter().position(|(k, _)| *k == kind)?;
-    Some(ends.remove(at).1)
-}
+pub(crate) use gitpoulpi_app::ai_state::{record_finished, take_finished};
 
 /// Shared by the run and the jobs list's Cancel, so a request that outlives
 /// its window (the tab was left) still stops from the indicator.

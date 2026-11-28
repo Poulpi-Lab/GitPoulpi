@@ -3,7 +3,7 @@
 //! plan and submits it in one shot.
 //!
 //! Rows are shown newest-first; the plan
-//! sent to the backend is oldest-first ([`RebaseForm::steps`] reverses).
+//! sent to the backend is oldest-first ([`RebasePlan::steps`] reverses).
 //! Squash/Fixup combine a row into the older commit that follows it
 //! *below* it on screen -- refused on the last (oldest) row, which has
 //! none.
@@ -15,66 +15,13 @@
 mod render;
 
 use crate::keymap::term::TermKeymap;
-use gitpoulpi_core::domain::{autosquash_order, InteractiveRebase, RebaseAction, RebaseStep};
+use gitpoulpi_core::domain::RebaseAction;
+pub(crate) use gitpoulpi_link::rebase_plan::{RebasePlan, RebaseRow};
 
 use super::*;
 use crate::keymap::Action as Bind;
 use crate::reword_ui::{RewordForm, RewordFormOutcome, RewordPart};
 use crate::theme::plain_button_style;
-
-/// One row of the plan, in the popup's own (newest-first) display order.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct RebaseRow {
-    pub(crate) commit: Oid,
-    pub(crate) summary: String,
-    pub(crate) action: RebaseAction,
-    /// Set once a `Reword` row's message has been edited; `None` keeps
-    /// the commit's own summary as the message.
-    pub(crate) new_message: Option<String>,
-    /// The commit's full message (summary and body), what a Reword opens
-    /// on and what a squash into another row contributes.
-    pub(crate) message: String,
-    /// Set while the row is a Reword only because commits are squashed
-    /// into it (see [`RebaseForm::sync_squash_receivers`]).
-    auto: Option<AutoReword>,
-    /// The user took the automatic Reword away by hand: it is not put
-    /// back while commits are squashed into the row.
-    no_auto: bool,
-}
-
-/// What an automatic Reword remembers: the action to give back when
-/// nothing is squashed into the row any more, and the combined message
-/// it last wrote (an edited message is no longer this text).
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct AutoReword {
-    previous: RebaseAction,
-    text: String,
-}
-
-impl RebaseRow {
-    /// A `Pick` row for a commit with its full `message`.
-    pub(crate) fn pick(commit: Oid, summary: &str, message: &str) -> Self {
-        Self {
-            commit,
-            summary: summary.to_string(),
-            action: RebaseAction::Pick,
-            new_message: None,
-            message: message.to_string(),
-            auto: None,
-            no_auto: false,
-        }
-    }
-
-    /// The message this row starts from: its full message, or its
-    /// summary when only that is known.
-    fn base_message(&self) -> &str {
-        if self.message.trim().is_empty() {
-            &self.summary
-        } else {
-            &self.message
-        }
-    }
-}
 
 /// The popup's focusable/clickable parts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -117,19 +64,13 @@ pub(crate) struct RebaseForm {
     /// What the header names: "feature" for a rebase, or "HEAD" for a
     /// cherry-pick.
     pub(crate) title: String,
-    rows: Vec<RebaseRow>,
-    cursor: usize,
-    pub(crate) autosquash: bool,
+    /// The rows and the selection; the form derefs to it.
+    plan: RebasePlan,
     /// A branch to check out first, when the plan is for a branch that is
     /// not the checked-out one (a ref dropped on another: see
     /// `ref_drop`). `None` for a plan about HEAD.
     pub(crate) checkout: Option<String>,
     editing: Option<RewordForm>,
-    initial: Vec<RebaseRow>,
-    error: Option<String>,
-    /// `true` for a multi-commit cherry-pick: the plan replays the rows'
-    /// (arbitrary) commits onto HEAD instead of rewriting a range.
-    pub(crate) cherry_pick: bool,
     /// A row is being carried by the mouse (press on a row, not yet
     /// released): moving over another row moves it there.
     dragging: bool,
@@ -158,6 +99,19 @@ pub(crate) struct RebaseForm {
     bar_drag: crate::scrollbar::BarDrag,
 }
 
+impl std::ops::Deref for RebaseForm {
+    type Target = RebasePlan;
+    fn deref(&self) -> &RebasePlan {
+        &self.plan
+    }
+}
+
+impl std::ops::DerefMut for RebaseForm {
+    fn deref_mut(&mut self) -> &mut RebasePlan {
+        &mut self.plan
+    }
+}
+
 impl RebaseForm {
     /// `rows` in newest-first order, exactly as they should first appear.
     pub(crate) fn new(
@@ -170,14 +124,9 @@ impl RebaseForm {
             upstream,
             onto,
             title,
-            initial: rows.clone(),
-            rows,
-            cursor: 0,
-            autosquash: false,
+            plan: RebasePlan::new(rows),
             checkout: None,
             editing: None,
-            error: None,
-            cherry_pick: false,
             dragging: false,
             dropdown: None,
             dropdown_cursor: 0,
@@ -211,28 +160,6 @@ impl RebaseForm {
                 true
             }
             None => false,
-        }
-    }
-
-    /// The actions a row's dropdown offers: four for a
-    /// cherry-pick, plus Fixup and Edit for a rebase.
-    fn choices(&self) -> &'static [RebaseAction] {
-        if self.cherry_pick {
-            &[
-                RebaseAction::Pick,
-                RebaseAction::Reword,
-                RebaseAction::Squash,
-                RebaseAction::Drop,
-            ]
-        } else {
-            &[
-                RebaseAction::Pick,
-                RebaseAction::Reword,
-                RebaseAction::Squash,
-                RebaseAction::Fixup,
-                RebaseAction::Drop,
-                RebaseAction::Edit,
-            ]
         }
     }
 
@@ -276,27 +203,6 @@ impl RebaseForm {
         form
     }
 
-    /// Bakes the autosquash preview into `rows` before any edit, so the
-    /// row a click or key refers to is the row that was drawn.
-    fn materialize(&mut self) {
-        if self.autosquash {
-            self.rows = self.display_rows();
-            self.autosquash = false;
-        }
-    }
-
-    /// Moves the row at `from` to position `to` (a drag), the cursor
-    /// following it.
-    fn move_row_to(&mut self, from: usize, to: usize) {
-        if from >= self.rows.len() || to >= self.rows.len() || from == to {
-            return;
-        }
-        let row = self.rows.remove(from);
-        self.rows.insert(to, row);
-        self.cursor = to;
-        self.sync_squash_receivers();
-    }
-
     /// The pointer moved, button held, over `part` (or off every row).
     pub(crate) fn on_drag(&mut self, part: Option<RebasePart>) {
         if !self.dragging {
@@ -315,222 +221,18 @@ impl RebaseForm {
         }
     }
 
-    /// The plan the backend would run, oldest first - the reverse of
-    /// display order, with `req.autosquash` handled by the backend
-    /// itself rather than pre-applied here (so the preview and the
-    /// actually-run plan can never disagree).
-    pub(crate) fn steps(&self) -> Vec<RebaseStep> {
-        self.rows
-            .iter()
-            .rev()
-            .map(|r| RebaseStep {
-                commit: r.commit,
-                action: r.action,
-                message: if r.action == RebaseAction::Reword {
-                    Some(
-                        r.new_message
-                            .clone()
-                            .unwrap_or_else(|| r.base_message().to_string()),
-                    )
-                } else {
-                    None
-                },
-            })
-            .collect()
-    }
-
-    /// The rows as they would be drawn once `autosquash` reordering is
-    /// applied - a pure preview, computed on demand rather than kept in
-    /// sync as a second copy of `rows`.
-    fn display_rows(&self) -> Vec<RebaseRow> {
-        if !self.autosquash {
-            return self.rows.clone();
-        }
-        // `autosquash_order` reasons oldest-first; reverse in, reverse
-        // out.
-        let mut oldest_first: Vec<(Oid, String, RebaseAction)> = self
-            .rows
-            .iter()
-            .rev()
-            .map(|r| (r.commit, r.summary.clone(), r.action))
-            .collect();
-        autosquash_order(&mut oldest_first);
-        let by_commit: std::collections::HashMap<Oid, &RebaseRow> =
-            self.rows.iter().map(|r| (r.commit, r)).collect();
-        oldest_first
-            .into_iter()
-            .rev()
-            .map(|(commit, _, action)| {
-                let base = by_commit.get(&commit).expect("row came from self.rows");
-                RebaseRow {
-                    commit,
-                    summary: base.summary.clone(),
-                    action,
-                    new_message: base.new_message.clone(),
-                    message: base.message.clone(),
-                    auto: base.auto.clone(),
-                    no_auto: base.no_auto,
-                }
-            })
-            .collect()
-    }
-
-    /// Keeps every row that commits are squashed into a Reword carrying
-    /// their combined message.
-    ///
-    /// The receiver of a Squash is the first row below it (older) that
-    /// is not itself a Squash / Fixup. When at least one Squash folds
-    /// into a `Pick` (or an unedited `Reword`), that row becomes a
-    /// Reword whose message is its own followed by the full messages of
-    /// the squashed commits, oldest first - git's combined squash
-    /// message without the `# This is a combination` comments. Fixup
-    /// drops its message as in git and never triggers this. When nothing
-    /// is squashed into the row any more it gets its previous action
-    /// back, unless the user edited the text meanwhile.
-    fn sync_squash_receivers(&mut self) {
-        for r in 0..self.rows.len() {
-            if matches!(
-                self.rows[r].action,
-                RebaseAction::Squash | RebaseAction::Fixup
-            ) {
-                continue;
-            }
-            let mut squashed: Vec<String> = Vec::new();
-            let mut k = r;
-            while k > 0
-                && matches!(
-                    self.rows[k - 1].action,
-                    RebaseAction::Squash | RebaseAction::Fixup
-                )
-            {
-                k -= 1;
-                if self.rows[k].action == RebaseAction::Squash {
-                    squashed.push(self.rows[k].base_message().trim().to_string());
-                }
-            }
-            let row = &mut self.rows[r];
-            if squashed.is_empty() {
-                if let Some(auto) = row.auto.take() {
-                    let untouched = row.new_message.is_none()
-                        || row.new_message.as_deref() == Some(auto.text.as_str());
-                    if row.action == RebaseAction::Reword && untouched {
-                        row.action = auto.previous;
-                        row.new_message = None;
-                    }
-                }
-                continue;
-            }
-            let mut combined = row.base_message().trim().to_string();
-            for message in &squashed {
-                combined.push_str("\n\n");
-                combined.push_str(message);
-            }
-            match &mut row.auto {
-                Some(auto) => {
-                    if row.action != RebaseAction::Reword {
-                        row.auto = None;
-                    } else if row.new_message.is_none()
-                        || row.new_message.as_deref() == Some(auto.text.as_str())
-                    {
-                        auto.text = combined.clone();
-                        row.new_message = Some(combined);
-                    }
-                }
-                None => {
-                    if !row.no_auto
-                        && (row.action == RebaseAction::Pick
-                            || (row.action == RebaseAction::Reword && row.new_message.is_none()))
-                    {
-                        row.auto = Some(AutoReword {
-                            previous: row.action,
-                            text: combined.clone(),
-                        });
-                        row.action = RebaseAction::Reword;
-                        row.new_message = Some(combined);
-                    }
-                }
-            }
-        }
-    }
-
-    /// Stores the message the popup returned for the focused row. Text
-    /// that is still the automatic combined message stays "unedited".
-    fn set_new_message(&mut self, message: String) {
-        use gitpoulpi_core::domain::normalize_reword_message;
-        let row = &mut self.rows[self.cursor];
-        if let Some(auto) = &row.auto {
-            if normalize_reword_message(&message) == normalize_reword_message(&auto.text) {
-                row.new_message = Some(auto.text.clone());
-                return;
-            }
-        }
-        row.new_message = Some(message);
-    }
-
-    fn is_last_row(&self, index: usize) -> bool {
-        index + 1 == self.rows.len()
-    }
-
-    /// Sets the focused row's action, refusing Squash/Fixup on the last
-    /// (oldest, no predecessor) row.
+    /// Sets the focused row's action; the new message is asked for the moment
+    /// Reword is chosen.
     fn set_action(&mut self, action: RebaseAction) {
-        if self.rows.is_empty() {
-            return;
-        }
-        self.materialize();
-        if matches!(action, RebaseAction::Squash | RebaseAction::Fixup)
-            && self.is_last_row(self.cursor)
-        {
-            self.error = Some(gitpoulpi_i18n::msg::rebase_ui::ERR_OLDEST.get().into());
-            return;
-        }
-        self.error = None;
-        self.rows[self.cursor].action = action;
-        // The row was chosen by hand: it is no longer an automatic Reword
-        // (unless Reword itself was chosen), and an unedited combined
-        // message goes with it.
-        if action != RebaseAction::Reword {
-            let row = &mut self.rows[self.cursor];
-            if let Some(auto) = row.auto.take() {
-                row.no_auto = true;
-                if row.new_message.as_deref() == Some(auto.text.as_str()) {
-                    row.new_message = None;
-                }
-            }
-        } else {
-            self.rows[self.cursor].no_auto = false;
-        }
-        self.sync_squash_receivers();
-        // The new message is asked for the moment Reword is chosen.
-        if action == RebaseAction::Reword {
+        if self.plan.apply_action(action) && action == RebaseAction::Reword {
             self.open_reword();
         }
     }
 
-    fn move_row(&mut self, delta: isize) {
-        self.materialize();
-        let n = self.rows.len();
-        if n < 2 {
-            return;
-        }
-        let at = self.cursor as isize;
-        let to = at + delta;
-        if to < 0 || to >= n as isize {
-            return;
-        }
-        self.rows.swap(at as usize, to as usize);
-        self.cursor = to as usize;
-        self.sync_squash_receivers();
-    }
-
     pub(crate) fn reset(&mut self) {
-        self.rows = self.initial.clone();
-        self.sync_squash_receivers();
-        self.cursor = 0;
-        self.autosquash = false;
+        self.plan.reset();
         self.editing = None;
         self.dropdown = None;
-        self.error = None;
     }
 
     /// Whether rows offer "split...": a rebase of the checked-out branch.
@@ -553,7 +255,7 @@ impl RebaseForm {
         }
         let commit = row.commit;
         self.cursor = i;
-        let edited = self.autosquash || self.rows != self.initial;
+        let edited = self.plan.is_edited();
         if edited && self.split_armed != Some(commit) {
             self.split_armed = Some(commit);
             self.error = Some(gitpoulpi_i18n::msg::rebase_ui::SPLIT_CONFIRM.get().into());
@@ -590,26 +292,9 @@ impl RebaseForm {
             self.error = Some(gitpoulpi_i18n::msg::rebase_ui::ERR_NOTHING.get().into());
             return RebaseFormOutcome::Stay;
         }
-        // Bake the autosquash preview in, so that the receivers of the
-        // squashes it creates carry their combined messages.
-        self.materialize();
-        self.sync_squash_receivers();
-        let rebase = Action::RebaseInteractive(InteractiveRebase {
-            upstream: self.upstream,
-            onto: self.onto,
-            steps: self.steps(),
-            autosquash: self.autosquash,
-            cherry_pick: self.cherry_pick,
-        });
-        RebaseFormOutcome::Submit(match &self.checkout {
-            // Stops if the checkout is refused, so the plan can never be
-            // replayed on the wrong branch.
-            Some(branch) => Action::CheckoutThen {
-                branch: branch.clone(),
-                then: Box::new(rebase),
-            },
-            None => rebase,
-        })
+        let (upstream, onto) = (self.upstream, self.onto);
+        let checkout = self.checkout.clone();
+        RebaseFormOutcome::Submit(self.plan.action(upstream, onto, checkout.as_deref()))
     }
 
     pub(crate) fn on_key(&mut self, key: KeyEvent) -> RebaseFormOutcome {

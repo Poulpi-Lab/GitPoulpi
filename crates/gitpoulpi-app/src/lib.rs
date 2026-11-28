@@ -11,6 +11,7 @@
 //!
 //! `tests/dependency_guard.rs` fails if a UI crate ever becomes a dependency.
 
+pub mod ai_state;
 pub mod commit_form;
 pub mod compare;
 pub mod dates;
@@ -30,6 +31,8 @@ pub mod refs_sections;
 pub mod refs_tree;
 pub mod registry;
 pub mod repo_facts;
+pub mod reword;
+pub mod rewrite_rules;
 pub mod sequences;
 pub mod settings;
 pub mod status_rows;

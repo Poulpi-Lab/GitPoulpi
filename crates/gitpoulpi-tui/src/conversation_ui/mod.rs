@@ -14,7 +14,7 @@
 // Built only with a hosting provider and the `conversation` feature.
 #![allow(dead_code)]
 
-mod cache;
+use gitpoulpi_link::conversation_cache as cache;
 mod input;
 mod paint;
 pub(crate) mod rows;

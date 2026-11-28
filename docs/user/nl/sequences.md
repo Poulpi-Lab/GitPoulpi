@@ -252,7 +252,7 @@ behouden wanneer de pagina opslaat.
 
 ## Een reeks uitvoeren
 
-Een reeks is een benoemde lijst stappen, elk een opdracht van het palet (alles stagen, het commitbericht met de AI schrijven, commit, push...). Voer hem uit vanuit het palet (`Reeks: <naam>`), met de toets die je hem gaf in Instellingen > Toetsenbord en muis (`[keybindings.sequence]` in `config.toml`), of vanaf de opdrachtregel (`gitpoulpi sequence run`).
+Een reeks is een benoemde lijst stappen, elk een opdracht van het palet (alles stagen, het commitbericht met de AI schrijven, commit, push...). Voer hem uit vanuit het palet (`Reeks: <naam>`), met de toets die je hem gaf in Instellingen > Toetsenbord en muis (`[keybindings.sequence]` in `tui.toml`), of vanaf de opdrachtregel (`gitpoulpi sequence run`).
 
 Tijdens het uitvoeren toont een strook boven het Log `<naam> k/n`, de stap en waarop hij wacht. De uitvoering staat ook in het paneel Taken als `Reeks <naam> k/n: <stap>`. Er draait één reeks tegelijk; een tweede starten zegt welke er draait.
 

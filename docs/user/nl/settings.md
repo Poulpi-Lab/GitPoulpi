@@ -7,7 +7,9 @@ Open de Instellingen met `Ctrl+,`, `Ctrl+N` en dan `,`, het tandwiel in de titel
 venster zolang het open is. Sluit het met de `✕` rechtsboven, `Esc` of `q`. Het vraagt alleen eerst
 om bevestiging als sluiten iets zou doen verliezen (zie [Instellingen sluiten](#instellingen-sluiten)).
 
-Wijzigingen worden meteen opgeslagen in `config.toml`. De
+Wijzigingen worden meteen opgeslagen: interface-instellingen (thema, indeling, kolommen, weergave van diffs en
+afbeeldingen, sneltoetsen...) in `tui.toml`, al het andere in `config.toml`, beide in je configuratiemap
+([waarom twee bestanden](config-reference.md#twee-bestanden-configtoml-en-tuitoml)). De
 [configuratiereferentie](config-reference.md) beschrijft elke sleutel, zijn standaardwaarde
 en zijn omgevingsvariabele. Deze pagina beschrijft het scherm Instellingen.
 
@@ -143,7 +145,7 @@ De meeste instellingen kun je wijzigen zonder dit scherm te openen: typ `Instell
 
 ![Het opdrachtenpalet gefilterd op Instellingen: met één regel per instelling en rechts de huidige waarde](../images/palette-settings.png)
 
-Een waarde wordt opgeslagen in `config.toml` en precies toegepast zoals de pagina dat doet. De Engelse woorden van de sleutel van de instelling (`remember tabs`) vinden de rij in elke taal.
+Een waarde wordt opgeslagen in zijn bestand (`tui.toml` of `config.toml`) en precies toegepast zoals de pagina dat doet. De Engelse woorden van de sleutel van de instelling (`remember tabs`) vinden de rij in elke taal.
 
 ## De pagina's
 
@@ -450,11 +452,11 @@ de server bevatten; zie [MCP en agents](mcp-and-agents.md).
 | **Positie van de statusbalk** | `ui.statusbar_position`: Waar de statusbalk (branch, tellers, meldingen, toetstips) staat: Boven, boven de tabbladen van de repository, of Onder (standaard). Het tabblad Start houdt zijn eigen statusbalk onderaan. Werkt direct. |
 | **Positie van de tabbalk** | `ui.tabs_position`: Waar de repositorytabbladen staan: Boven (standaard), Onder of Links, een lijst met één tabblad per regel aan de linkerrand van het venster. In een venster smaller dan 80 kolommen staan ze bovenaan. Naast een werkbalk als kolom blijven de tabbladen aan de buitenkant. Werkt direct. |
 | **Landinstelling voor datum/tijd** | **system** (standaard): maand- en dagnamen in de taal van de interface. **english**: altijd Engelse namen. |
-| **Datumformaat**, **Datum-/tijdformaat**, **Uitgebreid datumformaat** | De datumpatronen van de datumkolom van Bestandsgeschiedenis en Blame, van de kolom Datum van de Log en van de commit-details. Elk toont een live voorbeeld. Zie de [configuratiereferentie](config-reference.md#ui) voor de tokens. |
+| **Datumformaat**, **Datum-/tijdformaat**, **Uitgebreid datumformaat** | De datumpatronen van de datumkolom van Bestandsgeschiedenis en Blame, van de kolom Datum van de Log en van de commit-details. Elk toont een live voorbeeld. Zie de [configuratiereferentie](config-reference.md#ui-in-tuitoml) voor de tokens. |
 
 ![De keuzelijst Kleurthema van de grafiek: Thema volgen, daarna elk baanpalet met enkele van zijn kleuren](../images/settings-log-graph-lanes.png)
 
-Het thema en de grafiekkleuren (het Thema, het kleurthema van de grafiek, de kleuring en achtergrond van de banen, de sterkte van de rijtint) horen bij elke installatie: als meerdere installaties één `config.toml` delen, verandert het wijzigen ervan in de ene nooit de andere. Alleen de primaire installatie schrijft ook de gedeelde `ui.*`-sleutels.
+Het thema en de grafiekkleuren (het Thema, het kleurthema van de grafiek, de kleuring en achtergrond van de banen, de sterkte van de rijtint) horen bij elke installatie: als meerdere installaties één instellingenmap delen, verandert het wijzigen ervan in de ene nooit de andere. Alleen de primaire installatie schrijft ook de gedeelde `ui.*`-sleutels, in `tui.toml`; de andere houden de hunne in hun eigen item van `config.toml`.
 
 ### Toetsenbord & muis
 
@@ -474,7 +476,7 @@ toont elke sneltoets per context, met een zoekvak (`/`) en filters. Op een rij:
 | `c` of een klik op de `!` van de rij | Toont de actie met alle acties waarmee haar toets botst; `Esc` toont weer alles. Een toets die botst met die van een andere actie is rood, een waarschuwing over alleen de toets (de terminal kan hem niet sturen) oranje. |
 
 Gebruik dit om botsingen met tmux, AutoHotkey, herdr of je terminal op te lossen. Dezelfde
-instellingen staan in de tabel `[keybindings]` van `config.toml`; zie de
+instellingen staan in de tabel `[keybindings]` van `tui.toml`; zie de
 [configuratiereferentie](config-reference.md#keybindings) en [Sneltoetsen](keybindings.md).
 
 ![De pagina Toetsenbord & muis na c op Quit: de toets q is rood bij Quit en bij Stage or Unstage the Selected Row, de twee acties die botsen](../images/settings-keyboard-conflicts.png)
@@ -831,8 +833,10 @@ niet-opgeslagen concept wordt eerst om bevestiging gevraagd.
 
 ## Bestanden, omgevingsvariabelen en de CLI
 
-- Het instellingenbestand is `config.toml` in de configuratiemap van je besturingssysteem.
-  `gitpoulpi config path` toont zijn locatie.
+- De instellingenbestanden zijn `config.toml` (gemeenschappelijke instellingen) en `tui.toml` (de
+  interface-instellingen van de terminal-UI) in de configuratiemap van je besturingssysteem.
+  `gitpoulpi config path` toont hun locaties; `gitpoulpi config get <key>`
+  zegt in welk bestand een sleutel staat.
 - De status per repository staat in `.gitpoulpi/repo-state.toml` in de repository.
 - `gitpoulpi config get <key>` en `gitpoulpi config set <key> <value>` lezen en schrijven
   elke instelling.

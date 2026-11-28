@@ -62,7 +62,9 @@ actions!(
         CloseSearch,
         ToggleMark,
         ExtendUp,
-        ExtendDown
+        ExtendDown,
+        NextPill,
+        PrevPill
     ]
 );
 
@@ -84,6 +86,9 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("space", ToggleMark, Some(CONTEXT)),
         KeyBinding::new("shift-up", ExtendUp, Some(CONTEXT)),
         KeyBinding::new("shift-down", ExtendDown, Some(CONTEXT)),
+        // The pill cursor on the selected commit's refs: keys the shared keymap leaves free.
+        KeyBinding::new("]", NextPill, Some(CONTEXT)),
+        KeyBinding::new("[", PrevPill, Some(CONTEXT)),
     ]);
 }
 
@@ -117,6 +122,8 @@ pub struct LogPanel {
     /// The ref pill last clicked, with its display row: the menu key then opens the ref menu for it
     /// (the keyboard twin of a right click on a pill). Any other row selection drops it.
     pill: Option<(Oid, crate::ref_target::RefTarget)>,
+    /// Which pill of the selected commit the pill cursor is on (the order the Ref column lists them in).
+    pill_ix: Option<usize>,
     /// The open commit menu.
     menu: Option<Entity<menu::CommitMenu>>,
     _menu_sub: Option<Subscription>,
@@ -181,6 +188,7 @@ impl LogPanel {
             marked_rows: Arc::default(),
             swapped: false,
             pill: None,
+            pill_ix: None,
             menu: None,
             _menu_sub: None,
             scroll: UniformListScrollHandle::new(),
@@ -265,6 +273,7 @@ impl LogPanel {
             .is_some_and(|(oid, _)| self.data.key_at(ix) != Some(data::RowKey::Commit(*oid)))
         {
             self.pill = None;
+            self.pill_ix = None;
         }
         self.drop_marks();
         self.scroll.scroll_to_item(ix, ScrollStrategy::Nearest);
@@ -353,6 +362,7 @@ impl Render for LogPanel {
             selected: self.selected,
             layout,
             palette,
+            pill_cursor: self.pill_cursor(),
             marked: self.marked_rows.clone(),
             matches: self.search.match_set(),
             query_active: self.search.active(),
@@ -384,11 +394,15 @@ impl Render for LogPanel {
                     this.toggle_search(window, cx);
                 } else if !this.marks.is_empty() {
                     this.clear_marks(cx);
+                } else if this.pill_ix.is_some() {
+                    this.clear_pill_cursor(cx);
                 }
             }))
             .on_action(cx.listener(|this, _: &ToggleMark, _, cx| this.toggle_mark(cx)))
             .on_action(cx.listener(|this, _: &ExtendUp, _, cx| this.extend_by(-1, cx)))
             .on_action(cx.listener(|this, _: &ExtendDown, _, cx| this.extend_by(1, cx)))
+            .on_action(cx.listener(|this, _: &NextPill, _, cx| this.step_pill(true, cx)))
+            .on_action(cx.listener(|this, _: &PrevPill, _, cx| this.step_pill(false, cx)))
             .border_1()
             .border_color(if focus_ring {
                 skin.border_focused

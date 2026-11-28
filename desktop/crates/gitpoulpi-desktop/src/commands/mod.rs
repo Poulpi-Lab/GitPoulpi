@@ -17,6 +17,7 @@
 //! | `refs_ops` | the branch, tag and stash ops: which ids map to a `RefOp`, and running one |
 //! | `status`   | the one-line message shown in the status line |
 
+pub mod activity_ops;
 pub mod catalog;
 pub mod commit_ops;
 pub mod context;

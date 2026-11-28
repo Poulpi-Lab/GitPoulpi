@@ -69,7 +69,62 @@ pub(super) fn interactive(
 impl LogPanel {
     /// Remembers the clicked pill of `commit`.
     pub fn pick_pill(&mut self, commit: Oid, target: RefTarget) {
+        self.pill_ix = (self.selected_commit() == Some(commit))
+            .then(|| {
+                self.pills_of_selected()
+                    .iter()
+                    .position(|p| target_of(p) == target)
+            })
+            .flatten();
         self.pill = Some((commit, target));
+    }
+
+    /// The pills of the selected commit, in the order the Ref column lists them.
+    pub fn pills_of_selected(&self) -> Vec<Pill> {
+        let Some(oid) = self.selected_commit() else {
+            return Vec::new();
+        };
+        self.data
+            .refs_by_commit
+            .get(&oid)
+            .map(|idxs| super::pills::pills_for(&self.data.refs, idxs))
+            .unwrap_or_default()
+    }
+
+    /// The commit and pill the pill cursor is on, for painting.
+    pub fn pill_cursor(&self) -> Option<(Oid, usize)> {
+        let oid = self.selected_commit()?;
+        self.pill_ix.map(|i| (oid, i))
+    }
+
+    /// Moves the pill cursor to the next (or previous) ref of the selected commit; it wraps. The menu key
+    /// then opens that ref's menu, as a right click on the pill does.
+    pub fn step_pill(&mut self, forward: bool, cx: &mut gpui_kit::Context<Self>) {
+        let Some(oid) = self.selected_commit() else {
+            return;
+        };
+        let pills = self.pills_of_selected();
+        if pills.is_empty() {
+            self.say(crate::strings::NO_REFS_ON_COMMIT.to_string(), cx);
+            return;
+        }
+        let n = pills.len();
+        let next = match (self.pill_ix.filter(|i| *i < n), forward) {
+            (None, true) => 0,
+            (None, false) => n - 1,
+            (Some(i), true) => (i + 1) % n,
+            (Some(i), false) => (i + n - 1) % n,
+        };
+        self.pill_ix = Some(next);
+        self.pill = Some((oid, target_of(&pills[next])));
+        cx.notify();
+    }
+
+    /// Drops the pill cursor (Escape).
+    pub fn clear_pill_cursor(&mut self, cx: &mut gpui_kit::Context<Self>) {
+        self.pill_ix = None;
+        self.pill = None;
+        cx.notify();
     }
 
     /// The pill picked on the selected row, if any.

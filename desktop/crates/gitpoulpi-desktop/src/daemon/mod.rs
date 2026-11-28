@@ -8,6 +8,7 @@
 //! when the link's own [`host::DesktopHost`] wakes it (`app::live`); writes are link actions
 //! (`transfer`).
 
+pub mod activity;
 pub mod commit_ops;
 mod history;
 pub mod host;

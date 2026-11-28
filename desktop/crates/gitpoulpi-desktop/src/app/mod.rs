@@ -57,6 +57,7 @@ pub fn init(cx: &mut App, prefs_dir: Option<PathBuf>, overrides: &Overrides) -> 
     panels::log::init(cx);
     panels::refs::init(cx);
     panels::diff::init(cx);
+    panels::activity::init(cx);
     Ok(())
 }
 

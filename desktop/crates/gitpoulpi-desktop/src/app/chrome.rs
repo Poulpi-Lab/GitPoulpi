@@ -19,7 +19,6 @@ use super::workspace::Workspace;
 use crate::commands;
 use crate::commands::status::{self, Notice};
 use crate::prefs::PrefsStore;
-use crate::strings;
 use crate::theme::{self, CurrentTheme, Skin};
 
 /// Themes offered in the settings menu, in this order (the palette lists every preset).
@@ -396,7 +395,7 @@ impl Workspace {
                     icons[ci]
                 }))
                 .child(label)
-                .when(chevron, |d| {
+                .when(chevron && id != "tb-undo", |d| {
                     d.child(
                         Icon::new(AssetIcon::ChevronDown)
                             .size(px(11.0))
@@ -410,7 +409,19 @@ impl Workspace {
                     commands::run_id(toolbar_command(id), window, cx);
                 });
             }
-            row = row.child(b);
+            if id == "tb-undo" {
+                // The arrow beside Undo is a menu of its own: it opens the undo history and its siblings
+                // whether or not there is anything to undo right now.
+                row = row.child(
+                    h_flex()
+                        .gap(px(1.0))
+                        .items_center()
+                        .child(b)
+                        .child(undo_menu_button()),
+                );
+            } else {
+                row = row.child(b);
+            }
         }
         row
     }
@@ -428,11 +439,44 @@ impl Workspace {
         if let Some(text) = running {
             return Some((text, false));
         }
-        let jobs = self.backend.host().live_jobs();
-        if !jobs.is_empty() {
-            return Some((strings::jobs_running(jobs.len()), false));
-        }
         None
+    }
+
+    /// The status line's jobs indicator: how many background jobs run, a click opens the panel and the
+    /// cross asks to cancel the oldest one that can be.
+    fn jobs_indicator(&self, cx: &mut Context<Self>) -> Option<gpui_kit::AnyElement> {
+        let live = self.backend.host().live_jobs();
+        if live.is_empty() {
+            return None;
+        }
+        let (text, accent) = {
+            let skin = cx.global::<Skin>();
+            (skin.text, skin.accent)
+        };
+        let backend = self.backend.clone();
+        Some(
+            h_flex()
+                .id("status-jobs")
+                .gap(px(6.0))
+                .items_center()
+                .text_color(text)
+                .cursor_pointer()
+                .child(msg::jobs::jobs_count(live.len() as u64))
+                .child(
+                    div()
+                        .id("status-jobs-cancel")
+                        .text_color(accent)
+                        .child("\u{00D7}")
+                        .on_click(move |_, _, cx| {
+                            cx.stop_propagation();
+                            crate::panels::activity::jobs::cancel_oldest(&backend, cx);
+                        }),
+                )
+                .on_click(|_, window, cx| {
+                    commands::run_id("nav_prefix.jobs", window, cx);
+                })
+                .into_any_element(),
+        )
     }
 
     pub(super) fn status_line(&self, cx: &mut Context<Self>) -> impl IntoElement {
@@ -494,6 +538,7 @@ impl Workspace {
                     .child(div().text_color(warning).child(text))
             })
             .child("\u{2022}")
+            .children(self.jobs_indicator(cx))
             .children(self.activity_text(cx).map(|(text, error)| {
                 div()
                     .text_color(if error { warning } else { text_color })
@@ -508,10 +553,39 @@ impl Workspace {
             .child(div().flex_1())
             .child(
                 div()
+                    .id("status-activity")
                     .text_color(text)
-                    .child(msg::activity_log::BUTTON.get()),
+                    .cursor_pointer()
+                    .child(msg::activity_log::BUTTON.get())
+                    .on_click(|_, window, cx| {
+                        commands::run_id("nav_prefix.activity_log", window, cx);
+                    }),
             )
     }
+}
+
+/// The arrow beside the toolbar's Undo: the undo history, the Reflog of HEAD and the lost-commit
+/// recovery, each a registry command.
+fn undo_menu_button() -> impl IntoElement {
+    Button::new("tb-undo-menu")
+        .ghost()
+        .xsmall()
+        .icon(AssetIcon::ChevronDown)
+        .tooltip(msg::undo_safety::TIP_CHIP.get())
+        .dropdown_menu(|menu, _, _| {
+            menu.menu(
+                msg::undo_safety::OVERFLOW_UNDO_MENU.get(),
+                Box::new(RunCommand("global.undo_history".into())),
+            )
+            .menu(
+                msg::undo_safety::REFLOG_MENU_ROW.get(),
+                Box::new(RunCommand("palette.reflog_head".into())),
+            )
+            .menu(
+                msg::undo_safety::LOST_MENU_ROW.get(),
+                Box::new(RunCommand("palette.lost_commits".into())),
+            )
+        })
 }
 
 /// The command (an id of the shared registry) a toolbar button stands for.

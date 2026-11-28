@@ -2225,6 +2225,7 @@ dependencies = [
  "gitpoulpi-i18n",
  "gitpoulpi-ipc",
  "gitpoulpi-link",
+ "gitpoulpi-log",
  "gitpoulpi-testkit",
  "gpui-kit",
  "serde",

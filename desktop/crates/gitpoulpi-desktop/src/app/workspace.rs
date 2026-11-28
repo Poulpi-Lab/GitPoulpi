@@ -284,15 +284,35 @@ impl Workspace {
             refs: self.refs.read(cx).selection_facts(),
             undo: self.undo_avail(Direction::Undo),
             redo: self.undo_avail(Direction::Redo),
+            safety_tab: crate::panels::activity::open_safety_tab(cx),
+            undo_offer: self
+                .backend
+                .with_link(|l| gitpoulpi_link::undo_label::offer_of(&l.journal_state()).is_some()),
+            undo_sequence: self
+                .backend
+                .with_link(|l| l.journal_state().sequence.is_some()),
+            group: crate::panels::activity::group_state(&self.backend),
         }
     }
 
     /// What the journal offers, for the commands' availability (toolbar, menus, palette).
     pub(crate) fn undo_avail(&self, d: Direction) -> Avail {
-        if self.backend.can_undo_redo(d) {
-            Avail::Ready
-        } else {
+        let (state, busy) = self
+            .backend
+            .with_link(|l| (l.journal_state(), l.undo_busy()));
+        let (entry, refusal) = gitpoulpi_link::undo_ui::side(&state, d);
+        if state.disabled {
+            Avail::Off
+        } else if busy || entry.is_none() {
             Avail::Nothing
+        } else if let Some(r) = refusal {
+            if d == Direction::Undo && r.forgettable() {
+                Avail::Stuck
+            } else {
+                Avail::Blocked
+            }
+        } else {
+            Avail::Ready
         }
     }
 

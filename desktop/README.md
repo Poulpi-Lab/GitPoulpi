@@ -78,6 +78,33 @@ with the reason. A checkout, merge, rebase or pull blocked by local changes asks
 merge that stops on conflicts shows the operation banner (Resolve conflicts is not available yet; Continue, Skip and Abort work).
 The auto-stash question is the same for a ref's checkout, a commit's checkout or cherry-pick, a merge, a rebase and a pull.
 
+## Undo history, Activity Log and background jobs
+
+`Alt+Z`, the arrow beside the toolbar's Undo, the Edit entries and the palette open the **undo history**: every
+entry of the journal, newest first, with what it did, when, and its state (undone, blocked and why, made outside
+GitPoulpi, restorable). *Undo up to here* and *Redo up to here* list the entries first and ask; a step the daemon
+finds risky asks again (*Undo anyway*); *Restore only this* shows its plan first; a blocked entry offers the branch
+back where it was (`Alt+Shift+Z`) or can be forgotten, both after a question. The **Reflog** and **Lost work** views
+(keys `1` / `2` / `3`, `Tab`) list past positions of HEAD or a branch and commits no ref reaches; each row can be kept
+under a new branch or tag, cherry-picked, applied to the working tree or saved as a stash, and a reflog position can be
+restored. Every action is one undo entry. The panels' letters are the terminal UI's (`u`, `y`, `x`, `r`, `o`, `b`, `t`,
+`w`, `s`, `c`, `m`, `l`).
+
+The status line's **Activity** button (`Ctrl+N Shift+A`, `Shift+G` for every repository) opens the Activity Log: the
+**Git operations** tab lists what the link reported (operations with their duration, failures with the daemon's
+words and the operation's arguments), the **Application** tab the lines of the same log files the terminal UI reads.
+Levels are shown or hidden with `1`..`5` (`a` all, `n` none), `c` copies the entry, `o` shows the log folder, `x`
+clears the application log after a question, `[` / `]` jump between failures, `Left` / `Right` scroll long lines.
+
+The status line's jobs indicator (`Jobs: n`, a click, or `Ctrl+N Shift+J`) opens the **jobs** panel: running, queued and
+finished jobs with a Cancel where one can be had and the reason where not (`c` / `Del`). A grouped push shows one row per
+remote with its status (`Git: Show Grouped Push`, Retry for the failed ones), and a push the remote refused because it
+moved on asks *Pull first*, *Force push (with lease)* (always confirmed, naming the branch and the remote) or Cancel.
+
+In the Log, `]` and `[` move a **pill cursor** over the refs of the selected commit (the Ref column shows the one the
+cursor is on, outlined); the menu key (`Shift+F10`, `.`) then opens that ref's menu, as a right click on the pill does,
+and `Esc` drops the cursor. The shared keymap leaves both keys free.
+
 ## Layout
 
 `desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The

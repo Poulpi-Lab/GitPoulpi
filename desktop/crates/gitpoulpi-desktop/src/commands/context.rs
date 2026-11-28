@@ -30,6 +30,13 @@ pub struct WindowState {
     /// What the journal offers for Undo and Redo.
     pub undo: Avail,
     pub redo: Avail,
+    /// The view the undo-safety panel is open on (`None`: it is closed).
+    pub safety_tab: Option<gitpoulpi_app::palette::vocab::safety_panel::Tab>,
+    /// A blocked undo entry offers a branch to restore; the newest entries are one sequence run's.
+    pub undo_offer: bool,
+    pub undo_sequence: bool,
+    /// The saved or last grouped push.
+    pub group: gitpoulpi_app::palette::vocab::push_group::GroupState,
 }
 
 impl Default for WindowState {
@@ -47,6 +54,10 @@ impl Default for WindowState {
             refs: Default::default(),
             undo: Avail::Nothing,
             redo: Avail::Nothing,
+            safety_tab: None,
+            undo_offer: false,
+            undo_sequence: false,
+            group: Default::default(),
         }
     }
 }
@@ -78,6 +89,10 @@ impl WindowState {
             has_stash: self.refs.has_stash,
             undo: self.undo,
             redo: self.redo,
+            safety_tab: self.safety_tab,
+            undo_offer: self.undo_offer,
+            undo_sequence: self.undo_sequence,
+            group: self.group,
             lfs_program_ok: true,
             ..PaletteContext::default()
         }

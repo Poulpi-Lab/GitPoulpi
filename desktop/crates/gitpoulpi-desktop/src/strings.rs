@@ -81,6 +81,9 @@ pub const MENU_REPOSITORY: &str = "Repository";
 pub const MENU_GIT: &str = "Git";
 pub const MENU_TOOLS: &str = "Tools";
 
+/// The pill cursor keys (`[` and `]`) on a commit that has no branch, tag or remote branch.
+pub const NO_REFS_ON_COMMIT: &str = "This commit has no branch, tag or remote branch";
+
 #[cfg(test)]
 mod tests {
     use super::*;

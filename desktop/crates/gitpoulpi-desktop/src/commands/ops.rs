@@ -74,6 +74,8 @@ pub enum Op {
     Commit(CommitOp),
     /// Branches, tags and stashes (`refs_ops.rs`).
     Refs(super::refs_ops::RefOp),
+    /// The undo history, Activity Log, jobs and grouped push (`activity_ops.rs`).
+    Activity(super::activity_ops::ActivityOp),
 }
 
 /// What the working-changes pane does (its lists and the commit form).
@@ -185,6 +187,7 @@ pub fn op_for_action(action: Action) -> Option<Op> {
             return commit_ops::op_for_action(action)
                 .map(Op::Commit)
                 .or_else(|| super::refs_ops::for_action(action).map(Op::Refs))
+                .or_else(|| super::activity_ops::for_action(action).map(Op::Activity))
         }
     })
 }
@@ -254,6 +257,7 @@ pub fn op_for_palette(command: PaletteCommand) -> Option<Op> {
             return commit_ops::op_for_palette(command)
                 .map(Op::Commit)
                 .or_else(|| super::refs_ops::for_palette(command).map(Op::Refs))
+                .or_else(|| super::activity_ops::for_palette(command).map(Op::Activity))
         }
     })
 }

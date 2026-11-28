@@ -27,6 +27,7 @@ use gitpoulpi_link::{
     Ticket, TimingKind, UndoKey,
 };
 
+use super::activity::{Feed, FeedEntry, GroupRun};
 use crate::strings;
 
 #[derive(Default)]
@@ -115,6 +116,10 @@ struct State {
     done: Option<String>,
     /// Stages the staging guard refused, waiting for the window to ask the person.
     prompts: Vec<SensitivePrompt>,
+    /// The Git operations tab of the Activity Log.
+    feed: Feed,
+    /// The grouped push (or pull) the link last reported.
+    group: Option<GroupRun>,
 }
 
 /// A stage the guard refused because some files look like secrets: nothing was staged. The answer is
@@ -167,6 +172,40 @@ impl DesktopHost {
             .filter(|j| !j.state.is_finished())
             .cloned()
             .collect()
+    }
+
+    /// Every job the daemon still lists, the running ones first (then by id): the jobs panel.
+    pub fn all_jobs(&self) -> Vec<JobInfo> {
+        let mut jobs: Vec<JobInfo> = self.lock().jobs.values().cloned().collect();
+        jobs.sort_by_key(|j| (j.state.is_finished(), j.id));
+        jobs
+    }
+
+    /// The job with this id, finished or not.
+    pub fn job(&self, id: u64) -> Option<JobInfo> {
+        self.lock().jobs.get(&id).cloned()
+    }
+
+    /// The Git operations feed, oldest first.
+    pub fn feed(&self) -> Vec<FeedEntry> {
+        self.lock().feed.snapshot()
+    }
+
+    /// Empties the Git operations feed.
+    pub fn clear_feed(&self) {
+        self.lock().feed.clear();
+        super::activity::set_error_present(false);
+        self.notifier.bump();
+    }
+
+    /// The newest failed operation, for "copy / open the last error".
+    pub fn last_error(&self) -> Option<FeedEntry> {
+        self.lock().feed.last_error()
+    }
+
+    /// The grouped push the link last reported, if any.
+    pub fn group_run(&self) -> Option<GroupRun> {
+        self.lock().group.clone()
     }
 
     /// What was reported since the last call.
@@ -261,38 +300,125 @@ impl LinkHost for DesktopHost {
                 JobEvent::Say(text) => s.said.push(text),
             }
         }
+        super::activity::publish_jobs(self.all_jobs());
         self.notifier.bump();
     }
 
     fn push_group(&self, _link: &LinkContext, event: PushGroupEvent<'_>) {
+        {
+            let mut s = self.lock();
+            match &event {
+                PushGroupEvent::Started { request, .. } => {
+                    GroupRun::on_started(&mut s.group, request)
+                }
+                PushGroupEvent::Outcome { outcome, .. } => {
+                    GroupRun::on_outcome(&mut s.group, outcome)
+                }
+                PushGroupEvent::Failed { why, .. } => GroupRun::on_failed(&mut s.group, why),
+                PushGroupEvent::Progress {
+                    run_id,
+                    remote,
+                    status,
+                } => GroupRun::on_progress(&mut s.group, run_id, remote, status.clone()),
+            }
+        }
         if let PushGroupEvent::Failed { why, .. } = event {
             self.say(why.to_string());
+        } else {
+            self.notifier.bump();
         }
     }
 
     fn report(&self, _link: &LinkContext, report: Report<'_>) {
+        use gitpoulpi_i18n::msg::activity_log as m;
+        use gitpoulpi_log::Level;
+        let ms = |d: std::time::Duration| Some(d.as_millis() as u64);
+        let name = |action: &Action| title_of(action).unwrap_or_else(|| action.activity_label());
         match report {
-            Report::Success { action, .. } => {
+            Report::Success {
+                action,
+                repo,
+                elapsed,
+            } => {
+                let mut s = self.lock();
+                s.feed.push(
+                    Level::Info,
+                    name(action),
+                    Vec::new(),
+                    Some(repo.to_path_buf()),
+                    ms(elapsed),
+                );
                 if let Some(title) = title_of(action) {
-                    self.lock().done = Some(title);
-                    self.notifier.bump();
+                    s.done = Some(title);
                 }
+                drop(s);
+                self.notifier.bump();
             }
-            // The failures reach the window typed, as `LinkEvent`s of the link's own drain.
-            Report::Failure { .. } | Report::Rejection { .. } => {}
-            Report::Message { text, .. } => self.say(text.to_string()),
+            // The failures also reach the window typed, as `LinkEvent`s of the link's own drain.
+            Report::Failure {
+                action,
+                error,
+                repo,
+                elapsed,
+                context,
+            } => {
+                let details = vec![
+                    gitpoulpi_core::redact(&error_text(error)),
+                    m::ctx_operation(context.describe()),
+                    m::ctx_repository(repo.display().to_string()),
+                ];
+                super::activity::set_error_present(true);
+                self.lock().feed.push(
+                    Level::Error,
+                    m::failed_title(name(action)),
+                    details,
+                    Some(repo.to_path_buf()),
+                    ms(elapsed),
+                );
+                self.notifier.bump();
+            }
+            Report::Rejection {
+                action,
+                rejection,
+                repo,
+                elapsed,
+            } => {
+                self.lock().feed.push(
+                    Level::Warn,
+                    m::failed_title(name(action)),
+                    vec![rejection_text(rejection)],
+                    Some(repo.to_path_buf()),
+                    ms(elapsed),
+                );
+                self.notifier.bump();
+            }
+            Report::Message { text, repo } => {
+                self.lock().feed.push(
+                    Level::Info,
+                    text.to_string(),
+                    Vec::new(),
+                    Some(repo.to_path_buf()),
+                    None,
+                );
+                self.say(text.to_string())
+            }
             Report::BackgroundFetchSkipped { .. } => {}
         }
     }
 
-    fn timing(
-        &self,
-        _link: &LinkContext,
-        _kind: TimingKind,
-        _repo: &Path,
-        _label: String,
-        _ms: u64,
-    ) {
+    fn timing(&self, _link: &LinkContext, kind: TimingKind, repo: &Path, label: String, ms: u64) {
+        // What the person waited for is already a line of its own (`report`); the background polls
+        // are kept at the Debug level, which the Activity Log hides by default.
+        if kind == TimingKind::Background {
+            self.lock().feed.push(
+                gitpoulpi_log::Level::Debug,
+                label,
+                Vec::new(),
+                Some(repo.to_path_buf()),
+                Some(ms),
+            );
+            self.notifier.bump();
+        }
     }
 
     fn expect_background_fetch(&self, _link: &LinkContext) {}

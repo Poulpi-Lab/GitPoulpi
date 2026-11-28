@@ -43,6 +43,10 @@ struct Drained {
     visibility: bool,
     /// Local changes are in the way of an action and auto-stash is `ask`.
     autostash: Vec<gitpoulpi_link::AutoStashNeeded>,
+    /// Pushes the remote refused: the question (pull first, force push, cancel) is asked once.
+    rejected: Vec<gitpoulpi_link::PushRejectedNotice>,
+    /// Undos and redos the daemon found risky.
+    undo_confirms: Vec<gitpoulpi_link::undo_ui::PendingConfirm>,
 }
 
 /// `a` and `b` together: a part changed when it changed in either.
@@ -82,7 +86,11 @@ fn sort(events: Vec<LinkEvent>) -> Drained {
                 }
             }
             LinkEvent::ActionError(text) => d.errors.push(text),
-            LinkEvent::PushRejected(notice) => d.errors.push(rejection_text(&notice.rejection)),
+            LinkEvent::PushRejected(notice) => {
+                d.errors.push(rejection_text(&notice.rejection));
+                d.rejected.push(notice);
+            }
+            LinkEvent::UndoConfirm(confirm) => d.undo_confirms.push(confirm),
             LinkEvent::ActionMessage(text) => d.messages.push(text),
             LinkEvent::RefVisibilityChanged => d.visibility = true,
             LinkEvent::AutoStashNeeded(needed) => d.autostash.push(needed),
@@ -144,11 +152,35 @@ impl Workspace {
         if !drained.autostash.is_empty() {
             self.ask_autostash(drained.autostash, cx);
         }
+        if !drained.rejected.is_empty() || !drained.undo_confirms.is_empty() {
+            self.ask_link_questions(drained.rejected, drained.undo_confirms, cx);
+        }
         let prompts = host.take_prompts();
         if !prompts.is_empty() {
             self.ask_sensitive(prompts, cx);
         }
         cx.notify();
+    }
+
+    /// The questions the link raises about a refused push and a risky undo.
+    fn ask_link_questions(
+        &mut self,
+        rejected: Vec<gitpoulpi_link::PushRejectedNotice>,
+        confirms: Vec<gitpoulpi_link::undo_ui::PendingConfirm>,
+        cx: &mut Context<Self>,
+    ) {
+        use crate::panels::activity::resolve;
+        let (window, backend) = (self.window, self.backend.clone());
+        cx.defer(move |cx| {
+            let _ = window.update(cx, move |_, window, cx| {
+                for notice in rejected {
+                    resolve::ask_rejected(notice, backend.clone(), window, cx);
+                }
+                for confirm in confirms {
+                    resolve::ask_undo_confirm(confirm, backend.clone(), window, cx);
+                }
+            });
+        });
     }
 
     /// Reloads the panels the refresh says changed, and only those.

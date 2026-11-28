@@ -8,6 +8,14 @@
 # See README.md.
 
 [[action]]
+id = "activity_log.scroll_left"
+status = "done"
+
+[[action]]
+id = "activity_log.scroll_right"
+status = "done"
+
+[[action]]
 id = "composer.commit"
 status = "done"
 
@@ -183,6 +191,14 @@ id = "global.undo"
 status = "done"
 
 [[action]]
+id = "global.undo_history"
+status = "done"
+
+[[action]]
+id = "global.undo_offer"
+status = "done"
+
+[[action]]
 id = "log.compare_next"
 status = "done"
 
@@ -200,6 +216,10 @@ status = "done"
 
 [[action]]
 id = "log_columns.reset_width"
+status = "done"
+
+[[action]]
+id = "nav_prefix.activity_log"
 status = "done"
 
 [[action]]
@@ -228,12 +248,76 @@ status = "done"
 note = "Shows or hides the right-hand details pane."
 
 [[action]]
+id = "nav_prefix.global_log"
+status = "done"
+
+[[action]]
 id = "nav_prefix.help"
 status = "done"
 note = "Opens the keybindings view."
 
 [[action]]
+id = "nav_prefix.jobs"
+status = "done"
+
+[[action]]
 id = "palette.abort_operation"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_all"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_app_tab"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_clear"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_clear_log"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_git_tab"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_next_problem"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_prev_problem"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_scope"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_show_operation"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_debug"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_error"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_info"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_trace"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_warn"
 status = "done"
 
 [[action]]
@@ -279,6 +363,10 @@ status = "done"
 
 [[action]]
 id = "palette.copy_commit_field_short_sha"
+status = "done"
+
+[[action]]
+id = "palette.copy_last_error"
 status = "done"
 
 [[action]]
@@ -386,9 +474,17 @@ id = "palette.focus_status_section_unstaged"
 status = "done"
 
 [[action]]
+id = "palette.jobs_cancel_all"
+status = "done"
+
+[[action]]
 id = "palette.keybindings"
 status = "done"
 note = "Opens the keybindings view."
+
+[[action]]
+id = "palette.lost_commits"
+status = "done"
 
 [[action]]
 id = "palette.merge_selected_ref"
@@ -399,11 +495,23 @@ id = "palette.next_hunk"
 status = "done"
 
 [[action]]
+id = "palette.open_last_error"
+status = "done"
+
+[[action]]
 id = "palette.prev_hunk"
 status = "done"
 
 [[action]]
 id = "palette.push_selected_tag"
+status = "done"
+
+[[action]]
+id = "palette.reflog_head"
+status = "done"
+
+[[action]]
+id = "palette.reflog_selected_branch"
 status = "done"
 
 [[action]]
@@ -419,11 +527,99 @@ id = "palette.reset_to_selected_commit_soft"
 status = "done"
 
 [[action]]
+id = "palette.safety_close"
+status = "done"
+
+[[action]]
+id = "palette.safety_history_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_apply"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_branch"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_pick"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_stash"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_tag"
+status = "done"
+
+[[action]]
+id = "palette.safety_offer"
+status = "done"
+
+[[action]]
+id = "palette.safety_redo_to"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_apply"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_branch"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_more"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_restore"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_show"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_stash"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_tag"
+status = "done"
+
+[[action]]
+id = "palette.safety_restore_only"
+status = "done"
+
+[[action]]
+id = "palette.safety_undo_sequence"
+status = "done"
+
+[[action]]
+id = "palette.safety_undo_to"
+status = "done"
+
+[[action]]
 id = "palette.select_lines"
 status = "done"
 
 [[action]]
 id = "palette.set_upstream"
+status = "done"
+
+[[action]]
+id = "palette.show_grouped_push"
 status = "done"
 
 [[action]]
@@ -477,6 +673,14 @@ status = "done"
 
 [[action]]
 id = "palette.toggle_word_wrap"
+status = "done"
+
+[[action]]
+id = "palette.undo_forget"
+status = "done"
+
+[[action]]
+id = "palette.undo_sequence"
 status = "done"
 
 [[action]]

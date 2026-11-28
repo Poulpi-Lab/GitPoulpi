@@ -5,12 +5,12 @@ Generated from the shared registry (`gitpoulpi_app::registry::parity_rows`, ever
 `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` from `desktop/` to rewrite it.
 The branch merges when `parity_is_complete` passes (see `desktop/parity/README.md`).
 
-**976 rows: 133 done, 8 terminal only, 835 to do.**
+**976 rows: 184 done, 8 terminal only, 784 to do.**
 
 | Kind | Rows | Done | Terminal only | To do |
 |---|---:|---:|---:|---:|
-| action | 375 | 70 | 0 | 305 |
-| palette command | 588 | 63 | 0 | 525 |
+| action | 375 | 77 | 0 | 298 |
+| palette command | 588 | 107 | 0 | 481 |
 | family | 13 | 0 | 8 | 5 |
 
 A palette command that is the only twin of a key action shares that action's row.
@@ -42,9 +42,9 @@ A palette command that is the only twin of a key action shares that action's row
 | `global.select_tab` | global | Select Tab | t / Ctrl+N Tab | to do |
 | `global.undo` | global | Undo the Last Operation | Ctrl+Z | done |
 | `global.redo` | global | Redo the Undone Operation | Ctrl+Y / Ctrl+Shift+Z | done |
-| `global.undo_history` | global | Open the Undo History | Alt+Z | to do |
+| `global.undo_history` | global | Open the Undo History | Alt+Z | done |
 | `global.commit_column` | global | Show or Hide the Commit Column | Alt+C | to do |
-| `global.undo_offer` | global | Restore the Branch to Where the Blocked Action Left It | Alt+Shift+Z | to do |
+| `global.undo_offer` | global | Restore the Branch to Where the Blocked Action Left It | Alt+Shift+Z | done |
 | `global.context_menu` | global | Context Menu | . / Menu / Shift+F10 | done |
 | `git_prefix.compose_commit` | git_prefix | Compose Commit Message | c / Ctrl+G c | done |
 | `git_prefix.commit_now` | git_prefix | Commit Staged Changes Now | Enter / Ctrl+G Enter | done |
@@ -86,9 +86,9 @@ A palette command that is the only twin of a key action shares that action's row
 | `nav_prefix.collapse_status` | nav_prefix | Collapse or Restore Status Pane | Shift+L / Ctrl+N L | done |
 | `nav_prefix.settings` | nav_prefix | Open Settings | , | to do |
 | `nav_prefix.about` | nav_prefix | Open About | a | to do |
-| `nav_prefix.activity_log` | nav_prefix | Open the Activity Log | Shift+A | to do |
-| `nav_prefix.global_log` | nav_prefix | Open the global Activity Log | Shift+G | to do |
-| `nav_prefix.jobs` | nav_prefix | Show the Background Jobs | Shift+J | to do |
+| `nav_prefix.activity_log` | nav_prefix | Open the Activity Log | Shift+A | done |
+| `nav_prefix.global_log` | nav_prefix | Open the global Activity Log | Shift+G | done |
+| `nav_prefix.jobs` | nav_prefix | Show the Background Jobs | Shift+J | done |
 | `nav_prefix.updates` | nav_prefix | Show the Update Panel | u | to do |
 | `nav_prefix.help` | nav_prefix | Toggle Help | ? | done |
 | `nav_prefix.select_tab` | nav_prefix | Select Tab | Tab | to do |
@@ -383,8 +383,8 @@ A palette command that is the only twin of a key action shares that action's row
 | `preferences.prev_tab` | preferences | Previous Tab of the Settings Page | Alt+Left | to do |
 | `preferences.next_tab` | preferences | Next Tab of the Settings Page | Alt+Right | to do |
 | `ai_popup.copy` | ai_popup | Copy the Result | c | to do |
-| `activity_log.scroll_left` | activity_log | Scroll the Activity Log Left | Left | to do |
-| `activity_log.scroll_right` | activity_log | Scroll the Activity Log Right | Right | to do |
+| `activity_log.scroll_left` | activity_log | Scroll the Activity Log Left | Left | done |
+| `activity_log.scroll_right` | activity_log | Scroll the Activity Log Right | Right | done |
 | `integrations.add` | integrations | Add a Profile | a | to do |
 | `integrations.edit` | integrations | Edit the Selected Profile | e | to do |
 | `integrations.open_token` | integrations | Open the Token Page | o | to do |
@@ -436,7 +436,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.fast_forward_selected_to_current` | palette | Refs: Fast-Forward Selected Branch to Current |  | done |
 | `palette.fast_forward_current_to_selected` | palette | Refs: Fast-Forward Current Branch to Selected |  | done |
 | `palette.create_worktree_from_selected_ref` | palette | Refs: Create Worktree from Selected Branch or Tag... |  | to do |
-| `palette.reflog_selected_branch` | palette | Refs: Reflog of the Selected Branch... |  | to do |
+| `palette.reflog_selected_branch` | palette | Refs: Reflog of the Selected Branch... |  | done |
 | `palette.start_pull_request_from_selected_branch` | palette | Refs: Start a Pull Request from Selected Branch... |  | to do |
 | `palette.open_worktree_in_tab` | palette | Refs: Open Worktree in Tab |  | to do |
 | `palette.worktree_open_in_selected` | palette | Refs: Open Worktree In... |  | to do |
@@ -549,7 +549,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.push_to_all_targets` | palette | Git: Push to All Targets |  | to do |
 | `palette.pull_from_all_sources` | palette | Git: Pull from All Sources |  | to do |
 | `palette.pull_from_one_remote` | palette | Git: Pull from One Remote... |  | to do |
-| `palette.show_grouped_push` | palette | Git: Show Grouped Push |  | to do |
+| `palette.show_grouped_push` | palette | Git: Show Grouped Push |  | done |
 | `palette.continue_grouped_push` | palette | Git: Continue Grouped Push |  | to do |
 | `palette.abort_grouped_push` | palette | Git: Abort Grouped Push |  | to do |
 | `palette.retry_failed_pushes` | palette | Git: Retry Failed Pushes |  | to do |
@@ -699,32 +699,32 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.updates_revert` | palette | Updates: Revert to the Previous Version |  | to do |
 | `palette.updates_skip` | palette | Updates: Skip This Version |  | to do |
 | `palette.updates_close_tab` | palette | Release Notes: Close Tab |  | to do |
-| `palette.jobs_cancel_all` | palette | Jobs: Cancel All That Can Be Canceled |  | to do |
+| `palette.jobs_cancel_all` | palette | Jobs: Cancel All That Can Be Canceled |  | done |
 | `palette.copy_diagnostics` | palette | View: Copy Diagnostics |  | to do |
-| `palette.activity_level_toggle_error` | palette | Activity Log: Show or Hide Level Error |  | to do |
-| `palette.activity_level_toggle_warn` | palette | Activity Log: Show or Hide Level Warning |  | to do |
-| `palette.activity_level_toggle_info` | palette | Activity Log: Show or Hide Level Info |  | to do |
-| `palette.activity_level_toggle_debug` | palette | Activity Log: Show or Hide Level Debug |  | to do |
-| `palette.activity_level_toggle_trace` | palette | Activity Log: Show or Hide Level Trace |  | to do |
-| `palette.activity_level_all` | palette | Activity Log: Show All Levels |  | to do |
-| `palette.activity_level_clear` | palette | Activity Log: Show No Level |  | to do |
-| `palette.activity_level_clear_log` | palette | Activity Log: Clear the Application Log |  | to do |
-| `palette.activity_level_scope` | palette | Activity Log: Choose the Scope |  | to do |
-| `palette.activity_level_git_tab` | palette | Activity Log: Git Operations |  | to do |
-| `palette.activity_level_app_tab` | palette | Activity Log: Application Log |  | to do |
-| `palette.activity_level_show_operation` | palette | Activity Log: Show the Operation of This Line |  | to do |
-| `palette.activity_level_next_problem` | palette | Activity Log: Next Failed Operation |  | to do |
-| `palette.activity_level_prev_problem` | palette | Activity Log: Previous Failed Operation |  | to do |
-| `palette.copy_last_error` | palette | Activity Log: Copy the Last Error |  | to do |
+| `palette.activity_level_toggle_error` | palette | Activity Log: Show or Hide Level Error |  | done |
+| `palette.activity_level_toggle_warn` | palette | Activity Log: Show or Hide Level Warning |  | done |
+| `palette.activity_level_toggle_info` | palette | Activity Log: Show or Hide Level Info |  | done |
+| `palette.activity_level_toggle_debug` | palette | Activity Log: Show or Hide Level Debug |  | done |
+| `palette.activity_level_toggle_trace` | palette | Activity Log: Show or Hide Level Trace |  | done |
+| `palette.activity_level_all` | palette | Activity Log: Show All Levels |  | done |
+| `palette.activity_level_clear` | palette | Activity Log: Show No Level |  | done |
+| `palette.activity_level_clear_log` | palette | Activity Log: Clear the Application Log |  | done |
+| `palette.activity_level_scope` | palette | Activity Log: Choose the Scope |  | done |
+| `palette.activity_level_git_tab` | palette | Activity Log: Git Operations |  | done |
+| `palette.activity_level_app_tab` | palette | Activity Log: Application Log |  | done |
+| `palette.activity_level_show_operation` | palette | Activity Log: Show the Operation of This Line |  | done |
+| `palette.activity_level_next_problem` | palette | Activity Log: Next Failed Operation |  | done |
+| `palette.activity_level_prev_problem` | palette | Activity Log: Previous Failed Operation |  | done |
+| `palette.copy_last_error` | palette | Activity Log: Copy the Last Error |  | done |
 | `palette.run_last_error_remedy` | palette | Activity Log: Run the Suggested Action |  | to do |
-| `palette.open_last_error` | palette | Activity Log: Open the Last Error |  | to do |
+| `palette.open_last_error` | palette | Activity Log: Open the Last Error |  | done |
 | `palette.tab_dir_quit_cd` | palette | Tab: Quit and cd Here |  | to do |
 | `palette.move_repository_tab_false` | palette | Tab: Move Left |  | to do |
 | `palette.move_repository_tab_true` | palette | Tab: Move Right |  | to do |
-| `palette.undo_forget` | palette | Edit: Forget Blocked Undo Entry |  | to do |
-| `palette.reflog_head` | palette | Edit: Reflog... |  | to do |
-| `palette.lost_commits` | palette | Edit: Recover Lost Commits... |  | to do |
-| `palette.undo_sequence` | palette | Edit: Undo Whole Sequence |  | to do |
+| `palette.undo_forget` | palette | Edit: Forget Blocked Undo Entry |  | done |
+| `palette.reflog_head` | palette | Edit: Reflog... |  | done |
+| `palette.lost_commits` | palette | Edit: Recover Lost Commits... |  | done |
+| `palette.undo_sequence` | palette | Edit: Undo Whole Sequence |  | done |
 | `palette.review_tab_overview` | palette | Review: Show Overview |  | to do |
 | `palette.review_tab_files` | palette | Review: Show Files |  | to do |
 | `palette.review_tab_commits` | palette | Review: Show Commits |  | to do |
@@ -816,27 +816,27 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.review_use_draft` | palette | Review: ✦ Use the Draft... | u | to do |
 | `palette.review_edit_draft_text` | palette | Review: Edit the ✦ Draft Text... | t | to do |
 | `palette.review_discard_draft` | palette | Review: Discard the ✦ Draft | N | to do |
-| `palette.safety_undo_to` | palette | Undo History: Undo Up to Here... | u | to do |
-| `palette.safety_redo_to` | palette | Undo History: Redo Up to Here... | y | to do |
-| `palette.safety_undo_sequence` | palette | Undo History: Undo Whole Sequence | x | to do |
-| `palette.safety_restore_only` | palette | Undo History: Restore Only This... | r | to do |
-| `palette.safety_offer` | palette | Undo History: Restore the Branch to Where It Was... | o | to do |
-| `palette.safety_history_refresh` | palette | Undo History: Refresh |  | to do |
-| `palette.safety_close` | palette | Undo History: Close | Esc | to do |
-| `palette.safety_reflog_show` | palette | Reflog: Show in Log | l | to do |
-| `palette.safety_reflog_branch` | palette | Reflog: Create Branch Here... | b | to do |
-| `palette.safety_reflog_tag` | palette | Reflog: Create tag Here... | t | to do |
-| `palette.safety_reflog_apply` | palette | Reflog: Apply Changes to Working Tree | w | to do |
-| `palette.safety_reflog_stash` | palette | Reflog: Save Changes as stash | s | to do |
-| `palette.safety_reflog_restore` | palette | Reflog: Restore to This Position... | r | to do |
-| `palette.safety_reflog_more` | palette | Reflog: Load More | m | to do |
-| `palette.safety_reflog_refresh` | palette | Reflog: Refresh |  | to do |
-| `palette.safety_lost_branch` | palette | Lost Work: Create Branch Here... | b | to do |
-| `palette.safety_lost_tag` | palette | Lost Work: Create tag Here... | t | to do |
-| `palette.safety_lost_pick` | palette | Lost Work: Cherry-pick | c | to do |
-| `palette.safety_lost_apply` | palette | Lost Work: Apply Changes to Working Tree | w | to do |
-| `palette.safety_lost_stash` | palette | Lost Work: Save Changes as stash | s | to do |
-| `palette.safety_lost_refresh` | palette | Lost Work: Scan Again |  | to do |
+| `palette.safety_undo_to` | palette | Undo History: Undo Up to Here... | u | done |
+| `palette.safety_redo_to` | palette | Undo History: Redo Up to Here... | y | done |
+| `palette.safety_undo_sequence` | palette | Undo History: Undo Whole Sequence | x | done |
+| `palette.safety_restore_only` | palette | Undo History: Restore Only This... | r | done |
+| `palette.safety_offer` | palette | Undo History: Restore the Branch to Where It Was... | o | done |
+| `palette.safety_history_refresh` | palette | Undo History: Refresh |  | done |
+| `palette.safety_close` | palette | Undo History: Close | Esc | done |
+| `palette.safety_reflog_show` | palette | Reflog: Show in Log | l | done |
+| `palette.safety_reflog_branch` | palette | Reflog: Create Branch Here... | b | done |
+| `palette.safety_reflog_tag` | palette | Reflog: Create tag Here... | t | done |
+| `palette.safety_reflog_apply` | palette | Reflog: Apply Changes to Working Tree | w | done |
+| `palette.safety_reflog_stash` | palette | Reflog: Save Changes as stash | s | done |
+| `palette.safety_reflog_restore` | palette | Reflog: Restore to This Position... | r | done |
+| `palette.safety_reflog_more` | palette | Reflog: Load More | m | done |
+| `palette.safety_reflog_refresh` | palette | Reflog: Refresh |  | done |
+| `palette.safety_lost_branch` | palette | Lost Work: Create Branch Here... | b | done |
+| `palette.safety_lost_tag` | palette | Lost Work: Create tag Here... | t | done |
+| `palette.safety_lost_pick` | palette | Lost Work: Cherry-pick | c | done |
+| `palette.safety_lost_apply` | palette | Lost Work: Apply Changes to Working Tree | w | done |
+| `palette.safety_lost_stash` | palette | Lost Work: Save Changes as stash | s | done |
+| `palette.safety_lost_refresh` | palette | Lost Work: Scan Again |  | done |
 | `palette.safety_next_pane` | palette | Reflog / Lost Work: Next Pane | Tab | to do |
 | `palette.safety_path_tree` | palette | Reflog / Lost Work: Path or Tree File List | v | to do |
 | `palette.safety_reset_panes` | palette | Reflog / Lost Work: Reset Pane Sizes |  | to do |

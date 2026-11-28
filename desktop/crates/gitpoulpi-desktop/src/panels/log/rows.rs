@@ -30,6 +30,8 @@ pub(super) struct RowsContext {
     pub selected: usize,
     pub layout: ColumnLayout,
     pub palette: Palette,
+    /// The commit whose pill cursor is on, and which pill (see `LogPanel::pill_cursor`).
+    pub pill_cursor: Option<(gitpoulpi_core::domain::Oid, usize)>,
     pub marked: Arc<HashSet<usize>>,
     pub matches: Arc<HashSet<usize>>,
     pub query_active: bool,
@@ -158,16 +160,32 @@ impl RowsContext {
             .map(|i| pills_for(&self.data.refs, i))
             .unwrap_or_default();
         let has_pill = !pills.is_empty();
+        // The pill cursor on this commit shows its pill in the Ref column (else the first one).
+        let cursor = self
+            .pill_cursor
+            .filter(|(oid, _)| *oid == node.id)
+            .map(|(_, i)| i)
+            .filter(|i| *i < pills.len());
+        let shown = (!pills.is_empty()).then(|| cursor.unwrap_or(0));
         let ref_cell = h_flex()
             .items_center()
             .pl(px(4.0))
             .overflow_hidden()
-            .when_some(pills.first(), |d, p| {
+            .when_some(shown.map(|i| (i, &pills[i])), |d, (i, p)| {
+                let on_cursor = cursor == Some(i);
                 d.child(super::ref_menu::interactive(
                     ci,
                     node.id,
                     p,
-                    pill_element(p, pills.len() - 1, lane, skin),
+                    div()
+                        .rounded(px(4.0))
+                        .border_1()
+                        .border_color(if on_cursor {
+                            skin.accent
+                        } else {
+                            gpui_kit::transparent_black()
+                        })
+                        .child(pill_element(p, pills.len() - 1, lane, skin)),
                 ))
                 .child(
                     div()

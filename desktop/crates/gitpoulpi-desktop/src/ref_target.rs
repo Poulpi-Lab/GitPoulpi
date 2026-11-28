@@ -11,6 +11,23 @@ pub enum RefTarget {
     Remote(String),
     Tag(String),
     Stash(u32),
+    /// A row of the WORKTREES section, by its folder.
+    Worktree(String),
+    /// A row of the SUBMODULES section, by its repository-relative path.
+    Submodule(String),
+    /// A remote itself (the REMOTE section's folder of that name), not one of its branches.
+    RemoteNode(String),
+    /// A file of the working-changes lists or of a commit's file list.
+    File(String, FileSide),
+}
+
+/// Where a file row of [`RefTarget::File`] is listed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FileSide {
+    Unstaged,
+    Staged,
+    /// A commit's changed files.
+    Commit,
 }
 
 impl RefTarget {
@@ -20,14 +37,20 @@ impl RefTarget {
             RefTarget::Local(_) => Some(RefRowKind::Local),
             RefTarget::Remote(_) => Some(RefRowKind::Remote),
             RefTarget::Tag(_) => Some(RefRowKind::Tag),
-            RefTarget::Stash(_) => None,
+            _ => None,
         }
     }
 
     /// The name as shown: the ref's, or `stash@{n}`.
     pub fn name(&self) -> String {
         match self {
-            RefTarget::Local(n) | RefTarget::Remote(n) | RefTarget::Tag(n) => n.clone(),
+            RefTarget::Local(n)
+            | RefTarget::Remote(n)
+            | RefTarget::Tag(n)
+            | RefTarget::Worktree(n)
+            | RefTarget::Submodule(n)
+            | RefTarget::RemoteNode(n)
+            | RefTarget::File(n, _) => n.clone(),
             RefTarget::Stash(id) => crate::strings::stash_name(*id),
         }
     }

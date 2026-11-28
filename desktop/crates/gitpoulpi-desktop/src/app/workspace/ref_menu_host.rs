@@ -58,6 +58,12 @@ impl Workspace {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
+        if let RefTarget::File(path, side) = &target {
+            return self.open_file_menu(path.clone(), *side, at, window, cx);
+        }
+        if let Some(items) = self.repo_target_items(&target, cx) {
+            return self.show_items(items, target, at, window, cx);
+        }
         let snap = self.snapshot(cx);
         let (hidden, solo) = self.refs.read(cx).hidden_or_solo(&target);
         let items = ref_menu::items_for(&target, &snap, MenuFacts { hidden, solo });

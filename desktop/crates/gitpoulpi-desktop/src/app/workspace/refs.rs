@@ -13,6 +13,7 @@ use gpui_kit::{ClipboardItem, Context, Window};
 use super::Workspace;
 use crate::app::actions::with_workspace;
 use crate::commands::refs_ops::RefOp;
+use crate::commands::repo_ops::RepoOp;
 use crate::daemon::refs_ops::{self as rules, Plan, Snapshot, TagDelete};
 use crate::dialogs::{self, Choice, Spec};
 use crate::ref_target::RefTarget;
@@ -103,7 +104,7 @@ impl Workspace {
                 }
                 Some(RefTarget::Tag(n)) => self.start_tag_delete(n, snap, window, cx),
                 Some(RefTarget::Stash(id)) => self.drop_stash(id, window, cx),
-                None => say(self, msg::input::NO_REF_TO_DELETE.get(), cx),
+                Some(_) | None => say(self, msg::input::NO_REF_TO_DELETE.get(), cx),
             },
             RefOp::DeleteRemoteBranch | RefOp::DeleteBranchAndRemote => match selected {
                 Some(t @ (RefTarget::Local(_) | RefTarget::Remote(_))) => self.carry_out(
@@ -169,6 +170,7 @@ impl Workspace {
                 }
                 _ => say(self, msg::input::SELECT_REF_REFS.get(), cx),
             },
+            RefOp::Repo(op) => self.run_repo_op(op, selected, window, cx),
             RefOp::DropOnCurrent => match (selected, snap.head()) {
                 (Some(source), Some((head, _))) => {
                     let at = self.menu_origin(cx);
@@ -189,6 +191,12 @@ impl Workspace {
     ) {
         let snap = self.snapshot(cx);
         match target {
+            RefTarget::Worktree(_) => {
+                self.run_repo_op(RepoOp::WorktreeOpen, Some(target), window, cx)
+            }
+            RefTarget::Submodule(_) => {
+                self.run_repo_op(RepoOp::SubmoduleOpen, Some(target), window, cx)
+            }
             RefTarget::Stash(id) => self.show_stash(snap.stash(id).and_then(|s| s.commit), cx),
             t => self.carry_out(rules::checkout_plan(&t, &snap), window, cx),
         }

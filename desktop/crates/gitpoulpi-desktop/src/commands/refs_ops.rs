@@ -54,6 +54,8 @@ pub enum RefOp {
     ToggleSolo,
     /// The keyboard twin of dragging the selected ref onto the checked-out branch.
     DropOnCurrent,
+    /// A worktree, submodule, remote, LFS or file command a ref menu row carries (`repo_ops.rs`).
+    Repo(super::repo_ops::RepoOp),
 }
 
 /// The op of a key action, if the desktop implements it as a ref op.

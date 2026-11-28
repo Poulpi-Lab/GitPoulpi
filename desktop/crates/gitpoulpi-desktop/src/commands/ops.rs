@@ -76,6 +76,8 @@ pub enum Op {
     Refs(super::refs_ops::RefOp),
     /// The undo history, Activity Log, jobs and grouped push (`activity_ops.rs`).
     Activity(super::activity_ops::ActivityOp),
+    /// Worktrees, submodules, remotes, LFS and the file menu (`repo_ops.rs`, `file_ops.rs`).
+    Repo(super::repo_ops::RepoOp),
 }
 
 /// What the working-changes pane does (its lists and the commit form).
@@ -188,6 +190,7 @@ pub fn op_for_action(action: Action) -> Option<Op> {
                 .map(Op::Commit)
                 .or_else(|| super::refs_ops::for_action(action).map(Op::Refs))
                 .or_else(|| super::activity_ops::for_action(action).map(Op::Activity))
+                .or_else(|| super::repo_ops::for_action(action).map(Op::Repo))
         }
     })
 }
@@ -258,6 +261,7 @@ pub fn op_for_palette(command: PaletteCommand) -> Option<Op> {
                 .map(Op::Commit)
                 .or_else(|| super::refs_ops::for_palette(command).map(Op::Refs))
                 .or_else(|| super::activity_ops::for_palette(command).map(Op::Activity))
+                .or_else(|| super::repo_ops::for_palette(command).map(Op::Repo))
         }
     })
 }

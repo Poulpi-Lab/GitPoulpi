@@ -92,7 +92,7 @@ fn the_git_prefix_chord_reaches_the_command_and_says_it_is_not_there_yet(cx: &mu
     let (window, _ws) = open(cx, repo.root(), dir.path());
     press(cx, window, "ctrl-g");
     assert!(status_text(cx).is_some(), "the prefix key shows a hint");
-    press(cx, window, "shift-k");
+    press(cx, window, "w");
     let text = status_text(cx).expect("a message");
     assert!(text.contains("not available yet"), "{text}");
 }
@@ -140,12 +140,12 @@ fn a_disabled_menu_item_answers_with_its_reason_instead_of_running(cx: &mut Test
     let repo = fixture();
     let dir = tempfile::tempdir().unwrap();
     let (window, ws) = open(cx, repo.root(), dir.path());
-    press(cx, window, "alt-g");
+    press(cx, window, "alt-h");
     let item_state = ws.read_with(cx, |ws, cx| {
         let bar = ws.menu_bar().read(cx);
         bar.open_state().map(|_| bar.menus().len())
     });
-    assert!(item_state.is_some(), "the Git menu opened");
+    assert!(item_state.is_some(), "the Help menu opened");
     // Down into the first submenu's first item, then Enter on an item that is not implemented.
     press(cx, window, "enter down");
     press(cx, window, "enter");

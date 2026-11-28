@@ -334,11 +334,25 @@ impl RefsPanel {
                     .child(count_text),
             )
             .child(div().flex_1())
-            .when(kind == Kind::Remote, |d| {
+            .when_some(ops::plus_command(kind), |d, command| {
+                let hover = pal.hover;
                 d.child(
-                    Icon::new(AssetIcon::Plus)
-                        .size(px(13.0))
-                        .text_color(pal.muted),
+                    div()
+                        .id(("sec-plus", si))
+                        .flex_none()
+                        .p(px(3.0))
+                        .rounded(px(3.0))
+                        .cursor_pointer()
+                        .hover(move |s| s.bg(hover))
+                        .child(
+                            Icon::new(AssetIcon::Plus)
+                                .size(px(13.0))
+                                .text_color(pal.muted),
+                        )
+                        .on_click(move |_, window, cx| {
+                            cx.stop_propagation();
+                            crate::commands::run_id(command, window, cx);
+                        }),
                 )
             });
         let mut boxed = v_flex()

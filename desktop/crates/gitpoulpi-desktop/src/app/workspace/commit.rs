@@ -187,6 +187,21 @@ impl Workspace {
             let palette = self.command_state(window, cx).palette_context();
             self.log
                 .update(cx, |l, cx| l.open_menu(palette, window, cx));
+        } else if self
+            .right
+            .read(cx)
+            .focus_handle(cx)
+            .contains_focused(window, cx)
+        {
+            // The right pane: the menu of the file under the cursor (the rows of a commit's files or
+            // of the working changes), at the same place the Log's keyboard menus open.
+            match self.right.read(cx).current_file() {
+                Some((path, side)) => {
+                    let at = self.log.read(cx).selected_row_origin();
+                    self.open_file_menu(path, side, at, window, cx);
+                }
+                None => self.say(msg::input::NOTHING_FOR_MENU.get(), cx),
+            }
         } else {
             let label = crate::commands::exec::label_of(crate::commands::Command::Action(
                 gitpoulpi_app::keymap::Action::GlobalContextMenu,

@@ -105,10 +105,15 @@ impl RightPanel {
             self.selection.toggle(&list, ix);
         } else {
             self.selection.click(&list, ix);
-            if let Some(row) = rows.get(ix).filter(|r| r.folder) {
-                if !self.collapsed.remove(&row.path) {
-                    self.collapsed.insert(row.path.clone());
+            match rows.get(ix) {
+                Some(row) if row.folder => {
+                    if !self.collapsed.remove(&row.path) {
+                        self.collapsed.insert(row.path.clone());
+                    }
                 }
+                // A plain click on a file selects it and opens its diff, like the terminal UI.
+                Some(_) => self.open_selected_diff(cx),
+                None => {}
             }
         }
         cx.notify();

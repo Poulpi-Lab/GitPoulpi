@@ -19,9 +19,12 @@ use gpui_kit::{
 mod autostash;
 mod commit;
 pub use commit::BannerButton;
+mod file_menu;
 mod ref_forms;
 mod ref_menu_host;
 mod refs;
+mod repo;
+mod repo_lfs;
 mod stage;
 
 use super::actions::WorkspaceHandle;
@@ -69,6 +72,8 @@ pub struct Workspace {
     pub(super) operation: Option<gitpoulpi_core::domain::OperationState>,
     /// The ref menu, while one is open.
     ref_menu: Option<ref_menu_host::OpenMenu>,
+    /// What the worktree, remote, LFS and file commands remember (`workspace/repo.rs`).
+    pub(super) repo: repo::RepoState,
     pub(super) summary: Option<Summary>,
     pub(super) live: LiveState,
     pub(super) _pump: Option<Task<()>>,
@@ -130,6 +135,9 @@ impl Workspace {
                     RightEvent::SelectParent(oid) => {
                         this.log.update(cx, |l, cx| l.select_oid(*oid, cx))
                     }
+                    RightEvent::FileMenu { path, side, at } => {
+                        this.open_file_menu(path.clone(), *side, *at, window, cx)
+                    }
                 },
             ),
             cx.subscribe_in(
@@ -149,7 +157,8 @@ impl Workspace {
         let weak = cx.weak_entity();
         cx.set_global(WorkspaceHandle(weak));
         cx.defer_in(window, |this, window, cx| {
-            this.log.read(cx).focus_handle(cx).focus(window, cx)
+            this.log.read(cx).focus_handle(cx).focus(window, cx);
+            this.refresh_lfs(window, cx);
         });
         let mut this = Self {
             backend,
@@ -165,6 +174,7 @@ impl Workspace {
             selected_commit: false,
             operation: None,
             ref_menu: None,
+            repo: Default::default(),
             summary: None,
             live: LiveState::default(),
             _pump: None,
@@ -335,6 +345,8 @@ impl Workspace {
             let root = self.backend.repo_root().to_string_lossy().into_owned();
             PrefsStore::update(cx, |p| p.remember_recent(&root));
             self.reset_live(cx);
+            self.repo = Default::default();
+            self.apply_lfs_only(cx);
             self.refs.update(cx, |r, cx| r.reload(cx));
             self.log.update(cx, |l, cx| l.reload(cx));
             cx.notify();

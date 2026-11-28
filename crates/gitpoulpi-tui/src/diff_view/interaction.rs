@@ -1,5 +1,6 @@
 use super::model::{hunk_at, DiffRender, DiffRow, RowChange};
 use super::{DiffHighlight, DiffStageAction, DiffViewState};
+use crate::diff_view::DiffTextExt;
 use crate::th;
 use gitpoulpi_i18n::msg::diff_view as msg;
 

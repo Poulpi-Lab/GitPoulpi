@@ -7,6 +7,7 @@ use super::menu_actions;
 use super::mouse_left_menus;
 use super::mouse_left_panes;
 use super::mouse_prelude::{list_bar_offset, list_bar_regions, set_list_bar_offset, Geo};
+use crate::diff_view::DiffTextExt;
 use crate::event_loop::*;
 use crossterm::event::MouseEvent;
 use gitpoulpi_i18n::msg;

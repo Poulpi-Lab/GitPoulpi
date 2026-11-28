@@ -3,6 +3,7 @@
 //! command palette lists (maintainer rules 4 and 6): `run` is the one place an
 //! action happens, however it was asked for.
 
+use crate::diff_view::DiffTextExt;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use gitpoulpi_hosting::{DiffSide, PendingComment};
 use gitpoulpi_i18n::msg::review_view as msg;

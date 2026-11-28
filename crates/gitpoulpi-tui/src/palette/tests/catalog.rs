@@ -1,4 +1,6 @@
 use super::*;
+#[allow(unused_imports)]
+use crate::safety_panel::SafetyCmdExt;
 
 /// Every entry in the catalogue is reachable and unique.
 #[test]

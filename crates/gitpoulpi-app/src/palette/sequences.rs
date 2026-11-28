@@ -10,18 +10,19 @@
 //! A sequence that `validate` rejects stays listed but grayed out, with the
 //! reason; its key still resolves, and says the same when pressed.
 
-use super::*;
-use crate::sequence_run::registry;
+use super::{PaletteCommand, PaletteEntry};
+use crate::sequences as registry;
+use gitpoulpi_i18n::msg;
 use std::sync::Mutex;
 
 /// What a `Sequence: ...` row does. The number is the keymap slot.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SeqOp {
+pub enum SeqOp {
     Run(u16),
 }
 
 impl SeqOp {
-    pub(crate) fn slot(self) -> u16 {
+    pub fn slot(self) -> u16 {
         match self {
             SeqOp::Run(slot) => slot,
         }
@@ -82,17 +83,17 @@ fn model() -> &'static Model {
 
 /// Re-reads `config.toml` when it changed on disk, so a sequence added
 /// outside the window (the CLI, an editor) shows up without a restart.
-pub(crate) fn sync() {
+pub fn sync() {
     registry::reload_if_changed();
 }
 
 /// The `Sequence: <name>` entries, in slot order, in the current language.
-pub(crate) fn entries() -> &'static [PaletteEntry] {
+pub fn entries() -> &'static [PaletteEntry] {
     model().entries
 }
 
 /// Why the sequence cannot run, if it cannot.
-pub(crate) fn unavailable(op: SeqOp) -> Option<&'static str> {
+pub fn unavailable(op: SeqOp) -> Option<&'static str> {
     let model = model();
     let at = model
         .entries

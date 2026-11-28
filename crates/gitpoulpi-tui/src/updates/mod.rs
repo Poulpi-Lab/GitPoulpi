@@ -23,6 +23,8 @@
 //! downloads and stages the release by itself when this build came from a
 //! release archive ([`auto`]); otherwise it behaves like `notify`.
 
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::vocab::updates::{UpdatesCommand, Whys};
 pub(crate) mod auto;
 pub(crate) mod chip;
 pub(crate) mod handoff;
@@ -54,37 +56,6 @@ pub(crate) const GIT_HASH: &str = match option_env!("GITPOULPI_GIT_HASH") {
 /// How long the background check waits after the window starts, so the first
 /// frames and the repository load are not competing with it.
 const STARTUP_DELAY: std::time::Duration = std::time::Duration::from_secs(2);
-
-/// The palette's (and the tab's) actions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum UpdatesCommand {
-    /// `Help: Release notes`: opens the tab.
-    ReleaseNotes,
-    /// `Updates: Check for updates now`.
-    CheckNow,
-    /// `Updates: Download`: the release page in the browser.
-    Download,
-    /// `Updates: Skip this version`.
-    Skip,
-    /// `Updates: Update now`: download, verify and stage the release (a
-    /// package-manager channel runs its command).
-    UpdateNow,
-    /// `Updates: Restart to update`: hand the staged release to the updater.
-    Restart,
-    /// `Updates: Revert to the previous version`.
-    Revert,
-    /// `Release notes: Close tab`.
-    CloseTab,
-    /// `Updates: Show update`: opens the update panel.
-    ShowPanel,
-    /// `Updates: Open security notice`: the link of the notice that names
-    /// this version.
-    SecurityNotice,
-    /// `Updates: Copy update command`.
-    CopyCommand,
-    /// `Updates: Run update command in a terminal`.
-    RunInTerminal,
-}
 
 #[derive(Default)]
 struct Shared {
@@ -237,20 +208,6 @@ pub(crate) fn snapshot() -> Snapshot {
         checking: s.checking,
         install: auto::view(&s),
     }
-}
-
-/// Why each self-update command is unavailable now (`None`: available).
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(crate) struct Whys {
-    pub(crate) update_now: Option<&'static str>,
-    pub(crate) restart: Option<&'static str>,
-    pub(crate) revert: Option<&'static str>,
-    /// `Updates: Copy update command`.
-    pub(crate) copy: Option<&'static str>,
-    /// `Updates: Run update command in a terminal`.
-    pub(crate) terminal: Option<&'static str>,
-    /// `Updates: Open Security Notice`.
-    pub(crate) notice: Option<&'static str>,
 }
 
 /// The palette's view of the self-update commands.

@@ -112,6 +112,7 @@ mod ai_limit_dialog;
 mod ai_sent_dialog;
 #[cfg_attr(not(feature = "ai"), path = "ai_ui_stub.rs")]
 mod ai_ui;
+mod app_hooks;
 mod author_filter;
 mod avatar;
 mod blame_view;
@@ -441,7 +442,12 @@ use cursor::CursorShape;
 use diff_view::{DiffBarButton, DiffSource, DiffStageAction, DiffViewState, DiffViewToggle};
 use log_search::{LogSearch, SearchBarButton};
 use palette::{palette_matches, PaletteCommand, PaletteContext};
+// Terminal-side methods of vocabulary types that live in `gitpoulpi-app`: the
+// extension traits stay in scope for every module that glob-imports the root.
 use preferences::PreferencesState;
+#[allow(unused_imports)]
+#[cfg(all(feature = "radar", feature = "hosting"))]
+use radar::SizedColumnExt;
 use refs_tree::{ref_display_rows, CollapsedFolders, RefRowKind, RefTreeRow};
 use scrollbar::ScrollBar;
 use status_pane::{
@@ -450,6 +456,11 @@ use status_pane::{
     FileListMode, FolderContextAction, StatusSection, TreeRow,
 };
 use worktree_dialog::WorktreeSeed;
+#[allow(unused_imports)]
+use {
+    commit_column::PartExt, flow::FlowCmdExt, rewrite_view::RuleTemplateExt,
+    safety_panel::SafetyCmdExt, tree_fold::TreeFoldExt,
+};
 
 use std::collections::HashSet;
 use std::io;

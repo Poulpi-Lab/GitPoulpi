@@ -59,147 +59,6 @@ impl RuleGroup {
 
 pub(crate) use super::vocab::RuleTemplate;
 
-impl RuleTemplate {
-    pub(crate) const ALL: [RuleTemplate; 22] = [
-        RuleTemplate::Identity,
-        RuleTemplate::Mailmap,
-        RuleTemplate::Anonymise,
-        RuleTemplate::DateShift,
-        RuleTemplate::DateTimezone,
-        RuleTemplate::DateWindow,
-        RuleTemplate::CommitterFromAuthor,
-        RuleTemplate::MessageReplace,
-        RuleTemplate::MessageDeleteLines,
-        RuleTemplate::Trailer,
-        RuleTemplate::ContentReplace,
-        RuleTemplate::RemovePaths,
-        RuleTemplate::RemoveBlobsOver,
-        RuleTemplate::MovePaths,
-        RuleTemplate::LfsImport,
-        RuleTemplate::LfsExport,
-        RuleTemplate::Script,
-        RuleTemplate::RemoveSignatures,
-        RuleTemplate::LineEndings,
-        RuleTemplate::StripExec,
-        RuleTemplate::Reencode,
-        RuleTemplate::MessageEncoding,
-    ];
-
-    pub(crate) const fn group(self) -> RuleGroup {
-        match self {
-            Self::Identity | Self::Mailmap | Self::Anonymise => RuleGroup::Authors,
-            Self::DateShift | Self::DateTimezone | Self::DateWindow | Self::CommitterFromAuthor => {
-                RuleGroup::Dates
-            }
-            Self::MessageReplace
-            | Self::MessageDeleteLines
-            | Self::Trailer
-            | Self::MessageEncoding => RuleGroup::Messages,
-            Self::ContentReplace | Self::LineEndings | Self::StripExec | Self::Reencode => {
-                RuleGroup::Content
-            }
-            Self::RemovePaths | Self::RemoveBlobsOver | Self::MovePaths => RuleGroup::Paths,
-            Self::LfsImport | Self::LfsExport => RuleGroup::Lfs,
-            Self::Script => RuleGroup::Script,
-            Self::RemoveSignatures => RuleGroup::Signatures,
-        }
-    }
-
-    pub(crate) const fn label(self) -> M {
-        match self {
-            Self::Identity => t::K_IDENTITY,
-            Self::Mailmap => t::K_MAILMAP,
-            Self::Anonymise => t::K_ANONYMISE,
-            Self::DateShift => t::K_DATE_SHIFT,
-            Self::DateTimezone => t::K_DATE_TIMEZONE,
-            Self::DateWindow => t::K_DATE_WINDOW,
-            Self::CommitterFromAuthor => t::K_COMMITTER_FROM_AUTHOR,
-            Self::MessageReplace => t::K_MESSAGE_REPLACE,
-            Self::MessageDeleteLines => t::K_MESSAGE_DELETE_LINES,
-            Self::Trailer => t::K_TRAILER,
-            Self::ContentReplace => t::K_CONTENT_REPLACE,
-            Self::RemovePaths => t::K_REMOVE_PATHS,
-            Self::RemoveBlobsOver => t::K_REMOVE_BLOBS,
-            Self::MovePaths => t::K_MOVE_PATHS,
-            Self::LfsImport => t::K_LFS_IMPORT,
-            Self::LfsExport => t::K_LFS_EXPORT,
-            Self::Script => t::K_SCRIPT,
-            Self::RemoveSignatures => t::K_REMOVE_SIGNATURES,
-            Self::LineEndings => t::K_LINE_ENDINGS,
-            Self::StripExec => t::K_STRIP_EXEC,
-            Self::Reencode => t::K_REENCODE,
-            Self::MessageEncoding => t::K_MESSAGE_ENCODING,
-        }
-    }
-
-    /// Why this kind cannot be added in this build, when it cannot: a Script
-    /// rule needs the embedded Lua runtime.
-    pub(crate) fn disabled_reason(self) -> Option<M> {
-        match self {
-            Self::Script if !super::script::scripts_built() => Some(t::SCRIPT_OFF_REASON),
-            _ => None,
-        }
-    }
-
-    /// The kinds of one group, in menu order.
-    pub(crate) fn of_group(group: RuleGroup) -> Vec<RuleTemplate> {
-        Self::ALL
-            .into_iter()
-            .filter(|k| k.group() == group)
-            .collect()
-    }
-
-    /// A new rule of this kind. Starts filled with something sensible where
-    /// the kind has a natural default, else blank (and then the recipe says
-    /// what is missing until the fields are filled).
-    pub(crate) fn new_rule(self) -> Rule {
-        use gitpoulpi_core::domain::rewrite as r;
-        Rule::new(match self {
-            Self::Identity => blank_identity(),
-            Self::Mailmap => RuleKind::Mailmap {
-                apply_to: r::Who::Both,
-                file: None,
-            },
-            Self::Anonymise => blank_anonymise(),
-            Self::DateShift => RuleKind::DateShift {
-                by_seconds: 3_600,
-                apply_to: r::WhichDate::Both,
-            },
-            Self::DateTimezone => RuleKind::DateTimezone {
-                offset_minutes: 0,
-                keep: r::KeepClock::Instant,
-                apply_to: r::WhichDate::Both,
-            },
-            Self::DateWindow => blank_window(),
-            Self::CommitterFromAuthor => RuleKind::CommitterFromAuthor,
-            Self::MessageReplace => blank_message_replace(),
-            Self::MessageDeleteLines => RuleKind::MessageDeleteLines {
-                pattern: r::TextPattern {
-                    pattern: String::new(),
-                    regex: false,
-                    case_sensitive: true,
-                },
-            },
-            Self::Trailer => blank_trailer(),
-            Self::ContentReplace => blank_content(),
-            Self::RemovePaths => RuleKind::RemovePaths { globs: Vec::new() },
-            Self::RemoveBlobsOver => RuleKind::RemoveBlobsOver { bytes: 5 << 20 },
-            Self::MovePaths => RuleKind::MovePaths(PathMove::Rename {
-                from: String::new(),
-                to: String::new(),
-            }),
-            Self::LfsImport => blank_lfs_import(),
-            Self::LfsExport => blank_lfs_export(),
-            Self::Script => blank_script(),
-            Self::RemoveSignatures => RuleKind::RemoveSignatures,
-            Self::LineEndings => super::rules_form::blank_line_endings(),
-            Self::StripExec => super::rules_form::blank_strip_exec(),
-            Self::Reencode => super::rules_form::blank_reencode(),
-            Self::MessageEncoding => RuleKind::MessageEncoding { names: false },
-        })
-    }
-}
-
 /// The Add-menu template whose kind `kind` is.
 pub(crate) fn template_of(kind: &RuleKind) -> RuleTemplate {
     match kind {
@@ -530,6 +389,157 @@ pub(crate) fn rule_tools_unmet(
         .iter()
         .flat_map(|r| r.candidates())
         .collect()
+}
+
+pub(crate) trait RuleTemplateExt: Sized {
+    const ALL: [RuleTemplate; 22];
+    fn group(self) -> RuleGroup;
+    fn label(self) -> M;
+    /// Why this kind cannot be added in this build, when it cannot: a Script
+    /// rule needs the embedded Lua runtime.
+    fn disabled_reason(self) -> Option<M>;
+    /// The kinds of one group, in menu order.
+    fn of_group(group: RuleGroup) -> Vec<RuleTemplate>;
+    /// A new rule of this kind. Starts filled with something sensible where
+    /// the kind has a natural default, else blank (and then the recipe says
+    /// what is missing until the fields are filled).
+    fn new_rule(self) -> Rule;
+}
+
+impl RuleTemplateExt for RuleTemplate {
+    const ALL: [RuleTemplate; 22] = [
+        RuleTemplate::Identity,
+        RuleTemplate::Mailmap,
+        RuleTemplate::Anonymise,
+        RuleTemplate::DateShift,
+        RuleTemplate::DateTimezone,
+        RuleTemplate::DateWindow,
+        RuleTemplate::CommitterFromAuthor,
+        RuleTemplate::MessageReplace,
+        RuleTemplate::MessageDeleteLines,
+        RuleTemplate::Trailer,
+        RuleTemplate::ContentReplace,
+        RuleTemplate::RemovePaths,
+        RuleTemplate::RemoveBlobsOver,
+        RuleTemplate::MovePaths,
+        RuleTemplate::LfsImport,
+        RuleTemplate::LfsExport,
+        RuleTemplate::Script,
+        RuleTemplate::RemoveSignatures,
+        RuleTemplate::LineEndings,
+        RuleTemplate::StripExec,
+        RuleTemplate::Reencode,
+        RuleTemplate::MessageEncoding,
+    ];
+    fn group(self) -> RuleGroup {
+        match self {
+            Self::Identity | Self::Mailmap | Self::Anonymise => RuleGroup::Authors,
+            Self::DateShift | Self::DateTimezone | Self::DateWindow | Self::CommitterFromAuthor => {
+                RuleGroup::Dates
+            }
+            Self::MessageReplace
+            | Self::MessageDeleteLines
+            | Self::Trailer
+            | Self::MessageEncoding => RuleGroup::Messages,
+            Self::ContentReplace | Self::LineEndings | Self::StripExec | Self::Reencode => {
+                RuleGroup::Content
+            }
+            Self::RemovePaths | Self::RemoveBlobsOver | Self::MovePaths => RuleGroup::Paths,
+            Self::LfsImport | Self::LfsExport => RuleGroup::Lfs,
+            Self::Script => RuleGroup::Script,
+            Self::RemoveSignatures => RuleGroup::Signatures,
+        }
+    }
+    fn label(self) -> M {
+        match self {
+            Self::Identity => t::K_IDENTITY,
+            Self::Mailmap => t::K_MAILMAP,
+            Self::Anonymise => t::K_ANONYMISE,
+            Self::DateShift => t::K_DATE_SHIFT,
+            Self::DateTimezone => t::K_DATE_TIMEZONE,
+            Self::DateWindow => t::K_DATE_WINDOW,
+            Self::CommitterFromAuthor => t::K_COMMITTER_FROM_AUTHOR,
+            Self::MessageReplace => t::K_MESSAGE_REPLACE,
+            Self::MessageDeleteLines => t::K_MESSAGE_DELETE_LINES,
+            Self::Trailer => t::K_TRAILER,
+            Self::ContentReplace => t::K_CONTENT_REPLACE,
+            Self::RemovePaths => t::K_REMOVE_PATHS,
+            Self::RemoveBlobsOver => t::K_REMOVE_BLOBS,
+            Self::MovePaths => t::K_MOVE_PATHS,
+            Self::LfsImport => t::K_LFS_IMPORT,
+            Self::LfsExport => t::K_LFS_EXPORT,
+            Self::Script => t::K_SCRIPT,
+            Self::RemoveSignatures => t::K_REMOVE_SIGNATURES,
+            Self::LineEndings => t::K_LINE_ENDINGS,
+            Self::StripExec => t::K_STRIP_EXEC,
+            Self::Reencode => t::K_REENCODE,
+            Self::MessageEncoding => t::K_MESSAGE_ENCODING,
+        }
+    }
+    /// Why this kind cannot be added in this build, when it cannot: a Script
+    /// rule needs the embedded Lua runtime.
+    fn disabled_reason(self) -> Option<M> {
+        match self {
+            Self::Script if !super::script::scripts_built() => Some(t::SCRIPT_OFF_REASON),
+            _ => None,
+        }
+    }
+    /// The kinds of one group, in menu order.
+    fn of_group(group: RuleGroup) -> Vec<RuleTemplate> {
+        Self::ALL
+            .into_iter()
+            .filter(|k| k.group() == group)
+            .collect()
+    }
+    /// A new rule of this kind. Starts filled with something sensible where
+    /// the kind has a natural default, else blank (and then the recipe says
+    /// what is missing until the fields are filled).
+    fn new_rule(self) -> Rule {
+        use gitpoulpi_core::domain::rewrite as r;
+        Rule::new(match self {
+            Self::Identity => blank_identity(),
+            Self::Mailmap => RuleKind::Mailmap {
+                apply_to: r::Who::Both,
+                file: None,
+            },
+            Self::Anonymise => blank_anonymise(),
+            Self::DateShift => RuleKind::DateShift {
+                by_seconds: 3_600,
+                apply_to: r::WhichDate::Both,
+            },
+            Self::DateTimezone => RuleKind::DateTimezone {
+                offset_minutes: 0,
+                keep: r::KeepClock::Instant,
+                apply_to: r::WhichDate::Both,
+            },
+            Self::DateWindow => blank_window(),
+            Self::CommitterFromAuthor => RuleKind::CommitterFromAuthor,
+            Self::MessageReplace => blank_message_replace(),
+            Self::MessageDeleteLines => RuleKind::MessageDeleteLines {
+                pattern: r::TextPattern {
+                    pattern: String::new(),
+                    regex: false,
+                    case_sensitive: true,
+                },
+            },
+            Self::Trailer => blank_trailer(),
+            Self::ContentReplace => blank_content(),
+            Self::RemovePaths => RuleKind::RemovePaths { globs: Vec::new() },
+            Self::RemoveBlobsOver => RuleKind::RemoveBlobsOver { bytes: 5 << 20 },
+            Self::MovePaths => RuleKind::MovePaths(PathMove::Rename {
+                from: String::new(),
+                to: String::new(),
+            }),
+            Self::LfsImport => blank_lfs_import(),
+            Self::LfsExport => blank_lfs_export(),
+            Self::Script => blank_script(),
+            Self::RemoveSignatures => RuleKind::RemoveSignatures,
+            Self::LineEndings => super::rules_form::blank_line_endings(),
+            Self::StripExec => super::rules_form::blank_strip_exec(),
+            Self::Reencode => super::rules_form::blank_reencode(),
+            Self::MessageEncoding => RuleKind::MessageEncoding { names: false },
+        })
+    }
 }
 
 #[cfg(test)]

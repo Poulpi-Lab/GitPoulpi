@@ -6,8 +6,8 @@
 //! is leaked: once per (language epoch, set of type labels), which is bounded
 //! by language switches and edits of the workflow.
 
-use super::*;
 use crate::flow::FlowCmd;
+use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry};
 use gitpoulpi_i18n::msg::flow as flow_msg;
 use std::sync::Mutex;
 

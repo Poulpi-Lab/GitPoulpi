@@ -44,7 +44,7 @@ use gitpoulpi_core::Error as CoreError;
 pub(crate) use panel::{
     clear_status_button, is_open, level_cmd_open as level_command, nav_press, nav_targets,
     open as open_panel, open_global as open_global_panel, paint_status_button, pointer_hand,
-    pointer_text, set_home, status_button_width, LevelCmd,
+    pointer_text, set_home, status_button_width,
 };
 pub(crate) use panel::{last_error_command, last_error_has_remedy};
 #[cfg(feature = "hosting")]

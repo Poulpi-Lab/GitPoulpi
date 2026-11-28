@@ -4,9 +4,9 @@
 
 use super::*;
 
-/// Minimum width, in percent of the panes row, any one of the three main
-/// panes can be resized down to.
-pub(crate) const MIN_PANE_PERCENT: u16 = 10;
+pub(crate) use gitpoulpi_app::palette::vocab::pane_layout::MIN_PANE_PERCENT;
+#[cfg(test)]
+use gitpoulpi_app::palette::vocab::pane_layout::PANE_NUDGE;
 /// Dragging a divider past this raw percentage (before `MIN_PANE_PERCENT`
 /// clamps it) collapses the pane instead of leaving a sliver pinned at the
 /// minimum.
@@ -183,39 +183,6 @@ pub(crate) fn compute_divider1_pct(
 
 mod vocab;
 pub(crate) use vocab::PaneResize;
-
-/// What one notch changes a pane's width by, in percent of the window.
-pub(crate) const PANE_NUDGE: u16 = 3;
-
-impl PaneResize {
-    /// The two dividers after the notch, each kept inside the same limits a
-    /// drag keeps them in (`compute_divider1_pct` / `compute_divider2_pct`).
-    pub(crate) fn apply(self, divider1_pct: u16, divider2_pct: u16) -> (u16, u16) {
-        match self {
-            PaneResize::RefsWider => (
-                (divider1_pct + PANE_NUDGE).min(divider2_pct.saturating_sub(MIN_PANE_PERCENT)),
-                divider2_pct,
-            ),
-            PaneResize::RefsNarrower => (
-                divider1_pct
-                    .saturating_sub(PANE_NUDGE)
-                    .max(MIN_PANE_PERCENT),
-                divider2_pct,
-            ),
-            // The Status pane is what is right of divider 2.
-            PaneResize::StatusWider => (
-                divider1_pct,
-                divider2_pct
-                    .saturating_sub(PANE_NUDGE)
-                    .max(divider1_pct + MIN_PANE_PERCENT),
-            ),
-            PaneResize::StatusNarrower => (
-                divider1_pct,
-                (divider2_pct + PANE_NUDGE).min(100 - MIN_PANE_PERCENT),
-            ),
-        }
-    }
-}
 
 /// New `divider2_pct` while dragging the Log/Status divider - see
 /// `compute_divider1_pct`.

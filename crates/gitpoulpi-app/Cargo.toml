@@ -47,3 +47,5 @@ rewrite-scripts = []
 [dependencies]
 gitpoulpi-config.workspace = true
 gitpoulpi-core.workspace = true
+gitpoulpi-i18n.workspace = true
+gitpoulpi-log.workspace = true

@@ -13,3 +13,6 @@
 
 pub mod features;
 pub mod graph;
+pub mod keymap;
+pub mod palette;
+pub mod sequences;

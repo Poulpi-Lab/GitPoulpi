@@ -1,6 +1,8 @@
 //! Buffer tests of the Flow dialog, the grouped sidebar rows, the branch
 //! tooltips and the commands, over a fake [`FlowActions`].
 
+#[allow(unused_imports)]
+use crate::flow::FlowCmdExt;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 

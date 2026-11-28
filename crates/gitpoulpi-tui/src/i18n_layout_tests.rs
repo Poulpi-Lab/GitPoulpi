@@ -19,6 +19,10 @@
 //! keep every structural rule (borders, no spill, disjoint hits); the
 //! per-label budgets are asserted for the real languages only.
 
+#[allow(unused_imports)]
+use crate::log_table::LogColumnExt;
+#[allow(unused_imports)]
+use crate::refs_sidebar::SidebarSectionExt;
 use ratatui::backend::TestBackend;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

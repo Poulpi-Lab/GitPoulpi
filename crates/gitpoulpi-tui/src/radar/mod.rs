@@ -23,6 +23,8 @@ mod account_fs;
 mod account_ui;
 mod actions;
 mod columns;
+#[allow(unused_imports)]
+pub(crate) use columns::SizedColumnExt;
 mod host_acts;
 mod input;
 mod item_host;

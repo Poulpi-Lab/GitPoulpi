@@ -50,7 +50,7 @@ use crate::daemon_link::{error_text, Reply, Requester};
 use detail::Detail;
 
 pub(crate) use label::{offer_of, summary_text, text as label_text};
-pub(crate) use palette::SafetyCmd;
+pub(crate) use palette::{SafetyCmd, SafetyCmdExt};
 use panes::Panes;
 #[cfg(test)]
 pub(crate) use render::safety_rect;

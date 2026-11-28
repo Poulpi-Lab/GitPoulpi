@@ -1,11 +1,4 @@
-//! The Safety panel tabs.
-//!
-//! Pure vocabulary: it names no terminal type, so a frontend other than the
-//! terminal can share it. The module that owns the feature re-exports it.
+//! Re-export: the vocabulary lives in `gitpoulpi_app::palette::vocab::safety_panel`.
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Tab {
-    History,
-    Reflog,
-    Lost,
-}
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::vocab::safety_panel::*;

@@ -1308,6 +1308,8 @@ version = "1.3.0"
 dependencies = [
  "gitpoulpi-config",
  "gitpoulpi-core",
+ "gitpoulpi-i18n",
+ "gitpoulpi-log",
 ]
 
 [[package]]

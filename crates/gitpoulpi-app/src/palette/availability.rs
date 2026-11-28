@@ -1,5 +1,6 @@
+use super::families::families;
 use super::{sequences, ManagementCommand, PaletteCommand, WorkspaceCommand};
-use crate::repo_menu::RepoMenuAction;
+use crate::palette::vocab::repo_menu::RepoMenuAction;
 use gitpoulpi_i18n::msg;
 
 /// Everything the applicability rules need to know about the current UI
@@ -7,191 +8,191 @@ use gitpoulpi_i18n::msg;
 ///
 /// All-`bool` on purpose - see the module doc.
 #[derive(Debug, Clone, Copy, Default)]
-pub(crate) struct PaletteContext {
+pub struct PaletteContext {
     /// The Settings screen is open: only the commands that work over it
     /// (`PaletteCommand::stays_in_settings`) run, the rest are grayed out.
-    pub(crate) settings_open: bool,
+    pub settings_open: bool,
     /// The window is in a workspace.
-    pub(crate) workspace_active: bool,
+    pub workspace_active: bool,
     /// A workspace exists (or one is active).
-    pub(crate) workspaces_known: bool,
+    pub workspaces_known: bool,
     /// The Home tab's Workspaces page has a row selected.
-    pub(crate) workspace_selected: bool,
+    pub workspace_selected: bool,
     /// The journal's top undo / redo entry (`undo_ui::avail`).
-    pub(crate) undo: crate::undo_ui::Avail,
-    pub(crate) redo: crate::undo_ui::Avail,
+    pub undo: crate::palette::vocab::undo::Avail,
+    pub redo: crate::palette::vocab::undo::Avail,
     /// A blocked undo entry offers a reflog position to restore.
-    pub(crate) undo_offer: bool,
+    pub undo_offer: bool,
     /// The newest journal entries are one sequence run's.
-    pub(crate) undo_sequence: bool,
+    pub undo_sequence: bool,
     /// The view the Undo history / Reflog / Lost work panel is open on.
-    pub(crate) safety_tab: Option<crate::safety_panel::Tab>,
+    pub safety_tab: Option<crate::palette::vocab::safety_panel::Tab>,
     /// What the open code review allows (`None`: no review is open).
-    pub(crate) review: Option<crate::review_cmd::ReviewAvail>,
+    pub review: Option<crate::palette::vocab::review::ReviewAvail>,
     /// What the open Kanban board allows (`None`: no board is open).
-    pub(crate) board: Option<crate::board_cmd::BoardAvail>,
+    pub board: Option<crate::palette::vocab::board::BoardAvail>,
     /// What the open conversation allows (`None`: none is open).
-    pub(crate) item: Option<crate::item_cmd::ItemAvail>,
+    pub item: Option<crate::palette::vocab::item::ItemAvail>,
     /// What the open text box with the AI writing help allows (`None`: none
     /// is open).
-    pub(crate) composer: Option<crate::composer_cmd::ComposerAvail>,
-    pub(crate) in_refs_pane: bool,
-    pub(crate) in_diff_view: bool,
+    pub composer: Option<crate::palette::vocab::composer::ComposerAvail>,
+    pub in_refs_pane: bool,
+    pub in_diff_view: bool,
     /// File View / Blame / History is open in the central column.
-    pub(crate) in_file_view: bool,
+    pub in_file_view: bool,
     /// The Blame view is open (`FileInsight::blame_lines`).
-    pub(crate) blame_shown: bool,
+    pub blame_shown: bool,
     /// The File View is showing an image (`image_view::pane::active`).
-    pub(crate) image_shown: bool,
+    pub image_shown: bool,
     /// The Diff view is showing before / after pictures
     /// (`image_view::split::active`).
-    pub(crate) image_diff_shown: bool,
+    pub image_diff_shown: bool,
     /// The File History split view is open (`history_view`).
-    pub(crate) in_history_view: bool,
+    pub in_history_view: bool,
     /// A binary file with OS apps offers "Open in" (`open_with::view::shown`).
-    pub(crate) binary_shown: bool,
+    pub binary_shown: bool,
     /// The open diff or File View has a mouse text selection.
-    pub(crate) has_text_selection: bool,
+    pub has_text_selection: bool,
     /// Text dragged over in the commit message block.
-    pub(crate) commit_text_selection: bool,
+    pub commit_text_selection: bool,
     /// The open diff is the Unstaged half of the working tree, so its
     /// hunks and lines can be staged. `false` for the Staged half *and*
     /// for a commit's diff -- `in_stageable_diff` tells those two apart.
-    pub(crate) diff_stages: bool,
+    pub diff_stages: bool,
     /// The open diff is one of the two working-tree halves, i.e. hunk ids
     /// in it mean something to `StageTarget::{Hunk,Line}` at all.
-    pub(crate) in_stageable_diff: bool,
+    pub in_stageable_diff: bool,
     /// A leaf ref row (not a folder) is selected in the Refs sidebar.
-    pub(crate) selected_local_branch: bool,
-    pub(crate) selected_remote_branch: bool,
-    pub(crate) selected_tag: bool,
+    pub selected_local_branch: bool,
+    pub selected_remote_branch: bool,
+    pub selected_tag: bool,
     /// A ref is marked as the source of a keyboard drop (`ref_drop_mark`).
-    pub(crate) ref_marked: bool,
+    pub ref_marked: bool,
     /// The selected tag is one no remote is known to have - the same
     /// state the sidebar draws its marker from, so a grayed-out
     /// `Push Selected Tag` and an unmarked row always agree.
-    pub(crate) selected_tag_is_unpushed: bool,
+    pub selected_tag_is_unpushed: bool,
     /// The selected tag is on a remote only (not in this repository): the
     /// one state `Fetch Selected Tag` applies to.
-    pub(crate) selected_tag_remote_only: bool,
+    pub selected_tag_remote_only: bool,
     /// The selected tag is here and on a remote at another commit: the one
     /// state `Use the Remote's Version` and `Force Push` apply to.
-    pub(crate) selected_tag_differs: bool,
-    pub(crate) soloing: bool,
+    pub selected_tag_differs: bool,
+    pub soloing: bool,
     /// At least one ref is hidden from the graph - gates
     /// `ShowAllHiddenRefs`, the same way `soloing` gates `StopSoloing`.
-    pub(crate) has_hidden_refs: bool,
+    pub has_hidden_refs: bool,
     /// A folder or remote-root row (not a leaf) is selected in the Refs
     /// sidebar - gates `ToggleHideSelectedFolder`/`ToggleSoloSelectedFolder`.
-    pub(crate) selected_folder: bool,
+    pub selected_folder: bool,
     /// A row of the Stashes section is selected in the Refs sidebar.
-    pub(crate) selected_stash: bool,
+    pub selected_stash: bool,
     /// A row of the Worktrees section is selected in the Refs sidebar.
-    pub(crate) selected_worktree: bool,
+    pub selected_worktree: bool,
     /// A row of the Submodules section is selected in the Refs sidebar.
-    pub(crate) selected_submodule: bool,
+    pub selected_submodule: bool,
     /// The repository has submodules at all.
-    pub(crate) has_submodules: bool,
-    pub(crate) has_refs_filter: bool,
+    pub has_submodules: bool,
+    pub has_refs_filter: bool,
     /// An agent's view change waits behind the footer chip.
-    pub(crate) agent_pending: bool,
+    pub agent_pending: bool,
     /// An agent moved the view and the window can still go back.
-    pub(crate) agent_back: bool,
+    pub agent_back: bool,
     /// What the integration commands can do right now (`hosting_ui`).
-    pub(crate) hosting: crate::hosting_ui::HostingAvailability,
-    pub(crate) has_stash: bool,
+    pub hosting: crate::palette::vocab::hosting_command::HostingAvailability,
+    pub has_stash: bool,
     /// The repository has a pending auto-stash record (`autostash_banner`).
-    pub(crate) auto_stash_pending: bool,
-    pub(crate) unstaged_file_selected: bool,
-    pub(crate) staged_file_selected: bool,
+    pub auto_stash_pending: bool,
+    pub unstaged_file_selected: bool,
+    pub staged_file_selected: bool,
     /// A changed-file row is selected in the commit-detail pane.
-    pub(crate) commit_file_selected: bool,
+    pub commit_file_selected: bool,
     /// The Log's selection is on a real commit. False on the pinned WIP
     /// row, which has no `Oid` and therefore nothing to cherry-pick,
     /// revert or reset onto.
-    pub(crate) selected_commit: bool,
+    pub selected_commit: bool,
     /// The working tree has uncommitted changes, so the Log shows its WIP
     /// row - and with it the inline commit-message field.
-    pub(crate) has_wip: bool,
+    pub has_wip: bool,
     /// The sensitive-files question of a refused stage is up.
-    pub(crate) stage_guard_open: bool,
+    pub stage_guard_open: bool,
     /// The AI commit composer's review is open behind the palette.
-    pub(crate) compose_open: bool,
+    pub compose_open: bool,
     /// ... and a file row is selected in it.
-    pub(crate) compose_file: bool,
+    pub compose_file: bool,
     /// `ai.enabled`: every AI command is hidden from the palette while
     /// this is false.
-    pub(crate) ai_enabled: bool,
+    pub ai_enabled: bool,
     /// An AI profile of kind local agent exists ("Tab: Open AI Agent Here"
     /// needs one).
-    pub(crate) local_agent: bool,
+    pub local_agent: bool,
     /// An AI request is already running.
-    pub(crate) ai_running: bool,
+    pub ai_running: bool,
     /// The repository is mid-merge/rebase/cherry-pick with unresolved
     /// paths - i.e. `GitBackend::conflicts` returned something.
-    pub(crate) has_conflicts: bool,
+    pub has_conflicts: bool,
     /// The Status pane's selected file is one of those conflicted paths.
-    pub(crate) conflicted_file_selected: bool,
+    pub conflicted_file_selected: bool,
     /// The merge conflict editor is the central view.
-    pub(crate) merge_open: bool,
+    pub merge_open: bool,
     /// The built-in editor is the central view.
-    pub(crate) editor_open: bool,
+    pub editor_open: bool,
     /// ... and its Output came from the file on disk: picks are off.
-    pub(crate) merge_picks_off: bool,
+    pub merge_picks_off: bool,
     /// ... and the file has no conflict blocks to pick from.
-    pub(crate) merge_no_blocks: bool,
+    pub merge_no_blocks: bool,
     /// The editor shows a card (a conflict that is not text).
-    pub(crate) merge_card: bool,
+    pub merge_card: bool,
     /// How many conflicted files there are (next / previous file).
-    pub(crate) conflicted_files: usize,
+    pub conflicted_files: usize,
     /// The strip the editor shows: the file was edited outside / was
     /// resolved elsewhere / changed under the editor.
-    pub(crate) merge_strip_edited: bool,
-    pub(crate) merge_strip_resolved: bool,
-    pub(crate) merge_strip_changed: bool,
+    pub merge_strip_edited: bool,
+    pub merge_strip_resolved: bool,
+    pub merge_strip_changed: bool,
     /// A merge, cherry-pick or revert is in progress (a rebase is not:
     /// it has its own Abort).
-    pub(crate) operation_abortable: bool,
+    pub operation_abortable: bool,
     /// ... and it is a cherry-pick or a revert (a merge has nothing to
     /// skip).
-    pub(crate) operation_skippable: bool,
+    pub operation_skippable: bool,
     /// ... and it is a merge, which can be committed with nothing staged
     /// (its result may equal HEAD).
-    pub(crate) merge_in_progress: bool,
+    pub merge_in_progress: bool,
     /// How many repositories are open as tabs in this session
     /// (ADR-0006). Zero means the window is showing a repository that
     /// is not tabbed - which happens after closing the last tab.
-    pub(crate) open_repository_tabs: usize,
+    pub open_repository_tabs: usize,
     /// The current repository tab's index (`Tab: Move Left/Right` need a
     /// neighbour on that side).
-    pub(crate) current_tab_index: usize,
+    pub current_tab_index: usize,
     /// The repository has at least one remote.
-    pub(crate) has_remotes: bool,
+    pub has_remotes: bool,
     /// The grouped push or pull of this repository: a run to show, one
     /// paused on conflicts, its Continue on, something to retry.
-    pub(crate) group: crate::push_group_ui::GroupState,
+    pub group: crate::palette::vocab::push_group::GroupState,
     /// The window is the Repository Management tab.
-    pub(crate) in_repository_management: bool,
+    pub in_repository_management: bool,
     /// ...and its selection is on a repository row (not a header).
-    pub(crate) management_row_selected: bool,
+    pub management_row_selected: bool,
     /// The Radar is showing over the Home tab.
-    pub(crate) radar_open: bool,
+    pub radar_open: bool,
     /// The Release notes tab is open.
-    pub(crate) notes_open: bool,
+    pub notes_open: bool,
     /// A newer release is known (the chip says "available").
-    pub(crate) update_known: bool,
+    pub update_known: bool,
     /// Why the self-update commands cannot run now (`updates::whys`).
-    pub(crate) update_whys: crate::updates::Whys,
+    pub update_whys: crate::palette::vocab::updates::Whys,
     /// ...and its selection is on an item (a request, an issue, a WIP row).
-    pub(crate) radar_row: bool,
+    pub radar_row: bool,
     /// The `git.lfs_enabled` preference, resolved for this repository.
-    pub(crate) lfs_enabled: bool,
+    pub lfs_enabled: bool,
     /// The repository has files stored with LFS (the `LFS only` filter has
     /// something to narrow to).
-    pub(crate) lfs_has_files: bool,
+    pub lfs_has_files: bool,
     /// `git-lfs` is usable (or not known to be missing): the LFS commands
     /// that run it are grayed out with the install link when it is not.
-    pub(crate) lfs_program_ok: bool,
+    pub lfs_program_ok: bool,
 }
 
 impl PaletteContext {
@@ -202,8 +203,11 @@ impl PaletteContext {
 
 /// Why a merge editor command can't run: the editor is closed, or the
 /// file has nothing for it to act on.
-fn merge_reason(cmd: crate::merge_view::MergeCmd, ctx: PaletteContext) -> Option<&'static str> {
-    use crate::merge_view::MergeCmd as M;
+fn merge_reason(
+    cmd: crate::palette::vocab::merge_view::MergeCmd,
+    ctx: PaletteContext,
+) -> Option<&'static str> {
+    use crate::palette::vocab::merge_view::MergeCmd as M;
     use gitpoulpi_i18n::msg::merge as tr;
     if !ctx.merge_open {
         return Some(tr::REASON_NO_EDITOR.get());
@@ -279,12 +283,15 @@ fn merge_reason(cmd: crate::merge_view::MergeCmd, ctx: PaletteContext) -> Option
     }
 }
 
-fn undo_reason(avail: crate::undo_ui::Avail, verb: &'static str) -> Option<&'static str> {
-    use crate::undo_ui::Avail;
+fn undo_reason(
+    avail: crate::palette::vocab::undo::Avail,
+    verb: &'static str,
+) -> Option<&'static str> {
+    use crate::palette::vocab::undo::Avail;
     match (avail, verb) {
         (Avail::Ready, _) => None,
         (Avail::Off, _) => Some(msg::palette::WHY_UNDO_IS_TURNED_OFF_SETTINGS_GENERAL.get()),
-        (Avail::Nothing, "undo") => Some(crate::undo_ui::nothing_to_undo()),
+        (Avail::Nothing, "undo") => Some((families().nothing_to_undo)()),
         (Avail::Nothing, _) => Some(msg::palette::WHY_NOTHING_TO_REDO.get()),
         (Avail::Blocked | Avail::Stuck, "undo") => {
             Some(msg::palette::WHY_CHANGED_OUTSIDE_GITPOULPI_SINCE_HOVER_THE_UNDO.get())
@@ -302,10 +309,7 @@ fn undo_reason(avail: crate::undo_ui::Avail, verb: &'static str) -> Option<&'sta
 /// set for the diff bar. Hiding them would make the palette's contents
 /// depend on where the focus happens to be, which is exactly the
 /// "memorize the app's modes" burden the palette exists to remove.
-pub(crate) fn unavailable_reason(
-    command: PaletteCommand,
-    ctx: PaletteContext,
-) -> Option<&'static str> {
+pub fn unavailable_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static str> {
     // Settings is a screen over the whole window: a command that acts on a
     // pane, tab or dialog behind it would act unseen. The app-wide ones
     // (themes, language, search, About, help, logs) work over it.
@@ -328,7 +332,7 @@ impl PaletteCommand {
     /// grayed out with "close Settings first" (and `run_command` refuses it),
     /// so a command never works on a pane the user cannot see and Settings'
     /// unsaved edits are never lost behind their back.
-    pub(crate) fn stays_in_settings(self) -> bool {
+    pub fn stays_in_settings(self) -> bool {
         use PaletteCommand as C;
         matches!(
             self,
@@ -382,17 +386,17 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         // what moved, is in the Undo button's tooltip and the status line.
         C::Undo => undo_reason(ctx.undo, "undo"),
         C::Redo => undo_reason(ctx.redo, "redo"),
-        C::UndoForget => (ctx.undo != crate::undo_ui::Avail::Stuck)
+        C::UndoForget => (ctx.undo != crate::palette::vocab::undo::Avail::Stuck)
             .then_some(msg::undo_journal::NOT_BLOCKED.get()),
         C::UndoHistory | C::ReflogHead | C::LostCommits => (ctx.undo
-            == crate::undo_ui::Avail::Off)
+            == crate::palette::vocab::undo::Avail::Off)
             .then_some(msg::undo_ui::DISABLED.get()),
         C::Safety(cmd) => cmd.unavailable(ctx.safety_tab),
         C::Review(cmd) => cmd.unavailable(ctx.review),
         C::Board(cmd) => cmd.unavailable(ctx.board),
         C::Item(cmd) => cmd.unavailable(ctx.item),
         C::Composer(cmd) => cmd.unavailable(ctx.composer),
-        C::Flow(cmd) => cmd.unavailable(),
+        C::Flow(cmd) => (families().flow_unavailable)(cmd),
         C::UndoSequence => match undo_reason(ctx.undo, "undo") {
             Some(why) => Some(why),
             None => (!ctx.undo_sequence).then_some(msg::undo_ui::WHY_NO_SEQUENCE.get()),
@@ -426,8 +430,8 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::ImageEditIn
         | C::ImageEditDefault => (!ctx.image_shown).then_some(msg::palette::WHY_NO_IMAGE.get()),
         C::Rewrite(
-            crate::rewrite_view::RewriteEntry::SelectedCommits
-            | crate::rewrite_view::RewriteEntry::FromSelectedCommit,
+            crate::palette::vocab::rewrite_view::RewriteEntry::SelectedCommits
+            | crate::palette::vocab::rewrite_view::RewriteEntry::FromSelectedCommit,
         ) => (!ctx.selected_commit)
             .then_some(msg::palette::WHY_SELECT_A_COMMIT_IN_THE_LOG_FIRST_THE_WIP_ROW_ISN.get()),
         C::Rewrite(_) => None,
@@ -617,7 +621,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
 
         // The file context menu's rows, on the Status pane's selection.
         C::FileMenu(action) => {
-            use crate::status_pane::FileContextAction as F;
+            use crate::palette::vocab::status_pane::FileContextAction as F;
             if !(ctx.unstaged_file_selected || ctx.staged_file_selected) {
                 Some(msg::palette::WHY_SELECT_A_CHANGED_FILE_IN_THE_STATUS_PANE_FIRST.get())
             } else if matches!(action, F::Discard | F::IgnoreFile | F::IgnoreExtension)
@@ -870,14 +874,14 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         C::AgentShowPending | C::AgentDismissPending => {
             (!ctx.agent_pending).then_some(msg::palette::WHY_NO_AGENT_VIEW_IS_WAITING.get())
         }
-        C::SequenceCancel => (!crate::sequence_run::visible())
+        C::SequenceCancel => (!(families().sequence_running)())
             .then_some(msg::palette::WHY_NO_SEQUENCE_RUNNING.get()),
-        C::SequenceContinue => (!crate::sequence_run::can_continue())
+        C::SequenceContinue => (!(families().sequence_can_continue)())
             .then_some(msg::palette::WHY_SEQUENCE_NOT_WAITING.get()),
         C::SequenceRepoReview | C::SequenceRepoTrust | C::SequenceRepoIgnore => {
             // The strip may be hidden (ignored, or no free border row): the
             // commands answer while the file still waits for an answer.
-            (crate::sequence_run::repo::pending().is_none())
+            (!(families().repo_sequences_pending)())
                 .then_some(msg::palette::WHY_NO_REPO_SEQUENCES.get())
         }
         C::AgentBack => (!ctx.agent_back).then_some(msg::palette::WHY_NOTHING_TO_GO_BACK_TO.get()),
@@ -952,7 +956,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         // The Radar's own actions need the Radar open, and the row
         // actions an item selected.
         C::Radar(command) => {
-            use crate::radar::{Act, RadarCommand as L};
+            use crate::palette::vocab::radar::{Act, RadarCommand as L};
             match command {
                 L::Open | L::CloseTab => None,
                 _ if !ctx.radar_open => Some(msg::palette::WHY_RADAR_CLOSED.get()),
@@ -989,7 +993,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         }
         // Download and Skip need a newer release; Close needs the tab.
         C::Updates(command) => {
-            use crate::updates::UpdatesCommand as U;
+            use crate::palette::vocab::updates::UpdatesCommand as U;
             match command {
                 U::ReleaseNotes | U::CheckNow | U::ShowPanel => None,
                 U::CopyCommand => ctx.update_whys.copy,
@@ -1045,7 +1049,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
             }
         }
 
-        C::Hosting(h) => crate::hosting_ui::command_unavailable_from(h, ctx.hosting),
+        C::Hosting(h) => super::vocab::hosting_command::command_unavailable_from(h, ctx.hosting),
 
         C::AiGenerateStashMessage => {
             if !ctx.ai_enabled {
@@ -1108,16 +1112,16 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
             }
         }
 
-        C::Jobs(crate::jobs_ui::JobsCmd::CancelAll) => (!crate::jobs_ui::any_cancellable())
+        C::Jobs(crate::palette::vocab::jobs_ui::JobsCmd::CancelAll) => (!(families().any_job_cancellable)())
             .then_some(gitpoulpi_i18n::msg::jobs::PALETTE_NONE.get()),
 
         C::OpenLastError | C::CopyLastError | C::RunLastErrorRemedy
-            if !crate::activity_log::status_error::has_error() =>
+            if !(families().status_error_present)() =>
         {
             Some(gitpoulpi_i18n::msg::activity_log::WHY_NO_LAST_ERROR.get())
         }
         C::OpenLastError | C::CopyLastError => None,
-        C::RunLastErrorRemedy => (!crate::activity_log::last_error_has_remedy())
+        C::RunLastErrorRemedy => (!(families().last_error_has_remedy)())
             .then_some(gitpoulpi_i18n::msg::activity_log::WHY_NO_REMEDY.get()),
 
         // Always available.
@@ -1181,7 +1185,7 @@ fn base_reason(command: PaletteCommand, ctx: PaletteContext) -> Option<&'static 
         | C::WorkspaceSearch
         | C::OpenActivityLog
         | C::OpenGlobalLog
-        | C::Jobs(crate::jobs_ui::JobsCmd::Show | crate::jobs_ui::JobsCmd::Cancel(_))
+        | C::Jobs(crate::palette::vocab::jobs_ui::JobsCmd::Show | crate::palette::vocab::jobs_ui::JobsCmd::Cancel(_))
         | C::CopyDiagnostics
         | C::ActivityLevel(_)
         | C::ChangeProfile

@@ -8,104 +8,6 @@ use gitpoulpi_i18n::msg::sidebar as msg;
 mod vocab;
 pub(crate) use vocab::SidebarSection;
 
-impl SidebarSection {
-    pub(crate) const ORDER: [SidebarSection; 8] = [
-        SidebarSection::Local,
-        SidebarSection::Remote,
-        SidebarSection::Worktrees,
-        SidebarSection::Stashes,
-        SidebarSection::Tags,
-        SidebarSection::PullRequests,
-        SidebarSection::Issues,
-        SidebarSection::Submodules,
-    ];
-
-    /// Position in [`Self::ORDER`] - the key of the persisted section
-    /// heights (`PaneLayout::sidebar_heights`).
-    pub(crate) fn index(self) -> usize {
-        Self::ORDER
-            .iter()
-            .position(|s| *s == self)
-            .expect("every section is in ORDER")
-    }
-
-    /// The stable English name: the key of the persisted fold state, never shown.
-    // i18n-scan: off
-    pub(crate) fn title(self) -> &'static str {
-        match self {
-            SidebarSection::Local => "LOCAL",
-            SidebarSection::Remote => "REMOTE",
-            SidebarSection::Worktrees => "WORKTREES",
-            SidebarSection::Stashes => "STASHES",
-            SidebarSection::Tags => "TAGS",
-            SidebarSection::PullRequests => "PULL REQUESTS",
-            SidebarSection::Issues => "ISSUES",
-            SidebarSection::Submodules => "SUBMODULES",
-            SidebarSection::WorktreesEmpty => "WORKTREES (EMPTY)",
-        }
-    }
-    // i18n-scan: on
-
-    /// The section header's text in the current language (the stable key is
-    /// [`Self::title`]).
-    pub(crate) fn display_title(self) -> &'static str {
-        use gitpoulpi_i18n::msg::sidebar as m;
-        match self {
-            SidebarSection::Local => m::SECTION_LOCAL,
-            SidebarSection::Remote => m::SECTION_REMOTE,
-            SidebarSection::Worktrees => m::SECTION_WORKTREES,
-            SidebarSection::Stashes => m::SECTION_STASHES,
-            SidebarSection::Tags => m::SECTION_TAGS,
-            SidebarSection::PullRequests => m::SECTION_PULL_REQUESTS,
-            SidebarSection::Issues => m::SECTION_ISSUES,
-            SidebarSection::Submodules => m::SECTION_SUBMODULES,
-            SidebarSection::WorktreesEmpty => m::SECTION_WORKTREES,
-        }
-        .get()
-    }
-
-    pub(crate) fn icon(self) -> &'static str {
-        match self {
-            SidebarSection::Local => LOCAL_ICON,
-            SidebarSection::Remote => REMOTE_ICON,
-            SidebarSection::Worktrees => WORKTREE_ICON,
-            SidebarSection::Stashes => STASH_ICON,
-            SidebarSection::Tags => TAG_ICON,
-            SidebarSection::PullRequests => PULL_REQUEST_ICON,
-            SidebarSection::Issues => ISSUE_ICON,
-            SidebarSection::Submodules => SUBMODULE_ICON,
-            SidebarSection::WorktreesEmpty => WORKTREE_ICON,
-        }
-    }
-
-    /// The inverse of `ref_kind`: which sidebar section a ref of this kind lives
-    /// in. A ref chip in the Log carries a `RefRowKind` while the menu is keyed
-    /// by section, and the two must not be mapped by hand at each call site.
-    pub(crate) fn from_ref_kind(kind: RefRowKind) -> Self {
-        match kind {
-            RefRowKind::Local => SidebarSection::Local,
-            RefRowKind::Remote => SidebarSection::Remote,
-            RefRowKind::Tag => SidebarSection::Tags,
-        }
-    }
-
-    /// The ref kind this section lists, or `None` for the sections that don't
-    /// hold refs at all (worktrees, stashes).
-    pub(crate) fn ref_kind(self) -> Option<RefRowKind> {
-        match self {
-            SidebarSection::Local => Some(RefRowKind::Local),
-            SidebarSection::Remote => Some(RefRowKind::Remote),
-            SidebarSection::Tags => Some(RefRowKind::Tag),
-            SidebarSection::Worktrees
-            | SidebarSection::Stashes
-            | SidebarSection::PullRequests
-            | SidebarSection::Issues
-            | SidebarSection::Submodules
-            | SidebarSection::WorktreesEmpty => None,
-        }
-    }
-}
-
 /// The sections to render this frame, in order. Worktrees and stashes are
 /// elided entirely when empty.
 ///
@@ -183,42 +85,6 @@ pub(crate) fn available_sections(
             _ => true,
         })
         .collect()
-}
-
-impl SidebarSection {
-    /// The stable lowercase name persisted in `ui.sidebar_sections_hidden`.
-    // i18n-scan: off
-    pub(crate) fn config_name(self) -> &'static str {
-        match self {
-            SidebarSection::Local => "local",
-            SidebarSection::Remote => "remote",
-            SidebarSection::Worktrees => "worktrees",
-            SidebarSection::Stashes => "stashes",
-            SidebarSection::Tags => "tags",
-            SidebarSection::PullRequests => "pull_requests",
-            SidebarSection::Issues => "issues",
-            SidebarSection::Submodules => "submodules",
-            SidebarSection::WorktreesEmpty => "worktrees_empty",
-        }
-    }
-    // i18n-scan: on
-
-    /// Whether this build has the feature the section needs.
-    pub(crate) fn compiled_in(self) -> bool {
-        match self {
-            SidebarSection::Worktrees => crate::build_features::WORKTREE,
-            SidebarSection::Submodules => crate::build_features::SUBMODULE,
-            SidebarSection::PullRequests | SidebarSection::Issues => crate::build_features::HOSTING,
-            _ => true,
-        }
-    }
-
-    pub(crate) fn from_config_name(name: &str) -> Option<Self> {
-        Self::ORDER
-            .into_iter()
-            .chain([SidebarSection::WorktreesEmpty])
-            .find(|s| s.config_name() == name)
-    }
 }
 
 /// The set the pane is painted from: the stored one, where WORKTREES counts
@@ -1143,6 +1009,154 @@ pub(crate) fn selected_ref_folder(
     let row = rows.get(selected?)?;
     let path = row.folder_path()?;
     Some((path.to_string(), row.is_remote_root()))
+}
+
+pub(crate) trait SidebarSectionExt: Sized {
+    const ORDER: [SidebarSection; 8];
+    /// Position in [`Self::ORDER`] - the key of the persisted section
+    /// heights (`PaneLayout::sidebar_heights`).
+    fn index(self) -> usize;
+    /// The stable English name: the key of the persisted fold state, never shown.
+    fn title(self) -> &'static str;
+    /// The section header's text in the current language (the stable key is
+    /// [`Self::title`]).
+    fn display_title(self) -> &'static str;
+    fn icon(self) -> &'static str;
+    /// The inverse of `ref_kind`: which sidebar section a ref of this kind lives
+    /// in. A ref chip in the Log carries a `RefRowKind` while the menu is keyed
+    /// by section, and the two must not be mapped by hand at each call site.
+    fn from_ref_kind(kind: RefRowKind) -> Self;
+    /// The ref kind this section lists, or `None` for the sections that don't
+    /// hold refs at all (worktrees, stashes).
+    fn ref_kind(self) -> Option<RefRowKind>;
+    /// The stable lowercase name persisted in `ui.sidebar_sections_hidden`.
+    fn config_name(self) -> &'static str;
+    /// Whether this build has the feature the section needs.
+    fn compiled_in(self) -> bool;
+    fn from_config_name(name: &str) -> Option<Self>;
+}
+
+impl SidebarSectionExt for SidebarSection {
+    const ORDER: [SidebarSection; 8] = [
+        SidebarSection::Local,
+        SidebarSection::Remote,
+        SidebarSection::Worktrees,
+        SidebarSection::Stashes,
+        SidebarSection::Tags,
+        SidebarSection::PullRequests,
+        SidebarSection::Issues,
+        SidebarSection::Submodules,
+    ];
+    /// Position in [`Self::ORDER`] - the key of the persisted section
+    /// heights (`PaneLayout::sidebar_heights`).
+    fn index(self) -> usize {
+        Self::ORDER
+            .iter()
+            .position(|s| *s == self)
+            .expect("every section is in ORDER")
+    }
+    /// The stable English name: the key of the persisted fold state, never shown.
+    // i18n-scan: off
+    fn title(self) -> &'static str {
+        match self {
+            SidebarSection::Local => "LOCAL",
+            SidebarSection::Remote => "REMOTE",
+            SidebarSection::Worktrees => "WORKTREES",
+            SidebarSection::Stashes => "STASHES",
+            SidebarSection::Tags => "TAGS",
+            SidebarSection::PullRequests => "PULL REQUESTS",
+            SidebarSection::Issues => "ISSUES",
+            SidebarSection::Submodules => "SUBMODULES",
+            SidebarSection::WorktreesEmpty => "WORKTREES (EMPTY)",
+        }
+    }
+    // i18n-scan: on
+    /// The section header's text in the current language (the stable key is
+    /// [`Self::title`]).
+    fn display_title(self) -> &'static str {
+        use gitpoulpi_i18n::msg::sidebar as m;
+        match self {
+            SidebarSection::Local => m::SECTION_LOCAL,
+            SidebarSection::Remote => m::SECTION_REMOTE,
+            SidebarSection::Worktrees => m::SECTION_WORKTREES,
+            SidebarSection::Stashes => m::SECTION_STASHES,
+            SidebarSection::Tags => m::SECTION_TAGS,
+            SidebarSection::PullRequests => m::SECTION_PULL_REQUESTS,
+            SidebarSection::Issues => m::SECTION_ISSUES,
+            SidebarSection::Submodules => m::SECTION_SUBMODULES,
+            SidebarSection::WorktreesEmpty => m::SECTION_WORKTREES,
+        }
+        .get()
+    }
+    fn icon(self) -> &'static str {
+        match self {
+            SidebarSection::Local => LOCAL_ICON,
+            SidebarSection::Remote => REMOTE_ICON,
+            SidebarSection::Worktrees => WORKTREE_ICON,
+            SidebarSection::Stashes => STASH_ICON,
+            SidebarSection::Tags => TAG_ICON,
+            SidebarSection::PullRequests => PULL_REQUEST_ICON,
+            SidebarSection::Issues => ISSUE_ICON,
+            SidebarSection::Submodules => SUBMODULE_ICON,
+            SidebarSection::WorktreesEmpty => WORKTREE_ICON,
+        }
+    }
+    /// The inverse of `ref_kind`: which sidebar section a ref of this kind lives
+    /// in. A ref chip in the Log carries a `RefRowKind` while the menu is keyed
+    /// by section, and the two must not be mapped by hand at each call site.
+    fn from_ref_kind(kind: RefRowKind) -> Self {
+        match kind {
+            RefRowKind::Local => SidebarSection::Local,
+            RefRowKind::Remote => SidebarSection::Remote,
+            RefRowKind::Tag => SidebarSection::Tags,
+        }
+    }
+    /// The ref kind this section lists, or `None` for the sections that don't
+    /// hold refs at all (worktrees, stashes).
+    fn ref_kind(self) -> Option<RefRowKind> {
+        match self {
+            SidebarSection::Local => Some(RefRowKind::Local),
+            SidebarSection::Remote => Some(RefRowKind::Remote),
+            SidebarSection::Tags => Some(RefRowKind::Tag),
+            SidebarSection::Worktrees
+            | SidebarSection::Stashes
+            | SidebarSection::PullRequests
+            | SidebarSection::Issues
+            | SidebarSection::Submodules
+            | SidebarSection::WorktreesEmpty => None,
+        }
+    }
+    /// The stable lowercase name persisted in `ui.sidebar_sections_hidden`.
+    // i18n-scan: off
+    fn config_name(self) -> &'static str {
+        match self {
+            SidebarSection::Local => "local",
+            SidebarSection::Remote => "remote",
+            SidebarSection::Worktrees => "worktrees",
+            SidebarSection::Stashes => "stashes",
+            SidebarSection::Tags => "tags",
+            SidebarSection::PullRequests => "pull_requests",
+            SidebarSection::Issues => "issues",
+            SidebarSection::Submodules => "submodules",
+            SidebarSection::WorktreesEmpty => "worktrees_empty",
+        }
+    }
+    // i18n-scan: on
+    /// Whether this build has the feature the section needs.
+    fn compiled_in(self) -> bool {
+        match self {
+            SidebarSection::Worktrees => crate::build_features::WORKTREE,
+            SidebarSection::Submodules => crate::build_features::SUBMODULE,
+            SidebarSection::PullRequests | SidebarSection::Issues => crate::build_features::HOSTING,
+            _ => true,
+        }
+    }
+    fn from_config_name(name: &str) -> Option<Self> {
+        Self::ORDER
+            .into_iter()
+            .chain([SidebarSection::WorktreesEmpty])
+            .find(|s| s.config_name() == name)
+    }
 }
 
 #[cfg(test)]

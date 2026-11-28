@@ -27,7 +27,7 @@ pub(crate) mod source;
 pub(crate) mod view;
 
 pub(crate) use actions::{default_actions, FlowActions};
-pub(crate) use cmd::{menu_rows, request, take_request, FlowCmd};
+pub(crate) use cmd::{menu_rows, request, take_request, FlowCmd, FlowCmdExt};
 pub(crate) use dialog::{flow_rect, FlowDialog, FlowKind, FlowOutcome, FlowSeed};
 pub(crate) use source::FlowSource;
 

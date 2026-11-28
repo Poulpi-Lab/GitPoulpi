@@ -9,7 +9,7 @@ use super::{Action, Ctx, Keymap, ACTIONS};
 use gitpoulpi_i18n::msg::keymap_conflict as msg;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) enum Level {
+pub enum Level {
     /// The binding is refused (the config entry is ignored).
     Error,
     /// Allowed, shown in amber.
@@ -19,20 +19,20 @@ pub(crate) enum Level {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Conflict {
-    pub(crate) level: Level,
-    pub(crate) ctx: Ctx,
-    pub(crate) action: Action,
+pub struct Conflict {
+    pub level: Level,
+    pub ctx: Ctx,
+    pub action: Action,
     /// The other party of a clash, when there is one.
-    pub(crate) other: Option<Action>,
-    pub(crate) chord: KeyChord,
-    pub(crate) message: String,
+    pub other: Option<Action>,
+    pub chord: KeyChord,
+    pub message: String,
 }
 
 /// How keys reach the application. A terminal cannot send every chord (see
 /// `KeyChord::reach`); a desktop window receives every chord as typed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum KeyTransport {
+pub enum KeyTransport {
     /// `windows` = the console API (modifiers intact); `enhanced` = the
     /// kitty keyboard protocol is on.
     Terminal {
@@ -40,6 +40,27 @@ pub(crate) enum KeyTransport {
         enhanced: bool,
     },
     Desktop,
+}
+
+static TRANSPORT: std::sync::OnceLock<fn() -> KeyTransport> = std::sync::OnceLock::new();
+
+/// Publishes how keys reach the running frontend (the first call wins). A
+/// desktop window installs `|| KeyTransport::Desktop`; the terminal installs
+/// the console / kitty-protocol facts it probed.
+pub fn install_transport(transport: fn() -> KeyTransport) {
+    let _ = TRANSPORT.set(transport);
+}
+
+/// How keys reach the application now: what [`install_transport`] says, else
+/// a terminal that is not on the enhanced keyboard protocol.
+pub fn current_transport() -> KeyTransport {
+    match TRANSPORT.get() {
+        Some(transport) => transport(),
+        None => KeyTransport::Terminal {
+            windows: cfg!(windows),
+            enhanced: false,
+        },
+    }
 }
 
 impl KeyTransport {
@@ -63,7 +84,7 @@ impl KeyTransport {
 /// The pane contexts and the Home tab are children of `global`: their
 /// keys are looked up first, so a pane chord equal to a global one hides
 /// it while that pane has focus.
-pub(crate) const fn parent_of(ctx: Ctx) -> Option<Ctx> {
+pub const fn parent_of(ctx: Ctx) -> Option<Ctx> {
     if ctx.is_pane() || ctx.is_view() {
         Some(Ctx::Global)
     } else {
@@ -105,11 +126,11 @@ fn is_text_field_chord(c: KeyChord) -> bool {
         && matches!(c.key, Key::Char('a' | 'u' | 'k' | 'c' | 'x'))
 }
 
-pub(crate) fn detect(km: &Keymap, transport: KeyTransport) -> Vec<Conflict> {
+pub fn detect(km: &Keymap, transport: KeyTransport) -> Vec<Conflict> {
     detect_with(km, transport, parent_of)
 }
 
-pub(crate) fn detect_with(
+pub fn detect_with(
     km: &Keymap,
     transport: KeyTransport,
     parent: fn(Ctx) -> Option<Ctx>,
@@ -248,7 +269,7 @@ pub(crate) fn detect_with(
 /// stay fixed: Esc everywhere, and in `global` and the pane
 /// contexts the motion and navigation keys and the digits (the vim
 /// count prefix). The prefix tables take any key but Esc.
-pub(crate) fn fixed_reason(ctx: Ctx, chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
+pub fn fixed_reason(ctx: Ctx, chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
     let c = chord.class();
     if c.key == Key::Esc {
         return Some(msg::FIXED_ESC);
@@ -311,22 +332,17 @@ pub(crate) fn fixed_reason(ctx: Ctx, chord: KeyChord) -> Option<gitpoulpi_i18n::
 /// What binding `new` to `action` would do, for the capture popup and
 /// the tests. Nothing is saved here.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct Analysis {
+pub struct Analysis {
     /// Why the binding cannot be saved at all.
-    pub(crate) refusal: Option<String>,
+    pub refusal: Option<String>,
     /// A same-context action that already has the chord: saving replaces
     /// (unbinds) it, after the user chose Replace.
-    pub(crate) replace: Option<Action>,
+    pub replace: Option<Action>,
     /// Warnings and hints, worst first.
-    pub(crate) notes: Vec<(Level, String)>,
+    pub notes: Vec<(Level, String)>,
 }
 
-pub(crate) fn analyse(
-    km: &Keymap,
-    transport: KeyTransport,
-    action: Action,
-    new: &[KeyChord],
-) -> Analysis {
+pub fn analyse(km: &Keymap, transport: KeyTransport, action: Action, new: &[KeyChord]) -> Analysis {
     let d = def(action);
     let mut out = Analysis::default();
     if !d.rebindable {

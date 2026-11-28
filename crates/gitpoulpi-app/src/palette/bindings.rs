@@ -18,7 +18,7 @@ use crate::keymap::{Action, Ctx};
 /// The stable config name of a command: its `Debug` spelling in snake case
 /// (`StashPop(Latest)` is `stash_pop_latest`). Renaming a variant renames it,
 /// so a test pins the list.
-pub(crate) fn command_id(command: &PaletteCommand) -> String {
+pub fn command_id(command: &PaletteCommand) -> String {
     let debug = format!("{command:?}");
     let mut out = String::with_capacity(debug.len() + 8);
     let mut prev_lower = false;
@@ -40,7 +40,7 @@ pub(crate) fn command_id(command: &PaletteCommand) -> String {
 }
 
 /// The keymap action a command already has (a registered one), if any.
-pub(crate) fn static_bind_action(entry: &PaletteEntry) -> Option<Action> {
+pub fn static_bind_action(entry: &PaletteEntry) -> Option<Action> {
     if let Some(action) = command_action(entry) {
         return Some(action);
     }
@@ -53,7 +53,7 @@ pub(crate) fn static_bind_action(entry: &PaletteEntry) -> Option<Action> {
 }
 
 /// The bindable action of a command with no registered one.
-pub(crate) fn palette_action(entry: &PaletteEntry) -> Option<Action> {
+pub fn palette_action(entry: &PaletteEntry) -> Option<Action> {
     if static_bind_action(entry).is_some() {
         return None;
     }
@@ -64,7 +64,7 @@ pub(crate) fn palette_action(entry: &PaletteEntry) -> Option<Action> {
 }
 
 /// The entry an `Action::Palette(i)` stands for.
-pub(crate) fn palette_entry(action: Action) -> Option<&'static PaletteEntry> {
+pub fn palette_entry(action: Action) -> Option<&'static PaletteEntry> {
     match action {
         Action::Palette(i) => PALETTE_COMMANDS.get(i as usize),
         _ => None,
@@ -73,7 +73,7 @@ pub(crate) fn palette_entry(action: Action) -> Option<&'static PaletteEntry> {
 
 /// One `ActionDef` per command without a registered action (built once by
 /// `keymap::action::all_actions`).
-pub(crate) fn palette_action_defs() -> Vec<ActionDef> {
+pub fn palette_action_defs() -> Vec<ActionDef> {
     PALETTE_COMMANDS
         .iter()
         .enumerate()

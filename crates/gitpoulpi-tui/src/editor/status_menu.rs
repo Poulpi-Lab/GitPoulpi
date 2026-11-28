@@ -51,16 +51,6 @@ pub(super) const CHIPS: [(StatusMenu, EditorHit); 3] = [
     (StatusMenu::Indentation, EditorHit::IndentChip),
 ];
 
-impl StatusMenu {
-    fn chip_slot(self) -> usize {
-        match self {
-            StatusMenu::Encoding | StatusMenu::Reopen | StatusMenu::Convert => 0,
-            StatusMenu::LineEndings => 1,
-            StatusMenu::Indentation => 2,
-        }
-    }
-}
-
 fn eol_value(eol: Eol) -> &'static str {
     match eol {
         Eol::Lf => "lf",

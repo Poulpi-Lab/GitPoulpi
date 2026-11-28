@@ -6,6 +6,8 @@
 //! flips and the menu stays open, the checklist convention.
 
 use crate::context_menu::Entry;
+#[allow(unused_imports)]
+use crate::refs_sidebar::SidebarSectionExt;
 use crate::refs_sidebar::{can_hide, SidebarSection};
 use crate::RefContextAction;
 use gitpoulpi_i18n::msg;

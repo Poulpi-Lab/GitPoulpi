@@ -16,6 +16,8 @@
 //! is hidden while a History is open, and for views that are not of a
 //! commit (the working tree's diffs, a comparison).
 
+#[allow(unused_imports)]
+use crate::log_table::LogColumnExt;
 mod follow;
 mod picture;
 mod render;
@@ -83,16 +85,6 @@ impl Pref {
 mod vocab;
 pub(crate) use vocab::{ColumnCmd, ColumnState, Part, Side};
 
-impl ColumnState {
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            ColumnState::Off => gitpoulpi_i18n::msg::commit_column::STATE_OFF.get(),
-            ColumnState::File => gitpoulpi_i18n::msg::commit_column::STATE_FILE.get(),
-            ColumnState::Graph => gitpoulpi_i18n::msg::commit_column::STATE_GRAPH.get(),
-        }
-    }
-}
-
 /// Which list the column shows *when it is shown*: the bar's `File | All`
 /// selector. Remembered apart from shown / hidden, so reopening the column
 /// (the strip, `Alt+C`, a click on a segment) restores it.
@@ -144,96 +136,6 @@ pub(crate) const DEFAULT_SHOWN: [bool; PARTS] = [true, true, true, false, true, 
 /// part it names, which is the first cell of the next shown part (the Log's
 /// rule: its boundary is the first letter of the next column's header).
 pub(crate) type Boundary = Part;
-
-impl Part {
-    /// Every part, in the order a row shows them.
-    pub(crate) const ORDER: [Part; PARTS] = [
-        Part::Refs,
-        Part::Graph,
-        Part::Title,
-        Part::Author,
-        Part::Date,
-        Part::Changes,
-        Part::Sha,
-    ];
-
-    /// The header's word: the Log's own column titles.
-    pub(crate) fn title(self) -> &'static str {
-        use crate::log_table::LogColumn;
-        match self {
-            Part::Refs => LogColumn::Ref.title(),
-            Part::Graph => LogColumn::Graph.title(),
-            Part::Title => LogColumn::Message.title(),
-            Part::Author => LogColumn::Author.title(),
-            Part::Date => LogColumn::Date.title(),
-            Part::Changes => LogColumn::Changes.title(),
-            Part::Sha => LogColumn::Sha.title(),
-        }
-    }
-
-    /// The part the keyboard sizes after this one, among the shown ones.
-    pub(crate) fn next_sized(self, shown: [bool; PARTS]) -> Part {
-        let at = Part::ORDER.iter().position(|p| *p == self).unwrap_or(0);
-        (1..=Part::ORDER.len())
-            .map(|i| Part::ORDER[(at + i) % Part::ORDER.len()])
-            .find(|p| shown[p.slot()])
-            .unwrap_or(self)
-    }
-
-    /// Its slot in the saved widths and in the shown flags.
-    pub(crate) fn slot(self) -> usize {
-        match self {
-            Part::Graph => 0,
-            Part::Author => 1,
-            Part::Date => 2,
-            Part::Refs => 3,
-            Part::Title => 4,
-            Part::Changes => 5,
-            Part::Sha => 6,
-        }
-    }
-
-    /// The Log column this part mirrors: its name in the saved list of
-    /// shown parts (`LogColumn::config_name`) and its header word.
-    pub(crate) fn log_column(self) -> crate::log_table::LogColumn {
-        use crate::log_table::LogColumn;
-        match self {
-            Part::Refs => LogColumn::Ref,
-            Part::Graph => LogColumn::Graph,
-            Part::Title => LogColumn::Message,
-            Part::Author => LogColumn::Author,
-            Part::Date => LogColumn::Date,
-            Part::Changes => LogColumn::Changes,
-            Part::Sha => LogColumn::Sha,
-        }
-    }
-
-    /// The part a saved column name stands for.
-    pub(crate) fn from_name(name: &str) -> Option<Part> {
-        Part::ORDER
-            .iter()
-            .copied()
-            .find(|p| p.log_column().config_name() == name)
-    }
-
-    /// Whether the menu may hide it: the message never goes, as in the Log.
-    pub(crate) fn hideable(self) -> bool {
-        self != Part::Title
-    }
-
-    /// The least width a part keeps.
-    pub(crate) fn min_width(self) -> usize {
-        match self {
-            Part::Refs => picture::MIN_REFS,
-            Part::Graph => picture::min_lanes(),
-            Part::Title => picture::MIN_MESSAGE,
-            Part::Author => picture::MIN_AUTHOR,
-            Part::Date => picture::MIN_DATE,
-            Part::Changes => picture::MIN_CHANGES,
-            Part::Sha => picture::MIN_SHA,
-        }
-    }
-}
 
 /// The saved order's parts: unknown names and repeats ignored, the parts
 /// the list leaves out following in default order (the Log's rule), so an
@@ -1090,6 +992,109 @@ impl CommitColumn {
         self.strip = Rect::default();
         self.len = 0;
         self.visible_ids.clear();
+    }
+}
+
+pub(crate) trait PartExt: Sized {
+    /// Every part, in the order a row shows them.
+    const ORDER: [Part; PARTS];
+    /// The header's word: the Log's own column titles.
+    fn title(self) -> &'static str;
+    /// The part the keyboard sizes after this one, among the shown ones.
+    fn next_sized(self, shown: [bool; PARTS]) -> Part;
+    /// Its slot in the saved widths and in the shown flags.
+    fn slot(self) -> usize;
+    /// The Log column this part mirrors: its name in the saved list of
+    /// shown parts (`LogColumn::config_name`) and its header word.
+    fn log_column(self) -> crate::log_table::LogColumn;
+    /// The part a saved column name stands for.
+    fn from_name(name: &str) -> Option<Part>;
+    /// Whether the menu may hide it: the message never goes, as in the Log.
+    fn hideable(self) -> bool;
+    /// The least width a part keeps.
+    fn min_width(self) -> usize;
+}
+
+impl PartExt for Part {
+    /// Every part, in the order a row shows them.
+    const ORDER: [Part; PARTS] = [
+        Part::Refs,
+        Part::Graph,
+        Part::Title,
+        Part::Author,
+        Part::Date,
+        Part::Changes,
+        Part::Sha,
+    ];
+    /// The header's word: the Log's own column titles.
+    fn title(self) -> &'static str {
+        use crate::log_table::LogColumn;
+        match self {
+            Part::Refs => LogColumn::Ref.title(),
+            Part::Graph => LogColumn::Graph.title(),
+            Part::Title => LogColumn::Message.title(),
+            Part::Author => LogColumn::Author.title(),
+            Part::Date => LogColumn::Date.title(),
+            Part::Changes => LogColumn::Changes.title(),
+            Part::Sha => LogColumn::Sha.title(),
+        }
+    }
+    /// The part the keyboard sizes after this one, among the shown ones.
+    fn next_sized(self, shown: [bool; PARTS]) -> Part {
+        let at = Part::ORDER.iter().position(|p| *p == self).unwrap_or(0);
+        (1..=Part::ORDER.len())
+            .map(|i| Part::ORDER[(at + i) % Part::ORDER.len()])
+            .find(|p| shown[p.slot()])
+            .unwrap_or(self)
+    }
+    /// Its slot in the saved widths and in the shown flags.
+    fn slot(self) -> usize {
+        match self {
+            Part::Graph => 0,
+            Part::Author => 1,
+            Part::Date => 2,
+            Part::Refs => 3,
+            Part::Title => 4,
+            Part::Changes => 5,
+            Part::Sha => 6,
+        }
+    }
+    /// The Log column this part mirrors: its name in the saved list of
+    /// shown parts (`LogColumn::config_name`) and its header word.
+    fn log_column(self) -> crate::log_table::LogColumn {
+        use crate::log_table::LogColumn;
+        match self {
+            Part::Refs => LogColumn::Ref,
+            Part::Graph => LogColumn::Graph,
+            Part::Title => LogColumn::Message,
+            Part::Author => LogColumn::Author,
+            Part::Date => LogColumn::Date,
+            Part::Changes => LogColumn::Changes,
+            Part::Sha => LogColumn::Sha,
+        }
+    }
+    /// The part a saved column name stands for.
+    fn from_name(name: &str) -> Option<Part> {
+        Part::ORDER
+            .iter()
+            .copied()
+            .find(|p| p.log_column().config_name() == name)
+    }
+    /// Whether the menu may hide it: the message never goes, as in the Log.
+    fn hideable(self) -> bool {
+        self != Part::Title
+    }
+    /// The least width a part keeps.
+    fn min_width(self) -> usize {
+        match self {
+            Part::Refs => picture::MIN_REFS,
+            Part::Graph => picture::min_lanes(),
+            Part::Title => picture::MIN_MESSAGE,
+            Part::Author => picture::MIN_AUTHOR,
+            Part::Date => picture::MIN_DATE,
+            Part::Changes => picture::MIN_CHANGES,
+            Part::Sha => picture::MIN_SHA,
+        }
     }
 }
 

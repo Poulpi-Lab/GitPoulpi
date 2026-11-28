@@ -147,28 +147,6 @@ pub(crate) fn wrap(text: &str, width: usize) -> Vec<String> {
     lines
 }
 
-impl SizedColumn {
-    pub(super) fn of(cell: Cell) -> Self {
-        match cell {
-            Cell::Num => SizedColumn::Num,
-            Cell::Branches => SizedColumn::Branches,
-            Cell::Author => SizedColumn::Author,
-            Cell::Age => SizedColumn::Age,
-            _ => SizedColumn::Repo,
-        }
-    }
-
-    pub(super) fn cell(self) -> Cell {
-        match self {
-            SizedColumn::Repo => Cell::Repo,
-            SizedColumn::Branches => Cell::Branches,
-            SizedColumn::Num => Cell::Num,
-            SizedColumn::Author => Cell::Author,
-            SizedColumn::Age => Cell::Age,
-        }
-    }
-}
-
 impl RadarUi {
     fn slot(cell: Cell) -> Option<usize> {
         match cell {
@@ -442,6 +420,32 @@ impl RadarUi {
             Cell::Age => item.updated_at.clone(),
             Cell::Labels => item.labels.join(" \u{00B7} "),
             Cell::Branches => item.branches_text(),
+        }
+    }
+}
+
+pub(crate) trait SizedColumnExt: Sized {
+    fn of(cell: Cell) -> Self;
+    fn cell(self) -> Cell;
+}
+
+impl SizedColumnExt for SizedColumn {
+    fn of(cell: Cell) -> Self {
+        match cell {
+            Cell::Num => SizedColumn::Num,
+            Cell::Branches => SizedColumn::Branches,
+            Cell::Author => SizedColumn::Author,
+            Cell::Age => SizedColumn::Age,
+            _ => SizedColumn::Repo,
+        }
+    }
+    fn cell(self) -> Cell {
+        match self {
+            SizedColumn::Repo => Cell::Repo,
+            SizedColumn::Branches => Cell::Branches,
+            SizedColumn::Num => Cell::Num,
+            SizedColumn::Author => Cell::Author,
+            SizedColumn::Age => Cell::Age,
         }
     }
 }

@@ -262,7 +262,7 @@ fn open_language_combo(term: &mut Terminal) -> Screen {
 }
 
 fn stored(config: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default()
 }
 
 #[test]

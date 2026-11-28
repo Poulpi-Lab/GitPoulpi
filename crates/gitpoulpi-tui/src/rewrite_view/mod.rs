@@ -77,11 +77,11 @@ pub(crate) use bars::BarId;
 pub(crate) use drill::{Drill, DrillDiff};
 pub(crate) use host::{HostHandle, HostState};
 pub(crate) use identities::{Candidate, IdentitiesState, MergePick};
-pub(crate) use model::RuleTemplateExt;
 pub(crate) use model::{
     detail_of, rows as rule_rows, template_of, RuleGroup, RuleList, RuleRow, RuleTemplate,
     Validation,
 };
+pub(crate) use model::{RuleTemplateExt, RuleTemplateKit};
 pub(crate) use popup::{PopupRow, ROW_FILTERS};
 pub(crate) use purge::{PurgeConfirm, PurgeScreen};
 pub(crate) use push::{PushPanel, PushPick};

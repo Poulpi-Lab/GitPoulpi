@@ -30,6 +30,8 @@ pub mod refs_sections;
 pub mod refs_tree;
 pub mod registry;
 pub mod repo_facts;
+pub mod reword;
+pub mod rewrite_rules;
 pub mod sequences;
 pub mod status_rows;
 pub mod surface;

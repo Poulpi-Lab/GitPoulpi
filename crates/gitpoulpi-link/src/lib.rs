@@ -93,11 +93,13 @@ pub mod no_repository;
 pub mod oid_text;
 #[cfg(all(feature = "radar", feature = "hosting"))]
 pub mod radar;
+pub mod rebase_plan;
 pub mod redraw;
 pub mod rename_pairs;
 pub mod repo_state_path;
 #[cfg(all(feature = "review", feature = "hosting"))]
 pub mod review_model;
+pub mod rewrite_rules;
 pub mod ui_viewer;
 pub mod undo_label;
 pub mod undo_ui;

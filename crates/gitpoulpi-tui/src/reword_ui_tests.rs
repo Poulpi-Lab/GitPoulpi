@@ -1,6 +1,5 @@
 use super::*;
 use crate::test_support::*;
-use gitpoulpi_core::domain::RefVisibility;
 
 fn key(code: KeyCode) -> KeyEvent {
     KeyEvent::new(code, KeyModifiers::NONE)
@@ -14,81 +13,6 @@ fn type_str(form: &mut RewordForm, s: &str) {
     for c in s.chars() {
         form.on_key(key(KeyCode::Char(c)));
     }
-}
-
-fn branch(name: &str, target: u8, is_head: bool, upstream: Option<&str>) -> Ref {
-    Ref {
-        kind: RefKind::LocalBranch { name: name.into() },
-        target: oid(target),
-        visibility: RefVisibility::Shown,
-        is_head,
-        upstream: upstream.map(str::to_string),
-        tag_sync: None,
-        multi_remote: None,
-    }
-}
-
-fn remote(remote: &str, name: &str, target: u8) -> Ref {
-    Ref {
-        kind: RefKind::RemoteBranch {
-            remote: remote.into(),
-            name: name.into(),
-        },
-        target: oid(target),
-        visibility: RefVisibility::Shown,
-        is_head: false,
-        upstream: None,
-        tag_sync: None,
-        multi_remote: None,
-    }
-}
-
-/// 1 <- 2 <- 3 <- 4 (main, HEAD); origin/main is at 2; 9 is on
-/// another branch, off 1.
-fn graph() -> CommitGraph {
-    CommitGraph {
-        nodes: vec![
-            commit(4, &[3]),
-            commit(3, &[2]),
-            commit(9, &[1]),
-            commit(2, &[1]),
-            commit(1, &[]),
-        ],
-    }
-}
-
-#[test]
-fn a_commit_on_the_upstream_is_pushed_and_one_above_it_is_not() {
-    let refs = vec![
-        branch("main", 4, true, Some("origin/main")),
-        remote("origin", "main", 2),
-    ];
-    let g = graph();
-    assert_eq!(
-        pushed_upstream(&g, &refs, oid(2)).as_deref(),
-        Some("origin/main")
-    );
-    assert_eq!(
-        pushed_upstream(&g, &refs, oid(1)).as_deref(),
-        Some("origin/main")
-    );
-    assert_eq!(pushed_upstream(&g, &refs, oid(3)), None);
-    assert_eq!(pushed_upstream(&g, &refs, oid(4)), None);
-    // No upstream: nothing to force push.
-    let unset = vec![branch("main", 4, true, None), remote("origin", "main", 2)];
-    assert_eq!(pushed_upstream(&g, &unset, oid(2)), None);
-}
-
-#[test]
-fn only_head_and_its_ancestors_are_on_the_current_branch() {
-    let refs = vec![branch("main", 4, true, None)];
-    let g = graph();
-    assert_eq!(on_current_branch(&g, &refs, oid(4)), Some(true));
-    assert_eq!(on_current_branch(&g, &refs, oid(1)), Some(true));
-    assert_eq!(on_current_branch(&g, &refs, oid(9)), Some(false));
-    // Detached HEAD: the Log cannot tell, the backend decides.
-    let detached = vec![branch("main", 4, false, None)];
-    assert_eq!(on_current_branch(&g, &detached, oid(9)), None);
 }
 
 #[test]

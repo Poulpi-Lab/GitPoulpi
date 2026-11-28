@@ -457,8 +457,11 @@ use status_pane::{
 use worktree_dialog::WorktreeSeed;
 #[allow(unused_imports)]
 use {
-    commit_column::PartExt, flow::FlowCmdExt, rewrite_view::RuleTemplateExt,
-    safety_panel::SafetyCmdExt, tree_fold::TreeFoldExt,
+    commit_column::PartExt,
+    flow::FlowCmdExt,
+    rewrite_view::{RuleTemplateExt, RuleTemplateKit},
+    safety_panel::SafetyCmdExt,
+    tree_fold::TreeFoldExt,
 };
 
 use std::collections::HashSet;

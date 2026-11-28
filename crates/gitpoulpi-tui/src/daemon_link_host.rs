@@ -8,7 +8,8 @@ use gitpoulpi_core::privacy::Sensitive;
 use gitpoulpi_core::NotCancellableReason;
 
 use crate::daemon_link::{
-    Action, JobEvent, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind, UndoKey,
+    Action, JobEvent, LinkContext, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind,
+    UndoKey,
 };
 
 /// The host every TUI link is started with.
@@ -19,20 +20,21 @@ pub(crate) fn host() -> Arc<dyn LinkHost> {
 struct TuiLinkHost;
 
 impl LinkHost for TuiLinkHost {
-    fn wake(&self) {
+    fn wake(&self, _link: &LinkContext) {
         crate::redraw::poke();
     }
 
-    fn before_exit(&self) {
+    fn before_exit(&self, _link: &LinkContext) {
         crate::exit_log::restore_terminal();
     }
 
-    fn raise_window(&self) -> Result<String, String> {
+    fn raise_window(&self, _link: &LinkContext) -> Result<String, String> {
         crate::window_ctl::raise()
     }
 
     fn ask_sensitive_stage(
         &self,
+        _link: &LinkContext,
         root: std::path::PathBuf,
         action: Action,
         files: Vec<Sensitive>,
@@ -41,13 +43,13 @@ impl LinkHost for TuiLinkHost {
         crate::stage_guard_dialog::ask(root, action, files, ticket);
     }
 
-    fn on_connected(&self, requester: Requester) {
+    fn on_connected(&self, _link: &LinkContext, requester: Requester) {
         crate::jobs_ui::set_requester(requester.clone());
         crate::push_group_ui::set_requester(requester.clone());
         crate::hosting_notify::set_requester(requester);
     }
 
-    fn jobs(&self, event: JobEvent) {
+    fn jobs(&self, _link: &LinkContext, event: JobEvent) {
         match event {
             JobEvent::Seed(list) => crate::jobs_ui::seed(list),
             JobEvent::Changed(info) => crate::jobs_ui::changed(info),
@@ -56,7 +58,7 @@ impl LinkHost for TuiLinkHost {
         }
     }
 
-    fn push_group(&self, event: PushGroupEvent<'_>) {
+    fn push_group(&self, _link: &LinkContext, event: PushGroupEvent<'_>) {
         match event {
             PushGroupEvent::Started { root, request } => {
                 crate::push_group_ui::on_started(root, request);
@@ -73,7 +75,7 @@ impl LinkHost for TuiLinkHost {
         }
     }
 
-    fn report(&self, report: Report<'_>) {
+    fn report(&self, _link: &LinkContext, report: Report<'_>) {
         match report {
             Report::Success {
                 action,
@@ -100,18 +102,18 @@ impl LinkHost for TuiLinkHost {
         }
     }
 
-    fn timing(&self, kind: TimingKind, repo: &Path, label: String, ms: u64) {
+    fn timing(&self, _link: &LinkContext, kind: TimingKind, repo: &Path, label: String, ms: u64) {
         match kind {
             TimingKind::Foreground => crate::activity_log::timing_record(repo, label, ms),
             TimingKind::Background => crate::activity_log::timing_background(repo, label, ms),
         }
     }
 
-    fn expect_background_fetch(&self) {
+    fn expect_background_fetch(&self, _link: &LinkContext) {
         crate::activity_log::expect_background_fetch();
     }
 
-    fn background_fetch_pending(&self) -> bool {
+    fn background_fetch_pending(&self, _link: &LinkContext) -> bool {
         crate::activity_log::background_fetch_pending()
     }
 

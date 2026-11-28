@@ -120,7 +120,7 @@ pub struct LogPanel {
     columns: ColumnState,
     search: SearchState,
     focus: FocusHandle,
-    /// Paging: page size, ceiling, lazy on/off and the detached-HEAD front (shared with the terminal UI).
+    /// Paging: page size, ceiling, lazy on/off (shared with the terminal UI).
     lazy: LazyLog,
     /// The hidden and soloed refs, as the Refs sidebar edits them.
     hidden: HashSet<String>,

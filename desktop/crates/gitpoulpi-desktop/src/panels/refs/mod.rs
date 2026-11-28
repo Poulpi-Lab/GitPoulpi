@@ -18,11 +18,17 @@ use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 use std::sync::Arc;
 
+use gitpoulpi_app::palette::vocab::refs_sidebar::SidebarSection;
+use gitpoulpi_app::refs_sections::hidden_from_names;
 use gitpoulpi_app::refs_tree::{
-    hide_folder, load_collapsed, load_ref_visibility, save_collapsed, split_hidden,
-    toggle_hide_ref, CollapsedFolders, FolderHide, RefRowKind,
+    hide_folder, load_collapsed, load_ref_visibility, refs_title, refs_under_folder,
+    save_collapsed, split_hidden, toggle_folder_membership, toggle_hide_ref, CollapsedFolders,
+    FolderHide, RefRowKind,
 };
-use gitpoulpi_core::domain::{Oid, OperationKind, Ref, RefKind, Stash, TagWhere, Worktree};
+use gitpoulpi_app::tag_where::{snapshot_of, tooltip_lines, TagInfo};
+use gitpoulpi_core::domain::{
+    Oid, OperationKind, Ref, RefKind, Stash, Submodule, TagWhere, Worktree,
+};
 use gitpoulpi_i18n::msg;
 use gpui_kit::assets::IconName as AssetIcon;
 use gpui_kit::component::{
@@ -86,6 +92,11 @@ pub struct RefsPanel {
     refs: Vec<Ref>,
     stashes: Vec<Stash>,
     worktrees: Vec<Worktree>,
+    submodules: Vec<Submodule>,
+    /// Where each tag lives, for the place marker and its tooltip.
+    tags: Arc<HashMap<String, TagInfo>>,
+    /// `ui.sidebar_sections_hidden`.
+    hidden_sections: HashSet<SidebarSection>,
     /// `ui.ref_tree`: folders on `/`.
     hierarchical: bool,
     collapsed: CollapsedFolders,
@@ -99,6 +110,15 @@ pub struct RefsPanel {
     cursor: Option<(Kind, String)>,
     /// A line the last action wants to say (a hide that did nothing, and why).
     note: Option<String>,
+    /// Bumped by every change made here: a read of the stored sets taken under an older value is
+    /// stale (the user changed something while it ran) and is thrown away.
+    vis_gen: u64,
+    /// `SetRefVisibility` calls this panel sent that the daemon has not answered. While any is out,
+    /// the stored sets are mid-write, so what another frontend's event says cannot be told from our
+    /// own echo and is not applied.
+    vis_pending: usize,
+    /// An event arrived while calls were out: re-read once the last one is answered.
+    vis_stale: bool,
     filter: Entity<InputState>,
     query: String,
     focus: FocusHandle,
@@ -115,6 +135,7 @@ fn section_icon(kind: Kind) -> AssetIcon {
         Kind::Worktrees => AssetIcon::Leaf,
         Kind::Stashes => AssetIcon::Package,
         Kind::Tags => AssetIcon::Tag,
+        Kind::Submodules => AssetIcon::Folder,
     }
 }
 
@@ -130,7 +151,7 @@ struct Palette {
     accent: Hsla,
     selection: Hsla,
     hover: Hsla,
-    section: [Hsla; 5],
+    section: [Hsla; 6],
 }
 
 impl RefsPanel {
@@ -150,6 +171,9 @@ impl RefsPanel {
             refs: Vec::new(),
             stashes: Vec::new(),
             worktrees: Vec::new(),
+            submodules: Vec::new(),
+            tags: Arc::default(),
+            hidden_sections: HashSet::new(),
             hierarchical: true,
             collapsed: load_collapsed(&root),
             hidden,
@@ -159,6 +183,9 @@ impl RefsPanel {
             scrolls: HashMap::new(),
             cursor: None,
             note: None,
+            vis_gen: 0,
+            vis_pending: 0,
+            vis_stale: false,
             filter,
             query: String::new(),
             focus: cx.focus_handle(),
@@ -173,17 +200,25 @@ impl RefsPanel {
         let refs = self.backend.refs();
         let stashes = self.backend.stashes();
         let worktrees = self.backend.worktrees();
+        let submodules = self.backend.submodules();
         self._task = Some(cx.spawn(async move |this, cx| {
             let refs = refs.await.unwrap_or_default();
             let stashes = stashes.await.unwrap_or_default();
             let worktrees = worktrees.await.unwrap_or_default();
+            let submodules = submodules.await.unwrap_or_default();
             let _ = this.update(cx, |this, cx| {
-                this.hierarchical = gitpoulpi_config::Settings::resolve_ambient()
-                    .map(|s| s.config().ui.ref_tree)
-                    .unwrap_or(true);
+                let ui = gitpoulpi_config::Settings::resolve_ambient()
+                    .ok()
+                    .map(|s| s.config().ui.clone());
+                this.hierarchical = ui.as_ref().is_none_or(|ui| ui.ref_tree);
+                this.hidden_sections = ui
+                    .map(|ui| hidden_from_names(&ui.sidebar_sections_hidden))
+                    .unwrap_or_default();
+                this.tags = Arc::new(snapshot_of(&refs));
                 this.refs = refs;
                 this.stashes = stashes;
                 this.worktrees = worktrees;
+                this.submodules = submodules;
                 this.rebuild(cx);
             });
         }));
@@ -195,6 +230,8 @@ impl RefsPanel {
             refs: &self.refs,
             stashes: &self.stashes,
             worktrees: &self.worktrees,
+            submodules: &self.submodules,
+            hidden_sections: &self.hidden_sections,
             filter: &filter,
             hierarchical: self.hierarchical,
             collapsed: &self.collapsed,
@@ -226,6 +263,11 @@ impl RefsPanel {
 
     pub fn solo(&self) -> &HashSet<String> {
         &self.solo
+    }
+
+    /// Whether another frontend's change is waiting for this panel's own writes to be answered.
+    pub fn visibility_event_deferred(&self) -> bool {
+        self.vis_stale
     }
 
     /// The labels of the rows shown in a section, folds applied.
@@ -462,8 +504,8 @@ impl RefsPanel {
                 FolderHide::Done(note) => self.note = Some(note),
                 FolderHide::Plain => {
                     self.note = None;
-                    let under = model::refs_under_folder(&section.names, path);
-                    model::toggle_folder_membership(&mut self.hidden, &under);
+                    let under = refs_under_folder(None, &section.names, path);
+                    toggle_folder_membership(&mut self.hidden, &under);
                 }
             },
             _ => return,
@@ -480,8 +522,8 @@ impl RefsPanel {
                 }
             }
             RowKind::Folder { path, .. } => {
-                let under = model::refs_under_folder(&section.names, path);
-                model::toggle_folder_membership(&mut self.solo, &under);
+                let under = refs_under_folder(None, &section.names, path);
+                toggle_folder_membership(&mut self.solo, &under);
             }
             _ => return,
         }
@@ -529,8 +571,9 @@ impl RefsPanel {
         let (hidden, hidden_remotes) = split_hidden(&self.hidden);
         let mut solo: Vec<String> = self.solo.iter().cloned().collect();
         solo.sort();
-        // Fire and forget: the call runs on the daemon runtime whether or not it is awaited.
-        drop(self.backend.call::<serde_json::Value>(
+        self.vis_gen += 1;
+        self.vis_pending += 1;
+        let call = self.backend.call::<serde_json::Value>(
             OperationKind::SetRefVisibility,
             serde_json::json!({
                 "mode": "replace",
@@ -538,12 +581,66 @@ impl RefsPanel {
                 "solo": solo,
                 "hidden_remotes": hidden_remotes,
             }),
-        ));
+        );
+        cx.spawn(async move |this, cx| {
+            let _ = call.await;
+            let _ = this.update(cx, |this, cx| {
+                this.vis_pending -= 1;
+                if this.vis_pending == 0 && std::mem::take(&mut this.vis_stale) {
+                    this.reread_visibility(cx);
+                }
+            });
+        })
+        .detach();
+    }
+
+    /// Another frontend (the CLI, the terminal UI) changed the hidden or soloed refs
+    /// (`LinkEvent::RefVisibilityChanged`): shows what is stored now, in this panel and in the Log.
+    ///
+    /// The daemon may also echo this panel's own change. That is harmless (the stored sets equal the
+    /// shown ones, nothing changes), but the stored sets lag behind a change made here while its call
+    /// is out, and a read taken then would undo it: so events wait for the calls, and a read that a
+    /// newer local change overtook is dropped (`vis_gen`).
+    pub fn on_visibility_event(&mut self, cx: &mut Context<Self>) {
+        if self.vis_pending > 0 {
+            self.vis_stale = true;
+            return;
+        }
+        self.reread_visibility(cx);
+    }
+
+    fn reread_visibility(&mut self, cx: &mut Context<Self>) {
+        let generation = self.vis_gen;
+        let root = self.backend.repo_root();
+        cx.spawn(async move |this, cx| {
+            let stored = cx
+                .background_spawn(async move { load_ref_visibility(&root) })
+                .await;
+            let _ = this.update(cx, |this, cx| {
+                if this.vis_gen != generation || this.vis_pending > 0 {
+                    return;
+                }
+                let (hidden, solo) = stored;
+                if hidden == this.hidden && solo == this.solo {
+                    return;
+                }
+                this.hidden = hidden;
+                this.solo = solo;
+                this.note = None;
+                this.rebuild(cx);
+                cx.emit(RefsEvent::VisibilityChanged {
+                    hidden: this.hidden.clone(),
+                    solo: this.solo.clone(),
+                });
+            });
+        })
+        .detach();
     }
 
     // -- drawing --------------------------------------------------------------
 
-    fn title_text(&self) -> String {
+    /// The pane's title and the label of its button, from the shared rule (`refs_title`).
+    fn title_parts(&self) -> (String, Option<&'static str>) {
         let total: usize = self
             .sections
             .iter()
@@ -555,7 +652,8 @@ impl RefsPanel {
             .map(|s| s.names.clone())
             .unwrap_or_default();
         let hidden = model::hidden_count(&self.hidden, &remote_names);
-        model::title(self.solo.len(), total, hidden)
+        let (title, button) = refs_title(self.solo.len(), total, hidden);
+        (title.trim().to_string(), button)
     }
 
     fn row_element(
@@ -586,6 +684,18 @@ impl RefsPanel {
             _ => (false, false, None, false, false),
         };
         let refish = kind.ref_kind().is_some();
+        // Where a tag lives, in words: the shared tooltip.
+        let tip: Option<String> = match &row.kind {
+            RowKind::Ref {
+                full_name,
+                tag_where: Some(_),
+                ..
+            } => view
+                .tags
+                .get(full_name)
+                .map(|info| tooltip_lines(full_name, info).join("\n")),
+            _ => None,
+        };
         let (text, muted, accent) = (pal.text, pal.muted, pal.accent);
         let hover_bg = pal.hover;
         let sel_bg = pal.selection;
@@ -715,6 +825,11 @@ impl RefsPanel {
                 )
             })
             .when(refish, |d| d.child(hide_btn).child(solo_btn))
+            .when_some(tip, |d, tip| {
+                d.tooltip(move |window, cx| {
+                    gpui_kit::component::tooltip::Tooltip::new(tip.clone()).build(window, cx)
+                })
+            })
             .on_click(move |_, window, cx| {
                 let section = sec_idx.clone();
                 let _ = me_row.update(cx, |this, cx| {
@@ -765,6 +880,7 @@ impl RefsPanel {
         };
         let scroll = self.scrolls.entry(kind).or_default().clone();
         let view = RowView {
+            tags: self.tags.clone(),
             hidden: self.hidden.clone(),
             solo: self.solo.clone(),
             cursor: self
@@ -855,6 +971,7 @@ impl RefsPanel {
 
 /// What a row needs besides the section: the sets and the selection.
 struct RowView {
+    tags: Arc<HashMap<String, TagInfo>>,
     hidden: HashSet<String>,
     solo: HashSet<String>,
     cursor: Option<String>,
@@ -877,21 +994,23 @@ impl Render for RefsPanel {
             accent: skin.accent,
             selection: skin.selection,
             hover: skin.hover,
-            section: [skin.local, skin.remote, skin.local, skin.warning, skin.tag],
+            section: [
+                skin.local,
+                skin.remote,
+                skin.local,
+                skin.warning,
+                skin.tag,
+                skin.muted,
+            ],
         };
         let mut sections = v_flex().flex_1().min_h_0().gap(px(6.0)).overflow_hidden();
         for si in 0..self.sections.len() {
             sections = sections.child(self.section_box(si, &pal, skin.border, cx));
         }
         let focused = self.focus.contains_focused(window, cx);
-        let title = self.title_text();
-        let button = if !self.solo.is_empty() {
-            Some((msg::sidebar::STOP_SOLOING.get(), true))
-        } else if !self.hidden.is_empty() {
-            Some((msg::sidebar::SHOW_ALL.get(), false))
-        } else {
-            None
-        };
+        let (title, button) = self.title_parts();
+        let soloing = !self.solo.is_empty();
+        let button = button.map(|label| (label, soloing));
         v_flex()
             .size_full()
             .bg(skin.side_bg)

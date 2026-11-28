@@ -33,30 +33,7 @@ use crate::th;
 use gitpoulpi_core::domain::{Ref, TagWhere};
 use gitpoulpi_i18n::msg::tag_where as msg;
 
-/// What the snapshot knows about one tag.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Info {
-    pub(crate) place: TagWhere,
-    /// Remotes that have the tag at the same commit.
-    pub(crate) remotes: Vec<String>,
-    /// Remotes that have it at another commit.
-    pub(crate) differs_on: Vec<String>,
-}
-
-impl Info {
-    /// Every remote that has a tag of this name, same commit or not.
-    pub(crate) fn all_remotes(&self) -> Vec<String> {
-        let mut all: Vec<String> = self
-            .remotes
-            .iter()
-            .chain(self.differs_on.iter())
-            .cloned()
-            .collect();
-        all.sort();
-        all.dedup();
-        all
-    }
-}
+pub(crate) use gitpoulpi_app::tag_where::TagInfo as Info;
 
 type Snapshot = HashMap<String, Info>;
 
@@ -81,23 +58,7 @@ fn with_snapshot<R>(f: impl FnOnce(&mut Option<Snapshot>) -> R) -> R {
     }
 }
 
-/// The snapshot of `refs`' tags.
-pub(crate) fn snapshot_of(refs: &[Ref]) -> HashMap<String, Info> {
-    refs.iter()
-        .filter_map(|r| {
-            let name = r.tag_name()?.to_string();
-            let sync = r.tag_sync.as_ref()?;
-            Some((
-                name,
-                Info {
-                    place: sync.where_(),
-                    remotes: sync.pushed_to.clone(),
-                    differs_on: sync.differs_on.clone(),
-                },
-            ))
-        })
-        .collect()
-}
+pub(crate) use gitpoulpi_app::tag_where::snapshot_of;
 
 /// Installs the snapshot every surface reads. Called once per frame.
 pub(crate) fn install(refs: &[Ref]) {
@@ -132,22 +93,7 @@ pub(crate) fn color(place: TagWhere) -> Color {
 /// fetch does with it. `None` for a tag the snapshot does not know.
 pub(crate) fn tooltip_lines(name: &str) -> Option<Vec<String>> {
     let info = lookup(name)?;
-    let remotes = info.all_remotes().join(", ");
-    let mut lines = vec![name.to_string()];
-    lines.push(match info.place {
-        TagWhere::Local => msg::TIP_LOCAL.get().to_string(),
-        TagWhere::Remote => msg::tip_remote(&remotes),
-        TagWhere::Both => msg::tip_both(&remotes),
-        TagWhere::Differs => msg::tip_differs(&remotes),
-    });
-    if info.place == TagWhere::Differs {
-        lines.push(msg::TIP_DIFFERS_ACTIONS.get().to_string());
-    }
-    // What a fetch does with it matters exactly when a remote has it.
-    if info.place != TagWhere::Local {
-        lines.push(msg::TIP_FETCH_NOTE.get().to_string());
-    }
-    Some(lines)
+    Some(gitpoulpi_app::tag_where::tooltip_lines(name, &info))
 }
 
 // ---------------------------------------------------------------------

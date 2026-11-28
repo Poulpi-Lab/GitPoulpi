@@ -11,7 +11,7 @@ use super::*;
 /// that fails at once rather than queueing behind a dead socket. Both
 /// halves happen under the one lock, so no request can slip in between.
 #[derive(Default)]
-pub struct PendingRequests {
+pub(crate) struct PendingRequests {
     pub(super) waiting: HashMap<u64, oneshot::Sender<Response>>,
     pub(super) closed: Option<String>,
 }
@@ -221,7 +221,7 @@ pub fn remove_published_port_files() {
 /// it is alive; if none is found (or it is stale), starts one in-process
 /// and publishes its port there, so this TUI and any client launched
 /// afterwards find the same daemon. The embedded daemon runs on
-/// [`embedded_daemon_runtime`], **not** the caller's runtime, so it lives as
+/// `embedded_daemon_runtime`, **not** the caller's runtime, so it lives as
 /// long as the TUI process, though it still dies with that process rather
 /// than surviving independently (see `session-and-state.md`).
 pub async fn ensure_daemon(session: &str) -> Result<gitpoulpi_ipc::Endpoint, String> {

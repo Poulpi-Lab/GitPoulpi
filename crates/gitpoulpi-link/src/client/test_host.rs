@@ -10,10 +10,11 @@ use gitpoulpi_core::privacy::Sensitive;
 use gitpoulpi_core::NotCancellableReason;
 
 use super::{
-    Action, JobEvent, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind, UndoKey,
+    Action, JobEvent, LinkContext, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind,
+    UndoKey,
 };
 
-/// The origin [`TestHost`] treats as this process's own.
+/// The origin `TestHost` treats as this process's own.
 pub const OWN_ORIGIN: &str = "test-own-origin";
 
 /// The host a test starts a link with.
@@ -24,26 +25,35 @@ pub fn host() -> Arc<dyn LinkHost> {
 struct TestHost;
 
 impl LinkHost for TestHost {
-    fn wake(&self) {}
-    fn before_exit(&self) {}
-    fn raise_window(&self) -> Result<String, String> {
+    fn wake(&self, _link: &LinkContext) {}
+    fn before_exit(&self, _link: &LinkContext) {}
+    fn raise_window(&self, _link: &LinkContext) -> Result<String, String> {
         Err("no window".to_string())
     }
     fn ask_sensitive_stage(
         &self,
+        _link: &LinkContext,
         _root: std::path::PathBuf,
         _action: Action,
         _files: Vec<Sensitive>,
         _ticket: Option<Ticket>,
     ) {
     }
-    fn on_connected(&self, _requester: Requester) {}
-    fn jobs(&self, _event: JobEvent) {}
-    fn push_group(&self, _event: PushGroupEvent<'_>) {}
-    fn report(&self, _report: Report<'_>) {}
-    fn timing(&self, _kind: TimingKind, _repo: &Path, _label: String, _ms: u64) {}
-    fn expect_background_fetch(&self) {}
-    fn background_fetch_pending(&self) -> bool {
+    fn on_connected(&self, _link: &LinkContext, _requester: Requester) {}
+    fn jobs(&self, _link: &LinkContext, _event: JobEvent) {}
+    fn push_group(&self, _link: &LinkContext, _event: PushGroupEvent<'_>) {}
+    fn report(&self, _link: &LinkContext, _report: Report<'_>) {}
+    fn timing(
+        &self,
+        _link: &LinkContext,
+        _kind: TimingKind,
+        _repo: &Path,
+        _label: String,
+        _ms: u64,
+    ) {
+    }
+    fn expect_background_fetch(&self, _link: &LinkContext) {}
+    fn background_fetch_pending(&self, _link: &LinkContext) -> bool {
         false
     }
     fn job_label(&self, id: u64) -> String {

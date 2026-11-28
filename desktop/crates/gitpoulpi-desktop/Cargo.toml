@@ -22,11 +22,13 @@ path = "src/main.rs"
 gpui-kit = { version = "=0.11.0", features = ["tree-sitter-rust", "tree-sitter-toml", "tree-sitter-markdown", "tree-sitter-bash", "tree-sitter-yaml", "tree-sitter-javascript", "tree-sitter-typescript"] }
 
 gitpoulpi-core = { path = "../../../crates/gitpoulpi-core" }
-gitpoulpi-app = { path = "../../../crates/gitpoulpi-app" }
+# The worktree and submodule features (here, and forwarded to the embedded daemon by the link) are what
+# lets the daemon list them and the shared section rule show those Refs sections.
+gitpoulpi-app = { path = "../../../crates/gitpoulpi-app", features = ["worktree", "submodule"] }
 gitpoulpi-config = { path = "../../../crates/gitpoulpi-config" }
 gitpoulpi-i18n = { path = "../../../crates/gitpoulpi-i18n" }
 gitpoulpi-ipc = { path = "../../../crates/gitpoulpi-ipc" }
-gitpoulpi-link = { path = "../../../crates/gitpoulpi-link" }
+gitpoulpi-link = { path = "../../../crates/gitpoulpi-link", features = ["worktree", "submodule"] }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 toml = "1.2"

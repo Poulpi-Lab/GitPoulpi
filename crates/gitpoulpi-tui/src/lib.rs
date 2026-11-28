@@ -351,7 +351,6 @@ mod rebase_banner;
 mod rebase_ui;
 mod ref_drop;
 mod ref_menu;
-mod ref_name;
 mod ref_name_box;
 mod ref_reveal;
 mod refs_sidebar;

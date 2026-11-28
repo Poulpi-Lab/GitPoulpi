@@ -437,3 +437,84 @@ pub fn check_merge_base_is_the_fork_point(backend: &dyn GitBackend) {
         "an ancestor is its own merge base with a descendant"
     );
 }
+
+/// A detached HEAD is always part of the `all_refs` walk, like the current
+/// branch: commits made on a detached HEAD that no branch, tag or remote
+/// reaches are shown, once, in topological order, paging stable, and the
+/// total count agrees. A hidden-ref filter keeps that meaning (the walk
+/// already includes HEAD while a filter is active). With HEAD on a branch,
+/// or detached on a commit refs already reach, nothing changes.
+pub fn check_log_all_refs_includes_a_detached_head_no_ref_reaches(backend: &dyn GitBackend) {
+    let repo = TestRepoBuilder::new().commit("c1").commit("c2").build();
+    let repo_ref = repo.repo_ref();
+    let all = LogOptions {
+        all_refs: true,
+        ..LogOptions::default()
+    };
+    let ids = |o: &LogOptions| -> Vec<Oid> {
+        backend
+            .log(&repo_ref, o)
+            .unwrap()
+            .nodes
+            .iter()
+            .map(|n| n.id)
+            .collect()
+    };
+
+    // On a branch: the baseline.
+    let on_branch = ids(&all);
+    // Detached on a commit the branch reaches: unchanged.
+    repo.git(&["checkout", "-q", "--detach", "HEAD~1"]);
+    assert_eq!(
+        ids(&all),
+        on_branch,
+        "same walk, same order, as on the branch"
+    );
+
+    // Two commits only HEAD reaches.
+    for name in ["d1", "d2"] {
+        repo.git(&["commit", "-q", "--allow-empty", "-m", name]);
+    }
+    let walk = backend.log(&repo_ref, &all).unwrap();
+    let summaries: Vec<&str> = walk.nodes.iter().map(|n| n.summary.as_str()).collect();
+    for name in ["d1", "d2"] {
+        assert_eq!(
+            summaries.iter().filter(|s| **s == name).count(),
+            1,
+            "{name} must be walked exactly once: {summaries:?}"
+        );
+    }
+    let at = |s: &str| summaries.iter().position(|x| *x == s).unwrap();
+    assert!(at("d2") < at("d1") && at("d1") < at("c1"), "{summaries:?}");
+    assert_eq!(walk.nodes.len(), on_branch.len() + 2, "{summaries:?}");
+    assert_eq!(
+        backend.count_commits(&repo_ref, &all).unwrap(),
+        walk.nodes.len() as u64
+    );
+
+    // Paging tiles the walk.
+    let whole: Vec<Oid> = walk.nodes.iter().map(|n| n.id).collect();
+    let mut tiled = Vec::new();
+    for skip in (0..whole.len() as u32).step_by(2) {
+        tiled.extend(ids(&LogOptions {
+            skip,
+            limit: Some(2),
+            ..all.clone()
+        }));
+    }
+    assert_eq!(
+        tiled, whole,
+        "pages must tile the walk with no gap or overlap"
+    );
+
+    // A filter hiding the branch still walks the detached HEAD.
+    let hidden = LogOptions {
+        hidden: gitpoulpi_core::domain::RefFilter {
+            names: vec!["main".into()],
+            ..Default::default()
+        },
+        ..all.clone()
+    };
+    let filtered = backend.log(&repo_ref, &hidden).unwrap();
+    assert!(filtered.nodes.iter().any(|n| n.summary == "d2"));
+}

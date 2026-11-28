@@ -1,4 +1,5 @@
 use super::*;
+use std::hash::{Hash, Hasher};
 
 /// Reads the journal and publishes it to the render loop. Spawned beside
 /// every refresh (a poll sees a commit made in a shell, so the buttons'
@@ -11,7 +12,7 @@ pub(super) async fn refresh_journal(conn: LinkConn, activity: Arc<crate::activit
         )
         .await
     {
-        activity.journal.set(state);
+        apply_journal(&activity, state);
     }
 }
 
@@ -421,38 +422,37 @@ pub(super) async fn collect_refresh(
         stashes: stashes_hash,
         lfs: lfs.as_ref().map(|_| debug_hash(&lfs)),
     };
-    let fingerprint = fingerprint(
-        scope,
-        &status_result,
-        [
-            log_hash,
-            refs_hash,
-            stashes_hash,
-            scope
-                .intersects(ChangeScope::WORKTREES)
-                .then(|| json_hash(&worktrees_result)),
-            scope
-                .intersects(SUBMODULES_SCOPE)
-                .then(|| json_hash(&submodules_result)),
-            scope
-                .intersects(ChangeScope::CONFLICTS)
-                .then(|| json_hash(&conflicts_result)),
-            scope
-                .intersects(ChangeScope::CONFLICTS)
-                .then(|| json_hash(&operation_state_result)),
-            scope
-                .intersects(ChangeScope::CONFLICTS)
-                .then(|| json_hash(&index_lock_result)),
-            Some(json_hash(&remotes_result)),
-            Some(json_hash(&ssh_command_result)),
-            Some(json_hash(&sparse_result)),
-            Some(json_hash(&repo_config_result)),
-        ],
-    );
+    let status_hash = json_hash(&status_result);
+    let parts = PartHashes {
+        status: status_hash,
+        head: refs_hash.map(|_| head_hash(&refs_result)),
+        worktrees: scope
+            .intersects(ChangeScope::WORKTREES)
+            .then(|| json_hash(&worktrees_result)),
+        submodules: scope
+            .intersects(SUBMODULES_SCOPE)
+            .then(|| json_hash(&submodules_result)),
+        conflicts: scope.intersects(ChangeScope::CONFLICTS).then(|| {
+            combine(&[
+                json_hash(&conflicts_result),
+                json_hash(&operation_state_result),
+                json_hash(&index_lock_result),
+            ])
+        }),
+        remotes: Some(json_hash(&remotes_result)),
+        config: Some(combine(&[
+            json_hash(&ssh_command_result),
+            json_hash(&sparse_result),
+            json_hash(&repo_config_result),
+        ])),
+    };
+    let fingerprint = fingerprint(scope, &parts, [log_hash, refs_hash, stashes_hash]);
     RefreshOutcome {
         generation: 0,
         fingerprint,
         read_hashes,
+        summary: RefreshSummary::default(),
+        parts,
         log_result,
         log_limit: log_limit as usize,
         log_filter_gen,
@@ -531,17 +531,13 @@ pub(super) async fn gated<T>(
     }
 }
 
-/// Folds the scope, the status and the per-field hashes into one number.
-fn fingerprint<S: serde::Serialize>(
-    scope: ChangeScope,
-    status: &GitResult<S>,
-    fields: [Option<u64>; 12],
-) -> u64 {
-    use std::hash::{Hash, Hasher};
+/// Folds the scope, the per-part hashes and the three read hashes into one
+/// number.
+fn fingerprint(scope: ChangeScope, parts: &PartHashes, reads: [Option<u64>; 3]) -> u64 {
     let mut hasher = std::collections::hash_map::DefaultHasher::new();
     format!("{scope:?}").hash(&mut hasher);
-    json_hash(status).hash(&mut hasher);
-    fields.hash(&mut hasher);
+    parts.hash(&mut hasher);
+    reads.hash(&mut hasher);
     hasher.finish()
 }
 

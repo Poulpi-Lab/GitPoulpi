@@ -11,9 +11,9 @@ use gitpoulpi_i18n::Lang;
 use gpui_kit::component::TitleBar;
 use gpui_kit::{px, size, App, AppContext as _, Bounds, WindowBounds, WindowOptions};
 
+pub use crate::commands::status::Notice;
 pub(crate) use actions::workspace as workspace_of;
 pub use actions::{set_lane_theme, set_language, set_theme};
-pub use live::Notice;
 pub use workspace::{BannerButton, Workspace};
 
 use crate::commands;

@@ -212,7 +212,7 @@ pub fn pending_autostash(operation: &str, stash: u32) -> String {
 
 /// The git-lfs message with the install link. The link stays in every
 /// language: the window offers to open it when an error contains it.
-pub fn lfs_unavailable(reason: &LfsUnavailableReason) -> String {
+pub(crate) fn lfs_unavailable(reason: &LfsUnavailableReason) -> String {
     let lead = match reason {
         LfsUnavailableReason::Missing => msg::typed_error::LFS_MISSING_LEAD.get().to_string(),
         LfsUnavailableReason::TooOld(version) => {

@@ -57,7 +57,7 @@ pub(super) async fn read_loop(
                 repo: changed,
                 state,
             })) if changed == repo_id => {
-                activity.journal.set(state);
+                apply_journal(&activity, state);
             }
             // `gitpoulpi refs hide|show|solo` (or another TUI): the render
             // loop reloads the filter from the repo state.
@@ -168,7 +168,9 @@ pub(super) async fn read_loop(
                 if viewer == *crate::ui_viewer::viewer_id() =>
             {
                 let activity = Arc::clone(&activity);
+                let link = super::link_ctx::current();
                 std::thread::spawn(move || {
+                    let _in_link = link.as_ref().map(|link| link.enter());
                     let result = super::host::raise_window();
                     match &result {
                         Ok(how) => tracing::info!(how, "raised the window for a launcher click"),
@@ -222,4 +224,16 @@ fn quit_for_update() -> ! {
     super::host::before_exit();
     eprintln!("gitpoulpi: closing for an update"); // i18n-english
     std::process::exit(0)
+}
+
+/// Stores the daemon's journal report and, when it differs from the held one
+/// and the host asked for it (`LinkHost::wake_on_journal`), wakes the host:
+/// the undo and redo buttons of a frontend that waits on `wake` follow at once.
+pub(super) fn apply_journal(
+    activity: &crate::activity::Activity,
+    state: gitpoulpi_core::domain::JournalState,
+) {
+    if activity.journal.set(state) && super::host::wake_on_journal() {
+        super::host::wake();
+    }
 }

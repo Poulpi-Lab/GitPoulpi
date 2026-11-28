@@ -201,6 +201,7 @@ pub(super) async fn link_loop_with_port(
     // window that opens a repository gets a new link (`start`).
     let has_repo = conn.repo.root != std::path::Path::new(crate::no_repository::NO_REPOSITORY);
     let first_generation = activity.generation();
+    let mut summary = SummaryTracker::default();
     if has_repo {
         let opened = std::time::Instant::now();
         let mut first = collect_refresh(
@@ -219,6 +220,7 @@ pub(super) async fn link_loop_with_port(
             u64::try_from(opened.elapsed().as_millis()).unwrap_or(u64::MAX),
         );
         first.generation = first_generation;
+        first.summary = summary.observe(&first);
         let _ = outcome_tx.send_notify(first);
     }
 
@@ -239,6 +241,7 @@ pub(super) async fn link_loop_with_port(
         queued: None,
         last_delivered: None,
         last_lfs: None,
+        summary,
     };
     if has_repo {
         refresher.want(FIRST_LOAD_LATER);

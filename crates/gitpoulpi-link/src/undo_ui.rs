@@ -55,6 +55,8 @@ struct Inner {
     outside_seen: Option<u64>,
     /// A new outside entry arrived since the window last asked.
     outside_news: bool,
+    /// The reported state changed since `take_changed` last asked.
+    changed: bool,
 }
 
 /// The id of the top undo entry when it was made outside GitPoulpi.
@@ -89,7 +91,8 @@ impl JournalCell {
         self.inner.lock().unwrap_or_else(|e| e.into_inner())
     }
 
-    pub fn set(&self, state: JournalState) {
+    /// Stores the daemon's report; true when it differs from the one held.
+    pub fn set(&self, state: JournalState) -> bool {
         let mut held = self.lock();
         let changed = held.state != state;
         // One notice per new outside entry, so a burst is one line.
@@ -103,10 +106,20 @@ impl JournalCell {
             _ => {}
         }
         held.state = state;
+        if changed {
+            held.changed = true;
+        }
         drop(held);
         if changed {
             crate::redraw::poke();
         }
+        changed
+    }
+
+    /// True once per change of the reported state since the last call (the
+    /// frontend's `drain` turns it into an event).
+    pub fn take_changed(&self) -> bool {
+        std::mem::take(&mut self.lock().changed)
     }
 
     pub fn state(&self) -> JournalState {

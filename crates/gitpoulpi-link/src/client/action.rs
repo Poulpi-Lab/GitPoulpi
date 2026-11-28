@@ -920,9 +920,11 @@ impl Action {
         })
     }
 
-    /// What the status line says while this action runs (one mechanism for
-    /// every operation: see `activity`).
-    pub(super) fn activity_label(&self) -> String {
+    /// What the status line says while this action runs ("Staging all
+    /// changes..."), in the current UI language and git-term setting: one
+    /// mechanism for every operation (see `activity`), and the label a
+    /// frontend shows for an action it submitted.
+    pub fn activity_label(&self) -> String {
         use gitpoulpi_i18n::msg::link as l;
         fn name(path: &std::path::Path) -> String {
             path.file_name()
@@ -1083,7 +1085,7 @@ impl Action {
 
 /// Whether `action` is one the frontend's optimistic overlay knows how to
 /// apply before the daemon answers (the staging family).
-pub fn is_optimistic(action: &Action) -> bool {
+pub(crate) fn is_optimistic(action: &Action) -> bool {
     matches!(
         action,
         Action::StageFile(_)

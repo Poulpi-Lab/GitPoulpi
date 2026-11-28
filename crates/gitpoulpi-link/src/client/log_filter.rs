@@ -14,7 +14,7 @@ use std::sync::{Arc, Mutex};
 use gitpoulpi_core::domain::RefFilter;
 
 #[derive(Clone, Default)]
-pub struct LogFilterCell(Arc<Mutex<(u64, RefFilter)>>);
+pub(crate) struct LogFilterCell(Arc<Mutex<(u64, RefFilter)>>);
 
 impl LogFilterCell {
     /// A cell that starts as `filter`, generation 0.

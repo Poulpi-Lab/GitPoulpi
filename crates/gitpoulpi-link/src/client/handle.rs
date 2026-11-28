@@ -10,6 +10,8 @@ use super::*;
 pub struct DaemonLink {
     /// Which link thread this is, for the tickets it carries.
     pub(super) link_id: u64,
+    /// The identity every hook raised for this link carries.
+    pub(super) context: LinkContext,
     pub(super) manual_refresh_tx: tokio::sync::mpsc::UnboundedSender<()>,
     pub(super) action_tx: tokio::sync::mpsc::UnboundedSender<(Option<Ticket>, Action)>,
     pub(super) commit_files_tx: tokio::sync::mpsc::UnboundedSender<CommitFilesRequest>,
@@ -109,6 +111,16 @@ impl DaemonLink {
         self.lfs_gate.take_filters_posed_note()
     }
 
+    /// This link's identity: what its host hooks and events carry.
+    pub fn id(&self) -> LinkId {
+        self.context.id()
+    }
+
+    /// The context ([`LinkId`] and repository root) of this link.
+    pub fn context(&self) -> &LinkContext {
+        &self.context
+    }
+
     pub fn request_refresh(&self) {
         let _ = self.manual_refresh_tx.send(());
     }
@@ -147,6 +159,7 @@ impl DaemonLink {
     /// Starts an undo or redo of the entry the buttons show. Returns the
     /// status-line text: what started, or why nothing did.
     pub fn start_undo_redo(&self, direction: gitpoulpi_core::domain::Direction) -> String {
+        let _in_link = self.context.enter();
         let state = self.journal_state();
         if let Some(why) = crate::undo_ui::reason(&state, direction, self.undo_busy()) {
             return why;
@@ -162,6 +175,7 @@ impl DaemonLink {
     /// "Undo whole sequence" on the newest entries of one run: the status
     /// text, or why it cannot.
     pub fn start_undo_sequence(&self) -> String {
+        let _in_link = self.context.enter();
         let state = self.journal_state();
         if let Some(why) = crate::undo_ui::sequence_reason(&state, self.undo_busy()) {
             return why;
@@ -252,6 +266,8 @@ impl DaemonLink {
     }
 
     fn submit_one(&self, ticket: Option<Ticket>, action: Action) {
+        // The hooks below run on this (the caller's) thread: name the link.
+        let _in_link = self.context.enter();
         // A transfer identical to one still running joins it: nothing is
         // sent, and the press says so (the daemon's join is the backstop for
         // the other clients).
@@ -275,6 +291,7 @@ impl DaemonLink {
     /// fetch is already going, and flagged `auto` so the daemon also skips
     /// it while any transfer of the repository runs.
     pub fn submit_auto_fetch(&self) {
+        let _in_link = self.context.enter();
         let action = Action::FetchAll;
         if self.activity.claim_transfer(&action).is_some() {
             return;
@@ -299,17 +316,20 @@ impl DaemonLink {
     /// The status-line text for what the link has been doing for a while
     /// ("Staging all changes..."), `None` when nothing is slow.
     pub fn in_flight_text(&self) -> Option<String> {
+        let _in_link = self.context.enter();
         self.activity.in_flight_text(crate::activity::SHOW_AFTER)
     }
 
     /// When the in-flight text of an operation that has not run long enough
     /// yet will first show (a redraw is due then).
     pub fn in_flight_text_due_at(&self) -> Option<std::time::Instant> {
+        let _in_link = self.context.enter();
         self.activity.text_due_at()
     }
 
     /// The in-flight text is on screen and its spinner moves.
     pub fn in_flight_spinning(&self) -> bool {
+        let _in_link = self.context.enter();
         self.activity.spinning()
     }
 
@@ -439,8 +459,12 @@ pub fn start_at(
     port_file: Option<PathBuf>,
     host: Arc<dyn LinkHost>,
 ) -> DaemonLink {
-    // Before the thread starts, so even its first wake finds the host.
-    super::host::install(host);
+    // Before the thread starts, so even its first wake finds the host (the
+    // fallback for a hook raised off this link's threads; the link itself
+    // keeps its own, see `LinkContext`).
+    super::host::install(Arc::clone(&host));
+    let link_id = tickets::new_link_id();
+    let context = LinkContext::new(LinkId::new(link_id), repo.root.clone(), host);
     let (manual_refresh_tx, manual_refresh_rx) = tokio::sync::mpsc::unbounded_channel();
     let (action_tx, action_rx) = tokio::sync::mpsc::unbounded_channel();
     let (commit_files_tx, commit_files_task_rx) = tokio::sync::mpsc::unbounded_channel();
@@ -490,7 +514,6 @@ pub fn start_at(
     let activity = Arc::new(crate::activity::Activity::with_undo_enabled(undo_enabled));
     let link_activity = Arc::clone(&activity);
     let (failure_tx, failure_rx) = std_mpsc::channel();
-    let link_id = tickets::new_link_id();
     let channels = LinkChannels {
         manual_refresh_rx,
         action_rx,
@@ -517,7 +540,9 @@ pub fn start_at(
         activity: link_activity,
     };
 
+    let thread_context = context.clone();
     std::thread::spawn(move || {
+        let _in_link = thread_context.enter();
         let mut report = LinkEndReport {
             tx: failure_tx,
             reason: Some(
@@ -526,7 +551,14 @@ pub fn start_at(
                     .to_string(),
             ),
         };
-        let rt = match tokio::runtime::Runtime::new() {
+        // Every thread of this runtime carries the link, so the hooks its
+        // tasks raise name it (`link_ctx`).
+        let worker_context = thread_context.clone();
+        let rt = match tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .on_thread_start(move || worker_context.install_on_thread())
+            .build()
+        {
             Ok(rt) => rt,
             Err(e) => {
                 report.reason = Some(gitpoulpi_i18n::msg::link_error::runtime_failed(e));
@@ -541,6 +573,7 @@ pub fn start_at(
 
     DaemonLink {
         link_id,
+        context,
         failure_rx,
         manual_refresh_tx,
         action_tx,

@@ -107,7 +107,10 @@ impl LazyLog {
     /// walk. Call it before [`on_refresh`](LazyLog::on_refresh) /
     /// [`on_refresh_asked`](LazyLog::on_refresh_asked) with the refresh's
     /// total (front rows included). The terminal UI never calls it (its
-    /// walk is the ref walk alone, front is 0). The frontend must not let a
+    /// walk is the ref walk alone, front is 0). Both backends now seed the
+    /// ref walk with a detached HEAD, so a frontend no longer needs front
+    /// rows for commits only a detached HEAD reaches; the API stays valid
+    /// for other leading rows. The frontend must not let a
     /// front commit also appear in the walk.
     pub fn set_front(&mut self, front: usize) {
         self.front = front;

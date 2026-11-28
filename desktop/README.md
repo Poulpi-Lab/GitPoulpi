@@ -4,13 +4,26 @@ A native desktop frontend for GitPoulpi. It shows the same repository views as t
 sidebar, commit log with graph, commit and working-tree details, diff) and talks to the same daemon, so
 changes made from the terminal UI, the CLI or MCP show up here too.
 
-What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md).
+What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md); the
+generated table is [docs/parity.md](docs/parity.md).
+
+## Commands, keys and menus
+
+Commands come from the shared registry in `gitpoulpi-app`, the same one the terminal UI uses: key
+bindings (`[keybindings]` of `config.toml` overrides them), the command palette (Ctrl+P) with its
+shortcuts, fuzzy matching and availability reasons, and the menu bar (File, Edit, View, Repository,
+Branch, Git, Hosting, Tools, Help; F10 or Alt + the underlined letter). Everything runs through one
+dispatcher (`src/commands/`): a command the desktop does not implement yet says so in the status line,
+and its menu item and palette row are dimmed with the reason. The keybindings view lists every bound key
+by context (`?`, or the Keybindings item of the Tools menu).
 
 This frontend is under development on the `desktop` branch. It opens the repository through the same
 per-session daemon the terminal UI and the CLI use (the shared `gitpoulpi-link` client), so a commit made
-elsewhere shows up in the Log without any action. The toolbar's Fetch, Pull, Push, Undo and Redo run git
-operations (also `Ctrl+G f`, `Ctrl+G p`, `Ctrl+G Shift+P`, `Ctrl+Z`, `Ctrl+Y`); the other toolbar
-buttons are not wired yet. `--session NAME` joins another session.
+elsewhere shows up in the Log without any action. Every command runs through one dispatcher
+(`src/commands/`) that resolves the shared registry's ids: a toolbar button, a menu item, a palette row and a
+key (`Ctrl+G f`, `Ctrl+Z`, `o` in the Refs, `n` in a diff, ...) all end in the same place and give the same
+"not available yet" answer for what the desktop does not do yet. The toolbar's Fetch, Pull, Push, Undo and
+Redo run git operations; the other toolbar buttons answer "not available yet". `--session NAME` joins another session.
 
 ## Layout
 

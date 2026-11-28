@@ -29,36 +29,18 @@ use rows::{body_look, Line, Look, Opts, Rows};
 use crate::fonts;
 use crate::theme::{DiffColors, Skin};
 
-actions!(
-    gp_diff,
-    [
-        CloseDiff,
-        NextDiffFile,
-        PrevDiffFile,
-        NextHunk,
-        PrevHunk,
-        ToggleLayout,
-        ToggleWrap,
-        ToggleWhitespace
-    ]
-);
+actions!(gp_diff, [CloseDiff, NextDiffFile, PrevDiffFile]);
 
-/// Key context of the pane. The letters are the terminal UI's own (`diff.next_hunk` `n`,
-/// `diff.prev_hunk` `p`, `diff.toggle_layout` `m`, `diff.toggle_wrap` `w`, `diff.toggle_whitespace`
-/// `s`, `diff.close` `q`).
+/// Key context of the pane. Only Escape (the palette's close key) and `[` / `]` (previous and next file,
+/// which the terminal UI's diff has no command for) are bound here. The registry's diff keys (`n`, `p`,
+/// `m`, `w`, `s`, `q`) are resolved by the shared keymap and run through `commands::run`.
 const CONTEXT: &str = "GpDiffPane";
 
 pub fn init(cx: &mut App) {
     cx.bind_keys([
         KeyBinding::new("escape", CloseDiff, Some(CONTEXT)),
-        KeyBinding::new("q", CloseDiff, Some(CONTEXT)),
         KeyBinding::new("]", NextDiffFile, Some(CONTEXT)),
         KeyBinding::new("[", PrevDiffFile, Some(CONTEXT)),
-        KeyBinding::new("n", NextHunk, Some(CONTEXT)),
-        KeyBinding::new("p", PrevHunk, Some(CONTEXT)),
-        KeyBinding::new("m", ToggleLayout, Some(CONTEXT)),
-        KeyBinding::new("w", ToggleWrap, Some(CONTEXT)),
-        KeyBinding::new("s", ToggleWhitespace, Some(CONTEXT)),
     ]);
 }
 
@@ -456,11 +438,6 @@ impl Render for DiffPane {
             .on_action(cx.listener(|_, _: &CloseDiff, _, cx| cx.emit(DiffPaneEvent::Close)))
             .on_action(cx.listener(|this, _: &NextDiffFile, _, cx| this.step(1, cx)))
             .on_action(cx.listener(|this, _: &PrevDiffFile, _, cx| this.step(-1, cx)))
-            .on_action(cx.listener(|this, _: &NextHunk, _, cx| this.step_hunk(true, cx)))
-            .on_action(cx.listener(|this, _: &PrevHunk, _, cx| this.step_hunk(false, cx)))
-            .on_action(cx.listener(|this, _: &ToggleLayout, _, cx| this.toggle_layout(cx)))
-            .on_action(cx.listener(|this, _: &ToggleWrap, _, cx| this.toggle_wrap(cx)))
-            .on_action(cx.listener(|this, _: &ToggleWhitespace, _, cx| this.toggle_whitespace(cx)))
             .border_1()
             .border_color(border)
             .rounded(px(3.0))

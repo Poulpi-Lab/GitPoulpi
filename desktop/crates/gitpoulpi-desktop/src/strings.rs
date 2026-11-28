@@ -21,9 +21,6 @@ pub fn sort_label(ascending: bool) -> &'static str {
     }
 }
 
-/// Shown when a toolbar button is clicked whose git operation the desktop does not run yet.
-pub const NOT_AVAILABLE: &str = "This action is not available in the desktop frontend yet";
-
 /// The link asked this window to come to the front (an agent's request); the desktop does not do that yet.
 pub const NO_RAISE: &str = "this window cannot be raised on request yet";
 
@@ -52,6 +49,27 @@ pub fn jobs_running(n: usize) -> String {
     format!("{n} job(s) running")
 }
 
+/// The reason shown for a command the desktop app does not implement yet (palette row, disabled menu
+/// item, status line).
+pub const NOT_AVAILABLE_YET: &str = "Not available yet in the desktop app";
+
+/// The status line's answer when `what` is run but not implemented yet.
+pub fn not_available_yet(what: &str) -> String {
+    if what.is_empty() {
+        NOT_AVAILABLE_YET.to_string()
+    } else {
+        format!("{what} - {}", NOT_AVAILABLE_YET.to_lowercase())
+    }
+}
+
+// Menu bar headings that have no catalog string.
+pub const MENU_FILE: &str = "File";
+pub const MENU_EDIT: &str = "Edit";
+pub const MENU_VIEW: &str = "View";
+pub const MENU_REPOSITORY: &str = "Repository";
+pub const MENU_GIT: &str = "Git";
+pub const MENU_TOOLS: &str = "Tools";
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,6 +77,15 @@ mod tests {
     #[test]
     fn stash_name_uses_git_syntax() {
         assert_eq!(stash_name(2), "stash@{2}");
+    }
+
+    #[test]
+    fn the_status_line_names_the_command() {
+        assert_eq!(
+            not_available_yet("Git: Fetch"),
+            "Git: Fetch - not available yet in the desktop app"
+        );
+        assert_eq!(not_available_yet(""), NOT_AVAILABLE_YET);
     }
 
     #[test]

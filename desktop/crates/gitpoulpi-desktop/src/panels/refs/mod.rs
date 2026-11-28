@@ -46,28 +46,16 @@ use crate::theme::Skin;
 
 actions!(
     gp_refs,
-    [
-        RowUp,
-        RowDown,
-        RowLeft,
-        RowRight,
-        Activate,
-        ToggleSection,
-        ToggleHide,
-        ToggleSolo,
-        ClearSolo,
-        ShowAllHidden,
-        ExpandAll,
-        CollapseAll
-    ]
+    [RowUp, RowDown, RowLeft, RowRight, Activate, ToggleSection]
 );
 
 /// Key context of the rows; the Filter box sits outside it so typing a letter there stays typing.
 const CONTEXT: &str = "GpRefs";
 
-/// The terminal UI's Refs keys (`refs.solo` `o`, `refs.clear_solo` `Shift+O`, `refs.show_all` `Shift+H`,
-/// `refs.expand_all` `=`, `refs.collapse_all` `-`) plus the arrows and `h`/`j`/`k`/`l`. Hiding a ref
-/// has no key of its own in the terminal UI (menu and palette only), so it gets `Alt+H` here.
+/// Only the keys that move around: the arrows and `h`/`j`/`k`/`l`, Enter, and Space for a section. The
+/// commands (solo, clear solo, show all hidden, hide, expand all, collapse all) have no binding here:
+/// the shared keymap resolves their keys and `commands::run` runs them, the same way for the toolbar,
+/// the menus and the palette.
 pub fn init(cx: &mut App) {
     cx.bind_keys([
         KeyBinding::new("up", RowUp, Some(CONTEXT)),
@@ -80,12 +68,6 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("l", RowRight, Some(CONTEXT)),
         KeyBinding::new("enter", Activate, Some(CONTEXT)),
         KeyBinding::new("space", ToggleSection, Some(CONTEXT)),
-        KeyBinding::new("alt-h", ToggleHide, Some(CONTEXT)),
-        KeyBinding::new("o", ToggleSolo, Some(CONTEXT)),
-        KeyBinding::new("shift-o", ClearSolo, Some(CONTEXT)),
-        KeyBinding::new("shift-h", ShowAllHidden, Some(CONTEXT)),
-        KeyBinding::new("=", ExpandAll, Some(CONTEXT)),
-        KeyBinding::new("-", CollapseAll, Some(CONTEXT)),
     ]);
 }
 
@@ -1010,18 +992,6 @@ impl Render for RefsPanel {
                     .on_action(cx.listener(|this, _: &ToggleSection, _, cx| {
                         this.toggle_selected_section(cx)
                     }))
-                    .on_action(
-                        cx.listener(|this, _: &ToggleHide, _, cx| this.toggle_hidden_selected(cx)),
-                    )
-                    .on_action(
-                        cx.listener(|this, _: &ToggleSolo, _, cx| this.toggle_solo_selected(cx)),
-                    )
-                    .on_action(cx.listener(|this, _: &ClearSolo, _, cx| this.clear_solo(cx)))
-                    .on_action(
-                        cx.listener(|this, _: &ShowAllHidden, _, cx| this.show_all_hidden(cx)),
-                    )
-                    .on_action(cx.listener(|this, _: &ExpandAll, _, cx| this.expand_all(cx)))
-                    .on_action(cx.listener(|this, _: &CollapseAll, _, cx| this.collapse_all(cx)))
                     .rounded(px(3.0))
                     .border_1()
                     .border_color(if focused {

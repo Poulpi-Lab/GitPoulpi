@@ -6,7 +6,7 @@ use gpui_kit::component::{
     button::{Button, ButtonVariants as _},
     h_flex,
     menu::DropdownMenu as _,
-    Icon, Sizable as _, TitleBar, WindowExt as _,
+    Icon, Sizable as _, TitleBar,
 };
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
@@ -14,12 +14,10 @@ use gpui_kit::{
     StatefulInteractiveElement as _, Styled as _,
 };
 
-use super::actions::{
-    FitColumns, OpenPalette, OpenRecent, OpenRepo, ResetColumns, SetLaneTheme, SetLang, SetTheme,
-};
+use super::actions::{OpenRecent, RunCommand, SetLaneTheme, SetLang, SetTheme};
 use super::live::Notice;
 use super::workspace::Workspace;
-use crate::daemon::transfer::Transfer;
+use crate::commands;
 use crate::prefs::PrefsStore;
 use crate::strings;
 use crate::theme::{self, CurrentTheme, Skin};
@@ -83,8 +81,10 @@ impl Workspace {
                             .small()
                             .label(msg::open_in_bar::BUTTON.get())
                             .dropdown_menu(move |menu, _, _| {
-                                let mut menu =
-                                    menu.menu(msg::radar::ACT_OPEN_REPO.get(), Box::new(OpenRepo));
+                                let mut menu = menu.menu(
+                                    msg::radar::ACT_OPEN_REPO.get(),
+                                    Box::new(RunCommand("palette.browse_repository".into())),
+                                );
                                 if !recent.is_empty() {
                                     menu = menu.separator();
                                 }
@@ -112,7 +112,10 @@ impl Workspace {
                             .icon(AssetIcon::Search)
                             .label(msg::tab_bar::SEARCH.get())
                             .on_click(|_, window, cx| {
-                                window.dispatch_action(Box::new(OpenPalette), cx)
+                                window.dispatch_action(
+                                    Box::new(RunCommand("global.palette".into())),
+                                    cx,
+                                )
                             }),
                     )
                     .child(
@@ -186,11 +189,15 @@ impl Workspace {
                                     .separator()
                                     .menu(
                                         msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
-                                        Box::new(FitColumns),
+                                        Box::new(RunCommand(
+                                            "palette.log_column_fit_all_to_content".into(),
+                                        )),
                                     )
                                     .menu(
                                         msg::log_draw::COLUMN_MENU_RESET.get(),
-                                        Box::new(ResetColumns),
+                                        Box::new(RunCommand(
+                                            "palette.log_column_reset_width".into(),
+                                        )),
                                     )
                                 },
                             ),
@@ -398,15 +405,10 @@ impl Workspace {
                 });
             if !disabled {
                 b = b.hover(move |d| d.bg(button_hover));
-                b = if id == "tb-search" {
-                    b.on_click(cx.listener(|this, _, window, cx| {
-                        this.log.update(cx, |l, cx| l.toggle_search(window, cx))
-                    }))
-                } else if let Some(what) = transfer_of(id) {
-                    b.on_click(cx.listener(move |this, _, _, cx| this.transfer(what, cx)))
-                } else {
-                    b.on_click(|_, window, cx| window.push_notification(strings::NOT_AVAILABLE, cx))
-                };
+                // A button is a command like any other: same dispatcher, same "not available yet".
+                b = b.on_click(move |_, window, cx| {
+                    commands::run_id(toolbar_command(id), window, cx);
+                });
             }
             row = row.child(b);
         }
@@ -486,6 +488,10 @@ impl Workspace {
             )
             .child("\u{2022}")
             .child(div().child(msg::footer::session(self.backend.session())))
+            .when_some(crate::commands::status::current(cx), |d, message| {
+                d.child("\u{2022}")
+                    .child(div().text_color(text).child(message))
+            })
             .child("\u{2022}")
             .children(self.activity_text(cx).map(|(text, error)| {
                 div()
@@ -507,14 +513,19 @@ impl Workspace {
     }
 }
 
-/// The write a toolbar button starts, if it has one.
-fn transfer_of(id: &str) -> Option<Transfer> {
-    Some(match id {
-        "tb-fetch" => Transfer::Fetch,
-        "tb-pull" => Transfer::Pull,
-        "tb-push" => Transfer::Push,
-        "tb-undo" => Transfer::Undo,
-        "tb-redo" => Transfer::Redo,
-        _ => return None,
-    })
+/// The command (an id of the shared registry) a toolbar button stands for.
+fn toolbar_command(id: &str) -> &'static str {
+    match id {
+        "tb-undo" => "global.undo",
+        "tb-redo" => "global.redo",
+        "tb-fetch" => "git_prefix.fetch_all",
+        "tb-pull" => "git_prefix.pull",
+        "tb-push" => "git_prefix.push",
+        "tb-branch" => "git_prefix.new_branch",
+        "tb-tag" => "git_prefix.new_tag",
+        "tb-stash" => "git_prefix.stash_push",
+        "tb-pop" => "git_prefix.stash_pop",
+        "tb-lfs" => "git_prefix.lfs_menu",
+        _ => "global.find_in_log",
+    }
 }

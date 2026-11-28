@@ -1,35 +1,17 @@
-//! The window's actions: what menus, the command palette and shortcuts trigger.
+//! GPUI actions the window's menus carry, and the handles the command layer reaches the workspace by.
 //!
-//! Handlers are registered globally and reach the workspace through a weak handle, deferred: an action
-//! fires inside the window's own key dispatch, so updating the window again right there would fail.
+//! Keys do not come through here: `commands::keys` resolves every keystroke with the shared keymap and
+//! runs the command through `commands::run`. What stays is the small set of actions that carry data
+//! (a theme, a language, a recent repository, a command id) for the menus built by the toolkit.
 
 use gitpoulpi_i18n::Lang;
-use gpui_kit::{
-    actions, Action, App, Context, Global, KeyBinding, SharedString, WeakEntity, Window,
-};
+use gpui_kit::{Action, App, Context, Entity, Global, SharedString, WeakEntity, Window};
 use serde::Deserialize;
 
 use super::workspace::Workspace;
+use crate::commands;
 use crate::prefs::PrefsStore;
 use crate::theme::{self, CurrentTheme, LaneTheme};
-
-actions!(
-    gp,
-    [
-        OpenPalette,
-        FocusRefs,
-        FocusLog,
-        FocusChanges,
-        FocusFilter,
-        OpenRepo,
-        Quit,
-        ToggleLeft,
-        ToggleRight,
-        FitColumns,
-        ResetColumns,
-        ToggleSearch
-    ]
-);
 
 #[derive(Action, Clone, PartialEq, Eq, Deserialize)]
 #[action(namespace = gp, no_json)]
@@ -47,16 +29,28 @@ pub struct SetLaneTheme(pub SharedString);
 #[action(namespace = gp, no_json)]
 pub struct OpenRecent(pub SharedString);
 
+/// Runs a command of the registry by its id (`global.palette`, `palette.refresh`, ...).
+#[derive(Action, Clone, PartialEq, Eq, Deserialize)]
+#[action(namespace = gp, no_json)]
+pub struct RunCommand(pub SharedString);
+
 /// Weak handle to the workspace of the main window.
 pub(super) struct WorkspaceHandle(pub WeakEntity<Workspace>);
 impl Global for WorkspaceHandle {}
 
-/// Runs `f` on the workspace from a global action handler.
+/// The workspace of the main window, once it exists.
+pub(crate) fn workspace(cx: &App) -> Option<Entity<Workspace>> {
+    cx.try_global::<WorkspaceHandle>()
+        .and_then(|h| h.0.upgrade())
+}
+
+/// Runs `f` on the workspace from a global action handler. Deferred: an action fires inside the
+/// window's own key dispatch, so updating the window again right there would fail.
 pub(super) fn with_workspace(
     cx: &mut App,
     f: impl FnOnce(&mut Workspace, &mut Window, &mut Context<Workspace>) + 'static,
 ) {
-    let Some(ws) = cx.try_global::<WorkspaceHandle>().map(|h| h.0.clone()) else {
+    let Some(ws) = workspace(cx) else {
         return;
     };
     let Some(win) = cx.windows().first().copied() else {
@@ -64,7 +58,7 @@ pub(super) fn with_workspace(
     };
     cx.defer(move |cx| {
         let _ = win.update(cx, move |_, window, cx| {
-            let _ = ws.update(cx, |ws, cx| f(ws, window, cx));
+            ws.update(cx, |ws, cx| f(ws, window, cx));
         });
     });
 }
@@ -90,65 +84,24 @@ pub fn set_language(lang: Lang, cx: &mut App) {
     cx.refresh_windows();
 }
 
-/// Registers shortcuts and global handlers. Call once at startup.
+/// Switches the graph colour palette (`"theme"` follows the theme) and remembers the choice.
+pub fn set_lane_theme(slug: &str, cx: &mut App) {
+    let choice = if slug == "theme" {
+        None
+    } else {
+        Some(slug.to_string())
+    };
+    cx.set_global(LaneTheme(choice.clone()));
+    PrefsStore::update(cx, |p| p.ui.lane_theme = choice);
+    reapply_theme(cx);
+    // The lane colour indices come from the layout, so a repaint is all that is needed.
+    cx.refresh_windows();
+}
+
+/// Registers the global handlers. Call once at startup.
 pub fn init(cx: &mut App) {
-    cx.bind_keys([
-        KeyBinding::new("ctrl-p", OpenPalette, None),
-        KeyBinding::new("ctrl-shift-p", OpenPalette, None),
-        KeyBinding::new("ctrl-1", FocusRefs, None),
-        KeyBinding::new("ctrl-2", FocusLog, None),
-        KeyBinding::new("ctrl-3", FocusChanges, None),
-        KeyBinding::new("ctrl-f", ToggleSearch, None),
-        KeyBinding::new("ctrl-o", OpenRepo, None),
-        KeyBinding::new("ctrl-q", Quit, None),
-    ]);
-    cx.on_action(|_: &Quit, cx| cx.quit());
-    cx.on_action(|_: &OpenPalette, cx| with_workspace(cx, |ws, w, cx| ws.open_palette(w, cx)));
-    cx.on_action(|_: &FocusRefs, cx| {
-        with_workspace(cx, |ws, w, cx| {
-            ws.refs.update(cx, |r, cx| r.focus_filter(w, cx))
-        })
-    });
-    cx.on_action(|_: &FocusLog, cx| with_workspace(cx, |ws, w, cx| ws.focus_log(w, cx)));
-    cx.on_action(|_: &ToggleSearch, cx| {
-        with_workspace(cx, |ws, w, cx| {
-            ws.log.update(cx, |l, cx| l.toggle_search(w, cx))
-        })
-    });
-    cx.on_action(|_: &FocusFilter, cx| {
-        with_workspace(cx, |ws, w, cx| {
-            ws.log.update(cx, |l, cx| l.open_search(w, cx))
-        })
-    });
-    cx.on_action(|_: &FocusChanges, cx| {
-        use gpui_kit::Focusable as _;
-        with_workspace(cx, |ws, w, cx| {
-            ws.right.read(cx).focus_handle(cx).focus(w, cx)
-        })
-    });
-    cx.on_action(|_: &FitColumns, cx| {
-        with_workspace(cx, |ws, w, cx| ws.log.update(cx, |l, cx| l.fit_all(w, cx)))
-    });
-    cx.on_action(|_: &ResetColumns, cx| {
-        with_workspace(cx, |ws, _, cx| {
-            ws.log.update(cx, |l, cx| l.reset_widths(cx))
-        })
-    });
-    cx.on_action(|_: &ToggleLeft, cx| with_workspace(cx, |ws, _, cx| ws.toggle_left(cx)));
-    cx.on_action(|_: &ToggleRight, cx| with_workspace(cx, |ws, _, cx| ws.toggle_right(cx)));
     cx.on_action(|a: &SetTheme, cx| set_theme(a.0.as_ref(), cx));
-    cx.on_action(|a: &SetLaneTheme, cx| {
-        let choice = if a.0.as_ref() == "theme" {
-            None
-        } else {
-            Some(a.0.to_string())
-        };
-        cx.set_global(LaneTheme(choice.clone()));
-        PrefsStore::update(cx, |p| p.ui.lane_theme = choice);
-        reapply_theme(cx);
-        // The lane colour indices come from the layout, so a repaint is all that is needed.
-        cx.refresh_windows();
-    });
+    cx.on_action(|a: &SetLaneTheme, cx| set_lane_theme(a.0.as_ref(), cx));
     cx.on_action(|a: &SetLang, cx| {
         if let Some(l) = gitpoulpi_i18n::SHIPPED
             .iter()
@@ -158,24 +111,19 @@ pub fn init(cx: &mut App) {
             set_language(l, cx);
         }
     });
-    cx.on_action(|_: &OpenRepo, cx| {
-        let rx = cx.prompt_for_paths(gpui_kit::PathPromptOptions {
-            files: false,
-            directories: true,
-            multiple: false,
-            prompt: None,
-        });
-        cx.spawn(async move |cx| {
-            if let Ok(Ok(Some(paths))) = rx.await {
-                if let Some(p) = paths.into_iter().next() {
-                    cx.update(|cx| with_workspace(cx, move |ws, _, cx| ws.open_repo(&p, cx)));
-                }
-            }
-        })
-        .detach();
-    });
     cx.on_action(|a: &OpenRecent, cx| {
         let p = std::path::PathBuf::from(a.0.as_ref());
         with_workspace(cx, move |ws, _, cx| ws.open_repo(&p, cx));
+    });
+    cx.on_action(|a: &RunCommand, cx| {
+        let id = a.0.to_string();
+        let Some(win) = cx.windows().first().copied() else {
+            return;
+        };
+        cx.defer(move |cx| {
+            let _ = win.update(cx, move |_, window, cx| {
+                commands::run_id(&id, window, cx);
+            });
+        });
     });
 }

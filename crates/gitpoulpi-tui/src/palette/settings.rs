@@ -176,18 +176,27 @@ pub(crate) fn sub_query(op: SettingOp) -> Option<String> {
         .then(|| format!("{} ", model.prefixes[op.row() as usize]))
 }
 
-type Values = (
-    (Option<std::time::SystemTime>, u64, u64),
-    HashMap<&'static str, Current>,
+/// `config.toml` and `tui.toml` (mtime, length each), then the language epoch.
+type Stamp = (
+    (Option<std::time::SystemTime>, u64),
+    (Option<std::time::SystemTime>, u64),
+    u64,
 );
+type Values = (Stamp, HashMap<&'static str, Current>);
 static VALUES: Mutex<Option<Values>> = Mutex::new(None);
 
-fn config_stamp() -> (Option<std::time::SystemTime>, u64, u64) {
-    let meta = gitpoulpi_config::ConfigPaths::discover()
-        .and_then(|p| std::fs::metadata(p.config_file()).ok());
+fn config_stamp() -> Stamp {
+    let paths = gitpoulpi_config::ConfigPaths::discover();
+    let stat = |file: Option<std::path::PathBuf>| {
+        let meta = file.and_then(|f| std::fs::metadata(f).ok());
+        (
+            meta.as_ref().and_then(|m| m.modified().ok()),
+            meta.as_ref().map_or(0, |m| m.len()),
+        )
+    };
     (
-        meta.as_ref().and_then(|m| m.modified().ok()),
-        meta.as_ref().map_or(0, |m| m.len()),
+        stat(paths.as_ref().map(|p| p.config_file())),
+        stat(paths.as_ref().map(|p| p.tui_file())),
         gitpoulpi_i18n::epoch(),
     )
 }

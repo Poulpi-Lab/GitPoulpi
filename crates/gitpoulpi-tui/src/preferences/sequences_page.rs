@@ -146,24 +146,15 @@ fn localised(mut def: SequenceDef) -> SequenceDef {
 
 /// `[keybindings.sequence] <id>` as the file has it (a string or a list).
 fn chords_in_file(path: &Path, id: &str) -> Vec<String> {
-    let Ok(text) = std::fs::read_to_string(path) else {
-        return Vec::new();
-    };
-    let Ok(doc) = text.parse::<toml::Table>() else {
-        return Vec::new();
-    };
-    match doc
-        .get("keybindings")
-        .and_then(|k| k.get(KEYBINDINGS_CONTEXT))
-        .and_then(|k| k.get(id))
-    {
-        Some(toml::Value::String(s)) => vec![s.clone()],
-        Some(toml::Value::Array(a)) => a
-            .iter()
-            .filter_map(|v| v.as_str().map(str::to_string))
-            .collect(),
-        _ => Vec::new(),
-    }
+    // Through the loader: the bindings live in `tui.toml` once it exists.
+    gitpoulpi_config::Config::load(path)
+        .ok()
+        .and_then(|c| {
+            c.keybindings
+                .get(KEYBINDINGS_CONTEXT, id)
+                .map(<[String]>::to_vec)
+        })
+        .unwrap_or_default()
 }
 
 impl PreferencesState {

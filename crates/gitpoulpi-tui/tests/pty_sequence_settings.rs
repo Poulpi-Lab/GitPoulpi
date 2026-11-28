@@ -35,7 +35,13 @@ fn launch(repo: &Path, config: &Path, session: &str) -> Terminal {
 }
 
 fn stored(config: &Path) -> String {
-    std::fs::read_to_string(config.join("config.toml")).unwrap_or_default()
+    // Both files: the common keys stay in config.toml, the terminal UI's own
+    // settings (and key bindings) are in tui.toml.
+    ["config.toml", "tui.toml"]
+        .iter()
+        .map(|f| std::fs::read_to_string(config.join(f)).unwrap_or_default())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn parsed(config: &Path) -> toml::Table {

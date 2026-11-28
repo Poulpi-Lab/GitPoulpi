@@ -126,7 +126,7 @@ fn the_sections_choice_is_per_repository_and_survives_a_restart() {
     )
     .unwrap();
     let alpha_state = alpha.state_dir().join("repo-state.toml");
-    let config_file = config.path().join("config.toml");
+    let config_file = config.path().join("tui.toml");
 
     let mut term = launch(alpha.root(), config.path());
     term.wait_for("TAGS", STEP, |s| has_header(s, "TAGS"))
@@ -220,6 +220,7 @@ fn the_global_scope_ignores_but_keeps_the_repository_choice() {
     let config = tempfile::tempdir().unwrap();
     let config_file = config.path().join("config.toml");
     std::fs::write(&config_file, "[ui]\nsidebar_sections_scope = \"global\"\n").unwrap();
+    let tui_file = config.path().join("tui.toml");
     let alpha_state = alpha.state_dir().join("repo-state.toml");
     let own = gitpoulpi_session::RepoState {
         sidebar_sections_hidden: Some(vec!["remote".to_string()]),
@@ -250,7 +251,7 @@ fn the_global_scope_ignores_but_keeps_the_repository_choice() {
         !has_header(s, "TAGS") && has_header(s, "REMOTE")
     })
     .unwrap_or_else(|e| panic!("{e}\n{}", term.text()));
-    wait_file(&config_file, "the global default", |t| t.contains("tags"));
+    wait_file(&tui_file, "the global default", |t| t.contains("tags"));
     assert!(
         read(&alpha_state).contains("remote") && !read(&alpha_state).contains("tags"),
         "the repository's own choice is untouched: {}",
@@ -259,8 +260,8 @@ fn the_global_scope_ignores_but_keeps_the_repository_choice() {
     exit(term);
 
     // Back to per repository: the own choice (REMOTE hidden) is intact.
-    let config_text = read(&config_file).replace("\"global\"", "\"repository\"");
-    std::fs::write(&config_file, config_text).unwrap();
+    let config_text = read(&tui_file).replace("\"global\"", "\"repository\"");
+    std::fs::write(&tui_file, config_text).unwrap();
     let term = launch(alpha.root(), config.path());
     term.wait_for("per repository: REMOTE hidden, TAGS shown", STEP, |s| {
         has_header(s, "TAGS") && !has_header(s, "REMOTE")

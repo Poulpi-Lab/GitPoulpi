@@ -47,7 +47,13 @@ fn open_settings(term: &mut Terminal) {
 }
 
 fn stored(config: &Path) -> String {
-    std::fs::read_to_string(config.join("config.toml")).unwrap_or_default()
+    // Both files: common keys stay in config.toml, the terminal UI's own
+    // settings are in tui.toml.
+    ["config.toml", "tui.toml"]
+        .iter()
+        .map(|f| std::fs::read_to_string(config.join(f)).unwrap_or_default())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// Double clicks the first `needle` once its position has stopped moving: a

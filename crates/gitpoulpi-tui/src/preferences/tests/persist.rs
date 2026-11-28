@@ -327,7 +327,7 @@ fn the_tab_folder_rows_are_comboboxes_and_persist() {
     state.field = follow;
     state.commit_choice(&Target::Global("ui.tab_dir_follow"), 1);
     assert_eq!(state.config.ui.tab_dir_follow, TabDirFollow::Auto);
-    let raw = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
+    let raw = std::fs::read_to_string(dir.path().join("tui.toml")).unwrap();
     assert!(raw.contains("tab_dir_follow = \"auto\""), "{raw}");
     crate::tab_dir::reset_for_tests();
 }

@@ -53,13 +53,13 @@ fn quit(mut term: Terminal) {
 fn wait_config(config: &Path, what: &str, ok: impl Fn(&str) -> bool) -> String {
     let deadline = Instant::now() + STEP;
     loop {
-        let text = std::fs::read_to_string(config.join("config.toml")).unwrap_or_default();
+        let text = std::fs::read_to_string(config.join("tui.toml")).unwrap_or_default();
         if ok(&text) {
             return text;
         }
         assert!(
             Instant::now() < deadline,
-            "config.toml never showed {what}:\n{text}"
+            "tui.toml never showed {what}:\n{text}"
         );
         std::thread::sleep(Duration::from_millis(100));
     }

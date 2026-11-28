@@ -1170,13 +1170,18 @@ fn apply_handover(
     path: &Path,
     plan: impl FnOnce(&Config) -> Option<PrimaryHandover>,
 ) -> Result<Option<PrimaryHandover>> {
+    let _guard = crate::split::lock_writes();
     let raw = read_raw(path)?;
     let mut document = parse_document(&raw)?;
-    let config = Config::from_toml_str(&toml::to_string(&document)?)?.0;
+    // What the loader sees: with a `tui.toml`, the look keys come from it.
+    let (config, effective) = match crate::split::read_merged(path)? {
+        Some((doc, _)) => Config::from_document(doc)?,
+        None => Config::from_document(document.clone())?,
+    };
     let Some(mut handover) = plan(&config) else {
         return Ok(None);
     };
-    let present = |key: &str| document.get("ui").and_then(|u| u.get(key)).is_some();
+    let present = |key: &str| effective.get("ui").and_then(|u| u.get(key)).is_some();
     // A look remembered just now keeps only the keys the file really had.
     if config.installation.ui_before.is_none() {
         if let Some(before) = handover.installation.ui_before.as_mut() {
@@ -1237,6 +1242,17 @@ fn apply_handover(
             }
         }
     }
+    // The colours belong to the interface file (`tui.toml`) once the split is
+    // in place; the logo colour and the command aliases stay in `config.toml`.
+    // A `config.toml` named otherwise (a test fixture) keeps everything.
+    let tui_path = crate::split::tui_sibling(path);
+    let (look_actions, actions): (Vec<UiAction>, Vec<UiAction>) = if tui_path.is_some() {
+        actions
+            .into_iter()
+            .partition(|(key, _)| LOOK_KEYS.contains(key))
+    } else {
+        (Vec::new(), actions)
+    };
     put_installation(&mut document, &handover.installation)?;
     for (key, value) in &actions {
         let dotted = format!("ui.{key}");
@@ -1247,6 +1263,30 @@ fn apply_handover(
     }
     validate(&document)?;
     let text = splice(&raw, &document, &handover.installation, &actions)?;
+    if let (Some(tui), false) = (tui_path, look_actions.is_empty()) {
+        // Copy `config.toml` into a complete `tui.toml` first, then edit
+        // that, validating the merged result before either file is written.
+        crate::split::ensure_tui_at(path, &tui)?;
+        let tui_raw = read_raw(&tui)?;
+        let mut tui_doc = parse_document(&tui_raw)?;
+        for (key, value) in &look_actions {
+            let dotted = format!("ui.{key}");
+            match value {
+                Some(v) => insert_dotted(&mut tui_doc, &dotted, toml::Value::String(v.clone()))?,
+                None => remove_dotted(&mut tui_doc, &dotted),
+            }
+        }
+        let mut merged = crate::split::merge_documents(&document, &tui_doc);
+        AiConfig::migrate_document(&mut merged);
+        validate(&merged)?;
+        let tui_text = splice(
+            &tui_raw,
+            &tui_doc,
+            &InstallationConfig::default(),
+            &look_actions,
+        )?;
+        write_text(&tui, &tui_raw, &tui_text)?;
+    }
     write_text(path, &raw, &text)?;
     Ok(Some(handover))
 }

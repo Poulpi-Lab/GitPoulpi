@@ -29,7 +29,7 @@ fn select(state: &mut PreferencesState, id: &str) {
 }
 
 fn file(dir: &Path) -> String {
-    std::fs::read_to_string(dir.join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(dir.join("tui.toml")).unwrap_or_default()
 }
 
 fn draw(state: &mut PreferencesState) -> String {
@@ -378,7 +378,7 @@ fn the_french_reset_confirmation_and_refusals_are_translated() {
     for want in [
         "Réinitialiser tous les raccourcis",
         "Chaque raccourci revient à sa valeur par défaut.",
-        "La table [keybindings] est retirée de config.toml.",
+        "La table [keybindings] est retirée de tui.toml.",
         "Tout réinitialiser",
     ] {
         assert!(screen.contains(want), "missing {want:?}:\n{screen}");

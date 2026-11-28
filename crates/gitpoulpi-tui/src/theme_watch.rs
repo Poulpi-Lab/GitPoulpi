@@ -1,5 +1,5 @@
-//! Notices the theme being edited from outside: `config.toml` (a
-//! `gitpoulpi config set ui.theme ...` from a shell) or the active user
+//! Notices the theme being edited from outside: `config.toml` or `tui.toml`
+//! (a `gitpoulpi config set ui.theme ...` from a shell writes the latter) or the active user
 //! theme file `<config>/themes/<slug>.toml` rewritten while the window runs.
 //!
 //! Nothing else re-reads them (only closing Settings does), so without this a
@@ -18,7 +18,8 @@ use std::time::{Duration, Instant, SystemTime};
 const EVERY: Duration = Duration::from_millis(750);
 
 type Stat = Option<(SystemTime, u64)>;
-type Fingerprint = (Stat, Stat);
+/// `config.toml`, the active theme file, `tui.toml`.
+type Fingerprint = (Stat, Stat, Stat);
 
 #[derive(Default)]
 struct Watch {
@@ -63,11 +64,13 @@ fn stat_of(path: &Path) -> Stat {
     Some((meta.modified().ok()?, meta.len()))
 }
 
-/// The two files' fingerprint: `config.toml` and `themes/<slug>.toml`.
+/// The files' fingerprint: `config.toml`, `themes/<slug>.toml` and `tui.toml`
+/// (where `ui.theme` and the key bindings live once it exists).
 fn fingerprint(paths: &gitpoulpi_config::ConfigPaths, slug: &str) -> Fingerprint {
     (
         stat_of(&paths.config_file()),
         stat_of(&paths.themes_dir().join(format!("{slug}.toml"))),
+        stat_of(&paths.tui_file()),
     )
 }
 
@@ -124,12 +127,25 @@ mod tests {
     fn the_first_look_records_and_either_file_moving_is_a_change() {
         let mut w = Watch::default();
         let t0 = Instant::now();
-        assert!(!w.step(t0, || (at(1, 1), at(1, 1))));
+        assert!(!w.step(t0, || (at(1, 1), at(1, 1), None)));
         assert!(!w.step(t0 + Duration::from_millis(10), || panic!("too early")));
-        assert!(!w.step(t0 + EVERY, || (at(1, 1), at(1, 1))));
-        assert!(w.step(t0 + EVERY * 2, || (at(2, 1), at(1, 1))), "config");
-        assert!(w.step(t0 + EVERY * 3, || (at(2, 1), at(3, 9))), "theme");
-        assert!(w.step(t0 + EVERY * 4, || (at(2, 1), None)), "theme deleted");
+        assert!(!w.step(t0 + EVERY, || (at(1, 1), at(1, 1), None)));
+        assert!(
+            w.step(t0 + EVERY * 2, || (at(2, 1), at(1, 1), None)),
+            "config"
+        );
+        assert!(
+            w.step(t0 + EVERY * 3, || (at(2, 1), at(3, 9), None)),
+            "theme"
+        );
+        assert!(
+            w.step(t0 + EVERY * 4, || (at(2, 1), None, None)),
+            "theme deleted"
+        );
+        assert!(
+            w.step(t0 + EVERY * 5, || (at(2, 1), None, at(5, 5))),
+            "tui.toml"
+        );
     }
 
     #[test]
@@ -141,6 +157,10 @@ mod tests {
         std::fs::write(&file, "base = \"dark\"\n").unwrap();
         let before = fingerprint(&paths, "mine");
         std::fs::write(&file, "base = \"dark\"\n[ui]\naccent = \"#00ff00\"\n").unwrap();
+        assert_ne!(fingerprint(&paths, "mine"), before);
+        // `tui.toml` is part of the fingerprint.
+        let before = fingerprint(&paths, "mine");
+        std::fs::write(paths.tui_file(), "[ui]\ntheme = \"light\"\n").unwrap();
         assert_ne!(fingerprint(&paths, "mine"), before);
         // Another slug's file is not this theme's business.
         assert_eq!(fingerprint(&paths, "other").1, None);

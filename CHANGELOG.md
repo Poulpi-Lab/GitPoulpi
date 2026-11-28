@@ -7,6 +7,9 @@ IPC surfaces are stable within a major version).
 
 ## [Unreleased]
 
+### Changed
+- **Terminal UI settings move to `tui.toml`.** The settings that belong to the terminal UI (the look, language, layout and view preferences, key bindings, terminal capabilities) are written to a new `tui.toml` next to `config.toml`, created as a full copy of what `config.toml` holds the first time one is written (or when the terminal UI starts); `config.toml` keeps the settings common to every interface and is never modified by that copy, so an older build sharing the folder still reads all of its settings. Once `tui.toml` exists it is the only source of the keys it owns (a key it does not say is the default). `gitpoulpi config path` and `config get` gain `tui_file` / `tui_exists` and a per-key `file`; `config set ui.*` writes to the right file, and a running window follows a change made in either.
+
 ### Fixed
 - **Installations: default name of a release, and the shortcut icon after a colour change.** A release put in place by `install.sh` (an archive install with its `.gitpoulpi-dist` marker) is no longer called `GitPoulpi (portable)` but `GitPoulpi (release)`; a name already stored is left as it is. `gitpoulpi installation set logo_color` now repaints this installation's shortcut and folder-menu icons at once (the `.desktop` `Icon=` follows), like `installation set name` renames them, and `gitpoulpi desktop shortcut status` reports `icon_stale: true` for an icon that no longer matches the colour instead of silently rewriting it.
 

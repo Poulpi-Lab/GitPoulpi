@@ -327,3 +327,74 @@ fn the_configured_backend_is_the_one_the_daemon_actually_serves_from() {
 
 // No test reads or writes the real config, data dir or credentials of whoever runs it.
 gitpoulpi_testkit::isolate_binary!();
+
+#[test]
+fn config_path_names_the_terminal_ui_file_too() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let before = ok(config.path(), cwd.path(), &[], &["config", "path"]);
+    assert_eq!(
+        Path::new(before["tui_file"].as_str().unwrap()),
+        config.path().join("tui.toml")
+    );
+    assert_eq!(before["tui_exists"], Value::Bool(false));
+    ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "ui.minimap", "false"],
+    );
+    let after = ok(config.path(), cwd.path(), &[], &["config", "path"]);
+    assert_eq!(after["tui_exists"], Value::Bool(true));
+}
+
+#[test]
+fn config_get_and_set_name_the_file_of_each_key() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let file_of = |json: &Value| std::path::PathBuf::from(json["file"].as_str().unwrap());
+    let common = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "general.default_backend"],
+    );
+    assert_eq!(file_of(&common), config.path().join("config.toml"));
+    let interface = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "ui.minimap"],
+    );
+    assert_eq!(file_of(&interface), config.path().join("tui.toml"));
+
+    let set_common = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "general.default_backend", "system"],
+    );
+    assert_eq!(file_of(&set_common), config.path().join("config.toml"));
+    let before = std::fs::read(config.path().join("config.toml")).unwrap();
+    let set_interface = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "ui.minimap", "false"],
+    );
+    assert_eq!(file_of(&set_interface), config.path().join("tui.toml"));
+    // The interface write never touched `config.toml`.
+    assert_eq!(
+        std::fs::read(config.path().join("config.toml")).unwrap(),
+        before
+    );
+    let got = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "ui.minimap"],
+    );
+    assert_eq!(got["value"], Value::Bool(false));
+    assert_eq!(got["source"], Value::String("file".into()));
+    assert_eq!(file_of(&got), config.path().join("tui.toml"));
+}

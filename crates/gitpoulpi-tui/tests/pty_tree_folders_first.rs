@@ -160,7 +160,7 @@ fn the_safety_panel_tree_follows_the_setting_while_open() {
     term.click(c, r).unwrap();
     let deadline = std::time::Instant::now() + STEP;
     loop {
-        let stored = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+        let stored = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
         if stored.contains("tree_folders_first = false") {
             break;
         }

@@ -32,7 +32,12 @@ fn on_row(st: &mut PreferencesState, section: PrefSection, key: &'static str) ->
 }
 
 fn stored(dir: &Path) -> String {
-    std::fs::read_to_string(dir.join("config.toml")).unwrap_or_default()
+    // Both files: some of these keys are common, some are the terminal UI's.
+    ["config.toml", "tui.toml"]
+        .iter()
+        .map(|f| std::fs::read_to_string(dir.join(f)).unwrap_or_default())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn shown(st: &PreferencesState) -> String {

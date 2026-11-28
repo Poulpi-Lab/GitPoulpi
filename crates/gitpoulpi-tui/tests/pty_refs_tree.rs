@@ -321,7 +321,7 @@ fn y_flattens_the_tree_and_the_choice_survives_a_restart() {
     term.stop().unwrap();
 
     let written =
-        std::fs::read_to_string(config.path().join("config.toml")).expect("config.toml written");
+        std::fs::read_to_string(config.path().join("tui.toml")).expect("tui.toml written");
     assert!(written.contains("ref_tree = false"), "{written}");
 
     let term = launch(repo.root(), "refs-tree-flat-2", config.path());

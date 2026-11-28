@@ -107,25 +107,20 @@ impl<'de> serde::Deserialize<'de> for KeybindingsConfig {
     }
 }
 
-fn read_document(path: &Path) -> Result<toml::Value> {
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    Ok(if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    })
+/// The `[keybindings]` table as the loader sees it for `path` (the sibling
+/// `tui.toml` when there is one), `None` when nothing is bound.
+fn has_bindings(path: &Path) -> Result<bool> {
+    Ok(crate::split::read_merged(path)?
+        .and_then(|(doc, _)| doc.get("keybindings").cloned())
+        .is_some_and(|kb| kb.as_table().is_some_and(|t| !t.is_empty())))
 }
 
-fn write_document(path: &Path, document: &toml::Value) -> Result<()> {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
+fn bad_bindings(key: &str) -> impl FnOnce(toml::de::Error) -> Error + '_ {
+    move |err| Error::BadValue {
+        key: key.to_string(),
+        value: "<keybindings>".to_string(),
+        expected: err.to_string(),
     }
-    std::fs::write(path, toml::to_string_pretty(document)?)?;
-    Ok(())
 }
 
 fn check_name(key: &str, part: &str) -> Result<()> {
@@ -147,70 +142,92 @@ pub fn set_keybinding_in_file(
     let key = format!("keybindings.{ctx}.{action}");
     check_name(&key, ctx)?;
     check_name(&key, action)?;
-    let mut document = read_document(path)?;
-    let root = document.as_table_mut().ok_or(Error::UnsettableKey {
-        key: key.clone(),
-        kind: "value",
-    })?;
-    let kb = root
-        .entry("keybindings")
-        .or_insert_with(|| toml::Value::Table(toml::map::Map::new()));
-    let kb = kb.as_table_mut().ok_or(Error::UnsettableKey {
-        key: "keybindings".into(),
-        kind: "value",
-    })?;
-    let table = kb
-        .entry(ctx)
-        .or_insert_with(|| toml::Value::Table(toml::map::Map::new()));
-    let table = table.as_table_mut().ok_or(Error::UnsettableKey {
-        key: format!("keybindings.{ctx}"),
-        kind: "value",
-    })?;
     let value = match chords {
         [one] => toml::Value::String(one.clone()),
         many => toml::Value::Array(many.iter().cloned().map(toml::Value::String).collect()),
     };
-    table.insert(action.to_string(), value);
-    write_document(path, &document)
+    // The bindings are interface settings: `tui.toml` (see `crate::split`).
+    crate::split::edit_config_document(
+        path,
+        "keybindings",
+        |document| {
+            let root = document.as_table_mut().ok_or(Error::UnsettableKey {
+                key: key.clone(),
+                kind: "value",
+            })?;
+            let kb = root
+                .entry("keybindings")
+                .or_insert_with(|| toml::Value::Table(toml::map::Map::new()));
+            let kb = kb.as_table_mut().ok_or(Error::UnsettableKey {
+                key: "keybindings".into(),
+                kind: "value",
+            })?;
+            let table = kb
+                .entry(ctx)
+                .or_insert_with(|| toml::Value::Table(toml::map::Map::new()));
+            let table = table.as_table_mut().ok_or(Error::UnsettableKey {
+                key: format!("keybindings.{ctx}"),
+                kind: "value",
+            })?;
+            table.insert(action.to_string(), value);
+            Ok(())
+        },
+        bad_bindings("keybindings"),
+    )
+    .map(|_| ())
 }
 
 /// Removes one binding (back to its default). An emptied context table,
 /// and then an emptied `[keybindings]`, is dropped too.
 pub fn reset_keybinding_in_file(path: &Path, ctx: &str, action: &str) -> Result<()> {
-    if !path.exists() {
+    if !has_bindings(path)? {
         return Ok(());
     }
-    let mut document = read_document(path)?;
-    let Some(root) = document.as_table_mut() else {
-        return Ok(());
-    };
-    if let Some(kb) = root
-        .get_mut("keybindings")
-        .and_then(toml::Value::as_table_mut)
-    {
-        if let Some(table) = kb.get_mut(ctx).and_then(toml::Value::as_table_mut) {
-            table.remove(action);
-            if table.is_empty() {
-                kb.remove(ctx);
+    crate::split::edit_config_document(
+        path,
+        "keybindings",
+        |document| {
+            let Some(root) = document.as_table_mut() else {
+                return Ok(());
+            };
+            if let Some(kb) = root
+                .get_mut("keybindings")
+                .and_then(toml::Value::as_table_mut)
+            {
+                if let Some(table) = kb.get_mut(ctx).and_then(toml::Value::as_table_mut) {
+                    table.remove(action);
+                    if table.is_empty() {
+                        kb.remove(ctx);
+                    }
+                }
+                if kb.is_empty() {
+                    root.remove("keybindings");
+                }
             }
-        }
-        if kb.is_empty() {
-            root.remove("keybindings");
-        }
-    }
-    write_document(path, &document)
+            Ok(())
+        },
+        bad_bindings("keybindings"),
+    )
+    .map(|_| ())
 }
 
 /// Removes the whole `[keybindings]` table.
 pub fn reset_all_keybindings_in_file(path: &Path) -> Result<()> {
-    if !path.exists() {
+    if !has_bindings(path)? {
         return Ok(());
     }
-    let mut document = read_document(path)?;
-    if let Some(root) = document.as_table_mut() {
-        root.remove("keybindings");
-    }
-    write_document(path, &document)
+    crate::split::edit_config_document(
+        path,
+        "keybindings",
+        |document| {
+            if let Some(root) = document.as_table_mut() {
+                root.remove("keybindings");
+            }
+            Ok(())
+        },
+        bad_bindings("keybindings"),
+    )
+    .map(|_| ())
 }
 
 /// What `gitpoulpi config set keybindings.<ctx>.<action> <value>` stores:

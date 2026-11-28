@@ -10,21 +10,6 @@ use gitpoulpi_core::domain::{FileStatus, StatusEntry, WorkingTree};
 
 use crate::daemon_link::Action;
 
-/// Whether `action` is one the overlay knows how to apply.
-pub(crate) fn is_optimistic(action: &Action) -> bool {
-    matches!(
-        action,
-        Action::StageFile(_)
-            | Action::UnstageFile(_)
-            | Action::StageAll
-            | Action::UnstageAll
-            | Action::StagePaths { .. }
-            | Action::UnstagePaths { .. }
-            | Action::StageFolder(_)
-            | Action::UnstageFolder(_)
-    )
-}
-
 enum Scope<'a> {
     Path(&'a Path),
     Folder(&'a Path),

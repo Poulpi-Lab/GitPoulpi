@@ -47,10 +47,10 @@ pub(crate) use compact::{
 };
 pub(crate) use connector::{banded_graph_cell, node_column, with_ref_connector};
 pub(crate) use ghost_ref::GhostRef;
+pub(crate) use gitpoulpi_app::graph::LazyLog;
 pub use gitpoulpi_app::graph::LogLoadSettings;
 pub(crate) use gitpoulpi_app::graph::StashSlot;
 pub(crate) use gitpoulpi_app::graph::{place_stashes, GraphStash, LogEntry, LogRows};
-pub(crate) use gitpoulpi_app::graph::{LazyLog, LogPageRequest};
 pub(crate) use inline_image::GraphImage;
 #[cfg(test)]
 pub(crate) use layout::build_graph_lines;

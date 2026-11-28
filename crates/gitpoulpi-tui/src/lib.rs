@@ -101,7 +101,7 @@ macro_rules! hide_in_graph_icon {
 }
 
 mod about;
-mod activity;
+pub(crate) use gitpoulpi_link::activity;
 mod activity_log;
 mod after_clone;
 #[cfg_attr(not(feature = "ai"), path = "agent_launch_stub.rs")]
@@ -130,7 +130,7 @@ mod column_drag;
 mod column_resize;
 mod combo;
 mod commit_column;
-mod commit_settings;
+pub(crate) use gitpoulpi_link::commit_settings;
 mod conflict_badge;
 mod conflict_popup;
 mod context_menu;
@@ -188,18 +188,16 @@ mod kitty_keyboard;
 mod launcher;
 mod launcher_sync;
 mod lfs_ui;
-mod lfs_ui_pure;
 mod live_settings;
-mod live_settings_pure;
 mod log_search;
 mod logo_colors;
 mod merge_flow;
 mod merge_view;
 mod minimap;
 mod new_file;
-mod no_repository;
+pub(crate) use gitpoulpi_link::no_repository;
 mod off_branch_edit;
-mod oid_text;
+pub(crate) use gitpoulpi_link::oid_text;
 mod palette;
 mod pane_menu;
 mod paste_burst;
@@ -207,7 +205,7 @@ mod pointer_map;
 mod popup_list;
 mod preferences;
 mod quiet_backend;
-mod redraw;
+pub(crate) use gitpoulpi_link::redraw;
 mod refs_tree;
 mod relaunch;
 #[cfg(test)]
@@ -215,7 +213,7 @@ mod render_check_tests;
 mod repo_manager;
 mod repo_menu;
 mod repo_probe;
-mod repo_state_path;
+pub(crate) use gitpoulpi_link::repo_state_path;
 mod repo_switcher;
 mod safety_panel;
 mod scroll_marks;
@@ -241,13 +239,11 @@ mod text_cursor;
 mod title_logo;
 mod ui_intent;
 mod ui_viewer;
-mod ui_viewer_pure;
 mod undo_ui;
-mod undo_ui_pure;
 mod updates;
 mod wide_edge;
 mod window_ctl;
-mod wip_view;
+pub(crate) use gitpoulpi_link::wip_view;
 mod workspace_ui;
 // Pixels on a terminal: capability detection, the cell-metrics query,
 // the iTerm2 encoder and the buffer-cell widget. The commit graph is its
@@ -275,7 +271,7 @@ mod worktree_remove_dialog;
 // namespace and items cross module lines as `pub(crate)`. See
 // `docs/developer/where-we-are.md` for the map.
 mod autostash_banner;
-mod binary_hint;
+pub(crate) use gitpoulpi_link::binary_hint;
 mod board_cmd;
 #[cfg(feature = "hosting")]
 #[cfg_attr(not(feature = "board"), path = "board_view_stub.rs")]
@@ -287,7 +283,6 @@ mod chrome;
 mod commit_detail;
 #[cfg(test)]
 mod commit_files_bench;
-mod commit_files_cache;
 mod compare;
 mod compare_cards;
 mod compose_ui;
@@ -361,7 +356,7 @@ mod ref_reveal;
 mod refs_sidebar;
 mod remote_links;
 mod remotes_ui;
-mod rename_pairs;
+pub(crate) use gitpoulpi_link::rename_pairs;
 mod repo_dialogs;
 mod revert_mainline;
 mod review_cmd;

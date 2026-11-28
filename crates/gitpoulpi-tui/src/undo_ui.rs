@@ -11,7 +11,7 @@
 use gitpoulpi_core::domain::{Direction, JournalState};
 use gitpoulpi_i18n::msg;
 
-pub(crate) use crate::undo_ui_pure::*;
+pub(crate) use gitpoulpi_link::undo_ui::*;
 
 /// What the toolbar and the palette need per direction, as plain data.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

@@ -67,7 +67,7 @@ pub(crate) fn stale_after() -> Duration {
 /// The most lines `ui state --text` returns.
 const TEXT_LINES: usize = 200;
 
-pub(crate) use crate::ui_viewer_pure::*;
+pub(crate) use gitpoulpi_link::ui_viewer::*;
 
 /// What the window knows about itself this frame, as plain data.
 pub(crate) struct Facts {

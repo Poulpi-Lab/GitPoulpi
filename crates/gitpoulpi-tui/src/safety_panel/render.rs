@@ -292,7 +292,7 @@ impl SafetyPanel {
                 let row = self.history.rows.get(at)?;
                 let st = rows::row_state(row, at, state);
                 // One fixed-width icon column, one glyph per action family.
-                let icon = pad_right(label::family(row.entry.summary.kind).glyph(), ICON_W);
+                let icon = pad_right(label::glyph(label::family(row.entry.summary.kind)), ICON_W);
                 let tag = rows::tag(row, &st);
                 let style = match st {
                     rows::RowState::Blocked(_) => Style::default().fg(th().status.warning),

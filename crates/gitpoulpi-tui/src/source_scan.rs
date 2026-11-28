@@ -565,31 +565,16 @@ fn the_color_lint_flags_what_it_should() {
     }
 }
 
-/// The files the daemon client (and later a second frontend) depends on
-/// without wanting a terminal: plain data and logic. They name neither
+/// The files a second frontend will want without a terminal (the ones the
+/// daemon client needs moved to `gitpoulpi-link`, which has its own guard):
+/// plain data and logic. They name neither
 /// `ratatui` nor `crossterm` and glob nothing from their parent module, so
 /// they can move to a neutral crate unchanged. A comment may still mention
 /// either name.
 const PURE_FILES: &[&str] = &[
-    "activity.rs",
-    "binary_hint.rs",
-    "commit_files_cache.rs",
-    "commit_settings.rs",
-    "diff_recode.rs",
     "event_loop/fetch_policy.rs",
-    "history_view/rename.rs",
-    "lfs_ui_pure.rs",
-    "live_settings_pure.rs",
     "log_table/rows_now.rs",
-    "no_repository.rs",
-    "oid_text.rs",
-    "redraw.rs",
     "ref_name.rs",
-    "repo_state_path.rs",
-    "safety_panel/label.rs",
-    "ui_viewer_pure.rs",
-    "undo_ui_pure.rs",
-    "wip_view.rs",
 ];
 
 #[test]

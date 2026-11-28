@@ -601,7 +601,7 @@ fn draw_central_in(frame: &mut Frame, ctx: &mut CentralDrawCtx<'_>) {
         // backend decoded it stays, with a word in the title. Staging is off meanwhile.
         let recoded = match (diff_state.encoding, open_file) {
             (Some(charset), Some(f)) => Some(crate::diff_recode::resolve(
-                &crate::diff_recode::Want::of_state(diff_state, charset),
+                &crate::diff_recode::want_of_state(diff_state, charset),
                 f,
             )),
             _ => None,

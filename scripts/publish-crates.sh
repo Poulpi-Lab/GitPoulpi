@@ -32,6 +32,7 @@ CRATES=(
   gitpoulpi-update
   gitpoulpi-ai
   gitpoulpi-daemon
+  gitpoulpi-link
   gitpoulpi-tui
   gitpoulpi-commands
   gitpoulpi-mcp

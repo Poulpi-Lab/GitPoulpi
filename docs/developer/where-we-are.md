@@ -188,8 +188,18 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   crates.io page; offline or missing manifest degrades to `?` / crates.io.
 
 **Daemon link, settings, hosting, AI**
-- `daemon_link/`: the IPC client thread (`link_loop.rs`, `reader.rs`,
-  `refresh.rs`, `workers.rs`, `handle.rs`), `Action`s, outcomes.
+- `daemon_link`: the IPC client thread now lives in **`crates/gitpoulpi-link/src/client/`**
+  (`link_loop.rs`, `reader.rs`, `refresh.rs`, `workers.rs`, `handle.rs`), `Action`s,
+  outcomes. The TUI's `daemon_link` is a re-export (`lib.rs`) plus `daemon_link_host.rs`,
+  its `LinkHost` (`wake`, jobs, push group, activity-log reports, the stage-guard
+  question, `initial_log_filter`, `undo_key`, `daemon_job_live`,
+  `is_own_hosting_change`). The host is process-wide, installed by `start`.
+  The helpers moved with it keep their old TUI paths through re-exports
+  (`activity`, `commit_files_cache`, `binary_hint`, `diff_recode` (the TUI adds
+  `want_of_state`), `wip_view`, `commit_settings`, `redraw`, `rename_pairs`,
+  `live_settings`/`lfs_ui`/`undo_ui`/`ui_viewer` (pure halves), `safety_panel/label.rs`
+  (the TUI adds `glyph`)). Tests that need a link share `ticket_tests` through the
+  link crate's `test-support` feature.
 - `preferences/` (pages, fields, persistence, search), `integrations_page/`,
   `integrations_ssh.rs`, `live_settings.rs`.
 - `hosting_task/` (worker), `hosting_ui/` (sidebar sections, chip, menus),

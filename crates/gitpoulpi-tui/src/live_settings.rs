@@ -7,6 +7,9 @@ use std::sync::RwLock;
 
 use gitpoulpi_config::Config;
 
+// The subset the daemon client reads lives in a pure sibling file.
+pub(crate) use crate::live_settings_pure::*;
+
 // Statics read by the views every frame (`MINIMAP`, `BLAME_*`) are
 /// process-wide in the binary, but each unit-test thread gets its own copy:
 /// tests run in parallel in one process, and a test that turns the minimap on
@@ -181,38 +184,6 @@ pub(crate) fn install_language(ui: &gitpoulpi_config::UiConfig) {
     gitpoulpi_i18n::set(resolve_language(env.as_deref(), ui));
     gitpoulpi_i18n::set_translate_git_terms(ui.translate_git_terms);
     gitpoulpi_i18n::set_english_git_terms(ui.git_terms_english);
-}
-
-/// `general.auto_prune`, published like the date patterns so `daemon_link`'s
-/// `Fetch`/`FetchAll` handlers can read it without a `Config`. It governs
-/// whether those fetches (background auto-fetch and the toolbar's Fetch
-/// included) pass `--prune`; the diverged-push dialog's lease-check fetch
-/// never prunes, on purpose. On by default (like the config); pruning is not
-/// undoable, but the refs come back on the next fetch if the branch returns.
-static AUTO_PRUNE: AtomicBool = AtomicBool::new(true);
-
-/// Serializes the tests that touch the process-wide `AUTO_PRUNE`: the Settings
-/// toggle test flips it, and the `Fetch` wire golden expects it off.
-#[cfg(test)]
-pub(crate) static AUTO_PRUNE_TEST_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
-
-pub(crate) fn install_auto_prune(on: bool) {
-    AUTO_PRUNE.store(on, Ordering::Relaxed);
-}
-
-/// `general.auto_prune_tags`, published like `AUTO_PRUNE`.
-static AUTO_PRUNE_TAGS: AtomicBool = AtomicBool::new(false);
-
-pub(crate) fn install_auto_prune_tags(on: bool) {
-    AUTO_PRUNE_TAGS.store(on, Ordering::Relaxed);
-}
-
-/// What the Fetch / Fetch All paths send: both prune settings, read live.
-pub(crate) fn fetch_options() -> gitpoulpi_core::domain::FetchOptions {
-    gitpoulpi_core::domain::FetchOptions {
-        prune: AUTO_PRUNE.load(Ordering::Relaxed),
-        prune_tags: AUTO_PRUNE_TAGS.load(Ordering::Relaxed),
-    }
 }
 
 /// `ui.log_wip_counts_in_message`, published like `AUTO_PRUNE`.
@@ -523,7 +494,6 @@ pub(crate) fn install_blame_width(width: u16) {
 /// read (which has no config in hand) read one value. Live: a change
 /// applies on the next frame.
 static IMAGE_VIEW: AtomicBool = AtomicBool::new(true);
-static IMAGE_VIEW_MAX_MIB: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(32);
 static IMAGE_CARD_ONLY: AtomicBool = AtomicBool::new(false);
 static IMAGE_SYNC: AtomicBool = AtomicBool::new(true);
 /// `ui.image_view_pixelated_from` as a scale: 2.0 (the default), 1.0, or
@@ -533,7 +503,7 @@ static IMAGE_PIXELATED_FROM: std::sync::atomic::AtomicU32 =
 
 pub(crate) fn install_image_view(ui: &gitpoulpi_config::UiConfig) {
     IMAGE_VIEW.store(ui.image_view, Ordering::Relaxed);
-    IMAGE_VIEW_MAX_MIB.store(ui.image_view_max_mib, Ordering::Relaxed);
+    install_image_view_max_mib(ui.image_view_max_mib);
     IMAGE_CARD_ONLY.store(
         ui.image_view_text_fallback != gitpoulpi_config::ImageTextFallback::Halfblock,
         Ordering::Relaxed,
@@ -568,28 +538,11 @@ pub(crate) fn image_view() -> bool {
     crate::build_features::IMAGE_VIEW && IMAGE_VIEW.load(Ordering::Relaxed)
 }
 
-/// The byte cap on an image read, from `ui.image_view_max_mib`.
-pub(crate) fn image_view_max_bytes() -> u64 {
-    u64::from(IMAGE_VIEW_MAX_MIB.load(Ordering::Relaxed)) * 1024 * 1024
-}
-
 /// `ui.image_view_text_fallback = card`: no half-block picture where the
 /// terminal draws no images, an info card instead.
 #[cfg_attr(not(feature = "image-view"), allow(dead_code))]
 pub(crate) fn image_card_only() -> bool {
     IMAGE_CARD_ONLY.load(Ordering::Relaxed)
-}
-
-/// `general.delete_orig_files_after_merge`, published like `AUTO_PRUNE`. Read
-/// by `daemon_link::run_action`'s `Merge` arm after a successful merge.
-static DELETE_ORIG_AFTER_MERGE: AtomicBool = AtomicBool::new(false);
-
-pub(crate) fn install_delete_orig_after_merge(on: bool) {
-    DELETE_ORIG_AFTER_MERGE.store(on, Ordering::Relaxed);
-}
-
-pub(crate) fn delete_orig_after_merge() -> bool {
-    DELETE_ORIG_AFTER_MERGE.load(Ordering::Relaxed)
 }
 
 /// `log.commit_count`, published like `AUTO_PRUNE`: read each frame by the
@@ -615,42 +568,10 @@ pub(crate) fn commit_count() -> gitpoulpi_config::CommitCountMethod {
     }
 }
 
-/// `general.active_profile`, resolved to the `CommitAuthor` a commit should
-/// carry, or `None` when it names no profile (`Config::active_profile`'s
-/// "falls back to `git config user.*`" rule). Read by
-/// `daemon_link::run_action`'s `Commit` arm.
-///
-/// A profile with an empty name or email counts as no profile: half an
-/// identity would make git refuse the commit (`fatal: empty ident`).
-static ACTIVE_PROFILE_AUTHOR: RwLock<Option<gitpoulpi_core::domain::CommitAuthor>> =
-    RwLock::new(None);
-
 pub(crate) fn install_active_profile(config: &Config) {
     // The profile combobox owns "which profile applies here": this
     // repository's own choice, else `general.active_profile`.
     crate::profile_bar::install(config);
-}
-
-/// Publishes the author the resolved profile gives (`None` for no profile or
-/// half an identity).
-pub(crate) fn publish_author(profile: Option<gitpoulpi_config::Profile>) {
-    let author = profile.and_then(|p| {
-        if p.author_name.is_empty() || p.author_email.is_empty() {
-            None
-        } else {
-            Some(gitpoulpi_core::domain::CommitAuthor {
-                name: p.author_name,
-                email: p.author_email,
-            })
-        }
-    });
-    if let Ok(mut slot) = ACTIVE_PROFILE_AUTHOR.write() {
-        *slot = author;
-    }
-}
-
-pub(crate) fn active_profile_author() -> Option<gitpoulpi_core::domain::CommitAuthor> {
-    ACTIVE_PROFILE_AUTHOR.read().ok().and_then(|s| s.clone())
 }
 
 /// The Diff view's four display toggles (layout, hunks only, whitespace, word

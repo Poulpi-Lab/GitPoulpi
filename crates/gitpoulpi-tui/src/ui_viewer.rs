@@ -23,9 +23,7 @@
 //! Nothing here can mutate a repository.
 
 use crate::th;
-use std::collections::VecDeque;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Mutex, OnceLock};
+use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
 use crate::wide_edge::Clear;
@@ -33,7 +31,7 @@ use crossterm::event::{Event, KeyCode, MouseButton, MouseEventKind};
 use gitpoulpi_core::domain::{RepoId, UiControl};
 use gitpoulpi_ipc::ui::{
     sanitize_display, ProposalStatus, UiIntent, UiOrigin, UiOutcome, UiReportArgs, UiReportBody,
-    UiState, UiTab, ViewerId, ViewerInfo,
+    UiState, UiTab, ViewerInfo,
 };
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -69,120 +67,7 @@ pub(crate) fn stale_after() -> Duration {
 /// The most lines `ui state --text` returns.
 const TEXT_LINES: usize = 200;
 
-/// This process' viewer id, created once: every window the process restarts
-/// into (a tab switch) re-attaches with it, so the daemon sees one viewer.
-pub(crate) fn viewer_id() -> &'static ViewerId {
-    static ID: OnceLock<ViewerId> = OnceLock::new();
-    ID.get_or_init(|| {
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map_or(0, |d| d.subsec_nanos());
-        ViewerId(format!("tui-{}-{nanos:x}", std::process::id()))
-    })
-}
-
-/// A request pushed by the daemon to this window.
-pub(crate) enum Inbound {
-    Intent {
-        id: u64,
-        /// Boxed: a conflict proposal carries a whole file's picks.
-        intent: Box<UiIntent>,
-        origin: UiOrigin,
-    },
-    State {
-        id: u64,
-        include_text: bool,
-    },
-}
-
-/// What the link thread and the render loop hand each other.
-pub(crate) struct UiBridge {
-    /// Tells one bridge from the next (a window's link is replaced on Retry).
-    serial: u64,
-    inbox: Mutex<VecDeque<Inbound>>,
-    outbox: Mutex<Vec<UiReportArgs>>,
-    info: Mutex<Option<ViewerInfo>>,
-    info_dirty: AtomicBool,
-    wake: tokio::sync::Notify,
-}
-
-impl Default for UiBridge {
-    fn default() -> Self {
-        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
-        Self {
-            serial: NEXT.fetch_add(1, Ordering::Relaxed),
-            inbox: Default::default(),
-            outbox: Default::default(),
-            info: Default::default(),
-            info_dirty: Default::default(),
-            wake: Default::default(),
-        }
-    }
-}
-
-impl UiBridge {
-    /// Reader side: a request for this window.
-    pub(crate) fn push_inbound(&self, request: Inbound) {
-        self.inbox
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .push_back(request);
-        crate::redraw::poke();
-    }
-
-    fn take_inbound(&self) -> Vec<Inbound> {
-        self.inbox
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .drain(..)
-            .collect()
-    }
-
-    fn report(&self, report: UiReportArgs) {
-        self.outbox
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .push(report);
-        self.wake.notify_one();
-    }
-
-    /// Answers a launcher's `RaiseWindow` (`Ok`: it did what it could; `Err`:
-    /// nothing worked, and the launcher starts a new window).
-    pub(crate) fn report_raise(&self, id: u64, result: Result<String, String>) {
-        let outcome = match result {
-            Ok(_) => UiOutcome::Applied {
-                state: UiState::default(),
-            },
-            Err(reason) => UiOutcome::refused(reason),
-        };
-        self.report(UiReportArgs {
-            id,
-            body: UiReportBody::Outcome { outcome },
-        });
-    }
-
-    fn publish(&self, info: ViewerInfo) {
-        *self.info.lock().unwrap_or_else(|e| e.into_inner()) = Some(info);
-        self.info_dirty.store(true, Ordering::SeqCst);
-        self.wake.notify_one();
-    }
-
-    /// Link side: resolves when there is something to send.
-    pub(crate) async fn woken(&self) {
-        self.wake.notified().await;
-    }
-
-    /// Link side: the presence to send if it changed, and the answers.
-    pub(crate) fn take_outgoing(&self) -> (Option<ViewerInfo>, Vec<UiReportArgs>) {
-        let info = if self.info_dirty.swap(false, Ordering::SeqCst) {
-            self.info.lock().unwrap_or_else(|e| e.into_inner()).clone()
-        } else {
-            None
-        };
-        let reports = std::mem::take(&mut *self.outbox.lock().unwrap_or_else(|e| e.into_inner()));
-        (info, reports)
-    }
-}
+pub(crate) use crate::ui_viewer_pure::*;
 
 /// What the window knows about itself this frame, as plain data.
 pub(crate) struct Facts {

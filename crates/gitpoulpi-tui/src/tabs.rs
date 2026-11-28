@@ -27,9 +27,7 @@ pub(crate) fn no_repository_ref() -> RepoRef {
     }
 }
 
-/// The placeholder root shown in the title bar when nothing is open.
-/// Parenthesised so it cannot be mistaken for a path.
-pub(crate) const NO_REPOSITORY: &str = "(no repository)";
+pub(crate) use crate::no_repository::NO_REPOSITORY;
 
 /// What the Repository Management tab should do as it opens: just show
 /// itself, or also open the Browse / Clone / Init dialog over itself

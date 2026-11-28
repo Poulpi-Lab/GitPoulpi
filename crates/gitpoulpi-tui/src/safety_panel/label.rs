@@ -9,9 +9,28 @@
 //! its own verb and keeps the names, paths and short ids as recorded.
 
 use gitpoulpi_core::domain::{
-    EntryState, EntrySummary, ListedEntry, OperationKind, RestoreItem, RestoreItemKind,
+    EntryState, EntrySummary, JournalState, ListedEntry, Oid, OperationKind, RestoreItem,
+    RestoreItemKind, UndoRefusal,
 };
 use gitpoulpi_i18n::msg::undo_label as l;
+
+/// The reflog position a blocked top undo entry offers, with the label of
+/// the operation: `(ref to restore, oid, label)`.
+pub(crate) fn offer_of(state: &JournalState) -> Option<(String, Oid, String)> {
+    let Some(UndoRefusal::RefMoved {
+        restore: Some(pos), ..
+    }) = state.blocked.as_ref()
+    else {
+        return None;
+    };
+    let label = summary_text(state.undo.as_ref()?);
+    let name = pos
+        .refname
+        .strip_prefix("refs/heads/")
+        .unwrap_or(&pos.refname)
+        .to_string();
+    Some((name, pos.oid, label))
+}
 
 /// The icon family of a kind: one glyph column in the list.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

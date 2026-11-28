@@ -16,7 +16,7 @@ use gitpoulpi_session::RepoPreferences;
 /// A small file read: callers are action tasks and the window's reload on
 /// Settings close, never a per-frame path.
 pub(crate) fn repo_preferences(repo_root: &Path) -> RepoPreferences {
-    gitpoulpi_session::RepoState::load(&crate::remotes_ui::repo_state_path(repo_root))
+    gitpoulpi_session::RepoState::load(&crate::repo_state_path::repo_state_path(repo_root))
         .map(|s| s.preferences)
         .unwrap_or_default()
 }
@@ -62,7 +62,7 @@ impl CommitSettings {
     /// last reported (`repo_config`).
     pub(crate) fn load(repo_root: &Path, repo_config: &BTreeMap<String, Option<String>>) -> Self {
         let prefs = repo_preferences(repo_root);
-        let state_path = crate::remotes_ui::repo_state_path(repo_root);
+        let state_path = crate::repo_state_path::repo_state_path(repo_root);
         let state_dir = state_path
             .parent()
             .map(Path::to_path_buf)

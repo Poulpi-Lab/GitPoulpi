@@ -403,6 +403,8 @@ use event_loop::*;
 use file_panel::*;
 use file_selection::*;
 use git_actions::*;
+#[cfg(feature = "hosting")]
+use hosting_ui::HostingListSection as _;
 use hosting_ui::{HostingCommand, HostingEffect, HostingHit, HostingList, HostingUi, ToolbarChip};
 use log_inline_ref::*;
 use log_menu::*;

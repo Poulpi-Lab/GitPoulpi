@@ -35,9 +35,9 @@ use gitpoulpi_hosting::{
 use crate::combo::{Combo, ComboOption, ComboOutcome};
 use crate::context_menu::Entry;
 use crate::hosting_task::{
-    age_label, cache_path, load_cache, refs_signature, save_cache, start_projects, unix_now,
-    DefaultFactory, HostingRequest, HostingSnapshot, HostingWorker, IssueView, PrView, Problem,
-    ProjectsReceiver, ProjectsState, RefreshPolicy,
+    cache_path, load_cache, refs_signature, save_cache, start_projects, unix_now, DefaultFactory,
+    HostingRequest, HostingSnapshot, HostingWorker, IssueView, PrView, Problem, ProjectsReceiver,
+    ProjectsState, RefreshPolicy,
 };
 
 /// What [`HostingUi::reveal`] found.
@@ -51,22 +51,23 @@ pub(crate) enum RevealOutcome {
     NotListed,
 }
 
-/// Which of the two lists.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum HostingList {
-    Pulls,
-    Issues,
+pub(crate) use gitpoulpi_link::hosting_rows::HostingList;
+
+/// The sidebar sections the two lists live in.
+pub(crate) trait HostingListSection: Sized {
+    fn section(self) -> SidebarSection;
+    fn from_section(section: SidebarSection) -> Option<Self>;
 }
 
-impl HostingList {
-    pub(crate) fn section(self) -> SidebarSection {
+impl HostingListSection for HostingList {
+    fn section(self) -> SidebarSection {
         match self {
             HostingList::Pulls => SidebarSection::PullRequests,
             HostingList::Issues => SidebarSection::Issues,
         }
     }
 
-    pub(crate) fn from_section(section: SidebarSection) -> Option<Self> {
+    fn from_section(section: SidebarSection) -> Option<Self> {
         match section {
             SidebarSection::PullRequests => Some(HostingList::Pulls),
             SidebarSection::Issues => Some(HostingList::Issues),
@@ -151,93 +152,7 @@ pub(crate) enum HostingHit {
     NewPrChip,
 }
 
-/// The four collapsible groups of the PULL REQUESTS section.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum PrGroup {
-    Mine,
-    Assigned,
-    Awaiting,
-    All,
-}
-
-impl PrGroup {
-    /// The key a folded group is remembered under (`fold_state`).
-    pub(crate) fn key(self) -> &'static str {
-        match self {
-            PrGroup::Mine => "mine",
-            PrGroup::Assigned => "assigned",
-            PrGroup::Awaiting => "awaiting",
-            PrGroup::All => "all",
-        }
-    }
-
-    pub(crate) const ALL: [PrGroup; 4] = [
-        PrGroup::Mine,
-        PrGroup::Assigned,
-        PrGroup::Awaiting,
-        PrGroup::All,
-    ];
-
-    /// The group's header text; the pull / merge request word follows the host.
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            PrGroup::Mine => msg::hosting_ui::GROUP_MINE.get(),
-            PrGroup::Assigned => msg::hosting_ui::GROUP_ASSIGNED.get(),
-            PrGroup::Awaiting => msg::hosting_ui::GROUP_AWAITING.get(),
-            PrGroup::All => msg::hosting_ui::GROUP_ALL.get(),
-        }
-    }
-
-    /// Whether `pr` belongs to the group, for the signed-in user `me`.
-    fn holds(self, pr: &PullRequestSummary, me: &str) -> bool {
-        let is_me = |login: &String| !me.is_empty() && login.eq_ignore_ascii_case(me);
-        match self {
-            PrGroup::All => true,
-            PrGroup::Mine => !me.is_empty() && pr.author.eq_ignore_ascii_case(me),
-            PrGroup::Assigned => pr.assignees.iter().any(is_me),
-            PrGroup::Awaiting => pr.review_requested || pr.reviewers.iter().any(is_me),
-        }
-    }
-}
-
-/// One row of a sidebar list.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum HostingRow {
-    /// "Reconnect" - the token is missing, rejected or short of scope.
-    Reconnect,
-    /// An inert line (an error, or "offline").
-    Notice(String),
-    /// The search box.
-    Search,
-    /// The state-filter combobox.
-    Filter,
-    /// A group's header (chevron, name, count).
-    Group(PrGroup),
-    /// A pull request under a group: `(group, index into the snapshot)`.
-    Pull(PrGroup, usize),
-    /// The issue provider combobox (GitHub / GitLab profiles).
-    IssueProvider,
-    /// The provider's repository combobox.
-    IssueRepo,
-    Issue(usize),
-    /// The pull-request provider combobox (GitHub / GitLab profiles).
-    PullProvider,
-    /// The pull-request provider's repository combobox.
-    PullRepo,
-    /// The optional extra query of the issue source: a JQL / WIQL text field
-    /// (Jira, Azure) or the Trello lists dropdown.
-    IssueQuery,
-}
-
-impl HostingRow {
-    /// A row that is a control, not an item: one click uses it.
-    pub(crate) fn is_control(&self) -> bool {
-        !matches!(
-            self,
-            HostingRow::Notice(_) | HostingRow::Pull(..) | HostingRow::Issue(_)
-        )
-    }
-}
+pub(crate) use gitpoulpi_link::hosting_rows::{HostingRow, PrGroup};
 
 /// What a menu entry or a palette command does.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -406,36 +321,6 @@ fn state_glyph(state: PullRequestState) -> &'static str {
     }
 }
 
-fn state_word(state: PullRequestState) -> &'static str {
-    match state {
-        PullRequestState::Open => msg::hosting_ui::STATE_OPEN.get(),
-        PullRequestState::Draft => msg::hosting_ui::STATE_DRAFT.get(),
-        PullRequestState::Merged => msg::hosting_ui::STATE_MERGED.get(),
-        PullRequestState::Closed => msg::hosting_ui::STATE_CLOSED.get(),
-    }
-}
-
-/// `GH` / `GL` / `AZ` / `BB` for the profile's provider family (the chip's
-/// tag; the same letters `gitpoulpi_hosting::FamilySpec::tag` carries).
-pub(crate) fn provider_tag(kind: Option<gitpoulpi_config::IntegrationKind>) -> &'static str {
-    use gitpoulpi_config::ApiFamily;
-    match kind.map(|k| k.family()) {
-        Some(ApiFamily::Github) => "GH",
-        Some(ApiFamily::Gitlab) => "GL",
-        Some(ApiFamily::AzureDevops) => "AZ",
-        Some(ApiFamily::Bitbucket) => "BB",
-        Some(ApiFamily::Jira) => "JI",
-        Some(ApiFamily::Trello) => "TR",
-        Some(ApiFamily::Gitea) => "GT",
-        Some(ApiFamily::Linear) => "LN",
-        Some(ApiFamily::YouTrack) => "YT",
-        Some(ApiFamily::Redmine) => "RM",
-        Some(ApiFamily::Gerrit) => "GR",
-        Some(ApiFamily::LocalMarkdown) => "MD",
-        None => msg::hosting_ui::PR_ABBR.get(),
-    }
-}
-
 /// The branch name "Create branch from issue" offers for `issue` of a
 /// provider of `family` (plan D7): Jira, Linear and YouTrack name it from
 /// their key (`ABC-123-fix-login`, which they link back; Linear's own
@@ -580,54 +465,11 @@ pub(crate) fn edit_url(kind: Option<gitpoulpi_config::IntegrationKind>, web_url:
     gitpoulpi_hosting::pull_request_edit_url(kind, web_url)
 }
 
-/// `GitHub` / `GitLab` / `Azure DevOps` / ... for a profile kind (product
-/// names, not translated).
-pub(crate) fn provider_name(kind: gitpoulpi_config::IntegrationKind) -> &'static str {
-    use gitpoulpi_config::ApiFamily;
-    match kind.family() {
-        ApiFamily::Github => "GitHub",
-        ApiFamily::Gitlab => "GitLab",
-        ApiFamily::AzureDevops => "Azure DevOps",
-        ApiFamily::Bitbucket => "Bitbucket",
-        ApiFamily::Jira => "Jira",
-        ApiFamily::Trello => "Trello",
-        ApiFamily::Gitea => kind.label(),
-        ApiFamily::Linear => "Linear",
-        ApiFamily::YouTrack => "YouTrack",
-        ApiFamily::Redmine => "Redmine",
-        ApiFamily::Gerrit => "Gerrit",
-        ApiFamily::LocalMarkdown => "Local Markdown", // i18n-english
-    }
-}
-
-/// Whether the ISSUES section of a provider of `family` takes an extra
-/// provider-native query (`IssuesSource::filter`): a JQL fragment (Jira), a
-/// WIQL condition (Azure), Trello list names, a YouTrack query.
-pub(crate) fn takes_issue_query(family: gitpoulpi_config::ApiFamily) -> bool {
-    use gitpoulpi_config::ApiFamily;
-    matches!(
-        family,
-        ApiFamily::Jira | ApiFamily::AzureDevops | ApiFamily::Trello | ApiFamily::YouTrack
-    )
-}
-
-/// Whether `pr` matches what was typed in the search box.
-fn pr_matches(pr: &PullRequestSummary, query: &str) -> bool {
-    let q = query.trim().to_lowercase();
-    q.is_empty()
-        || [&pr.title, &pr.iid_label, &pr.author, &pr.source_branch]
-            .iter()
-            .any(|f| f.to_lowercase().contains(&q))
-}
-
-fn issue_matches(issue: &IssueSummary, query: &str) -> bool {
-    let q = query.trim().to_lowercase();
-    q.is_empty()
-        || [&issue.title, &issue.iid_label, &issue.author]
-            .iter()
-            .any(|f| f.to_lowercase().contains(&q))
-        || issue.labels.iter().any(|l| l.to_lowercase().contains(&q))
-}
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_link::hosting_rows::{
+    chip_visible, issue_matches, pr_matches, provider_name, provider_tag, state_word,
+    takes_issue_query, RowsInput,
+};
 
 pub(crate) struct HostingUi {
     repo_root: PathBuf,

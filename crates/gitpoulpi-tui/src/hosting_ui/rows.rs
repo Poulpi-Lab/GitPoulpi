@@ -64,14 +64,6 @@ impl HostingUi {
             .then(|| crate::activity::spinner_frame(elapsed))
     }
 
-    fn loading_row(&self, list: HostingList) -> Option<HostingRow> {
-        let frame = self.loading(list)?;
-        Some(HostingRow::Notice(match list {
-            HostingList::Pulls => msg::hosting_ui::loading_prs(frame),
-            HostingList::Issues => msg::hosting_ui::loading_issues(frame),
-        }))
-    }
-
     pub(super) fn linked_snapshot(&self) -> Option<&HostingSnapshot> {
         self.snapshot.as_ref().filter(|s| s.linked())
     }
@@ -83,20 +75,24 @@ impl HostingUi {
         crate::issue_ref_picker::choices(issues)
     }
 
-    /// `(pull requests, issues)` sections to show. The pull requests need
-    /// a profile that answers for the remote; the issues only need a
-    /// GitHub / GitLab profile to pick a tracker from.
+    /// The rows' inputs, borrowed from this state: what both frontends list
+    /// comes from `gitpoulpi_link::hosting_rows`.
+    pub(super) fn view(&self) -> RowsInput<'_> {
+        RowsInput {
+            snapshot: self.snapshot.as_ref(),
+            collapsed: &self.collapsed,
+            pr_query: &self.pr_query,
+            issue_query: &self.issue_query,
+            loading_pulls: self.loading(HostingList::Pulls),
+            loading_issues: self.loading(HostingList::Issues),
+            fresh: self.fresh,
+            now: (self.now)(),
+        }
+    }
+
+    /// `(pull requests, issues)` sections to show.
     pub(crate) fn sections_visible(&self) -> (bool, bool) {
-        (
-            self.snapshot
-                .as_ref()
-                .is_some_and(|s| !s.pull_profiles.is_empty() || s.linked())
-                || (self.snapshot.is_none() && self.loading(HostingList::Pulls).is_some()),
-            self.snapshot
-                .as_ref()
-                .is_some_and(|s| !s.issue_profiles.is_empty())
-                || (self.snapshot.is_none() && self.loading(HostingList::Issues).is_some()),
-        )
+        self.view().sections_visible()
     }
 
     fn query(&self, list: HostingList) -> &str {
@@ -109,129 +105,24 @@ impl HostingUi {
     /// Indexes into the snapshot's pull requests that `group` shows,
     /// after the search box.
     pub(super) fn group_members(&self, group: PrGroup) -> Vec<usize> {
-        let Some(snap) = self.linked_snapshot() else {
-            return Vec::new();
-        };
-        snap.prs
-            .iter()
-            .enumerate()
-            .filter(|(_, pr)| group.holds(pr, &snap.me) && pr_matches(pr, &self.pr_query))
-            .map(|(i, _)| i)
-            .collect()
+        self.view().group_members(group)
     }
 
     pub(crate) fn rows(&self, list: HostingList) -> Vec<HostingRow> {
-        match list {
-            HostingList::Pulls => self.pull_rows(),
-            HostingList::Issues => self.issue_rows(),
-        }
-    }
-
-    fn problem_rows(problem: Option<&Problem>, has_data: bool) -> Option<HostingRow> {
-        let problem = problem?;
-        if problem.wants_reconnect() {
-            Some(HostingRow::Reconnect)
-        } else if !has_data {
-            Some(HostingRow::Notice(match problem {
-                Problem::Offline(_) => msg::hosting_ui::OFFLINE.get().to_string(),
-                Problem::Other(why) | Problem::RateLimited(why) => why.clone(),
-                _ => String::new(),
-            }))
-        } else {
-            None
-        }
-    }
-
-    fn pull_rows(&self) -> Vec<HostingRow> {
-        let Some(shown) = self
-            .snapshot
-            .as_ref()
-            .filter(|s| !s.pull_profiles.is_empty() || s.linked())
-        else {
-            return self
-                .loading_row(HostingList::Pulls)
-                .into_iter()
-                .collect::<Vec<_>>();
-        };
-        let mut rows = vec![HostingRow::PullProvider, HostingRow::PullRepo];
-        let Some(snap) = Some(shown).filter(|s| s.linked() && s.can_pulls) else {
-            return rows;
-        };
-        rows.extend(Self::problem_rows(
-            snap.problem.as_ref(),
-            !snap.prs.is_empty(),
-        ));
-        rows.push(HostingRow::Search);
-        rows.push(HostingRow::Filter);
-        for group in PrGroup::ALL {
-            rows.push(HostingRow::Group(group));
-            if !self.collapsed.contains(&group) {
-                rows.extend(
-                    self.group_members(group)
-                        .into_iter()
-                        .map(|i| HostingRow::Pull(group, i)),
-                );
-            }
-        }
-        rows
-    }
-
-    fn issue_rows(&self) -> Vec<HostingRow> {
-        let Some(snap) = self
-            .snapshot
-            .as_ref()
-            .filter(|s| !s.issue_profiles.is_empty())
-        else {
-            return self
-                .loading_row(HostingList::Issues)
-                .into_iter()
-                .collect::<Vec<_>>();
-        };
-        let mut rows = vec![HostingRow::IssueProvider, HostingRow::IssueRepo];
-        if snap
-            .issues_target
-            .as_ref()
-            .is_some_and(|t| !t.project.is_empty())
-        {
-            // The provider-native extra query (Jira JQL, Azure WIQL, Trello
-            // lists): one optional step after the project.
-            if self.issues_family().is_some_and(takes_issue_query) {
-                rows.push(HostingRow::IssueQuery);
-            }
-            rows.extend(Self::problem_rows(
-                snap.issues_problem.as_ref(),
-                !snap.issues.is_empty(),
-            ));
-            rows.push(HostingRow::Search);
-            rows.push(HostingRow::Filter);
-            rows.extend(
-                snap.issues
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, i)| issue_matches(i, &self.issue_query))
-                    .map(|(i, _)| HostingRow::Issue(i)),
-            );
-        }
-        rows
+        self.view().rows(list)
     }
 
     pub(super) fn data_len(&self, list: HostingList) -> usize {
-        match list {
-            HostingList::Pulls => self.linked_snapshot().map_or(0, |s| s.prs.len()),
-            HostingList::Issues => self.snapshot.as_ref().map_or(0, |s| s.issues.len()),
-        }
+        self.view().data_len(list)
     }
 
     pub(crate) fn row_counts(&self) -> (usize, usize) {
-        (
-            self.rows(HostingList::Pulls).len(),
-            self.rows(HostingList::Issues).len(),
-        )
+        self.view().row_counts()
     }
 
     /// The count in a section's title: real items, not status rows.
     pub(crate) fn item_count(&self, list: HostingList) -> usize {
-        self.data_len(list)
+        self.view().item_count(list)
     }
 
     fn view_label(&self, list: HostingList) -> &'static str {
@@ -244,54 +135,13 @@ impl HostingUi {
     /// The section's title: `PULL REQUESTS`, and `GITHUB ISSUES` /
     /// `GITLAB ISSUES` once a provider is chosen.
     pub(crate) fn section_title(&self, list: HostingList) -> String {
-        if list == HostingList::Issues {
-            if let Some(target) = self
-                .snapshot
-                .as_ref()
-                .and_then(|s| s.issues_target.as_ref())
-            {
-                let name = provider_name(target.profile.kind).to_uppercase();
-                // Azure calls them work items, Trello cards; the rest issues.
-                return match target.profile.kind.family() {
-                    gitpoulpi_config::ApiFamily::AzureDevops => {
-                        msg::hosting_ui::issues_title_work_items(name)
-                    }
-                    gitpoulpi_config::ApiFamily::Trello => {
-                        msg::hosting_ui::issues_title_cards(name)
-                    }
-                    _ => msg::hosting_ui::issues_title_of(name),
-                };
-            }
-        }
-        match list {
-            HostingList::Pulls => msg::hosting_ui::PULLS_TITLE.get().to_string(),
-            HostingList::Issues => msg::hosting_ui::ISSUES_TITLE.get().to_string(),
-        }
+        self.view().section_title(list)
     }
 
     /// Text appended to a section's title: how old the data is, when it
     /// is not fresh.
     pub(crate) fn title_suffix(&self, list: HostingList) -> String {
-        // In flight for a while: a spinner after the (stale) data's age.
-        let spinner = self
-            .loading(list)
-            .map(|f| format!(" {f}"))
-            .unwrap_or_default();
-        let Some(snap) = self.snapshot.as_ref() else {
-            return spinner;
-        };
-        let stale = !self.fresh || matches!(snap.problem, Some(Problem::Offline(_)));
-        if stale && snap.fetched_at > 0 {
-            let now = (self.now)();
-            let age = if now - snap.fetched_at < 60 {
-                msg::reltime::JUST_NOW.get().to_string()
-            } else {
-                msg::hosting_ui::age_suffix(age_label(now, snap.fetched_at))
-            };
-            format!(" \u{00B7} {age}{spinner}")
-        } else {
-            spinner
-        }
+        self.view().title_suffix(list)
     }
 
     pub(crate) fn head_pr(&self) -> Option<&PullRequestSummary> {
@@ -1011,10 +861,4 @@ impl HostingUi {
     pub(crate) fn modal_open(&self) -> bool {
         self.menu.is_some() || self.picker.is_some()
     }
-}
-
-/// Whether the chip of a branch's latest request is drawn: a closed or
-/// merged one is hidden when `ui.hide_finished_pr_chip` is on.
-pub(crate) fn chip_visible(state: PullRequestState, hide_finished: bool) -> bool {
-    !(hide_finished && matches!(state, PullRequestState::Closed | PullRequestState::Merged))
 }

@@ -82,9 +82,9 @@ global-search = []
 workspaces = []
 rewrite-scripts = ["gitpoulpi-daemon/rewrite-scripts", "gitpoulpi-cli-backend/rewrite-scripts"]
 mcp = []
-lfs = ["gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs"]
-worktree = ["gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
-submodule = ["gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule"]
+lfs = ["gitpoulpi-link/lfs", "gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs"]
+worktree = ["gitpoulpi-link/worktree", "gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
+submodule = ["gitpoulpi-link/submodule", "gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule"]
 # Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
 avatar-fetch = ["dep:reqwest"]
 # Image preview engine (GIF, WebP, BMP, ICO decoders); PNG/JPEG stay unconditional for avatars.
@@ -127,6 +127,7 @@ toml.workspace = true
 gitpoulpi-session.workspace = true
 # The frontend-neutral graph model (lanes, stash rows, lazy paging) shared with the desktop UI.
 gitpoulpi-app.workspace = true
+gitpoulpi-link.workspace = true
 crossterm.workspace = true
 ratatui.workspace = true
 tokio.workspace = true
@@ -163,6 +164,7 @@ gitpoulpi-logo-build.workspace = true
 gitpoulpi-hosting = { workspace = true, features = ["test-support"] }
 async-trait.workspace = true
 gitpoulpi-testkit.workspace = true
+gitpoulpi-link = { workspace = true, features = ["test-support"] }
 tempfile.workspace = true
 insta.workspace = true
 # The pty driver, for `tests/pty_ui.rs`: those tests drive this crate's

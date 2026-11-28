@@ -8,7 +8,7 @@ use gitpoulpi_core::privacy::Sensitive;
 use gitpoulpi_core::NotCancellableReason;
 
 use crate::daemon_link::{
-    Action, JobEvent, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind,
+    Action, JobEvent, LinkHost, PushGroupEvent, Report, Requester, Ticket, TimingKind, UndoKey,
 };
 
 /// The host every TUI link is started with.
@@ -121,5 +121,25 @@ impl LinkHost for TuiLinkHost {
 
     fn not_cancellable(&self, reason: NotCancellableReason) -> &'static str {
         crate::jobs_ui::reason(reason)
+    }
+
+    fn initial_log_filter(&self, root: &Path) -> gitpoulpi_core::domain::RefFilter {
+        crate::graph::load_walk_filter(root)
+    }
+
+    fn undo_key(&self, which: UndoKey) -> String {
+        let action = match which {
+            UndoKey::Undo => crate::keymap::Action::GlobalUndo,
+            UndoKey::UndoOffer => crate::keymap::Action::GlobalUndoOffer,
+        };
+        crate::keymap::current().shown(action)
+    }
+
+    fn daemon_job_live(&self) -> bool {
+        crate::jobs_ui::daemon_job_live()
+    }
+
+    fn is_own_hosting_change(&self, change: &gitpoulpi_ipc::HostingChangeArgs) -> bool {
+        crate::hosting_notify::is_own(change)
     }
 }

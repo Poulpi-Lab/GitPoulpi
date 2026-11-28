@@ -287,6 +287,8 @@ fn a_local_job_draws_the_indicator_and_its_cancel_calls_the_stop() {
 #[test]
 fn a_running_fetch_job_is_in_the_indicator_and_not_in_the_in_flight_text() {
     use crate::activity::Activity;
+    // The client asks the host whether a job is on the indicator.
+    crate::daemon_link::host::install(crate::daemon_link_host::host());
     changed(job(1, OperationKind::Fetch, "/r/tool"));
     let activity = Activity::default();
     activity.begin_as("fetching\u{2026}".into(), false, true);

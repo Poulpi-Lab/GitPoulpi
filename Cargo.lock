@@ -1507,6 +1507,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-link"
+version = "1.3.0"
+dependencies = [
+ "gitpoulpi-app",
+ "gitpoulpi-cli-backend",
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+ "gitpoulpi-daemon",
+ "gitpoulpi-i18n",
+ "gitpoulpi-ipc",
+ "gitpoulpi-link",
+ "gitpoulpi-session",
+ "gitpoulpi-testkit",
+ "imara-diff",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "gitpoulpi-log"
 version = "1.3.0"
 dependencies = [
@@ -1625,6 +1647,7 @@ dependencies = [
  "gitpoulpi-hosting",
  "gitpoulpi-i18n",
  "gitpoulpi-ipc",
+ "gitpoulpi-link",
  "gitpoulpi-log",
  "gitpoulpi-logo-build",
  "gitpoulpi-secrets",

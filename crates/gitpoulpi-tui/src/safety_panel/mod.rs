@@ -49,7 +49,7 @@ use crate::combo::Combo;
 use crate::daemon_link::{error_text, Reply, Requester};
 use detail::Detail;
 
-pub(crate) use label::{offer_of, summary_text, text as label_text};
+pub(crate) use label::{offer_of, summary_text};
 pub(crate) use palette::SafetyCmd;
 use panes::Panes;
 #[cfg(test)]

@@ -296,7 +296,7 @@ fn icons_labels_ages_and_tags_stay_in_their_columns() {
         let (mut icon_xs, mut label_xs, mut age_ends) = (Vec::new(), Vec::new(), Vec::new());
         for (needle, family, ago) in rows_wanted {
             let y = y_of(&buf, needle);
-            let icon = family.glyph().trim_end();
+            let icon = label::glyph(family).trim_end();
             let at = column_of(&buf, y, icon)
                 .unwrap_or_else(|| panic!("{lang:?}: no {icon:?} on {needle:?}'s row"));
             icon_xs.push(at);
@@ -340,7 +340,7 @@ fn every_family_has_a_one_icon_two_cell_column() {
         F::Outside,
         F::Other,
     ] {
-        let glyph = family.glyph();
+        let glyph = label::glyph(family);
         assert_eq!(crate::display_width(glyph), 2, "{family:?} {glyph:?}");
         assert!(
             !glyph.contains('\u{FE0F}') && !glyph.contains('\u{FE0E}'),

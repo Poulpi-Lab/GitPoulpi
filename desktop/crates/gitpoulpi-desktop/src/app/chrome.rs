@@ -488,6 +488,10 @@ impl Workspace {
             )
             .child("\u{2022}")
             .child(div().child(msg::footer::session(self.backend.session())))
+            .when_some(self.operation_status(cx), |d, text| {
+                d.child("\u{2022}")
+                    .child(div().text_color(warning).child(text))
+            })
             .when_some(crate::commands::status::current(cx), |d, message| {
                 d.child("\u{2022}")
                     .child(div().text_color(text).child(message))

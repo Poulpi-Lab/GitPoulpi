@@ -12,7 +12,7 @@ use gitpoulpi_app::palette::vocab::status_pane::StatusSection;
 use gitpoulpi_app::palette::vocab::tree_fold::TreeFold;
 use gitpoulpi_i18n::msg;
 use gitpoulpi_link::Action;
-use gpui_kit::{Context, KeyDownEvent, Modifiers, Window};
+use gpui_kit::{Context, Focusable as _, KeyDownEvent, Modifiers, Window};
 
 use super::status::{conflicts, section_paths, section_rows, ListView};
 use super::{Mode, RightPanel};
@@ -424,6 +424,12 @@ impl RightPanel {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
+        if matches!(self.mode, Mode::Commit(..) | Mode::Compare(..)) {
+            if !self.filter.read(cx).focus_handle(cx).is_focused(window) {
+                self.commit_key(ev, cx);
+            }
+            return;
+        }
         if !matches!(self.mode, Mode::Wip) || self.field_focused(window, cx) {
             return;
         }

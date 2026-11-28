@@ -14,7 +14,7 @@ use gpui_kit::{px, size, App, AppContext as _, Bounds, WindowBounds, WindowOptio
 pub(crate) use actions::workspace as workspace_of;
 pub use actions::{set_lane_theme, set_language, set_theme};
 pub use live::Notice;
-pub use workspace::Workspace;
+pub use workspace::{BannerButton, Workspace};
 
 use crate::commands;
 use crate::daemon::Shared;

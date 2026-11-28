@@ -16,6 +16,8 @@ use gpui_kit::{
     Task, Window,
 };
 
+mod commit;
+pub use commit::BannerButton;
 mod stage;
 
 use super::actions::WorkspaceHandle;
@@ -58,6 +60,8 @@ pub struct Workspace {
     panes: Entity<ResizableState>,
     menu_bar: Entity<MenuBar>,
     selected_commit: bool,
+    /// The merge, cherry-pick, revert or rebase stopped in the repository (from the last refresh).
+    pub(super) operation: Option<gitpoulpi_core::domain::OperationState>,
     pub(super) summary: Option<Summary>,
     /// What the last action said, for the status line.
     pub(super) notice: Option<Notice>,
@@ -106,6 +110,11 @@ impl Workspace {
                         this.notice = Some(Notice::info(text.clone()));
                         cx.notify();
                     }
+                    RightEvent::GoToRow(ix) => this.log.update(cx, |l, cx| l.go_to_row(*ix, cx)),
+                    RightEvent::SwapCompare => this.log.update(cx, |l, cx| l.swap_compare(cx)),
+                    RightEvent::SelectParent(oid) => {
+                        this.log.update(cx, |l, cx| l.select_oid(*oid, cx))
+                    }
                 },
             ),
             cx.subscribe_in(
@@ -142,6 +151,7 @@ impl Workspace {
             panes,
             menu_bar,
             selected_commit: false,
+            operation: None,
             summary: None,
             notice: None,
             live: LiveState::default(),
@@ -166,6 +176,12 @@ impl Workspace {
                 let sel = sel.clone();
                 self.right.update(cx, |r, cx| r.show(sel, &status, cx));
             }
+            LogEvent::Compare(spec) => {
+                self.selected_commit = false;
+                let spec = spec.clone();
+                self.right.update(cx, |r, cx| r.show_compare(spec, cx));
+            }
+            LogEvent::Say(text) => self.say(text.clone(), cx),
             LogEvent::Loaded(s) => {
                 let status = s.status.clone();
                 let branch = s.branch.clone();
@@ -365,6 +381,7 @@ impl Render for Workspace {
             .child(self.title_bar(cx))
             .child(self.menu_bar.clone())
             .child(self.tab_row(cx))
+            .children(self.operation_banner(cx))
             .child(
                 div()
                     .flex_1()

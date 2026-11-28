@@ -11,6 +11,7 @@
 //! | `commit`   | the selected commit's details and files |
 
 mod commit;
+mod compare;
 mod composer;
 mod files;
 mod stage;
@@ -50,6 +51,12 @@ pub enum RightEvent {
     },
     /// A line for the status line (why a command did nothing, what it started).
     Say(String),
+    /// A comparison card was clicked: the Log cursor goes to that display row.
+    GoToRow(usize),
+    /// The comparison's Swap button.
+    SwapCompare,
+    /// A parent of the shown commit was clicked: select it in the Log.
+    SelectParent(Oid),
 }
 
 enum Mode {
@@ -57,6 +64,8 @@ enum Mode {
     Wip,
     /// A commit, with the stash label when the selection is a stash.
     Commit(CommitNode, Option<String>),
+    /// Two or more selected Log rows compared.
+    Compare(crate::panels::log::compare::CompareSpec),
 }
 
 pub struct RightPanel {
@@ -245,12 +254,22 @@ impl RightPanel {
     }
 
     fn load_commit(&mut self, oid: Oid, mode: Mode, cx: &mut Context<Self>) {
+        let fut = self.backend.commit_diff(oid);
+        self.load_with(mode, fut, cx);
+    }
+
+    /// Shows `mode` and fills the file list from `fut` (a commit's diff or a comparison's).
+    fn load_with(
+        &mut self,
+        mode: Mode,
+        fut: impl std::future::Future<Output = Result<Vec<FileDiff>, String>> + 'static,
+        cx: &mut Context<Self>,
+    ) {
         self.mode = mode;
         self.revision += 1;
         let rev = self.revision;
         self.files = Arc::default();
         self.rows.clear();
-        let fut = self.backend.commit_diff(oid);
         self._task = Some(cx.spawn(async move |this, cx| {
             let files = fut.await.unwrap_or_default();
             let _ = this.update(cx, |this, cx| {
@@ -267,7 +286,7 @@ impl RightPanel {
     fn rebuild_rows(&mut self, cx: &mut Context<Self>) {
         let q = self.filter.read(cx).value().to_lowercase();
         let mut rows: Vec<FileRow> = Vec::new();
-        if matches!(self.mode, Mode::Commit(..)) {
+        if matches!(self.mode, Mode::Commit(..) | Mode::Compare(..)) {
             for (ix, f) in self.files.iter().enumerate() {
                 let path = f.path.to_string_lossy().into_owned();
                 if !q.is_empty() && !path.to_lowercase().contains(&q) {
@@ -340,6 +359,10 @@ impl Render for RightPanel {
                 let (node, stash) = (node.clone(), stash.clone());
                 self.commit_view(&node, &stash, &skin, cx)
                     .into_any_element()
+            }
+            Mode::Compare(spec) => {
+                let spec = spec.clone();
+                self.compare_view(&spec, &skin, cx).into_any_element()
             }
         };
         div()

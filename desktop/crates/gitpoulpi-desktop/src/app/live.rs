@@ -157,6 +157,10 @@ impl Workspace {
                 .read_hashes
                 .for_filter_generation(outcome.log_filter_gen, filter_gen),
         );
+        // A read the scope left out arrives as an error: the operation state then stays as it was.
+        if let Ok(state) = &outcome.operation_state_result {
+            self.operation = state.clone();
+        }
         let status_hash = hash_status(&outcome);
         let status_changed = status_hash.is_some() && status_hash != self.live.status_hash;
         if status_hash.is_some() {
@@ -216,6 +220,7 @@ impl Workspace {
     /// The repository switch restarts the link: its refreshes start from scratch.
     pub(super) fn reset_live(&mut self) {
         self.live = LiveState::default();
+        self.operation = None;
         self.notice = None;
     }
 }

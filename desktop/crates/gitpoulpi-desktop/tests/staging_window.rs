@@ -686,8 +686,23 @@ fn the_keyboard_walks_selects_stages_and_opens_the_diff(cx: &mut TestAppContext)
     wait_until(cx, "the row staged by Ctrl+Space", |_| {
         staged_names(&repo) == ["n.txt"]
     });
-    // Enter opens the cursor row's diff.
+    // The pane has to show the staged file in Staged before the cursor is put back: a refresh that lands
+    // after the cursor was set would drop a cursor on a row that just left its list.
+    wait_until(cx, "the pane to list n.txt as staged", |cx| {
+        ws.read_with(cx, |ws, cx| {
+            let right = ws.right.read(cx);
+            !right
+                .row_paths(StatusSection::Unstaged)
+                .contains(&"n.txt".to_string())
+                && right
+                    .row_paths(StatusSection::Staged)
+                    .contains(&"n.txt".to_string())
+        })
+    });
+    // The cursor was on the row that left the list, so it is gone: Down puts it on the first row, and
+    // Enter opens that row's diff.
     run(cx, window, "palette.focus_status");
+    press(cx, window, "down");
     press(cx, window, "enter");
     wait_until(cx, "the diff of the cursor row", |cx| {
         ws.read_with(cx, |ws, _| ws.diff_is_open())

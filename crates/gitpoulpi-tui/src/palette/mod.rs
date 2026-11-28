@@ -22,7 +22,6 @@ use gitpoulpi_core::domain::{ConflictSide, ResetMode};
 
 use crate::diff_view::DiffViewMode;
 use crate::repo_menu::RepoMenuAction;
-use crate::status_pane::FileContextAction;
 use crate::{
     AmendScope, CommitField, HostingCommand, LogColumn, RefField, SidebarSection, StatusSection,
 };

@@ -15,6 +15,7 @@
 //! header controls. The popups own the pointer while open; their hit
 //! rects come first and are pushed by the paint walk.
 
+use crate::keymap::term::TermChord;
 use std::time::{Duration, Instant};
 
 use crossterm::event::{KeyEvent, MouseEvent};
@@ -515,8 +516,12 @@ impl Capture {
         self.error = None;
         self.focus = 0;
         let new = self.new_chords(km);
-        self.analysis =
-            conflict::analyse(km, conflict::Platform::current(), self.def().action, &new);
+        self.analysis = conflict::analyse(
+            km,
+            crate::keymap::term::current_transport(),
+            self.def().action,
+            &new,
+        );
     }
 
     fn buttons(&self) -> Vec<Btn> {

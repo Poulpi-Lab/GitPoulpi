@@ -57,6 +57,7 @@ pub(crate) mod error_text;
 mod failed_op;
 mod file_insight;
 mod handle;
+pub mod host;
 mod link_loop;
 mod log_filter;
 mod merge;
@@ -76,6 +77,7 @@ pub use self::action::*;
 pub(crate) use self::conn::*;
 use self::file_insight::*;
 pub use self::handle::*;
+pub use self::host::{JobEvent, LinkHost, PushGroupEvent, Report, TimingKind};
 use self::link_loop::*;
 pub(crate) use self::log_filter::LogFilterCell;
 pub use self::merge::*;
@@ -95,6 +97,8 @@ use self::workers::*;
 mod action_requests_tests;
 #[cfg(test)]
 mod commit_files_tests;
+#[cfg(test)]
+mod host_tests;
 #[cfg(test)]
 mod link_guard;
 #[cfg(test)]

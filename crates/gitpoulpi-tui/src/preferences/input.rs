@@ -1,6 +1,7 @@
 //! Keyboard and mouse input for the Preferences screen, and the actions its buttons run.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 pub(super) fn flash_unselected(flashing: bool, selected: bool) -> bool {
     flashing && !selected

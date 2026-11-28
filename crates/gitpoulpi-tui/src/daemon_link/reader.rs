@@ -107,7 +107,11 @@ pub(super) async fn read_loop(
                 remote,
                 status,
             })) if changed == repo_id => {
-                crate::push_group_ui::on_progress(&run_id, &remote, status);
+                super::host::push_group(super::host::PushGroupEvent::Progress {
+                    run_id: &run_id,
+                    remote: &remote,
+                    status,
+                });
             }
             // A history rewrite preview's progress: kept for the workbench
             // to read each frame (latest value wins).
@@ -165,7 +169,7 @@ pub(super) async fn read_loop(
             {
                 let activity = Arc::clone(&activity);
                 std::thread::spawn(move || {
-                    let result = crate::window_ctl::raise();
+                    let result = super::host::raise_window();
                     match &result {
                         Ok(how) => tracing::info!(how, "raised the window for a launcher click"),
                         Err(why) => tracing::info!(why, "could not raise the window"),
@@ -185,8 +189,12 @@ pub(super) async fn read_loop(
             }
             // The session's background jobs (clone, fetch, push...): kept in
             // the process-wide cell every window paints its indicator from.
-            Some(ServerMessage::Event(Event::JobChanged { job })) => crate::jobs_ui::changed(job),
-            Some(ServerMessage::Event(Event::JobRemoved { id })) => crate::jobs_ui::removed(id),
+            Some(ServerMessage::Event(Event::JobChanged { job })) => {
+                super::host::jobs(super::host::JobEvent::Changed(job))
+            }
+            Some(ServerMessage::Event(Event::JobRemoved { id })) => {
+                super::host::jobs(super::host::JobEvent::Removed(id))
+            }
             Some(_) => {}
             // The daemon closing the connection on us: a daemon that stopped, or one
             // of a *different GitPoulpi build* dropping a request it cannot parse (an
@@ -211,7 +219,7 @@ pub(super) async fn read_loop(
 /// handing the terminal back and saying why, since the updater takes this
 /// terminal over next on Unix.
 fn quit_for_update() -> ! {
-    crate::exit_log::restore_terminal();
+    super::host::before_exit();
     eprintln!("gitpoulpi: closing for an update"); // i18n-english
     std::process::exit(0)
 }

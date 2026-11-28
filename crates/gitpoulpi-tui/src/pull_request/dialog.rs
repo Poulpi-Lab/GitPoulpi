@@ -1,4 +1,5 @@
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 /// How long after a click closed a combo popup the area it covered ignores
 /// presses (a double click's second one).

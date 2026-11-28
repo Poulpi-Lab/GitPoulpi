@@ -1,4 +1,5 @@
-use super::chord::{is_ctrl_enter_class, Key};
+use super::chord::Key;
+use super::term::{is_ctrl_enter_class, TermChord, TermKeymap};
 use super::*;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use std::collections::HashSet;
@@ -266,10 +267,10 @@ fn installed_keymap_is_the_defaults() {
 use super::chord::Reach;
 #[cfg(feature = "ai")]
 use super::conflict::detect_with;
-use super::conflict::{detect, Level, Platform};
+use super::conflict::{detect, Conflict, KeyTransport, Level};
 use gitpoulpi_config::KeybindingsConfig;
 
-const LINUX: Platform = Platform {
+const LINUX: KeyTransport = KeyTransport::Terminal {
     windows: false,
     enhanced: false,
 };
@@ -356,7 +357,7 @@ fn defaults_have_no_conflicts() {
     let km = Keymap::defaults();
     for platform in [
         LINUX,
-        Platform {
+        KeyTransport::Terminal {
             windows: true,
             enhanced: false,
         },
@@ -367,6 +368,66 @@ fn defaults_have_no_conflicts() {
             .collect();
         assert!(errors.is_empty(), "{errors:?}");
     }
+}
+
+#[test]
+fn a_desktop_reaches_every_chord_and_has_no_commonly_taken_hints() {
+    // `Ctrl+Shift+Tab` never arrives on a plain terminal and tmux, kitty and
+    // friends commonly take `Ctrl+B`; a desktop window gets both as typed.
+    let km = Keymap::from_config(&cfg(&[
+        ("global", "home", &["Ctrl+Shift+Tab"]),
+        ("global", "tab_menu", &["Ctrl+B"]),
+    ]));
+    let notes = |t| -> Vec<Conflict> {
+        detect(&km, t)
+            .into_iter()
+            .filter(|c| c.level != Level::Error)
+            .collect()
+    };
+    let on_terminal = notes(LINUX);
+    assert!(
+        on_terminal
+            .iter()
+            .any(|c| c.chord == KeyChord::parse("Ctrl+Shift+Tab").unwrap()),
+        "{on_terminal:?}"
+    );
+    assert!(
+        on_terminal
+            .iter()
+            .any(|c| c.chord == KeyChord::parse("Ctrl+B").unwrap()),
+        "{on_terminal:?}"
+    );
+    assert!(
+        notes(KeyTransport::Desktop).iter().all(|c| {
+            c.chord != KeyChord::parse("Ctrl+Shift+Tab").unwrap()
+                && c.chord != KeyChord::parse("Ctrl+B").unwrap()
+        }),
+        "{:?}",
+        notes(KeyTransport::Desktop)
+    );
+}
+
+#[test]
+fn the_neutral_entry_points_agree_with_the_terminal_adapter() {
+    let km = Keymap::defaults();
+    let refresh = km.chords_of(Action::GlobalRefresh)[0];
+    assert!(km.chord_is(Action::GlobalRefresh, refresh));
+    assert_eq!(
+        km.action_for(Ctx::Global, refresh),
+        Some(Action::GlobalRefresh)
+    );
+    let ev = press('o', KeyModifiers::CONTROL);
+    let chord = super::term::chord_of(&ev).unwrap();
+    assert_eq!(
+        km.action_for(Ctx::Global, chord),
+        km.action_in(Ctx::Global, &ev)
+    );
+    // A prefix table looks at the bare key.
+    let after_prefix = KeyChord::parse("Ctrl+Left").unwrap();
+    assert_eq!(
+        km.action_for(Ctx::NavPrefix, after_prefix),
+        km.action_for(Ctx::NavPrefix, after_prefix.bare())
+    );
 }
 
 #[test]
@@ -483,7 +544,7 @@ fn reach_table() {
         .any(|c| c.action == Action::GlobalSettings && c.message.contains("does not send")));
     assert!(!detect(
         &km,
-        Platform {
+        KeyTransport::Terminal {
             windows: true,
             enhanced: false
         }
@@ -734,7 +795,7 @@ fn the_radar_key_shared_with_view_contexts_is_not_a_conflict() {
     assert!(km.is(Action::ComposerInsertIssueRef, &alt_r));
     for platform in [
         LINUX,
-        Platform {
+        KeyTransport::Terminal {
             windows: true,
             enhanced: false,
         },

@@ -2,24 +2,7 @@
 
 use super::*;
 
-/// Identifies one of the Log table's six columns - one enum for every
-/// concern that needs to name a column: width allocation, on-screen
-/// display order (drag-to-reorder), show/hide (right-click header menu),
-/// and which column a hover/click lands in (drives per-column tooltip
-/// content and header/boundary hit-testing). A single shared identity
-/// instead of a near-duplicate enum per concern.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum LogColumn {
-    Ref,
-    Graph,
-    Message,
-    Author,
-    Date,
-    /// Files changed and lines added/removed (`3 files +12 -4`). Hidden by
-    /// default, and filled lazily for the rows on screen only.
-    Changes,
-    Sha,
-}
+pub(crate) use super::vocab::LogColumn;
 
 /// The widest a column can be fitted to its content (a pasted novel in a
 /// commit summary must not make a column a thousand cells wide).

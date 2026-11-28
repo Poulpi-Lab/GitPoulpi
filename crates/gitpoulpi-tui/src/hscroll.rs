@@ -41,12 +41,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
-/// Which way a key or palette command scrolls.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Dir {
-    Left,
-    Right,
-}
+mod vocab;
+pub(crate) use vocab::Dir;
 
 impl HPane {
     /// The registry action that scrolls this pane `dir` from the keyboard.

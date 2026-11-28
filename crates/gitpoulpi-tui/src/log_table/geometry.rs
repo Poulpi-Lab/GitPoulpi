@@ -113,10 +113,3 @@ pub(crate) fn log_row_to_index(area: Rect, offset: usize, row: u16, len: usize) 
     let index = (row - top) as usize + offset;
     (index < len).then_some(index)
 }
-
-/// Whether the working tree has uncommitted changes, i.e. whether the Log
-/// shows its WIP row as display index 0. The one spelling of that
-/// question, so the render side and every event handler agree on it.
-pub(crate) fn has_wip_row(status_result: &gitpoulpi_core::Result<WorkingTree>) -> bool {
-    matches!(status_result, Ok(tree) if !tree.files.is_empty())
-}

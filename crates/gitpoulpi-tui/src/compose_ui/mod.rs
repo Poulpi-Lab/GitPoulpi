@@ -21,6 +21,7 @@ mod render;
 use super::*;
 use crate::combo::{Combo, ComboOption, ComboOutcome};
 use crate::daemon_link::ComposedCommit;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use crate::reword_ui::{RewordForm, RewordFormOutcome, RewordPart};
 use crate::theme::plain_button_style;

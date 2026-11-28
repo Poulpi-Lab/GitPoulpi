@@ -16,6 +16,7 @@
 //!       acme-web       ~/src/acme-web   missing   [Locate...] [Clone] [Remove] [⋮]
 //! ```
 
+use crate::keymap::term::TermKeymap;
 use std::collections::HashSet;
 use std::path::PathBuf;
 

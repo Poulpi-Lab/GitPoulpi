@@ -29,18 +29,33 @@ pub(crate) struct Conflict {
     pub(crate) message: String,
 }
 
-/// What the running terminal can send; see `KeyChord::reach`.
-#[derive(Debug, Clone, Copy)]
-pub(crate) struct Platform {
-    pub(crate) windows: bool,
-    pub(crate) enhanced: bool,
+/// How keys reach the application. A terminal cannot send every chord (see
+/// `KeyChord::reach`); a desktop window receives every chord as typed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum KeyTransport {
+    /// `windows` = the console API (modifiers intact); `enhanced` = the
+    /// kitty keyboard protocol is on.
+    Terminal {
+        windows: bool,
+        enhanced: bool,
+    },
+    Desktop,
 }
 
-impl Platform {
-    pub(crate) fn current() -> Platform {
-        Platform {
-            windows: cfg!(windows),
-            enhanced: crate::kitty_keyboard::is_active(),
+impl KeyTransport {
+    fn reach(self, chord: KeyChord) -> Reach {
+        match self {
+            KeyTransport::Terminal { windows, enhanced } => chord.reach(windows, enhanced),
+            KeyTransport::Desktop => Reach::Ok,
+        }
+    }
+
+    /// The tools that commonly take `chord` before a terminal application
+    /// sees it; none for a desktop window.
+    fn commonly_taken_by(self, chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
+        match self {
+            KeyTransport::Terminal { .. } => commonly_taken_by(chord),
+            KeyTransport::Desktop => None,
         }
     }
 }
@@ -90,13 +105,13 @@ fn is_text_field_chord(c: KeyChord) -> bool {
         && matches!(c.key, Key::Char('a' | 'u' | 'k' | 'c' | 'x'))
 }
 
-pub(crate) fn detect(km: &Keymap, platform: Platform) -> Vec<Conflict> {
-    detect_with(km, platform, parent_of)
+pub(crate) fn detect(km: &Keymap, transport: KeyTransport) -> Vec<Conflict> {
+    detect_with(km, transport, parent_of)
 }
 
 pub(crate) fn detect_with(
     km: &Keymap,
-    platform: Platform,
+    transport: KeyTransport,
     parent: fn(Ctx) -> Option<Ctx>,
 ) -> Vec<Conflict> {
     let mut out = Vec::new();
@@ -194,7 +209,7 @@ pub(crate) fn detect_with(
             });
         }
         // Rule 6: reach.
-        match chord_a.reach(platform.windows, platform.enhanced) {
+        match transport.reach(*chord_a) {
             Reach::Ok => {}
             Reach::NotDistinct(other) => out.push(Conflict {
                 level: Level::Warning,
@@ -214,7 +229,7 @@ pub(crate) fn detect_with(
             }),
         }
         // Rule 7: commonly taken.
-        if let Some(tool) = commonly_taken_by(*chord_a) {
+        if let Some(tool) = transport.commonly_taken_by(*chord_a) {
             out.push(Conflict {
                 level: Level::Info,
                 ctx: *ctx_a,
@@ -308,7 +323,7 @@ pub(crate) struct Analysis {
 
 pub(crate) fn analyse(
     km: &Keymap,
-    platform: Platform,
+    transport: KeyTransport,
     action: Action,
     new: &[KeyChord],
 ) -> Analysis {
@@ -329,7 +344,7 @@ pub(crate) fn analyse(
         }
     }
     let hypothetical = km.with_chords(action, new.to_vec());
-    for c in detect(&hypothetical, platform) {
+    for c in detect(&hypothetical, transport) {
         let involved = c.action == action || c.other == Some(action);
         if !involved || !new.iter().any(|n| n.class() == c.chord.class()) {
             continue;

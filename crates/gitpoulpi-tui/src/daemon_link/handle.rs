@@ -1,5 +1,5 @@
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 
 /// Handle the render loop holds: ways to ask for a refresh or submit a
 /// mutation, and ways to receive the results (both request and
@@ -257,7 +257,7 @@ impl DaemonLink {
         // sent, and the press says so (the daemon's join is the backstop for
         // the other clients).
         if let Some(kind) = self.activity.claim_transfer(&action) {
-            crate::jobs_ui::say(kind.already());
+            super::host::jobs(super::host::JobEvent::Say(kind.already()));
             // A tracked one has nothing of its own to wait for: the one it
             // joined belongs to someone else.
             tickets::report_ticket(
@@ -280,7 +280,7 @@ impl DaemonLink {
         if self.activity.claim_transfer(&action).is_some() {
             return;
         }
-        crate::activity_log::expect_background_fetch();
+        super::host::expect_background_fetch();
         self.activity.submitted(&action);
         let _ = self.action_tx.send((None, action));
     }
@@ -428,13 +428,20 @@ impl DaemonLink {
 /// refresh result arrives asynchronously on `outcome_rx` once the daemon
 /// connection is up (auto-starting the daemon in-process if none is found
 /// running for this session - see `ensure_daemon`).
-pub fn start(session: String, repo: RepoRef) -> DaemonLink {
+pub fn start(session: String, repo: RepoRef, host: Arc<dyn LinkHost>) -> DaemonLink {
     let port_file = session_port_file(&session);
-    start_at(session, repo, port_file)
+    start_at(session, repo, port_file, host)
 }
 
 /// [`start`] against an explicit discovery file (see `ensure_daemon_at`).
-pub(crate) fn start_at(session: String, repo: RepoRef, port_file: Option<PathBuf>) -> DaemonLink {
+pub(crate) fn start_at(
+    session: String,
+    repo: RepoRef,
+    port_file: Option<PathBuf>,
+    host: Arc<dyn LinkHost>,
+) -> DaemonLink {
+    // Before the thread starts, so even its first wake finds the host.
+    super::host::install(host);
     let (manual_refresh_tx, manual_refresh_rx) = tokio::sync::mpsc::unbounded_channel();
     let (action_tx, action_rx) = tokio::sync::mpsc::unbounded_channel();
     let (commit_files_tx, commit_files_task_rx) = tokio::sync::mpsc::unbounded_channel();

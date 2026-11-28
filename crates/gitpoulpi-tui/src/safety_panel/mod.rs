@@ -49,7 +49,7 @@ use crate::combo::Combo;
 use crate::daemon_link::{error_text, Reply, Requester};
 use detail::Detail;
 
-pub(crate) use label::{summary_text, text as label_text};
+pub(crate) use label::{offer_of, summary_text, text as label_text};
 pub(crate) use palette::SafetyCmd;
 use panes::Panes;
 #[cfg(test)]
@@ -70,12 +70,8 @@ const REFLOG_AHEAD: usize = 10;
 /// How many lost commits one request fetches.
 const LOST_PAGE: usize = 200;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Tab {
-    History,
-    Reflog,
-    Lost,
-}
+mod vocab;
+pub(crate) use vocab::Tab;
 
 /// Everything a row, button or menu entry can do. One list so the
 /// buttons, the right-click menu and the keys cannot drift apart.
@@ -1322,26 +1318,6 @@ impl SafetyPanel {
             },
         }
     }
-}
-
-/// The reflog position a blocked top undo entry offers, with the label of
-/// the operation: `(ref to restore, oid, label)`.
-pub(crate) fn offer_of(
-    state: &gitpoulpi_core::domain::JournalState,
-) -> Option<(String, Oid, String)> {
-    let Some(UndoRefusal::RefMoved {
-        restore: Some(pos), ..
-    }) = state.blocked.as_ref()
-    else {
-        return None;
-    };
-    let label = label::summary_text(state.undo.as_ref()?);
-    let name = pos
-        .refname
-        .strip_prefix("refs/heads/")
-        .unwrap_or(&pos.refname)
-        .to_string();
-    Some((name, pos.oid, label))
 }
 
 impl HistoryView {

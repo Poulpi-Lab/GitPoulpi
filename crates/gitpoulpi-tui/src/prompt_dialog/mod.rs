@@ -19,6 +19,7 @@ mod render;
 #[cfg(test)]
 mod tests;
 
+use crate::keymap::term::TermKeymap;
 use std::cell::{Cell, RefCell};
 
 use crate::combo::{Combo, ComboOutcome};

@@ -5,6 +5,7 @@
 use super::CommandCtx;
 use crate::event_loop::*;
 use crate::hscroll::{self, Dir, HPane};
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg::pane_hscroll as msg;
 
 /// The pane the keyboard is in, if it is one that scrolls sideways.

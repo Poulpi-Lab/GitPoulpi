@@ -23,6 +23,7 @@
 //! the repository list is a multi-select over what the app knows (open tabs,
 //! favorites, recent, the workspace's own), plus what Browse adds.
 
+use crate::keymap::term::TermKeymap;
 use std::path::{Path, PathBuf};
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};

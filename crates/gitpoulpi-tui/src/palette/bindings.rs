@@ -8,7 +8,10 @@
 //! `ToggleColumn(..)` has its own. Unbound by default; the key runs the same
 //! `run_command` the palette runs.
 
-use super::*;
+use super::{
+    command_action, default_shortcut_actions, PaletteCommand, PaletteEntry, BADGE_SUFFIX,
+    PALETTE_COMMANDS,
+};
 use crate::keymap::action::ActionDef;
 use crate::keymap::{Action, Ctx};
 

@@ -4,6 +4,7 @@
 use super::commands::{CommandCtx, Flow};
 use super::KeyEnv;
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use crate::prompt_dialog::{prompt_hit_at, PromptOutcome};
 use crossterm::event::MouseEvent;
 

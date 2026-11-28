@@ -1,4 +1,5 @@
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 impl FolderPicker {
     // -- keys -------------------------------------------------------------------

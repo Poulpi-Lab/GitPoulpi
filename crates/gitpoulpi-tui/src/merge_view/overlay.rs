@@ -3,6 +3,7 @@
 //! file moved under the editor. Every hit rect comes out of this paint
 //! (maintainer rule 6) and goes in front of the editor's own (rule 5).
 
+use crate::keymap::term::TermChord;
 use crate::th;
 use crossterm::event::KeyCode;
 use ratatui::buffer::Buffer;

@@ -14,6 +14,7 @@
 
 mod render;
 
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_core::domain::{autosquash_order, InteractiveRebase, RebaseAction, RebaseStep};
 
 use super::*;

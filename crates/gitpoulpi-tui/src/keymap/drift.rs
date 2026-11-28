@@ -242,3 +242,28 @@ fn nothing_outside_the_keymap_reads_the_raw_id_or_label() {
         hits.join("\n")
     );
 }
+
+/// The keymap registry is frontend-neutral so it can move to a crate shared
+/// with the desktop frontend: only `term.rs` may know the terminal's types,
+/// and no registry file may reach them through a glob import of its parent.
+#[test]
+fn the_neutral_keymap_files_name_no_terminal_crate() {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/keymap");
+    let mut hits = Vec::new();
+    for name in ["chord.rs", "mod.rs", "conflict.rs", "action.rs"] {
+        let text = std::fs::read_to_string(dir.join(name)).unwrap();
+        for (n, line) in production_lines(&text) {
+            if ["crossterm", "ratatui", "use super::*"]
+                .iter()
+                .any(|bad| line.contains(bad))
+            {
+                hits.push(format!("keymap/{name}:{n}: {}", line.trim()));
+            }
+        }
+    }
+    assert!(
+        hits.is_empty(),
+        "move terminal-facing code into keymap/term.rs and import explicitly:\n{}",
+        hits.join("\n")
+    );
+}

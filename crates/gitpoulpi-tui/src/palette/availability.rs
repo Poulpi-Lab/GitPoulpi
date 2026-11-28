@@ -1,4 +1,6 @@
-use super::*;
+use super::{sequences, ManagementCommand, PaletteCommand, WorkspaceCommand};
+use crate::repo_menu::RepoMenuAction;
+use gitpoulpi_i18n::msg;
 
 /// Everything the applicability rules need to know about the current UI
 /// state, flattened to plain data at the call site.

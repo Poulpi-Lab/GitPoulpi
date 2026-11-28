@@ -127,7 +127,7 @@ impl Requester {
                 if let Ok(mut held) = fill.lock() {
                     *held = Some(decoded);
                 }
-                crate::redraw::poke();
+                super::host::wake();
             }),
         };
         if self.tx.send(request).is_err() {

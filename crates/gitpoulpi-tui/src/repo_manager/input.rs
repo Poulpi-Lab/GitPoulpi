@@ -1,4 +1,5 @@
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 /// The keys this view understands, decoded by the caller - the same
 /// shape `repo_switcher::Key` has, so this module needs no crossterm.

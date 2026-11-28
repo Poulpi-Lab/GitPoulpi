@@ -9,6 +9,7 @@
 //! callers keep using `chrome::*` paths.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Focus {

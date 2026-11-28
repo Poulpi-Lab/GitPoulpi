@@ -572,16 +572,8 @@ pub(crate) fn take_goto() -> Option<RepoId> {
 
 // ---- commands (palette and keymap) ----
 
-/// A `Jobs: ...` palette command.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum JobsCmd {
-    /// `Jobs: Show background jobs`: opens the panel (`Ctrl+N Shift+J`).
-    Show,
-    /// `Jobs: Cancel <label>`: one row per job that can be canceled.
-    Cancel(u64),
-    /// `Jobs: Cancel all that can be canceled`.
-    CancelAll,
-}
+mod cmd;
+pub(crate) use cmd::JobsCmd;
 
 pub(crate) fn run(cmd: JobsCmd) {
     match cmd {

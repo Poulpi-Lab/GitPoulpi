@@ -1,4 +1,8 @@
-use super::*;
+use super::{
+    flow, jobs, sequences, settings, unavailable_reason, PaletteCommand, PaletteContext,
+    PaletteEntry, PALETTE_COMMANDS,
+};
+use gitpoulpi_i18n::msg;
 
 /// One row of the filtered list the popup shows.
 pub(crate) struct PaletteMatch {

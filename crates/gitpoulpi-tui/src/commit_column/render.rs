@@ -1,5 +1,7 @@
 //! Paints the commit column and returns the hit rects of that same walk.
 
+#[allow(unused_imports)]
+use crate::commit_column::PartExt;
 use gitpoulpi_core::domain::{CommitNode, Oid};
 use gitpoulpi_i18n::msg::commit_column as msg;
 use ratatui::layout::Rect;

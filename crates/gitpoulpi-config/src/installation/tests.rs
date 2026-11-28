@@ -1228,3 +1228,55 @@ fn a_release_install_is_not_named_portable_nor_numbered_by_other_kinds() {
     let entry = seed(&config, &release, &e, &NoAliases, &only_portable).unwrap();
     assert_eq!(entry.name, "GitPoulpi (release)");
 }
+
+#[test]
+fn the_primarys_colour_write_goes_to_tui_toml_and_config_toml_is_not_touched() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let a = pinned("a");
+    let base = "[general]\nundo_depth = 5\n\n[ui]\ntheme = \"nord\"\nlogo_color = \"red\"\n\n[installation]\nprimary = \"p-a\"\n";
+    std::fs::write(&path, base).unwrap();
+    assert_eq!(
+        set_look_in_file(&path, &a, "theme", "light").unwrap(),
+        "light"
+    );
+    assert_eq!(std::fs::read_to_string(&path).unwrap(), base);
+    let tui: toml::Value =
+        toml::from_str(&std::fs::read_to_string(dir.path().join("tui.toml")).unwrap()).unwrap();
+    assert_eq!(tui["ui"]["theme"].as_str(), Some("light"));
+    assert!(tui["ui"].get("logo_color").is_none());
+    assert_eq!(Config::load(&path).unwrap().ui.theme, "light");
+}
+
+#[test]
+fn a_handover_routes_the_colours_to_tui_toml_and_the_aliases_stay_in_config_toml() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("config.toml");
+    let (a, b) = (pinned("a"), pinned("b"));
+    std::fs::write(
+        &path,
+        "[ui]\ntheme = \"nord\"\nlogo_color = \"red\"\ncommand_alias = \"gp\"\n",
+    )
+    .unwrap();
+    become_primary_in_file(&path, &a).unwrap().unwrap();
+    set_look_in_file(&path, &b, "theme", "light").unwrap();
+    let tui_path = dir.path().join("tui.toml");
+    assert!(!tui_path.exists(), "a non-primary's colour is its entry");
+    become_primary_in_file(&path, &b).unwrap().unwrap();
+    let tui: toml::Value = toml::from_str(&std::fs::read_to_string(&tui_path).unwrap()).unwrap();
+    assert_eq!(tui["ui"]["theme"].as_str(), Some("light"));
+    let common: toml::Value = toml::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(
+        common["ui"]["theme"].as_str(),
+        Some("nord"),
+        "config.toml keeps what older builds read"
+    );
+    assert!(tui["ui"].get("command_alias").is_none());
+    assert!(tui["ui"].get("logo_color").is_none());
+    assert!(common["ui"].get("command_alias").is_some());
+    assert_eq!(Config::load(&path).unwrap().ui.theme, "light");
+    resign_primary_in_file(&path, &b.id).unwrap().unwrap();
+    let common: toml::Value = toml::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+    assert_eq!(common["ui"]["command_alias"].as_str(), Some("gp"));
+    assert_eq!(Config::load(&path).unwrap().ui.theme, "nord");
+}

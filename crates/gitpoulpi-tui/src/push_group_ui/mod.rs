@@ -24,6 +24,8 @@
 //! Process-wide state, like the other small modals: the window restarts on
 //! every tab switch and the run's answers come from the link's own thread.
 
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::vocab::push_group::GroupState;
 mod input;
 mod model;
 mod render;
@@ -312,17 +314,6 @@ pub(crate) fn drain(link: &DaemonLink) {
     for action in actions {
         link.submit_action(action);
     }
-}
-
-/// What the palette needs to know about the saved or last grouped run of
-/// `root`: whether there is a run to show, one paused on conflicts, whether
-/// its Continue is on, and whether some target can be retried.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(crate) struct GroupState {
-    pub run: bool,
-    pub paused: bool,
-    pub ready: bool,
-    pub retry: bool,
 }
 
 pub(crate) fn group_state(root: &Path) -> GroupState {

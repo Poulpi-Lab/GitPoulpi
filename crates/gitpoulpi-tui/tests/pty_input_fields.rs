@@ -302,7 +302,7 @@ fn the_input_color_setting_applies_live_and_a_custom_hex_is_honoured() {
     let (tick_col, tick_row) = screen.find("\u{2713} Follow theme").unwrap();
     // Follow theme (ticked), Gray, Blue.
     term.click(tick_col + 2, tick_row + 2).expect("pick Blue");
-    let path = config.path().join("config.toml");
+    let path = config.path().join("tui.toml");
     let deadline = std::time::Instant::now() + STEP;
     while !std::fs::read_to_string(&path)
         .unwrap_or_default()

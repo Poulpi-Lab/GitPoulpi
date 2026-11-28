@@ -238,30 +238,6 @@ pub(crate) fn worktree_plus_entries(
 mod vocab;
 pub(crate) use vocab::RefField;
 
-impl RefField {
-    pub(crate) const fn all() -> [RefField; 3] {
-        [RefField::Name, RefField::FullRef, RefField::TargetSha]
-    }
-
-    fn label(self) -> &'static str {
-        match self {
-            RefField::Name => msg::NOUN_NAME.get(),
-            RefField::FullRef => msg::NOUN_FULL_REF.get(),
-            RefField::TargetSha => msg::NOUN_TARGET_SHA.get(),
-        }
-    }
-
-    /// The Copy submenu's own wording, which is shorter than `label`
-    /// because the parent row already says "Copy".
-    fn row_label(self) -> &'static str {
-        match self {
-            RefField::Name => msg::COPY_NAME.get(),
-            RefField::FullRef => msg::COPY_FULL_REF.get(),
-            RefField::TargetSha => msg::COPY_TARGET_SHA.get(),
-        }
-    }
-}
-
 /// `refs/heads/main` from (`Local`, `main`).
 ///
 /// Derived from the row's kind rather than read from the backend

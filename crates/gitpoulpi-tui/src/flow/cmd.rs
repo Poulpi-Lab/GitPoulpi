@@ -6,6 +6,8 @@
 //! (through [`request`] and [`take_request`], the pattern `safety_panel`
 //! uses) to open a dialog, the dropdown, the toggle or the Settings page.
 
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::vocab::flow::FlowCmd;
 use std::sync::Mutex;
 
 use gitpoulpi_core::workflow::BranchKind;
@@ -13,36 +15,15 @@ use gitpoulpi_i18n::msg::flow as msg;
 
 use super::view;
 
-/// A Flow command. `Start(i)` is the i-th topic type of the workflow.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum FlowCmd {
-    /// Opens the `Flow ▾` dropdown.
-    Menu,
-    /// The Start form with the type chosen in a dropdown.
-    StartAny,
-    /// The Start form of one topic type.
-    Start(u8),
-    /// New issue (host-driven flows): the form with the type chosen in a
-    /// dropdown, or of one topic type.
-    NewIssueAny,
-    NewIssue(u8),
-    /// Take over a branch the host or a bot made.
-    PickUp,
-    Finish,
-    Sync,
-    Promote,
-    SetParent,
-    /// Grouped sidebar branches / the plain trees.
-    ToggleGrouping,
-    /// Settings > Repository > Workflow.
-    Settings,
-    /// Continue or abort an action a conflict stopped.
-    Resume,
+/// Why a flow command does nothing right now: it reads the window's workflow
+/// state, so it is not part of the shared vocabulary.
+pub(crate) trait FlowCmdExt {
+    fn unavailable(self) -> Option<&'static str>;
 }
 
-impl FlowCmd {
+impl FlowCmdExt for FlowCmd {
     /// Why the command does nothing right now (`None`: it can run).
-    pub(crate) fn unavailable(self) -> Option<&'static str> {
+    fn unavailable(self) -> Option<&'static str> {
         if self == FlowCmd::Settings {
             return None;
         }

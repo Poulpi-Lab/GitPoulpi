@@ -178,7 +178,11 @@ fn choices_show_the_translation_and_store_the_schema_word() {
         state.field = index;
         let target = state.fields()[index].target.clone();
         state.commit_choice(&target, pick);
-        let on_disk = std::fs::read_to_string(dir.path().join("config.toml")).unwrap();
+        let on_disk = ["config.toml", "tui.toml"]
+            .iter()
+            .map(|f| std::fs::read_to_string(dir.path().join(f)).unwrap_or_default())
+            .collect::<Vec<_>>()
+            .join("\n");
         assert!(on_disk.contains(raw), "{key}: {on_disk}");
     }
 }

@@ -49,7 +49,7 @@ fn at(screen: &Screen, needle: &str) -> (u16, u16) {
 }
 
 fn config_text(dir: &tempfile::TempDir) -> String {
-    std::fs::read_to_string(dir.path().join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(dir.path().join("tui.toml")).unwrap_or_default()
 }
 
 fn wait_config(dir: &tempfile::TempDir, what: &str) {
@@ -60,7 +60,7 @@ fn wait_config(dir: &tempfile::TempDir, what: &str) {
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    panic!("config.toml never showed {what}: {}", config_text(dir));
+    panic!("tui.toml never showed {what}: {}", config_text(dir));
 }
 
 fn stash_count(root: &std::path::Path) -> usize {
@@ -390,7 +390,7 @@ fn the_settings_page_moves_the_toolbar() {
             }
         },
         |_| {
-            std::fs::read_to_string(config.path().join("config.toml"))
+            std::fs::read_to_string(config.path().join("tui.toml"))
                 .is_ok_and(|t| t.contains("toolbar_position = \"left\""))
         },
     );

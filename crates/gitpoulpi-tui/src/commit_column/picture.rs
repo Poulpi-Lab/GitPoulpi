@@ -12,6 +12,8 @@
 //! screen lines (the Log's WIP and stash rows carry their own lanes and do
 //! not alter the commits' rows).
 
+#[allow(unused_imports)]
+use crate::commit_column::PartExt;
 use gitpoulpi_core::domain::CommitNode;
 
 use crate::avatar::AvatarService;

@@ -25,7 +25,7 @@ use gitpoulpi_core::domain::{
     LFS_INSTALL_URL,
 };
 
-pub(crate) use crate::lfs_ui_pure::*;
+pub(crate) use gitpoulpi_link::lfs_ui::*;
 
 /// One row of the toolbar's `LFS` dropdown. Each is
 /// also a palette command and a bindable `Ctrl+G` action, so the dropdown

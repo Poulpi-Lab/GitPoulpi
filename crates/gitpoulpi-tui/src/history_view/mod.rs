@@ -17,7 +17,6 @@
 //! ([`HistoryView::promote`]); nothing ever sends it to the daemon.
 
 mod actions;
-pub(crate) mod rename;
 mod render;
 
 use std::path::PathBuf;
@@ -32,11 +31,11 @@ use crate::daemon_link::{
 use crate::diff_view::{DiffSource, DiffViewState};
 
 pub(crate) use actions::{menu_entries, HistoryAction};
-pub(crate) use rename::merge_rename;
 pub(crate) use render::{render_list, render_strip, HistoryHit, ListPaint};
 
-/// Commits asked for per page.
-pub(crate) const PAGE: usize = 100;
+/// Commits asked for per page (the client's constant).
+#[cfg(test)]
+pub(crate) const PAGE: usize = gitpoulpi_link::HISTORY_PAGE;
 /// The next page is asked for when the cursor is this close to the end.
 const NEAR_END: usize = 15;
 /// How long a selection must stand before its diff is asked for: a held

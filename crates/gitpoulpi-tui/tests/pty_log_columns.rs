@@ -98,7 +98,7 @@ fn a_hidden_log_column_survives_a_restart_and_applies_to_another_repo() {
     std::thread::sleep(Duration::from_millis(1000));
     quit(term);
 
-    let saved = std::fs::read_to_string(config.path().join("config.toml")).unwrap();
+    let saved = std::fs::read_to_string(config.path().join("tui.toml")).unwrap();
     assert!(saved.contains("log_columns_hidden"), "{saved}");
     assert!(saved.contains("sha"), "{saved}");
 

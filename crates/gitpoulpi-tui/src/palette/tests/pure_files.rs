@@ -1,5 +1,5 @@
 //! The vocabulary files the palette's payloads and availability types live in
-//! stay free of terminal types, so a frontend other than the terminal can
+//! (now thin re-exports of `gitpoulpi_app::palette::vocab`) stay free of terminal types, so a frontend other than the terminal can
 //! share them: they name neither `ratatui` nor `crossterm` and pull nothing in
 //! through `use super::*`.
 
@@ -25,11 +25,6 @@ const PURE_FILES: &[&str] = &[
     "safety_panel/vocab.rs",
     "status_pane/vocab.rs",
     "tree_fold/vocab.rs",
-    "palette/availability.rs",
-    "palette/bindings.rs",
-    "palette/catalog.rs",
-    "palette/matching.rs",
-    "palette/mod.rs",
 ];
 
 #[test]

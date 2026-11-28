@@ -9,6 +9,8 @@
 //! site has to remember to save.
 
 use crate::refs_sidebar::SidebarSection;
+#[allow(unused_imports)]
+use crate::refs_sidebar::SidebarSectionExt;
 use crate::status_pane::StatusSection;
 use gitpoulpi_session::{FoldState, RepoState};
 use std::collections::HashSet;

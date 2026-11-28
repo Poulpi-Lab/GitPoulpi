@@ -3,6 +3,8 @@
 //! [`RewriteView::popup_pick`], so they cannot drift apart. Painting is
 //! `render.rs`; nothing here draws.
 
+#[allow(unused_imports)]
+use crate::rewrite_view::RuleTemplateExt;
 use gitpoulpi_i18n::{msg::rewrite_view as t, M};
 use gitpoulpi_ipc::rewrite::RowFilter;
 use gitpoulpi_session::RecipePlace;

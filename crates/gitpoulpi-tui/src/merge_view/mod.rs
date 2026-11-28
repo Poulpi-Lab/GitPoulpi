@@ -55,26 +55,6 @@ pub(crate) struct SaveRequest {
 mod cmd;
 pub(crate) use cmd::MergePane;
 
-#[allow(dead_code)]
-impl MergePane {
-    pub(crate) fn side(self) -> Option<ConflictSide> {
-        match self {
-            MergePane::A => Some(ConflictSide::Ours),
-            MergePane::B => Some(ConflictSide::Theirs),
-            MergePane::Base => Some(ConflictSide::Base),
-            MergePane::Output => None,
-        }
-    }
-
-    pub(crate) fn of_side(side: ConflictSide) -> MergePane {
-        match side {
-            ConflictSide::Ours => MergePane::A,
-            ConflictSide::Theirs => MergePane::B,
-            ConflictSide::Base => MergePane::Base,
-        }
-    }
-}
-
 /// Which scrollbar.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum MergeScroll {

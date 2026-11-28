@@ -243,12 +243,12 @@ fn nothing_outside_the_keymap_reads_the_raw_id_or_label() {
     );
 }
 
-/// The keymap registry is frontend-neutral so it can move to a crate shared
-/// with the desktop frontend: only `term.rs` may know the terminal's types,
+/// The keymap registry is frontend-neutral and lives in `gitpoulpi-app`, shared
+/// with the desktop frontend: only `term.rs` (here) may know the terminal's types,
 /// and no registry file may reach them through a glob import of its parent.
 #[test]
 fn the_neutral_keymap_files_name_no_terminal_crate() {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/keymap");
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../gitpoulpi-app/src/keymap");
     let mut hits = Vec::new();
     for name in ["chord.rs", "mod.rs", "conflict.rs", "action.rs"] {
         let text = std::fs::read_to_string(dir.join(name)).unwrap();

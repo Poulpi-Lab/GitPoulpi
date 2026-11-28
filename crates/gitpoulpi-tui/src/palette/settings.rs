@@ -13,37 +13,13 @@
 //! `&'static PaletteEntry` like the catalogue's), the values shown beside
 //! them are read again whenever `config.toml` changes.
 
-use super::*;
 use crate::preferences::palette_settings::{self as ps, Current, Edit, SettingKind, SettingRow};
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::SettingOp;
+use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry};
 use gitpoulpi_i18n::msg;
 use std::collections::HashMap;
 use std::sync::Mutex;
-
-/// What a `Settings: ...` row does. The numbers index [`rows`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SettingOp {
-    Toggle(u16),
-    /// Edits a number or text on the Settings page.
-    Edit(u16),
-    /// Narrows the palette to the setting's choices.
-    Sub(u16),
-    /// Picks one choice (`.1` indexes the setting's options).
-    Choose(u16, u16),
-    /// Opens Settings on the setting.
-    Page(u16),
-}
-
-impl SettingOp {
-    fn row(self) -> u16 {
-        match self {
-            SettingOp::Toggle(r)
-            | SettingOp::Edit(r)
-            | SettingOp::Sub(r)
-            | SettingOp::Choose(r, _)
-            | SettingOp::Page(r) => r,
-        }
-    }
-}
 
 struct Model {
     rows: Vec<SettingRow>,
@@ -77,6 +53,7 @@ fn build() -> Model {
                 requires: None,
                 text: Some(leak(now)),
                 text_en: Some(leak(english)),
+                surface: gitpoulpi_app::surface::settings_surface(row.key),
             });
         };
         let (op, now) = match &row.kind {
@@ -149,17 +126,6 @@ pub(crate) fn entries() -> &'static [PaletteEntry] {
     &model().entries
 }
 
-/// Whether the entry is listed for `query` (trimmed, lower case): a choice
-/// row only once the query names its setting (`Settings: <label>:`).
-pub(crate) fn listed(entry: &PaletteEntry, query: &str, prefixes: &[String]) -> bool {
-    match entry.command {
-        PaletteCommand::Setting(SettingOp::Choose(r, _)) => prefixes
-            .get(r as usize)
-            .is_some_and(|p| !p.is_empty() && query.starts_with(p.as_str())),
-        _ => true,
-    }
-}
-
 /// Each setting's `Settings: <label>:` (lower case), for [`listed`].
 pub(crate) fn prefixes() -> &'static [String] {
     &model().prefixes
@@ -176,18 +142,27 @@ pub(crate) fn sub_query(op: SettingOp) -> Option<String> {
         .then(|| format!("{} ", model.prefixes[op.row() as usize]))
 }
 
-type Values = (
-    (Option<std::time::SystemTime>, u64, u64),
-    HashMap<&'static str, Current>,
+/// `config.toml` and `tui.toml` (mtime, length each), then the language epoch.
+type Stamp = (
+    (Option<std::time::SystemTime>, u64),
+    (Option<std::time::SystemTime>, u64),
+    u64,
 );
+type Values = (Stamp, HashMap<&'static str, Current>);
 static VALUES: Mutex<Option<Values>> = Mutex::new(None);
 
-fn config_stamp() -> (Option<std::time::SystemTime>, u64, u64) {
-    let meta = gitpoulpi_config::ConfigPaths::discover()
-        .and_then(|p| std::fs::metadata(p.config_file()).ok());
+fn config_stamp() -> Stamp {
+    let paths = gitpoulpi_config::ConfigPaths::discover();
+    let stat = |file: Option<std::path::PathBuf>| {
+        let meta = file.and_then(|f| std::fs::metadata(f).ok());
+        (
+            meta.as_ref().and_then(|m| m.modified().ok()),
+            meta.as_ref().map_or(0, |m| m.len()),
+        )
+    };
     (
-        meta.as_ref().and_then(|m| m.modified().ok()),
-        meta.as_ref().map_or(0, |m| m.len()),
+        stat(paths.as_ref().map(|p| p.config_file())),
+        stat(paths.as_ref().map(|p| p.tui_file())),
         gitpoulpi_i18n::epoch(),
     )
 }

@@ -91,7 +91,7 @@ fn thumb(s: &Screen) -> Option<(u16, u16)> {
 }
 
 fn stored(config: &std::path::Path) -> String {
-    std::fs::read_to_string(config.join("config.toml")).unwrap_or_default()
+    std::fs::read_to_string(config.join("tui.toml")).unwrap_or_default()
 }
 
 fn wait_stored(config: &std::path::Path, needle: &str) {

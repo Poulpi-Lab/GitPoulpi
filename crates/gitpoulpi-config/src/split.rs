@@ -7,7 +7,8 @@
 //! ([`KEY_HOME`]), the pure function that derives a `tui.toml` from a
 //! `config.toml` ([`derive_tui_document`]), the merge the loader applies
 //! ([`merge_documents`]) and the no-clobber creation of the file
-//! ([`ensure_tui_file`], not called by anything yet).
+//! ([`ensure_tui_file`]), plus the one writer every setting write goes through
+//! ([`edit_config_document`]).
 //!
 //! Design rules, so the next reader does not have to rediscover them:
 //!
@@ -365,24 +366,113 @@ pub(crate) fn read_merged(config_file: &Path) -> Result<Option<(toml::Value, Opt
 /// overwrites a `tui.toml` that already received edits. Where hard links are
 /// not available it falls back to `create_new`. `config.toml` is only read.
 ///
-/// Not called from anywhere yet: the writers and the frontends wire it in
-/// later steps.
+/// Called by the interface writers (before their first write) and by the
+/// terminal UI at start.
 pub fn ensure_tui_file(paths: &ConfigPaths) -> Result<bool> {
-    let target = paths.tui_file();
+    ensure_tui_at(&paths.config_file(), &paths.tui_file())
+}
+
+pub(crate) fn ensure_tui_at(config_file: &Path, target: &Path) -> Result<bool> {
     if target.exists() {
         return Ok(false);
     }
-    let config_file = paths.config_file();
-    let common = if config_file.exists() {
-        toml::from_str::<toml::Value>(&std::fs::read_to_string(&config_file)?)?
-    } else {
-        empty_table()
-    };
+    let common = read_doc(config_file)?;
     let body = toml::to_string_pretty(&derive_tui_document(&common))?;
     if let Some(parent) = target.parent() {
         crate::secure_fs::create_private_dir_all(parent)?;
     }
-    create_new_file(&target, body.as_bytes()).map_err(Error::Io)
+    create_new_file(target, body.as_bytes()).map_err(Error::Io)
+}
+
+/// The document at `path`; an empty one when the file is missing or blank.
+fn read_doc(path: &Path) -> Result<toml::Value> {
+    if !path.exists() {
+        return Ok(empty_table());
+    }
+    let raw = std::fs::read_to_string(path)?;
+    if raw.trim().is_empty() {
+        return Ok(empty_table());
+    }
+    Ok(toml::from_str(&raw)?)
+}
+
+/// Serializes every sparse read-modify-write of the config files of this
+/// process, so two threads racing the first interface write (which creates
+/// `tui.toml`) or two writes to one file never lose each other's key.
+static WRITE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+pub(crate) fn lock_writes() -> std::sync::MutexGuard<'static, ()> {
+    WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+/// The home of a key a writer is about to set (what `config set` routes by): a key below an interface key
+/// (`ui.log_column_widths.sha`) lives where its parent does.
+pub fn home_of_write(key: &str) -> Home {
+    let mut parts = key.splitn(3, '.');
+    match (parts.next(), parts.next()) {
+        (Some(table @ ("ui" | "merge")), Some(name)) => home_of(&format!("{table}.{name}")),
+        _ => home_of(key),
+    }
+}
+
+/// The one sparse read-modify-write every setting writer goes through.
+///
+/// `key` says which file owns what `edit` changes. For `config.toml`
+/// (the file must be named exactly so) a key homed in an interface file is
+/// edited in the sibling `tui.toml`, created first as the full derived copy
+/// ([`ensure_tui_at`]) so it never holds just that one key; a common key is
+/// edited in `config.toml` alone, and `config.toml` is never modified by an
+/// interface write. The *merged* document is validated as a [`Config`]
+/// before anything is written, and only the file that owns the key is
+/// written. For any other file name the file is edited as it stands, as
+/// before the split.
+///
+/// `bad` turns a deserialization failure into the caller's error. Returns the
+/// validated merged config.
+pub(crate) fn edit_config_document(
+    path: &Path,
+    key: &str,
+    edit: impl FnOnce(&mut toml::Value) -> Result<()>,
+    bad: impl FnOnce(toml::de::Error) -> Error,
+) -> Result<crate::Config> {
+    let _guard = lock_writes();
+    let sibling = tui_sibling(path);
+    let interface = home_of_write(key) != Common;
+
+    let (target, mut doc, other) = match sibling {
+        Some(tui) if interface => {
+            ensure_tui_at(path, &tui)?;
+            let doc = read_doc(&tui)?;
+            let common = read_doc(path)?;
+            (tui, doc, Side::Common(common))
+        }
+        Some(tui) if tui.exists() => {
+            let doc = read_doc(path)?;
+            let tui_doc = read_doc(&tui)?;
+            (path.to_path_buf(), doc, Side::Tui(tui_doc))
+        }
+        _ => (path.to_path_buf(), read_doc(path)?, Side::None),
+    };
+    edit(&mut doc)?;
+    let mut checked = match &other {
+        Side::Common(common) => merge_documents(common, &doc),
+        Side::Tui(tui) => merge_documents(&doc, tui),
+        Side::None => doc.clone(),
+    };
+    crate::AiConfig::migrate_document(&mut checked);
+    let config: crate::Config = checked.try_into().map_err(bad)?;
+
+    if let Some(parent) = target.parent() {
+        crate::secure_fs::create_private_dir_all(parent)?;
+    }
+    crate::secure_fs::write_private(&target, toml::to_string_pretty(&doc)?.as_bytes())?;
+    Ok(config)
+}
+
+enum Side {
+    Common(toml::Value),
+    Tui(toml::Value),
+    None,
 }
 
 fn open_new(path: &Path) -> std::io::Result<std::fs::File> {

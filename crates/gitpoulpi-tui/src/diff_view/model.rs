@@ -5,76 +5,19 @@ use super::layout::{
 use super::{DiffBarButton, DiffViewMode, DiffViewState, DIFF_BAR_BUTTONS};
 use crate::editor_buffer::tab_width;
 use crate::th;
+use gitpoulpi_app::diff::styled;
 use gitpoulpi_i18n::msg::diff_view as msg;
 use std::rc::Rc;
 
-use gitpoulpi_core::domain::{FileDiff, Hunk, HunkId, LineOrigin};
+pub(crate) use gitpoulpi_app::diff::{
+    hunk_at, selected_lines, AnnotSide, AnnotTag, DiffRow, DiffText, RowChange,
+};
+
+use gitpoulpi_core::domain::{FileDiff, Hunk, LineOrigin};
 use ratatui::prelude::*;
 
 use crate::text_select::{self, RowSegs};
 use crate::{chip_overflow_style, display_width, fit_bar, BarItem, OVERFLOW_LABEL};
-
-/// What one rendered row shows, so a screen row can be mapped back to
-/// something stageable.
-///
-/// Built by the same walk that produces the rows themselves: a second
-/// walk would drift, and here the cost is a `StageTarget` naming the
-/// wrong lines.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) struct DiffRow {
-    /// The hunk this row belongs to, `None` only for the two "nothing to
-    /// show here" notices.
-    pub(crate) hunk: Option<HunkId>,
-    /// Whether this is the hunk's `@@ ... @@` header row.
-    pub(crate) header: bool,
-    /// The changed (non-context) lines this row shows, numbered as the
-    /// backend numbers them: indices into the original `Hunk::lines`
-    /// (`LineSelector::line_indices`).
-    ///
-    /// One entry in the unified layouts; up to two in Split, where a
-    /// delete and its paired add share a row. Empty on a header, a
-    /// context row, a word-wrap continuation and an elision marker.
-    /// Context is not selectable: `filter_hunk_to_selection` keeps it
-    /// either way, so "selected lines" means "selected changes", as in
-    /// `git add -p`.
-    pub(crate) lines: [Option<u32>; 2],
-    /// The file line numbers this row shows, `[old side, new side]`.
-    /// `None` where the side has no line here, and on headers and notices;
-    /// wrapped continuation rows repeat them. What `ui show diff --line`
-    /// and the highlight band find their rows by.
-    pub(crate) numbers: [Option<u32>; 2],
-    /// What kind of change the row is, for the scrollbar's overview ruler.
-    /// Unlike `lines` it is also set on rows staging cannot act on.
-    pub(crate) change: RowChange,
-    /// Set on a row an [`Annotator`] added under a code line (a review's
-    /// comment thread, say): what it is and which side of the diff it
-    /// belongs to. Such a row belongs to no hunk and carries no changed line.
-    pub(crate) annot: Option<AnnotTag>,
-}
-
-/// What an annotation row is, as its owner (the review view) names it:
-/// `kind` and `index` are the maintainer's vocabulary, `side` says where the row
-/// sits (see [`annot_region`]).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct AnnotTag {
-    pub(crate) kind: u8,
-    pub(crate) index: u32,
-    pub(crate) side: AnnotSide,
-}
-
-/// Where an annotation row is drawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(not(all(feature = "hosting", feature = "review")), allow(dead_code))]
-pub(crate) enum AnnotSide {
-    /// Under the old (left) half in Split, the whole text column in Inline.
-    Old,
-    /// Under the new (right) half in Split, the whole text column in Inline.
-    New,
-    /// The whole text column in both layouts (a list after the diff).
-    Span,
-    /// The whole row, from the first column (a heading).
-    Full,
-}
 
 /// One screen line an [`Annotator`] adds. `text` is already wrapped to the
 /// width the annotator was told.
@@ -108,56 +51,6 @@ pub(crate) trait Annotator: std::fmt::Debug {
     fn trailing(&self, text_width: usize) -> Vec<AnnotRow>;
 }
 
-/// The change a diff row stands for (see `DiffRow::change`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) enum RowChange {
-    #[default]
-    None,
-    Add,
-    Del,
-    /// A Split row pairing a deletion with an addition.
-    Both,
-}
-
-impl RowChange {
-    pub(super) fn of(origin: &LineOrigin) -> Self {
-        match origin {
-            LineOrigin::Add => RowChange::Add,
-            LineOrigin::Delete => RowChange::Del,
-            _ => RowChange::None,
-        }
-    }
-}
-
-impl DiffRow {
-    fn header(hunk: HunkId) -> Self {
-        Self {
-            hunk: Some(hunk),
-            header: true,
-            lines: [None, None],
-            numbers: [None, None],
-            change: RowChange::None,
-            annot: None,
-        }
-    }
-
-    pub(super) fn body(hunk: HunkId, lines: [Option<u32>; 2]) -> Self {
-        Self {
-            hunk: Some(hunk),
-            header: false,
-            lines,
-            numbers: [None, None],
-            change: RowChange::None,
-            annot: None,
-        }
-    }
-
-    pub(super) fn with_change(mut self, change: RowChange) -> Self {
-        self.change = change;
-        self
-    }
-}
-
 /// The rendered diff: the rows, the row index each surviving hunk's
 /// header landed on (what ↑/↓ and `n`/`p` scroll to), and one `DiffRow`
 /// per row.
@@ -188,15 +81,14 @@ pub(crate) struct DiffRender {
     pub(crate) annot_text: Rc<std::collections::HashMap<usize, String>>,
 }
 
-/// The raw lines a diff render shows, per side (see `DiffRender::text`).
-#[derive(Debug, Default)]
-pub(crate) struct DiffText {
-    pub(crate) sides: [Vec<String>; 2],
+/// A render's logical lines as a selectable text column.
+pub(crate) trait DiffTextExt {
+    /// One side as a selectable text column.
+    fn side(&self, side: usize) -> text_select::Lines<'_>;
 }
 
-impl DiffText {
-    /// One side as a selectable text column.
-    pub(crate) fn side(&self, side: usize) -> text_select::Lines<'_> {
+impl DiffTextExt for DiffText {
+    fn side(&self, side: usize) -> text_select::Lines<'_> {
         text_select::Lines {
             lines: &self.sides[side.min(1)],
             tabs: text_select::Tabs::Expand(tab_width()),
@@ -208,12 +100,7 @@ impl DiffRender {
     /// A single italic line and no hunk: the "nothing to show" notices.
     pub(crate) fn notice(text: impl Into<String>) -> Self {
         Self {
-            lines: vec![Line::from(Span::styled(
-                text.into(),
-                Style::default()
-                    .fg(th().ui.muted)
-                    .add_modifier(Modifier::ITALIC),
-            ))],
+            lines: vec![super::term::line_of(&styled::notice(text))],
             hunk_starts: Vec::new(),
             rows: Rc::from(vec![DiffRow::default()]),
             segs: Rc::from(vec![[None, None]]),
@@ -308,40 +195,6 @@ impl DiffRender {
         out.annot_text = Rc::new(annots);
         out
     }
-}
-
-/// The hunk the row at `row` belongs to.
-///
-/// A free function over `&[DiffRow]`, not a method on `DiffRender`: the
-/// render loop keeps only the row map between frames.
-pub(crate) fn hunk_at(rows: &[DiffRow], row: usize) -> Option<HunkId> {
-    rows.get(row).and_then(|r| r.hunk)
-}
-
-/// Which lines an inclusive row range covers, for a line-level
-/// `StageTarget`.
-///
-/// Returns the hunk the range starts in, that hunk's selected line
-/// indices, and whether the range spilled into another hunk. A
-/// `LineSelector` names one hunk, and a second patch would be wrong: the
-/// first `git apply --cached` changes the diff the second hunk's ids were
-/// taken from. So the spill is reported and dropped, never applied.
-pub(crate) fn selected_lines(
-    rows: &[DiffRow],
-    from: usize,
-    to: usize,
-) -> Option<(HunkId, Vec<u32>, bool)> {
-    let rows = rows.get(from..=to.min(rows.len().saturating_sub(1)))?;
-    let hunk = rows.iter().find_map(|r| r.hunk)?;
-    let spilled = rows.iter().any(|r| r.hunk.is_some_and(|h| h != hunk));
-    let mut lines: Vec<u32> = rows
-        .iter()
-        .filter(|r| r.hunk == Some(hunk))
-        .flat_map(|r| r.lines.into_iter().flatten())
-        .collect();
-    lines.sort_unstable();
-    lines.dedup();
-    Some((hunk, lines, spilled))
 }
 
 /// The Diff view's top button bar, laid out for one width.
@@ -560,7 +413,7 @@ fn hunk_first_line(start: u32, count: u32) -> u32 {
 /// changed-word emphasis (`diff_view/intraline.rs`).
 const MAX_EMPHASIS_LINES: usize = 20_000;
 
-fn changed_lines(hunks: &[super::layout::EffectiveHunk]) -> usize {
+fn changed_lines(hunks: &[gitpoulpi_app::diff::EffectiveHunk]) -> usize {
     hunks
         .iter()
         .flat_map(|eh| &eh.hunk.lines)
@@ -714,65 +567,10 @@ pub(crate) fn lfs_card(
     change: &gitpoulpi_core::domain::LfsChange,
     local: Option<bool>,
 ) -> DiffRender {
-    use gitpoulpi_core::domain::human_size;
-    let bold = Style::default()
-        .fg(th().ui.text)
-        .add_modifier(Modifier::BOLD);
-    let plain = Style::default().fg(th().ui.text);
-    let dim = Style::default().fg(th().ui.muted);
-    let short = |p: &gitpoulpi_core::domain::LfsPointer| format!("{}...", p.short_oid());
-
-    let mut lines: Vec<Line<'static>> = vec![Line::from(Span::styled(
-        msg::LFS_TITLE.get().to_string(),
-        bold,
-    ))];
-    match (&change.old, &change.new) {
-        (Some(old), Some(new)) => {
-            lines.push(Line::from(Span::styled(
-                format!("{} -> {}", human_size(old.size), human_size(new.size)),
-                plain,
-            )));
-            lines.push(Line::from(Span::styled(
-                format!("sha256 {} -> {}", short(old), short(new)),
-                dim,
-            )));
-        }
-        (None, Some(new)) => {
-            lines.push(Line::from(Span::styled(
-                msg::lfs_new(human_size(new.size)),
-                plain,
-            )));
-            lines.push(Line::from(Span::styled(
-                format!("sha256 {}", short(new)),
-                dim,
-            )));
-        }
-        (Some(old), None) => {
-            lines.push(Line::from(Span::styled(
-                msg::lfs_removed(human_size(old.size)),
-                plain,
-            )));
-            lines.push(Line::from(Span::styled(
-                format!("sha256 {}", short(old)),
-                dim,
-            )));
-        }
-        (None, None) => {}
-    }
-    if change.new.is_some() {
-        lines.push(Line::from(Span::styled(
-            match local {
-                Some(true) => msg::LFS_LOCAL.get().to_string(),
-                Some(false) => msg::LFS_NOT_DOWNLOADED.get().to_string(),
-                None => msg::LFS_UNKNOWN.get().to_string(),
-            },
-            dim,
-        )));
-    }
-    lines.push(Line::from(Span::styled(
-        msg::LFS_RAW_HINT.get().to_string(),
-        dim,
-    )));
+    let lines: Vec<Line<'static>> = styled::lfs_card(change, local)
+        .iter()
+        .map(super::term::line_of)
+        .collect();
     let n = lines.len();
     DiffRender {
         lines,
@@ -831,13 +629,5 @@ fn emit_gap(
 }
 
 fn hunk_header_line(hunk: &Hunk) -> Line<'static> {
-    Line::from(Span::styled(
-        format!(
-            "@@ -{},{} +{},{} @@",
-            hunk.old_start, hunk.old_lines, hunk.new_start, hunk.new_lines
-        ),
-        Style::default()
-            .fg(th().diff.hunk_fg)
-            .add_modifier(Modifier::BOLD),
-    ))
+    super::term::line_of(&styled::hunk_header(hunk))
 }

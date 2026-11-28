@@ -106,26 +106,6 @@ pub(crate) enum LogContextAction {
 mod vocab;
 pub(crate) use vocab::{ColumnOp, CommitField};
 
-impl ColumnOp {
-    pub(crate) const ALL: [ColumnOp; 4] = [
-        ColumnOp::ShowInLog,
-        ColumnOp::Diff,
-        ColumnOp::File,
-        ColumnOp::Blame,
-    ];
-
-    /// The menu row: the File History's own wording for the same four.
-    pub(crate) fn label(self) -> &'static str {
-        use gitpoulpi_i18n::msg::history_view as h;
-        match self {
-            ColumnOp::ShowInLog => h::ACTION_SHOW_IN_LOG.get(),
-            ColumnOp::Diff => h::ACTION_SHOW_DIFF.get(),
-            ColumnOp::File => h::ACTION_OPEN_FILE.get(),
-            ColumnOp::Blame => h::ACTION_BLAME.get(),
-        }
-    }
-}
-
 /// The rows the commit column's menu puts before the Log's own: the views of
 /// the open file at the commit under the pointer.
 pub(crate) fn column_menu_entries() -> Vec<context_menu::Entry<LogContextAction>> {
@@ -133,53 +113,6 @@ pub(crate) fn column_menu_entries() -> Vec<context_menu::Entry<LogContextAction>
         .into_iter()
         .map(|op| context_menu::Entry::action(op.label(), LogContextAction::Column(op)))
         .collect()
-}
-
-impl CommitField {
-    /// Every field, in menu order. `all()` rather than a literal at the
-    /// call site so the menu and `label`/`value` cannot drift apart.
-    const fn all() -> [CommitField; 6] {
-        [
-            CommitField::Message,
-            CommitField::AuthorName,
-            CommitField::AuthorEmail,
-            CommitField::Date,
-            CommitField::ShortSha,
-            CommitField::LongSha,
-        ]
-    }
-
-    /// The menu row, which is also the noun the status line uses.
-    fn label(self) -> &'static str {
-        match self {
-            CommitField::Message => msg::FIELD_MESSAGE.get(),
-            CommitField::AuthorName => msg::FIELD_AUTHOR_NAME.get(),
-            CommitField::AuthorEmail => msg::FIELD_AUTHOR_EMAIL.get(),
-            CommitField::Date => msg::FIELD_DATE.get(),
-            CommitField::ShortSha => msg::FIELD_SHORT_SHA.get(),
-            CommitField::LongSha => msg::FIELD_FULL_SHA.get(),
-        }
-    }
-
-    /// What lands on the clipboard.
-    ///
-    /// `message` is the *full* `summary\n\nbody`, not the one-line
-    /// `summary` the Log column shows: a user copying a commit message
-    /// wants the message, and the truncated version is already on screen.
-    /// `Date` goes through `format_timestamp_full`, so what is copied is
-    /// the same rendering the hover tooltip shows - seconds included,
-    /// and honouring `ui.date_time_format` rather than inventing a
-    /// second date format nobody configured.
-    pub(crate) fn value(self, node: &gitpoulpi_core::domain::CommitNode) -> String {
-        match self {
-            CommitField::Message => node.message.clone(),
-            CommitField::AuthorName => node.author_name.clone(),
-            CommitField::AuthorEmail => node.author_email.clone(),
-            CommitField::Date => format_timestamp_full(node.timestamp),
-            CommitField::ShortSha => node.id.to_hex()[..SHORT_SHA_LEN].to_string(),
-            CommitField::LongSha => node.id.to_hex(),
-        }
-    }
 }
 
 /// The length of a "short SHA" everywhere in this UI - the Log column,
@@ -1088,6 +1021,69 @@ pub(crate) fn log_commit_at_row(
     match rows.entry(index) {
         graph::LogEntry::Commit(i) => log_result.as_ref().ok()?.nodes.get(i).map(|c| c.id),
         graph::LogEntry::Wip | graph::LogEntry::Stash(_) => None,
+    }
+}
+
+pub(crate) trait CommitFieldExt: Sized {
+    /// Every field, in menu order. `all()` rather than a literal at the
+    /// call site so the menu and `label`/`value` cannot drift apart.
+    fn all() -> [CommitField; 6];
+    /// The menu row, which is also the noun the status line uses.
+    fn label(self) -> &'static str;
+    /// What lands on the clipboard.
+    ///
+    /// `message` is the *full* `summary\n\nbody`, not the one-line
+    /// `summary` the Log column shows: a user copying a commit message
+    /// wants the message, and the truncated version is already on screen.
+    /// `Date` goes through `format_timestamp_full`, so what is copied is
+    /// the same rendering the hover tooltip shows - seconds included,
+    /// and honouring `ui.date_time_format` rather than inventing a
+    /// second date format nobody configured.
+    fn value(self, node: &gitpoulpi_core::domain::CommitNode) -> String;
+}
+
+impl CommitFieldExt for CommitField {
+    /// Every field, in menu order. `all()` rather than a literal at the
+    /// call site so the menu and `label`/`value` cannot drift apart.
+    fn all() -> [CommitField; 6] {
+        [
+            CommitField::Message,
+            CommitField::AuthorName,
+            CommitField::AuthorEmail,
+            CommitField::Date,
+            CommitField::ShortSha,
+            CommitField::LongSha,
+        ]
+    }
+    /// The menu row, which is also the noun the status line uses.
+    fn label(self) -> &'static str {
+        match self {
+            CommitField::Message => msg::FIELD_MESSAGE.get(),
+            CommitField::AuthorName => msg::FIELD_AUTHOR_NAME.get(),
+            CommitField::AuthorEmail => msg::FIELD_AUTHOR_EMAIL.get(),
+            CommitField::Date => msg::FIELD_DATE.get(),
+            CommitField::ShortSha => msg::FIELD_SHORT_SHA.get(),
+            CommitField::LongSha => msg::FIELD_FULL_SHA.get(),
+        }
+    }
+    /// What lands on the clipboard.
+    ///
+    /// `message` is the *full* `summary\n\nbody`, not the one-line
+    /// `summary` the Log column shows: a user copying a commit message
+    /// wants the message, and the truncated version is already on screen.
+    /// `Date` goes through `format_timestamp_full`, so what is copied is
+    /// the same rendering the hover tooltip shows - seconds included,
+    /// and honouring `ui.date_time_format` rather than inventing a
+    /// second date format nobody configured.
+    fn value(self, node: &gitpoulpi_core::domain::CommitNode) -> String {
+        match self {
+            CommitField::Message => node.message.clone(),
+            CommitField::AuthorName => node.author_name.clone(),
+            CommitField::AuthorEmail => node.author_email.clone(),
+            CommitField::Date => format_timestamp_full(node.timestamp),
+            CommitField::ShortSha => node.id.to_hex()[..SHORT_SHA_LEN].to_string(),
+            CommitField::LongSha => node.id.to_hex(),
+        }
     }
 }
 

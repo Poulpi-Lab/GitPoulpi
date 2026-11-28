@@ -336,54 +336,60 @@ impl Config {
     }
 }
 
-/// Serializes the read-modify-write of `config.toml` done by the column
-/// layouts, which are saved from short-lived threads.
-static COLUMN_WRITE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+/// Strings as a TOML array.
+fn strings_value(v: &[String]) -> toml::Value {
+    toml::Value::Array(v.iter().cloned().map(toml::Value::String).collect())
+}
+
+/// A name-to-width map as a TOML table.
+fn widths_value(widths: &std::collections::BTreeMap<String, u16>) -> toml::Value {
+    let mut table = toml::map::Map::new();
+    for (name, w) in widths {
+        table.insert(name.clone(), toml::Value::Integer(i64::from(*w)));
+    }
+    toml::Value::Table(table)
+}
+
+/// One load-modify-save of the interface keys `entries` (all homed in
+/// `tui.toml`, see [`split`]), the shape of every column writer.
+fn set_ui_entries_in_file(path: &Path, entries: Vec<(&'static str, toml::Value)>) -> Result<()> {
+    let key = entries.first().map_or("ui", |(k, _)| *k).to_string();
+    split::edit_config_document(
+        path,
+        &key,
+        |document| {
+            for (key, value) in entries {
+                insert_dotted(document, key, value)?;
+            }
+            Ok(())
+        },
+        |err| Error::BadValue {
+            key: key.clone(),
+            value: "<columns>".to_string(),
+            expected: err.to_string(),
+        },
+    )
+    .map(|_| ())
+}
 
 /// Writes the three `[ui]` commit-column keys (`commit_column_columns_visible`,
-/// `commit_column_columns_order`, `commit_column_columns_widths`) in one load-modify-save of the document at
-/// `path`, leaving every other key as the file had it.
+/// `commit_column_columns_order`, `commit_column_columns_widths`) in one
+/// load-modify-save, leaving every other key as the file had it. Interface
+/// keys: written to `tui.toml` (see [`split`]).
 pub fn set_commit_column_in_file(
     path: &Path,
     visible: &[String],
     order: &[String],
     widths: &std::collections::BTreeMap<String, u16>,
 ) -> Result<()> {
-    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    let mut table = toml::map::Map::new();
-    for (name, w) in widths {
-        table.insert(name.clone(), toml::Value::Integer(i64::from(*w)));
-    }
-    insert_dotted(
-        &mut document,
-        "ui.commit_column_columns_visible",
-        toml::Value::Array(visible.iter().cloned().map(toml::Value::String).collect()),
-    )?;
-    insert_dotted(
-        &mut document,
-        "ui.commit_column_columns_order",
-        toml::Value::Array(order.iter().cloned().map(toml::Value::String).collect()),
-    )?;
-    insert_dotted(
-        &mut document,
-        "ui.commit_column_columns_widths",
-        toml::Value::Table(table),
-    )?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+    set_ui_entries_in_file(
+        path,
+        vec![
+            ("ui.commit_column_columns_visible", strings_value(visible)),
+            ("ui.commit_column_columns_order", strings_value(order)),
+            ("ui.commit_column_columns_widths", widths_value(widths)),
+        ],
+    )
 }
 
 /// Writes the two global `[ui]` Log-column keys (`log_columns_hidden`,
@@ -394,31 +400,18 @@ pub fn set_log_column_layout_in_file(
     hidden: &[String],
     order: &[String],
 ) -> Result<()> {
-    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    let strings =
-        |v: &[String]| toml::Value::Array(v.iter().cloned().map(toml::Value::String).collect());
-    insert_dotted(&mut document, "ui.log_columns_hidden", strings(hidden))?;
-    insert_dotted(&mut document, "ui.log_columns_order", strings(order))?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+    set_ui_entries_in_file(
+        path,
+        vec![
+            ("ui.log_columns_hidden", strings_value(hidden)),
+            ("ui.log_columns_order", strings_value(order)),
+        ],
+    )
 }
 
-/// Writes the three `[ui]` Log-column keys (`log_columns_hidden`,
-/// `log_columns_order`, `log_column_widths`) in one load-modify-save of the
-/// document at `path`, leaving every other key as the file had it.
+/// Writes the four `[ui]` Log-column keys (`log_columns_hidden`,
+/// `log_columns_order`, `log_column_widths`, `log_column_widths_scroll`) in
+/// one load-modify-save, leaving every other key as the file had it.
 pub fn set_log_columns_in_file(
     path: &Path,
     hidden: &[String],
@@ -426,94 +419,38 @@ pub fn set_log_columns_in_file(
     widths: &std::collections::BTreeMap<String, u16>,
     scroll_widths: &std::collections::BTreeMap<String, u16>,
 ) -> Result<()> {
-    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    let strings =
-        |v: &[String]| toml::Value::Array(v.iter().cloned().map(toml::Value::String).collect());
-    let mut table = toml::map::Map::new();
-    for (name, w) in widths {
-        table.insert(name.clone(), toml::Value::Integer(i64::from(*w)));
-    }
-    insert_dotted(&mut document, "ui.log_columns_hidden", strings(hidden))?;
-    insert_dotted(&mut document, "ui.log_columns_order", strings(order))?;
-    insert_dotted(
-        &mut document,
-        "ui.log_column_widths",
-        toml::Value::Table(table),
-    )?;
-    let mut scroll = toml::map::Map::new();
-    for (name, w) in scroll_widths {
-        scroll.insert(name.clone(), toml::Value::Integer(i64::from(*w)));
-    }
-    insert_dotted(
-        &mut document,
-        "ui.log_column_widths_scroll",
-        toml::Value::Table(scroll),
-    )?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+    set_ui_entries_in_file(
+        path,
+        vec![
+            ("ui.log_columns_hidden", strings_value(hidden)),
+            ("ui.log_columns_order", strings_value(order)),
+            ("ui.log_column_widths", widths_value(widths)),
+            ("ui.log_column_widths_scroll", widths_value(scroll_widths)),
+        ],
+    )
 }
 
-/// Writes `[ui] log_columns_layout` (`fit` or `scroll`) in one load-modify-save
-/// of the document at `path`, under the same lock as the column widths so a
-/// toggle and a width save, run from two threads, never lose each other's key.
+/// Writes `[ui] log_columns_layout` (`fit` or `scroll`) in one load-modify-save,
+/// under the same write lock as the column widths so a toggle and a width
+/// save, run from two threads, never lose each other's key.
 pub fn set_log_columns_layout_in_file(path: &Path, layout: LogColumnsLayout) -> Result<()> {
-    let _guard = COLUMN_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    insert_dotted(
-        &mut document,
-        "ui.log_columns_layout",
-        toml::Value::String(layout.as_str().to_string()),
-    )?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+    set_ui_entries_in_file(
+        path,
+        vec![(
+            "ui.log_columns_layout",
+            toml::Value::String(layout.as_str().to_string()),
+        )],
+    )
 }
 
 /// Writes `[ui] sidebar_sections_hidden` (the left-pane sections the user
-/// hid, by name) in one load-modify-save of the document at `path`, leaving
-/// every other key as the file had it.
+/// hid, by name) in one load-modify-save, leaving every other key as the
+/// file had it.
 pub fn set_sidebar_sections_hidden_in_file(path: &Path, hidden: &[String]) -> Result<()> {
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    let names = toml::Value::Array(hidden.iter().cloned().map(toml::Value::String).collect());
-    insert_dotted(&mut document, "ui.sidebar_sections_hidden", names)?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+    set_ui_entries_in_file(
+        path,
+        vec![("ui.sidebar_sections_hidden", strings_value(hidden))],
+    )
 }
 
 /// Sets one dotted key in the `config.toml` *document* at `path`, leaving
@@ -545,40 +482,26 @@ pub fn set_in_file(path: &Path, key: &str, value: &str) -> Result<serde_json::Va
         set_keybinding_in_file(path, ctx, action, &chords)?;
         return Ok(serde_json::json!(chords));
     }
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    AiConfig::migrate_document(&mut document);
-
     // The schema, not the file, decides how the string a user typed is
     // parsed -- a file that is silent about the key would otherwise leave
     // nothing to infer a type from.
     let schema_value = Config::default().get(key)?;
     let coerced = coerce(key, &schema_value, value)?;
-    insert_dotted(&mut document, key, json_to_toml(coerced))?;
 
-    let config: Config = document
-        .clone()
-        .try_into()
-        .map_err(|err: toml::de::Error| Error::BadValue {
+    let config = split::edit_config_document(
+        path,
+        key,
+        |document| {
+            AiConfig::migrate_document(document);
+            insert_dotted(document, key, json_to_toml(coerced))
+        },
+        |err| Error::BadValue {
             key: key.to_string(),
             value: value.to_string(),
             expected: err.to_string(),
-        })?;
-    let stored = config.get(key)?;
-
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(stored)
+        },
+    )?;
+    config.get(key)
 }
 
 /// Replaces a whole array-of-tables section (`[[profiles]]`,
@@ -596,39 +519,26 @@ pub fn set_in_file(path: &Path, key: &str, value: &str) -> Result<serde_json::Va
 /// so "I deleted my last integration" leaves a file that reads like one
 /// that never had one.
 pub fn set_list_in_file<T: serde::Serialize>(path: &Path, key: &str, items: &[T]) -> Result<()> {
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document: toml::Value = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    AiConfig::migrate_document(&mut document);
-
-    if items.is_empty() {
-        remove_dotted(&mut document, key);
-    } else {
-        insert_dotted(&mut document, key, toml::Value::try_from(items)?)?;
-    }
-
-    // Validate before writing, exactly like `set_in_file`.
-    let _: Config = document
-        .clone()
-        .try_into()
-        .map_err(|err: toml::de::Error| Error::BadValue {
+    split::edit_config_document(
+        path,
+        key,
+        |document| {
+            AiConfig::migrate_document(document);
+            if items.is_empty() {
+                remove_dotted(document, key);
+            } else {
+                insert_dotted(document, key, toml::Value::try_from(items)?)?;
+            }
+            Ok(())
+        },
+        // Validated before writing, exactly like `set_in_file`.
+        |err| Error::BadValue {
             key: key.to_string(),
             value: "<list>".to_string(),
             expected: err.to_string(),
-        })?;
-
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+        },
+    )
+    .map(|_| ())
 }
 
 /// Writes (or, with `None`, removes) `[[ui.open_in]]`, keeping everything else
@@ -645,38 +555,28 @@ pub fn set_conflict_prevention_in_file(
     path: &Path,
     section: &ConflictPreventionConfig,
 ) -> Result<()> {
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document: toml::Value = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    if section.is_default() {
-        remove_dotted(&mut document, "conflict_prevention");
-    } else {
-        insert_dotted(
-            &mut document,
-            "conflict_prevention",
-            toml::Value::try_from(section)?,
-        )?;
-    }
-    let _: Config = document
-        .clone()
-        .try_into()
-        .map_err(|err: toml::de::Error| Error::BadValue {
+    split::edit_config_document(
+        path,
+        "conflict_prevention",
+        |document| {
+            if section.is_default() {
+                remove_dotted(document, "conflict_prevention");
+                Ok(())
+            } else {
+                insert_dotted(
+                    document,
+                    "conflict_prevention",
+                    toml::Value::try_from(section)?,
+                )
+            }
+        },
+        |err| Error::BadValue {
             key: "conflict_prevention".to_string(),
             value: "<section>".to_string(),
             expected: err.to_string(),
-        })?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+        },
+    )
+    .map(|_| ())
 }
 
 /// [`set_open_in_in_file`] for `[[ui.image_editors]]`.
@@ -685,33 +585,23 @@ pub fn set_image_editors_in_file(path: &Path, entries: Option<&[OpenInEntry]>) -
 }
 
 fn set_entries_in_file(path: &Path, key: &str, entries: Option<&[OpenInEntry]>) -> Result<()> {
-    let raw = if path.exists() {
-        std::fs::read_to_string(path)?
-    } else {
-        String::new()
-    };
-    let mut document: toml::Value = if raw.trim().is_empty() {
-        toml::Value::Table(toml::map::Map::new())
-    } else {
-        toml::from_str(&raw)?
-    };
-    match entries {
-        None => remove_dotted(&mut document, key),
-        Some(items) => insert_dotted(&mut document, key, toml::Value::try_from(items)?)?,
-    }
-    let _: Config = document
-        .clone()
-        .try_into()
-        .map_err(|err: toml::de::Error| Error::BadValue {
+    split::edit_config_document(
+        path,
+        key,
+        |document| {
+            match entries {
+                None => remove_dotted(document, key),
+                Some(items) => insert_dotted(document, key, toml::Value::try_from(items)?)?,
+            }
+            Ok(())
+        },
+        |err| Error::BadValue {
             key: key.to_string(),
             value: "<list>".to_string(),
             expected: err.to_string(),
-        })?;
-    if let Some(parent) = path.parent() {
-        secure_fs::create_private_dir_all(parent)?;
-    }
-    secure_fs::write_private(path, toml::to_string_pretty(&document)?.as_bytes())?;
-    Ok(())
+        },
+    )
+    .map(|_| ())
 }
 
 /// Removes a dotted key, and any table it leaves empty, so deleting the

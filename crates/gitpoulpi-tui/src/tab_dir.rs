@@ -15,6 +15,8 @@
 //! because the buttons are drawn and handled in places that have no config in
 //! hand and the TUI restarts its window on every tab switch.
 
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::vocab::tab_dir::TabDirButton;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -32,23 +34,6 @@ use crate::external_tools;
 /// into [`request_quit_cd`] only when the window really ends (an unsaved
 /// editor cancels the quit and clears `quit_how`).
 pub(crate) const QUIT_CD_HOW: &str = "quit-and-cd-button";
-
-/// The two controls.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TabDirButton {
-    QuitCd,
-    Terminal,
-}
-
-impl TabDirButton {
-    /// The text on the tab bar.
-    pub(crate) fn label(self) -> String {
-        match self {
-            TabDirButton::QuitCd => format!(" {} ", msg::tab_dir::QUIT_CD.get()),
-            TabDirButton::Terminal => format!(" {} ", msg::tab_dir::TERMINAL.get()),
-        }
-    }
-}
 
 static CWD_FILE: OnceLock<PathBuf> = OnceLock::new();
 static LAUNCH_DIRS: OnceLock<Vec<PathBuf>> = OnceLock::new();

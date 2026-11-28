@@ -74,13 +74,13 @@ fn the_mouse_rows_are_the_first_tab_of_keyboard_and_mouse_and_space_ticks_one() 
     term.send_keys("Space").unwrap();
     let deadline = std::time::Instant::now() + STEP;
     loop {
-        let stored = std::fs::read_to_string(config.path().join("config.toml")).unwrap_or_default();
+        let stored = std::fs::read_to_string(config.path().join("tui.toml")).unwrap_or_default();
         if stored.contains("mouse_enabled = false") {
             break;
         }
         assert!(
             std::time::Instant::now() < deadline,
-            "Space on Mouse enabled never reached config.toml: {stored}\n{}",
+            "Space on Mouse enabled never reached tui.toml: {stored}\n{}",
             term.text()
         );
         std::thread::sleep(Duration::from_millis(150));

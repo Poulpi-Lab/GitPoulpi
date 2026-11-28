@@ -12,12 +12,16 @@ pub mod load;
 pub mod paging;
 pub mod part;
 pub mod stash;
+pub mod total;
+pub mod walk_filter;
 
 pub use layout::{build_graph_grid_themed, GraphGrid, GraphRow, WipAnchor};
 pub use load::LogLoadSettings;
 pub use paging::{lookahead_rows, LazyLog, LogPageRequest};
 pub use part::{ColorRef, NodeKind, Sides, TreeCell, TreePart};
 pub use stash::{place_stashes, GraphStash, LogEntry, LogRows, StashSlot};
+pub use total::{refs_key, CommitTotal, TotalShown};
+pub use walk_filter::{load_walk_filter, walk_filter};
 
 #[cfg(test)]
 mod tests;

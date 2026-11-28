@@ -29,8 +29,8 @@ fn get(config: &Path, id: &str, key: &str) -> String {
     json["value"].as_str().unwrap().to_string()
 }
 
-fn file_value(config: &Path, key: &str) -> Option<String> {
-    let text = std::fs::read_to_string(config.join("config.toml")).ok()?;
+fn file_value(config: &Path, file: &str, key: &str) -> Option<String> {
+    let text = std::fs::read_to_string(config.join(file)).ok()?;
     let doc: toml::Value = toml::from_str(&text).ok()?;
     doc.get("ui")?.get(key)?.as_str().map(str::to_string)
 }
@@ -53,7 +53,10 @@ fn a_theme_set_by_one_installation_never_reaches_the_other() {
     );
     assert!(ok, "{json}");
     // Nobody is primary: A wrote its entry, never the shared key.
-    assert_eq!(file_value(config, "theme").as_deref(), Some("nord"));
+    assert_eq!(
+        file_value(config, "config.toml", "theme").as_deref(),
+        Some("nord")
+    );
     assert_eq!(get(config, "alpha", "ui.theme"), "light");
     assert_ne!(
         get(config, "beta", "ui.theme"),
@@ -78,6 +81,15 @@ fn a_theme_set_by_one_installation_never_reaches_the_other() {
     std::fs::write(config.join("config.toml"), toml::to_string(&doc).unwrap()).unwrap();
     let (ok, json) = run(config, "alpha", &["config", "set", "ui.theme", "dark"]);
     assert!(ok, "{json}");
-    assert_eq!(file_value(config, "theme").as_deref(), Some("dark"));
+    // The shared key now lives in the terminal UI's own file; `config.toml`
+    // keeps what older builds read.
+    assert_eq!(
+        file_value(config, "tui.toml", "theme").as_deref(),
+        Some("dark")
+    );
+    assert_eq!(
+        file_value(config, "config.toml", "theme").as_deref(),
+        Some("nord")
+    );
     assert_eq!(get(config, "beta", "ui.theme"), "dark");
 }

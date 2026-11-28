@@ -8,7 +8,7 @@ use std::sync::RwLock;
 use gitpoulpi_config::Config;
 
 // The subset the daemon client reads lives in a pure sibling file.
-pub(crate) use crate::live_settings_pure::*;
+pub(crate) use gitpoulpi_link::live_settings::*;
 
 // Statics read by the views every frame (`MINIMAP`, `BLAME_*`) are
 /// process-wide in the binary, but each unit-test thread gets its own copy:

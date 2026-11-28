@@ -359,7 +359,10 @@ pub(crate) enum HostingEffect {
     Focus(HostingList),
 }
 
-pub(crate) use crate::hosting_command::{HostingAvailability, HostingCommand};
+#[allow(unused_imports)]
+pub(crate) use crate::hosting_command::{
+    command_unavailable_from, HostingAvailability, HostingCommand,
+};
 
 /// Marks a provider-dropdown row that proposes a whole `(profile,
 /// repository)` pair taken from a remote.
@@ -368,157 +371,6 @@ const SUGGEST_PREFIX: &str = "@";
 /// The provider dropdown's "clear the choice" row (its value is empty).
 fn unlink_label() -> &'static str {
     msg::hosting_ui::UNLINK_OPTION.get()
-}
-
-fn not_linked() -> &'static str {
-    msg::hosting_ui::WHY_NOT_LINKED.get()
-}
-
-/// Why `cmd` cannot run given `a`, or `None`.
-pub(crate) fn command_unavailable_from(
-    cmd: HostingCommand,
-    a: HostingAvailability,
-) -> Option<&'static str> {
-    match cmd {
-        HostingCommand::OpenLinkedPr
-        | HostingCommand::EditLinkedPr
-        | HostingCommand::CopyLinkedPrUrl => {
-            if !a.linked {
-                Some(not_linked())
-            } else if !a.head_pr {
-                Some(msg::hosting_ui::WHY_NO_HEAD_PR.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::RefreshHosting
-        | HostingCommand::SearchPullRequests
-        | HostingCommand::ChoosePullRequestFilter => (!a.linked).then_some(not_linked()),
-        HostingCommand::CreatePullRequest => {
-            (!a.has_profiles).then_some(msg::hosting_ui::WHY_NO_INTEGRATION.get())
-        }
-        HostingCommand::CreateIssue => {
-            if !a.issue_repo {
-                Some(msg::hosting_ui::WHY_ISSUES_PICK_BOTH.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::SearchIssues | HostingCommand::ChooseIssueFilter => {
-            if !a.issue_repo {
-                Some(msg::hosting_ui::WHY_ISSUES_PICK_REPO.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::EditIssueQuery => {
-            if !a.issue_repo {
-                Some(msg::hosting_ui::WHY_ISSUES_PICK_REPO.get())
-            } else if !a.issue_query {
-                Some(msg::hosting_ui::WHY_NO_ISSUE_QUERY.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::ChooseIssueProvider => {
-            (!a.has_issue_profiles).then_some(msg::hosting_ui::WHY_NO_INTEGRATION.get())
-        }
-        HostingCommand::ChooseIssueRepository => {
-            if !a.has_issue_profiles {
-                Some(msg::hosting_ui::WHY_NO_INTEGRATION.get())
-            } else if !a.issue_provider {
-                Some(msg::hosting_ui::WHY_ISSUES_PICK_PROVIDER.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::UnlinkIssueSource => {
-            (!a.issues_pinned).then_some(msg::hosting_ui::WHY_NO_ISSUE_SOURCE.get())
-        }
-        HostingCommand::ChoosePullProvider => {
-            (!a.has_pull_profiles).then_some(msg::hosting_ui::WHY_NO_INTEGRATION.get())
-        }
-        HostingCommand::ChoosePullRepository => {
-            if !a.has_pull_profiles {
-                Some(msg::hosting_ui::WHY_NO_INTEGRATION.get())
-            } else if !a.pull_provider {
-                Some(msg::hosting_ui::WHY_PULLS_PICK_PROVIDER.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::UnlinkPullSource => {
-            (!a.pulls_pinned).then_some(msg::hosting_ui::WHY_NO_PULL_SOURCE.get())
-        }
-        HostingCommand::UnlinkProfile => {
-            (!a.profile_pinned).then_some(msg::hosting_ui::WHY_NO_PROFILE_PINNED.get())
-        }
-        HostingCommand::CheckoutPullRequest => {
-            if !a.linked {
-                Some(not_linked())
-            } else if !a.has_prs {
-                Some(msg::hosting_ui::WHY_NO_PRS.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::OpenCommitReference => {
-            (!a.has_commit_references).then_some(msg::hosting_ui::WHY_NO_COMMIT_REFS.get())
-        }
-        HostingCommand::InsertIssueRef => {
-            (!a.issues_linked).then_some(msg::hosting_ui::WHY_NO_ISSUE_REF_SOURCE.get())
-        }
-        HostingCommand::OpenIssue => {
-            if !a.has_issues {
-                Some(msg::hosting_ui::WHY_NO_ISSUES.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::UseProfile => {
-            (!a.has_profiles).then_some(msg::hosting_ui::WHY_NO_HOSTING.get())
-        }
-        HostingCommand::EditReviewers => {
-            (!a.meta_prs).then_some(msg::hosting_ui::WHY_NO_META_PRS.get())
-        }
-        HostingCommand::ReviewPullRequest => {
-            (!a.meta_prs).then_some(msg::hosting_ui::WHY_NO_REVIEW.get())
-        }
-        HostingCommand::EditAssignees if a.assignment_blocked => {
-            Some(msg::hosting_ui::WHY_ASSIGNMENT_BLOCKED.get())
-        }
-        HostingCommand::EditAssignees
-        | HostingCommand::EditLabels
-        | HostingCommand::SetMilestone => {
-            (!a.meta_prs && !a.meta_issues).then_some(msg::hosting_ui::WHY_NO_META.get())
-        }
-        HostingCommand::CloseIssue
-        | HostingCommand::ReopenIssue
-        | HostingCommand::OpenInObsidian => {
-            if !a.local_issues {
-                Some(msg::local_issues::WHY_NOT_LOCAL.get())
-            } else if !a.has_issues {
-                Some(msg::hosting_ui::WHY_NO_ISSUES.get())
-            } else {
-                None
-            }
-        }
-        HostingCommand::CreateObsidianBase => {
-            (!a.local_issues).then_some(msg::local_issues::WHY_NOT_LOCAL.get())
-        }
-        HostingCommand::OpenIssueConversation => {
-            (!a.has_issues).then_some(msg::hosting_ui::WHY_NO_ISSUES.get())
-        }
-        HostingCommand::OpenBoard => {
-            (!a.issue_repo).then_some(msg::hosting_ui::WHY_ISSUES_PICK_REPO.get())
-        }
-        HostingCommand::PushForReview => {
-            (!a.gerrit_pulls).then_some(msg::hosting_ui::WHY_NO_PUSH_REVIEW.get())
-        }
-        HostingCommand::IntegrationsPreferences
-        | HostingCommand::ConnectIntegration
-        | HostingCommand::RadarOptions => None,
-    }
 }
 
 /// What the toolbar needs to draw the chip.

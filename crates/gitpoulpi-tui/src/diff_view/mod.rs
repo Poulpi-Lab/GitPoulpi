@@ -37,6 +37,7 @@ mod interaction;
 mod intraline;
 mod layout;
 mod model;
+mod term;
 
 #[cfg(test)]
 pub(crate) use interaction::hunk_button;
@@ -51,6 +52,7 @@ pub(crate) use interaction::{
 };
 pub(crate) use layout::marker as line_marker;
 pub(crate) use layout::{h_scroll_max, h_track_content, minimap_row};
+pub(crate) use model::DiffTextExt;
 pub(crate) use model::{
     diff_bar, hunk_at, render_diff_with, selected_lines, DiffBarRender, DiffRender, DiffRenderOpts,
     DiffRow,
@@ -69,36 +71,6 @@ pub(crate) use model::{
 
 mod mode;
 pub(crate) use mode::DiffViewMode;
-
-impl DiffViewMode {
-    /// `m`: the other layout.
-    pub(crate) fn next(self) -> Self {
-        match self {
-            DiffViewMode::Inline => DiffViewMode::Split,
-            DiffViewMode::Split => DiffViewMode::Inline,
-        }
-    }
-}
-
-/// The config-side twin is `gitpoulpi_config::DiffLayout`; these two
-/// conversions are the one seam between them.
-impl From<gitpoulpi_config::DiffLayout> for DiffViewMode {
-    fn from(layout: gitpoulpi_config::DiffLayout) -> Self {
-        match layout {
-            gitpoulpi_config::DiffLayout::Inline => DiffViewMode::Inline,
-            gitpoulpi_config::DiffLayout::Split => DiffViewMode::Split,
-        }
-    }
-}
-
-impl From<DiffViewMode> for gitpoulpi_config::DiffLayout {
-    fn from(mode: DiffViewMode) -> Self {
-        match mode {
-            DiffViewMode::Inline => gitpoulpi_config::DiffLayout::Inline,
-            DiffViewMode::Split => gitpoulpi_config::DiffLayout::Split,
-        }
-    }
-}
 
 /// One of the Diff view's display toggles: layout, hunks only, word wrap,
 /// whitespace-only changes. `apply` is the only place any of them is

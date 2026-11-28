@@ -56,39 +56,39 @@ lang-cs = ["gitpoulpi-i18n/lang-cs"]
 lang-sv = ["gitpoulpi-i18n/lang-sv"]
 lang-tr = ["gitpoulpi-i18n/lang-tr"]
 lang-qps = ["gitpoulpi-i18n/lang-qps"]
-ai = ["dep:gitpoulpi-ai", "dep:async-trait"]
+ai = ["dep:gitpoulpi-ai", "dep:async-trait", "gitpoulpi-app/ai"]
 # Internal: "at least one hosting provider". Never enabled alone.
-hosting = ["gitpoulpi-daemon/hosting", "gitpoulpi-ai?/conversation"]
-github = ["hosting", "gitpoulpi-hosting/github"]
-gitlab = ["hosting", "gitpoulpi-hosting/gitlab"]
-azure-devops = ["hosting", "gitpoulpi-hosting/azure-devops"]
-bitbucket = ["hosting", "gitpoulpi-hosting/bitbucket"]
-jira = ["hosting", "gitpoulpi-hosting/jira"]
-trello = ["hosting", "gitpoulpi-hosting/trello"]
-gitea = ["hosting", "gitpoulpi-hosting/gitea"]
-linear = ["hosting", "gitpoulpi-hosting/linear"]
-youtrack = ["hosting", "gitpoulpi-hosting/youtrack"]
-redmine = ["hosting", "gitpoulpi-hosting/redmine"]
-gerrit = ["hosting", "gitpoulpi-hosting/gerrit"]
-local-issues = ["hosting", "gitpoulpi-hosting/local-issues"]
-radar = []
-mermaid = []
-board = []
-review = ["conversation"]
+hosting = ["gitpoulpi-daemon/hosting", "gitpoulpi-ai?/conversation", "gitpoulpi-app/hosting"]
+github = ["hosting", "gitpoulpi-hosting/github", "gitpoulpi-app/github"]
+gitlab = ["hosting", "gitpoulpi-hosting/gitlab", "gitpoulpi-app/gitlab"]
+azure-devops = ["hosting", "gitpoulpi-hosting/azure-devops", "gitpoulpi-app/azure-devops"]
+bitbucket = ["hosting", "gitpoulpi-hosting/bitbucket", "gitpoulpi-app/bitbucket"]
+jira = ["hosting", "gitpoulpi-hosting/jira", "gitpoulpi-app/jira"]
+trello = ["hosting", "gitpoulpi-hosting/trello", "gitpoulpi-app/trello"]
+gitea = ["hosting", "gitpoulpi-hosting/gitea", "gitpoulpi-app/gitea"]
+linear = ["hosting", "gitpoulpi-hosting/linear", "gitpoulpi-app/linear"]
+youtrack = ["hosting", "gitpoulpi-hosting/youtrack", "gitpoulpi-app/youtrack"]
+redmine = ["hosting", "gitpoulpi-hosting/redmine", "gitpoulpi-app/redmine"]
+gerrit = ["hosting", "gitpoulpi-hosting/gerrit", "gitpoulpi-app/gerrit"]
+local-issues = ["hosting", "gitpoulpi-hosting/local-issues", "gitpoulpi-app/local-issues"]
+radar = ["gitpoulpi-app/radar"]
+mermaid = ["gitpoulpi-app/mermaid"]
+board = ["gitpoulpi-app/board"]
+review = ["conversation", "gitpoulpi-app/review"]
 # The read-only conversation view of an issue or a request (`item_view`).
-conversation = []
-history-rewrite = []
-global-search = []
-workspaces = []
-rewrite-scripts = ["gitpoulpi-daemon/rewrite-scripts", "gitpoulpi-cli-backend/rewrite-scripts"]
-mcp = []
-lfs = ["gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs"]
-worktree = ["gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree"]
-submodule = ["gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule"]
+conversation = ["gitpoulpi-app/conversation"]
+history-rewrite = ["gitpoulpi-app/history-rewrite"]
+global-search = ["gitpoulpi-app/global-search"]
+workspaces = ["gitpoulpi-app/workspaces"]
+rewrite-scripts = ["gitpoulpi-daemon/rewrite-scripts", "gitpoulpi-cli-backend/rewrite-scripts", "gitpoulpi-app/rewrite-scripts"]
+mcp = ["gitpoulpi-app/mcp"]
+lfs = ["gitpoulpi-link/lfs", "gitpoulpi-daemon/lfs", "gitpoulpi-cli-backend/lfs", "gitpoulpi-app/lfs"]
+worktree = ["gitpoulpi-link/worktree", "gitpoulpi-daemon/worktree", "gitpoulpi-cli-backend/worktree", "gitpoulpi-app/worktree"]
+submodule = ["gitpoulpi-link/submodule", "gitpoulpi-daemon/submodule", "gitpoulpi-cli-backend/submodule", "gitpoulpi-app/submodule"]
 # Author avatars fetched over HTTP (reqwest); off = initials/identicon only.
-avatar-fetch = ["dep:reqwest"]
+avatar-fetch = ["dep:reqwest", "gitpoulpi-app/avatar-fetch"]
 # Image preview engine (GIF, WebP, BMP, ICO decoders); PNG/JPEG stay unconditional for avatars.
-image-view = ["dep:gif", "dep:image-webp"]
+image-view = ["dep:gif", "dep:image-webp", "gitpoulpi-app/image-view"]
 
 [dependencies]
 encoding_rs.workspace = true
@@ -127,6 +127,7 @@ toml.workspace = true
 gitpoulpi-session.workspace = true
 # The frontend-neutral graph model (lanes, stash rows, lazy paging) shared with the desktop UI.
 gitpoulpi-app.workspace = true
+gitpoulpi-link.workspace = true
 crossterm.workspace = true
 ratatui.workspace = true
 tokio.workspace = true
@@ -163,6 +164,7 @@ gitpoulpi-logo-build.workspace = true
 gitpoulpi-hosting = { workspace = true, features = ["test-support"] }
 async-trait.workspace = true
 gitpoulpi-testkit.workspace = true
+gitpoulpi-link = { workspace = true, features = ["test-support"] }
 tempfile.workspace = true
 insta.workspace = true
 # The pty driver, for `tests/pty_ui.rs`: those tests drive this crate's

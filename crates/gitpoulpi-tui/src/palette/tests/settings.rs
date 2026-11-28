@@ -118,3 +118,35 @@ fn an_english_query_finds_a_setting_in_french() {
         found.iter().map(|m| m.entry.name()).collect::<Vec<_>>()
     );
 }
+
+/// The Settings rows that exist only because of what a terminal is carry
+/// `Surface::TerminalOnly` with a reason; every other row is for any frontend.
+/// The keys are named in `gitpoulpi_app::surface`, so a renamed setting fails
+/// here instead of silently becoming "for any frontend".
+#[test]
+fn the_terminal_only_settings_are_marked_where_the_rows_are_built() {
+    use gitpoulpi_app::surface::{Surface, TERMINAL_ONLY_SETTINGS};
+    let rows = crate::preferences::palette_settings::rows();
+    for (key, reason) in TERMINAL_ONLY_SETTINGS {
+        assert!(
+            rows.iter().any(|r| r.key == *key),
+            "{key} is no longer a Settings row"
+        );
+        assert!(!reason.trim().is_empty());
+    }
+    let entries = crate::palette::settings::entries();
+    assert!(!entries.is_empty());
+    let marked = entries
+        .iter()
+        .filter(|e| matches!(e.surface, Surface::TerminalOnly(_)))
+        .count();
+    assert!(
+        marked >= TERMINAL_ONLY_SETTINGS.len(),
+        "{marked} rows marked"
+    );
+    for entry in entries {
+        if let Surface::TerminalOnly(reason) = entry.surface {
+            assert!(!reason.trim().is_empty(), "{}", entry.name());
+        }
+    }
+}

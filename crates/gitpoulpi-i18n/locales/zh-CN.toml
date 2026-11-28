@@ -2793,7 +2793,7 @@ hint_conflicts = "冲突"
 conflicts_of = "{label} 的冲突 - Esc 显示全部快捷键"
 no_conflicts = "此快捷键没有冲突"
 hint_controls = "控制"
-config_issues = { one = "config.toml：已忽略 {n} 个条目 - {id}：{message}", other = "config.toml：已忽略 {n} 个条目 - {id}：{message}" }
+config_issues = { one = "{file}：已忽略 {n} 个条目 - {id}：{message}", other = "{file}：已忽略 {n} 个条目 - {id}：{message}" }
 no_match = "没有符合筛选条件的快捷键"
 unbound = "（未绑定）"
 none = "（无）"

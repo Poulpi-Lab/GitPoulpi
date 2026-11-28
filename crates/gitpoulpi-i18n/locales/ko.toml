@@ -2792,7 +2792,7 @@ hint_conflicts = "충돌"
 conflicts_of = "{label}의 충돌 - Esc로 모든 단축키 표시"
 no_conflicts = "이 단축키에는 충돌이 없습니다"
 hint_controls = "컨트롤"
-config_issues = { one = "config.toml: 항목 {n}개 무시됨 - {id}: {message}", other = "config.toml: 항목 {n}개 무시됨 - {id}: {message}" }
+config_issues = { one = "{file}: 항목 {n}개 무시됨 - {id}: {message}", other = "{file}: 항목 {n}개 무시됨 - {id}: {message}" }
 no_match = "필터와 일치하는 단축키가 없습니다"
 unbound = "(지정 안 됨)"
 none = "(없음)"

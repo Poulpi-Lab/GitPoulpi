@@ -520,3 +520,37 @@ fn the_sequence_pool_shows_only_the_slots_a_sequence_holds() {
     assert!(matches_query("page-seq", def, &km));
     assert!(matches_query("name of page", def, &km));
 }
+
+/// The "entries ignored" line names the file the bad entry is read from:
+/// `config.toml` while there is no `tui.toml`, `tui.toml` once it exists.
+#[test]
+fn the_ignored_entries_line_names_the_file_they_come_from() {
+    let _l = gitpoulpi_i18n::override_lang(gitpoulpi_i18n::Lang::En);
+    let bad = "[keybindings.global]\nsettings = \"Ctrl+Nope\"\n";
+    for (file, seed_tui) in [("config.toml", false), ("tui.toml", true)] {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("config.toml"), bad).unwrap();
+        if seed_tui {
+            std::fs::write(dir.path().join("tui.toml"), bad).unwrap();
+        }
+        let config = Config::load(&dir.path().join("config.toml")).unwrap();
+        let mut s = PreferencesState::with_parts(
+            config,
+            Some(dir.path().join("config.toml")),
+            dir.path(),
+            RepoState::default(),
+            RepoState::path_for(dir.path(), ".gitpoulpi"),
+            std::sync::Arc::new(InMemoryTokens::default()),
+        );
+        s.show_keybindings(false);
+        let screen = draw_at(&mut s, 140, 40);
+        let want = format!("{file}: 1 entry ignored");
+        assert!(screen.contains(&want), "want {want:?}:\n{screen}");
+        let other = if file == "tui.toml" {
+            "config.toml: 1 entry"
+        } else {
+            "tui.toml: 1 entry"
+        };
+        assert!(!screen.contains(other), "{screen}");
+    }
+}

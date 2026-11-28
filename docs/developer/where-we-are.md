@@ -1423,6 +1423,13 @@ blank frames on a locked session; that is not worked around.
   something: export `GITPOULPI_CONFIG_DIR` (and a temp `HOME`/`XDG_CONFIG_HOME`)
   to a scratch dir first.
 
+### Settings files
+
+- **Two files, one directory.** `config.toml` is common, `tui.toml` is the terminal UI's interface settings (`gitpoulpi_config::split`, `KEY_HOME` classifies every `[ui]` key; a new field fails `every_interface_key_is_classified` until it has a home). It is created as a copy and `config.toml` is never modified by that, so an older build keeps working on its own full file; the price is that settings changed in the older build afterwards are not seen by the newer one (told in the user docs: config reference and troubleshooting).
+- **Once `tui.toml` exists it is the only source** for the keys it owns. Never fall back to `config.toml` for a key it lacks, and never read the raw `config.toml` document for an interface value: go through `Settings` / `Config::load` (the theme watcher, the palette's settings stamp and the Sequences page learned this the hard way).
+- **Name the file from the code, not a literal.** A message that says where a setting lives ("N entries ignored") takes the file name as a parameter; the same goes for new docs rows: put the key under the right file, `docs_coverage.rs` checks it.
+- **`desktop.toml` is not documented for users yet.** Keep the `desktop_keys_are_excused_until_the_documentation_wave` allowance until that wave.
+
 ## On the APEX workflow
 
 Work runs as one worktree agent per batch, merged in sequence.

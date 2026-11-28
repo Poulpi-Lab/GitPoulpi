@@ -2792,7 +2792,7 @@ hint_conflicts = "conflitos"
 conflicts_of = "Conflitos de {label} - Esc mostra todos os atalhos"
 no_conflicts = "Este atalho não tem conflitos"
 hint_controls = "controlos"
-config_issues = { one = "config.toml: {n} entrada ignorada - {id}: {message}", other = "config.toml: {n} entradas ignoradas - {id}: {message}" }
+config_issues = { one = "{file}: {n} entrada ignorada - {id}: {message}", other = "{file}: {n} entradas ignoradas - {id}: {message}" }
 no_match = "nenhum atalho corresponde aos filtros"
 unbound = "(sem tecla)"
 none = "(nenhum)"

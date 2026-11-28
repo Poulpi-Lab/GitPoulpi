@@ -2793,7 +2793,7 @@ hint_conflicts = "conflictos"
 conflicts_of = "Conflictos de {label} - Esc muestra todos los atajos"
 no_conflicts = "Este atajo no tiene conflictos"
 hint_controls = "controles"
-config_issues = { one = "config.toml: {n} entrada ignorada - {id}: {message}", other = "config.toml: {n} entradas ignoradas - {id}: {message}" }
+config_issues = { one = "{file}: {n} entrada ignorada - {id}: {message}", other = "{file}: {n} entradas ignoradas - {id}: {message}" }
 no_match = "ningún atajo coincide con los filtros"
 unbound = "(sin asignar)"
 none = "(ninguno)"

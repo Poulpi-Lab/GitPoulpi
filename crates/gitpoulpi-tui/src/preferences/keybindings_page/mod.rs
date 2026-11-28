@@ -144,6 +144,9 @@ pub(super) struct KeybindingsPage {
     pub(super) km: Keymap,
     conflicts: Vec<Conflict>,
     issues: Vec<KeymapIssue>,
+    /// The file the `[keybindings]` entries are read from, named in the
+    /// "N entries ignored" line: `tui.toml` once it exists, else `config.toml`.
+    pub(super) issues_file: &'static str,
     /// Publish saved keymaps process-wide (always, except in unit tests).
     pub(super) live: bool,
     /// What the last write said (`... saved to <path>`): Settings paints
@@ -220,6 +223,7 @@ impl KeybindingsPage {
             km,
             conflicts: Vec::new(),
             issues: Vec::new(),
+            issues_file: "config.toml",
             live: !cfg!(test),
             notice: None,
             list_height: 10,
@@ -555,6 +559,7 @@ impl PreferencesState {
         self.strip = false;
         self.remember_sub_tab(PrefSection::Keybindings, SubTab::List);
         self.keys = KeybindingsPage::new(Keymap::from_config(&self.config.keybindings));
+        self.keys.issues_file = self.keybindings_file_name();
         if reset_all {
             self.keys.popup = Some(Popup::ConfirmReset { focus: 1 });
         }
@@ -580,6 +585,21 @@ impl PreferencesState {
         self.keys_shown() && self.focus == PrefFocus::Fields
     }
 
+    /// The file the keybindings are read from: `tui.toml` when it sits next
+    /// to the `config.toml` (it then owns the whole table), else `config.toml`.
+    fn keybindings_file_name(&self) -> &'static str {
+        let tui = gitpoulpi_config::split::TUI_FILE_NAME;
+        match self.config_file() {
+            Some(path)
+                if path.file_name().is_some_and(|n| n == "config.toml")
+                    && path.with_file_name(tui).exists() =>
+            {
+                tui
+            }
+            _ => "config.toml",
+        }
+    }
+
     /// Rebuilds the effective keymap from the reloaded config and, live,
     /// installs it.
     fn keys_reload(&mut self, path: &Path) {
@@ -587,6 +607,7 @@ impl PreferencesState {
             self.config.keybindings = config.keybindings;
         }
         self.keys.km = Keymap::from_config(&self.config.keybindings);
+        self.keys.issues_file = self.keybindings_file_name();
         self.keys.refresh();
         if self.keys.live {
             keymap::install(Keymap::from_config(&self.config.keybindings));

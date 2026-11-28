@@ -1,0 +1,43 @@
+[package]
+name = "gitpoulpi-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "GitPoulpi desktop frontend: a native window over the same daemon the terminal UI uses."
+
+[lib]
+name = "gitpoulpi_desktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gitpoulpi-desktop"
+path = "src/main.rs"
+
+[dependencies]
+# Pinned exactly: the toolkit moves fast and its API changes between minors.
+gpui-kit = { version = "=0.11.0", features = ["tree-sitter-rust", "tree-sitter-toml", "tree-sitter-markdown", "tree-sitter-bash", "tree-sitter-yaml", "tree-sitter-javascript", "tree-sitter-typescript"] }
+
+gitpoulpi-core = { path = "../../../crates/gitpoulpi-core" }
+# The worktree and submodule features (here, and forwarded to the embedded daemon by the link) are what
+# lets the daemon list them and the shared section rule show those Refs sections.
+gitpoulpi-app = { path = "../../../crates/gitpoulpi-app", features = ["worktree", "submodule"] }
+gitpoulpi-config = { path = "../../../crates/gitpoulpi-config" }
+gitpoulpi-i18n = { path = "../../../crates/gitpoulpi-i18n" }
+gitpoulpi-ipc = { path = "../../../crates/gitpoulpi-ipc" }
+gitpoulpi-link = { path = "../../../crates/gitpoulpi-link", features = ["worktree", "submodule"] }
+gitpoulpi-log = { path = "../../../crates/gitpoulpi-log" }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+toml = "1.2"
+anyhow = "1"
+
+[dev-dependencies]
+# The headless window test needs GPUI's test platform; the feature is only on for test builds.
+gpui-kit = { version = "=0.11.0", features = ["test-support"] }
+gitpoulpi-testkit = { path = "../../../crates/gitpoulpi-testkit" }
+tempfile = "3"
+tokio = { version = "1", features = ["rt", "time"] }

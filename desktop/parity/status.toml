@@ -1,0 +1,760 @@
+# Which registry rows the desktop frontend marks done.
+#
+# Ids are the shared registry's: an action's config id (`global.quit`) or `palette.<command id>`.
+# Only `done` is listed; `terminal only` comes from the registry and everything else is `to do`.
+# The tests make this list equal to what the command dispatcher implements, so an id cannot be
+# added or kept by hand: implement it in `src/commands/ops.rs`, then run
+# `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` (it rewrites this file and the table).
+# See README.md.
+
+[[action]]
+id = "activity_log.scroll_left"
+status = "done"
+
+[[action]]
+id = "activity_log.scroll_right"
+status = "done"
+
+[[action]]
+id = "composer.commit"
+status = "done"
+
+[[action]]
+id = "diff.close"
+status = "done"
+
+[[action]]
+id = "diff.discard_hunk"
+status = "done"
+
+[[action]]
+id = "diff.discard_lines"
+status = "done"
+
+[[action]]
+id = "diff.next_hunk"
+status = "done"
+
+[[action]]
+id = "diff.prev_hunk"
+status = "done"
+
+[[action]]
+id = "diff.select_lines"
+status = "done"
+
+[[action]]
+id = "diff.stage_hunk"
+status = "done"
+
+[[action]]
+id = "diff.stage_lines"
+status = "done"
+
+[[action]]
+id = "diff.toggle_layout"
+status = "done"
+
+[[action]]
+id = "diff.toggle_whitespace"
+status = "done"
+
+[[action]]
+id = "diff.toggle_wrap"
+status = "done"
+
+[[action]]
+id = "git_prefix.cherry_pick"
+status = "done"
+
+[[action]]
+id = "git_prefix.commit_now"
+status = "done"
+
+[[action]]
+id = "git_prefix.compose_commit"
+status = "done"
+
+[[action]]
+id = "git_prefix.delete_ref"
+status = "done"
+
+[[action]]
+id = "git_prefix.discard_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.fetch_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.new_branch"
+status = "done"
+
+[[action]]
+id = "git_prefix.new_tag"
+status = "done"
+
+[[action]]
+id = "git_prefix.pull"
+status = "done"
+
+[[action]]
+id = "git_prefix.push"
+status = "done"
+
+[[action]]
+id = "git_prefix.push_tags"
+status = "done"
+
+[[action]]
+id = "git_prefix.rebase_onto"
+status = "done"
+
+[[action]]
+id = "git_prefix.reset_mixed"
+status = "done"
+
+[[action]]
+id = "git_prefix.revert"
+status = "done"
+
+[[action]]
+id = "git_prefix.stage_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.stage_file"
+status = "done"
+
+[[action]]
+id = "git_prefix.stash_message"
+status = "done"
+
+[[action]]
+id = "git_prefix.stash_pop"
+status = "done"
+
+[[action]]
+id = "git_prefix.stash_push"
+status = "done"
+
+[[action]]
+id = "git_prefix.unstage_file"
+status = "done"
+
+[[action]]
+id = "global.context_menu"
+status = "done"
+
+[[action]]
+id = "global.find_in_log"
+status = "done"
+note = "Opens the Log's find bar."
+
+[[action]]
+id = "global.git_prefix"
+status = "done"
+note = "First key of the two-key chord; the next key is looked up in the git_prefix context."
+
+[[action]]
+id = "global.help"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "global.nav_prefix"
+status = "done"
+note = "First key of the two-key chord; the next key is looked up in the nav_prefix context."
+
+[[action]]
+id = "global.palette"
+status = "done"
+note = "Opens the command palette (shared catalogue, shortcuts, fuzzy matching, reasons)."
+
+[[action]]
+id = "global.quit"
+status = "done"
+note = "Quits the app."
+
+[[action]]
+id = "global.redo"
+status = "done"
+
+[[action]]
+id = "global.refresh"
+status = "done"
+note = "Reloads the refs and the Log."
+
+[[action]]
+id = "global.undo"
+status = "done"
+
+[[action]]
+id = "global.undo_history"
+status = "done"
+
+[[action]]
+id = "global.undo_offer"
+status = "done"
+
+[[action]]
+id = "log.compare_next"
+status = "done"
+
+[[action]]
+id = "log.compare_selection"
+status = "done"
+
+[[action]]
+id = "log.compare_swap"
+status = "done"
+
+[[action]]
+id = "log_columns.fit_all"
+status = "done"
+
+[[action]]
+id = "log_columns.reset_width"
+status = "done"
+
+[[action]]
+id = "nav_prefix.activity_log"
+status = "done"
+
+[[action]]
+id = "nav_prefix.change_graph_color_theme"
+status = "done"
+note = "Opens the graph colour picker."
+
+[[action]]
+id = "nav_prefix.change_language"
+status = "done"
+note = "Opens the language picker."
+
+[[action]]
+id = "nav_prefix.change_theme"
+status = "done"
+note = "Opens the theme picker."
+
+[[action]]
+id = "nav_prefix.collapse_refs"
+status = "done"
+note = "Shows or hides the Refs sidebar."
+
+[[action]]
+id = "nav_prefix.collapse_status"
+status = "done"
+note = "Shows or hides the right-hand details pane."
+
+[[action]]
+id = "nav_prefix.global_log"
+status = "done"
+
+[[action]]
+id = "nav_prefix.help"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "nav_prefix.jobs"
+status = "done"
+
+[[action]]
+id = "palette.abort_operation"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_all"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_app_tab"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_clear"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_clear_log"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_git_tab"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_next_problem"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_prev_problem"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_scope"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_show_operation"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_debug"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_error"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_info"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_trace"
+status = "done"
+
+[[action]]
+id = "palette.activity_level_toggle_warn"
+status = "done"
+
+[[action]]
+id = "palette.annotate_selected_tag"
+status = "done"
+
+[[action]]
+id = "palette.browse_repository"
+status = "done"
+note = "Folder chooser of the operating system, then opens that repository (File menu)."
+
+[[action]]
+id = "palette.checkout_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.checkout_selected_ref"
+status = "done"
+
+[[action]]
+id = "palette.close_diff"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_author_email"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_author_name"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_date"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_long_sha"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_message"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_short_sha"
+status = "done"
+
+[[action]]
+id = "palette.copy_last_error"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_full_ref"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_name"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_target_sha"
+status = "done"
+
+[[action]]
+id = "palette.create_annotated_tag_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_branch_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_tag_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_branch_and_remote"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_remote_branch"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_tag_from_remote"
+status = "done"
+
+[[action]]
+id = "palette.diff_mode_inline"
+status = "done"
+
+[[action]]
+id = "palette.diff_mode_split"
+status = "done"
+
+[[action]]
+id = "palette.discard_hunk"
+status = "done"
+
+[[action]]
+id = "palette.discard_lines"
+status = "done"
+
+[[action]]
+id = "palette.drop_selected_ref_on_current"
+status = "done"
+
+[[action]]
+id = "palette.fast_forward_current_to_selected"
+status = "done"
+
+[[action]]
+id = "palette.fast_forward_selected_to_current"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_discard"
+status = "done"
+
+[[action]]
+id = "palette.files_clear_selection"
+status = "done"
+
+[[action]]
+id = "palette.files_select_all"
+status = "done"
+
+[[action]]
+id = "palette.files_toggle_selection"
+status = "done"
+
+[[action]]
+id = "palette.focus_log"
+status = "done"
+
+[[action]]
+id = "palette.focus_refs"
+status = "done"
+
+[[action]]
+id = "palette.focus_refs_filter"
+status = "done"
+
+[[action]]
+id = "palette.focus_status"
+status = "done"
+
+[[action]]
+id = "palette.focus_status_section_staged"
+status = "done"
+
+[[action]]
+id = "palette.focus_status_section_unstaged"
+status = "done"
+
+[[action]]
+id = "palette.jobs_cancel_all"
+status = "done"
+
+[[action]]
+id = "palette.keybindings"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "palette.lost_commits"
+status = "done"
+
+[[action]]
+id = "palette.merge_selected_ref"
+status = "done"
+
+[[action]]
+id = "palette.next_hunk"
+status = "done"
+
+[[action]]
+id = "palette.open_last_error"
+status = "done"
+
+[[action]]
+id = "palette.prev_hunk"
+status = "done"
+
+[[action]]
+id = "palette.push_selected_tag"
+status = "done"
+
+[[action]]
+id = "palette.reflog_head"
+status = "done"
+
+[[action]]
+id = "palette.reflog_selected_branch"
+status = "done"
+
+[[action]]
+id = "palette.rename_selected_branch"
+status = "done"
+
+[[action]]
+id = "palette.reset_to_selected_commit_hard"
+status = "done"
+
+[[action]]
+id = "palette.reset_to_selected_commit_soft"
+status = "done"
+
+[[action]]
+id = "palette.safety_close"
+status = "done"
+
+[[action]]
+id = "palette.safety_history_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_apply"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_branch"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_pick"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_stash"
+status = "done"
+
+[[action]]
+id = "palette.safety_lost_tag"
+status = "done"
+
+[[action]]
+id = "palette.safety_offer"
+status = "done"
+
+[[action]]
+id = "palette.safety_redo_to"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_apply"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_branch"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_more"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_refresh"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_restore"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_show"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_stash"
+status = "done"
+
+[[action]]
+id = "palette.safety_reflog_tag"
+status = "done"
+
+[[action]]
+id = "palette.safety_restore_only"
+status = "done"
+
+[[action]]
+id = "palette.safety_undo_sequence"
+status = "done"
+
+[[action]]
+id = "palette.safety_undo_to"
+status = "done"
+
+[[action]]
+id = "palette.select_lines"
+status = "done"
+
+[[action]]
+id = "palette.set_upstream"
+status = "done"
+
+[[action]]
+id = "palette.show_grouped_push"
+status = "done"
+
+[[action]]
+id = "palette.skip_operation"
+status = "done"
+
+[[action]]
+id = "palette.stage_hunk"
+status = "done"
+
+[[action]]
+id = "palette.stage_lines"
+status = "done"
+
+[[action]]
+id = "palette.stash_apply"
+status = "done"
+
+[[action]]
+id = "palette.stash_drop"
+status = "done"
+
+[[action]]
+id = "palette.theme"
+status = "done"
+note = "Opens the theme picker."
+
+[[action]]
+id = "palette.toggle_hide_in_graph"
+status = "done"
+
+[[action]]
+id = "palette.toggle_hide_selected_folder"
+status = "done"
+
+[[action]]
+id = "palette.toggle_section_collapse"
+status = "done"
+
+[[action]]
+id = "palette.toggle_solo"
+status = "done"
+
+[[action]]
+id = "palette.toggle_solo_selected_folder"
+status = "done"
+
+[[action]]
+id = "palette.toggle_whitespace"
+status = "done"
+
+[[action]]
+id = "palette.toggle_word_wrap"
+status = "done"
+
+[[action]]
+id = "palette.undo_forget"
+status = "done"
+
+[[action]]
+id = "palette.undo_sequence"
+status = "done"
+
+[[action]]
+id = "palette.unstage_hunk"
+status = "done"
+
+[[action]]
+id = "palette.unstage_lines"
+status = "done"
+
+[[action]]
+id = "refs.clear_solo"
+status = "done"
+
+[[action]]
+id = "refs.collapse_all"
+status = "done"
+
+[[action]]
+id = "refs.expand_all"
+status = "done"
+
+[[action]]
+id = "refs.reveal"
+status = "done"
+
+[[action]]
+id = "refs.show_all"
+status = "done"
+
+[[action]]
+id = "refs.solo"
+status = "done"
+
+[[action]]
+id = "status.amend"
+status = "done"
+
+[[action]]
+id = "status.collapse_all"
+status = "done"
+
+[[action]]
+id = "status.collapse_all_folders"
+status = "done"
+
+[[action]]
+id = "status.collapse_below"
+status = "done"
+
+[[action]]
+id = "status.compose"
+status = "done"
+
+[[action]]
+id = "status.expand_all"
+status = "done"
+
+[[action]]
+id = "status.expand_below"
+status = "done"
+
+[[action]]
+id = "status.open_diff"
+status = "done"
+
+[[action]]
+id = "status.skip_hooks"
+status = "done"
+
+[[action]]
+id = "status.stage_toggle"
+status = "done"
+
+[[action]]
+id = "status.toggle_file_mode"
+status = "done"

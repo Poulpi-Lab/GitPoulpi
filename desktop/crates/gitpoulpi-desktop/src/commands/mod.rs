@@ -15,17 +15,20 @@
 //! | `commit_ops` | the Log's commit operations: cherry-pick, revert, reset, checkout, copy, the menu key, comparing rows |
 //! | `staging`  | running the staging and commit ops on the working-changes pane and the diff |
 //! | `refs_ops` | the branch, tag and stash ops: which ids map to a `RefOp`, and running one |
+//! | `repo_ops` | the worktree, submodule, remote and LFS ops; `file_ops` the file menu's ops and the programs they start |
 //! | `status`   | the one-line message shown in the status line |
 
 pub mod catalog;
 pub mod commit_ops;
 pub mod context;
 pub mod exec;
+pub mod file_ops;
 pub mod keys;
 pub mod ops;
 pub mod palette;
 pub mod picker;
 pub mod refs_ops;
+pub mod repo_ops;
 pub mod staging;
 pub mod status;
 

@@ -73,6 +73,75 @@ pub const STASH_EMPTY: &str = "This stash has no changes to show";
 /// The name field of the forms.
 pub const NAME_LABEL: &str = "Name";
 
+// Worktrees, submodules, remotes, LFS and file commands.
+/// The button that closes a read-only list.
+pub const CLOSE: &str = "Close";
+/// The pattern field of the LFS track and untrack forms.
+pub const LFS_PATTERN_LABEL: &str = "Pattern (for example *.psd)";
+/// A pattern typed in an LFS form that is empty.
+pub const LFS_PATTERN_NEEDED: &str = "type a pattern, for example *.psd";
+/// The folder field of the Create worktree form.
+pub const FOLDER_LABEL: &str = "Folder";
+/// The branch field of the Create worktree form.
+pub const WORKTREE_BRANCH_LABEL: &str =
+    "Worktree branch (a new name, an existing branch to check out, or empty)";
+/// The check box of the Create worktree form.
+pub const OPEN_WORKTREE_AFTER: &str = "Open the new worktree after creating it";
+/// Why a remote command has no remote.
+pub const NO_REMOTE_TO_ACT_ON: &str = "this repository has no remote";
+/// The name field of the Add and Edit remote forms.
+pub const REMOTE_NAME_LABEL: &str = "Name";
+/// The fetch URL field.
+pub const REMOTE_FETCH_URL_LABEL: &str = "Fetch URL";
+/// The push URL field.
+pub const REMOTE_PUSH_URL_LABEL: &str = "Push URL (empty: same as the fetch URL)";
+/// A submodule command run on a row that is not a submodule.
+pub const SELECT_SUBMODULE: &str = "select a submodule in the Refs pane first";
+/// A worktree command run with no worktree selected.
+pub const SELECT_WORKTREE: &str = "select a worktree in the Refs pane first";
+/// A file command run with no file selected.
+pub const SELECT_FILE: &str = "select a file in the working changes or in a commit's files first";
+/// Why the file command needs a file on disk.
+pub const FILE_NOT_ON_DISK: &str = "the file is not on disk";
+/// Running an external program failed.
+pub fn launch_failed(what: &str, why: &str) -> String {
+    format!("could not start {what}: {why}")
+}
+/// Status line after an external program started.
+pub fn launched(what: &str) -> String {
+    format!("opened {what}")
+}
+/// The LFS menu's heading.
+pub const LFS_MENU_TITLE: &str = "Git LFS";
+/// The status line when LFS is not initialised in the repository.
+pub const LFS_NOT_INITIALIZED: &str = "Git LFS is not initialized in this repository";
+/// The first line of the LFS status dialog.
+pub fn lfs_files_line(n: usize) -> String {
+    format!("{n} file(s) stored with LFS")
+}
+/// One tracked pattern line of the LFS status.
+pub fn lfs_pattern_line(pattern: &str, lockable: bool) -> String {
+    if lockable {
+        format!("{pattern} (lockable)")
+    } else {
+        pattern.to_string()
+    }
+}
+/// The line of the file history view that names the file.
+pub fn history_title(path: &str) -> String {
+    format!("History of {path}")
+}
+/// The title of the file blame view.
+pub fn blame_title(path: &str) -> String {
+    format!("Blame of {path}")
+}
+/// Why the file has no history.
+pub const NO_FILE_HISTORY: &str = "this file has no history yet";
+/// The Open in submenu's heading on a worktree.
+pub const OPEN_IN: &str = "Open in";
+/// A worktree menu without a configured Open in entry.
+pub const OPEN_IN_NONE: &str = "Open in (no entry yet)";
+
 // Menu bar headings that have no catalog string.
 pub const MENU_FILE: &str = "File";
 pub const MENU_EDIT: &str = "Edit";

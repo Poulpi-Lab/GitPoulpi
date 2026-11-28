@@ -51,6 +51,6 @@ pub fn qualified_ref_name(target: &RefTarget) -> Option<String> {
         RefTarget::Local(_) => Some(format!("refs/heads/{name}")),
         RefTarget::Remote(_) => Some(format!("refs/remotes/{name}")),
         RefTarget::Tag(_) => Some(format!("refs/tags/{name}")),
-        RefTarget::Stash(_) => None,
+        _ => None,
     }
 }

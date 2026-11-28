@@ -18,6 +18,7 @@ use gpui_kit::{
 };
 
 use crate::commands::refs_ops::RefOp;
+use crate::commands::repo_ops::RepoOp;
 use crate::daemon::refs_ops::{self as rules, Snapshot};
 use crate::ref_target::RefTarget;
 use crate::strings;
@@ -46,7 +47,7 @@ pub enum Item {
 }
 
 impl Item {
-    fn act(label: String, op: RefOp) -> Item {
+    pub(crate) fn act(label: String, op: RefOp) -> Item {
         Item::Action {
             label,
             op: Some(op),
@@ -56,7 +57,7 @@ impl Item {
         }
     }
 
-    fn danger(label: String, op: RefOp) -> Item {
+    pub(crate) fn danger(label: String, op: RefOp) -> Item {
         Item::Action {
             label,
             op: Some(op),
@@ -66,7 +67,7 @@ impl Item {
         }
     }
 
-    fn off(label: String, why: String) -> Item {
+    pub(crate) fn off(label: String, why: String) -> Item {
         Item::Action {
             label,
             op: None,
@@ -77,11 +78,11 @@ impl Item {
     }
 
     /// A row of the terminal UI's list the desktop does not run yet.
-    fn later(label: String) -> Item {
+    pub(crate) fn later(label: String) -> Item {
         Item::off(label, strings::NOT_AVAILABLE_YET.to_string())
     }
 
-    fn keyed(self, action: Action) -> Item {
+    pub(crate) fn keyed(self, action: Action) -> Item {
         let shown = gitpoulpi_app::keymap::current().shown(action);
         match self {
             Item::Action {
@@ -120,7 +121,7 @@ pub struct MenuFacts {
     pub solo: bool,
 }
 
-fn glyph(g: &str, text: String) -> String {
+pub(crate) fn glyph(g: &str, text: String) -> String {
     format!("{g}  {text}")
 }
 
@@ -211,7 +212,12 @@ pub fn items_for(target: &RefTarget, snap: &Snapshot, facts: MenuFacts) -> Vec<I
                 .keyed(Action::RefsSolo),
         ]
     };
-    let worktree = || Item::later(glyph("\u{229E}", m::create_worktree(&name)));
+    let worktree = || {
+        Item::act(
+            glyph("\u{229E}", m::create_worktree(&name)),
+            RefOp::Repo(RepoOp::WorktreeFromRef),
+        )
+    };
     let mut rows = vec![reveal(), Item::Separator];
     let twins = rules::delete_targets(snap, target);
     match target {
@@ -261,11 +267,20 @@ pub fn items_for(target: &RefTarget, snap: &Snapshot, facts: MenuFacts) -> Vec<I
             rows.push(Item::Separator);
             if is_current {
                 rows.push(
-                    Item::later(glyph("\u{21E9}", m::PULL.get().to_string()))
-                        .keyed(Action::GitPull),
+                    Item::act(
+                        glyph("\u{21E9}", m::PULL.get().to_string()),
+                        RefOp::Repo(RepoOp::BranchPull),
+                    )
+                    .keyed(Action::GitPull),
                 );
             }
-            rows.push(Item::later(glyph("\u{21E7}", m::push_branch(&name))).keyed(Action::GitPush));
+            rows.push(
+                Item::act(
+                    glyph("\u{21E7}", m::push_branch(&name)),
+                    RefOp::Repo(RepoOp::BranchPush),
+                )
+                .keyed(Action::GitPush),
+            );
             rows.push(Item::later(glyph(
                 "\u{21E7}",
                 gitpoulpi_i18n::msg::remotes::PUSH_TO_SELECTED
@@ -273,7 +288,10 @@ pub fn items_for(target: &RefTarget, snap: &Snapshot, facts: MenuFacts) -> Vec<I
                     .to_string(),
             )));
             rows.push(Item::later(glyph("\u{21F1}", m::start_pr(&name))));
-            rows.push(Item::later(glyph("\u{27F2}", m::FETCH.get().to_string())));
+            rows.push(Item::act(
+                glyph("\u{27F2}", m::FETCH.get().to_string()),
+                RefOp::Repo(RepoOp::BranchFetch),
+            ));
             rows.push(Item::act(
                 glyph("\u{21C5}", m::remotes_of(&name)),
                 RefOp::SetUpstream,
@@ -408,7 +426,7 @@ pub fn items_for(target: &RefTarget, snap: &Snapshot, facts: MenuFacts) -> Vec<I
             });
             rows.push(Item::Separator);
         }
-        RefTarget::Stash(_) => {}
+        _ => {}
     }
     rows.push(copy_menu());
     rows

@@ -43,6 +43,8 @@ struct Drained {
     visibility: bool,
     /// Local changes are in the way of an action and auto-stash is `ask`.
     autostash: Vec<gitpoulpi_link::AutoStashNeeded>,
+    /// The newest LFS snapshot a refresh carried.
+    lfs: Option<gitpoulpi_link::lfs_ui::LfsSnapshot>,
 }
 
 /// `a` and `b` together: a part changed when it changed in either.
@@ -72,6 +74,9 @@ fn sort(events: Vec<LinkEvent>) -> Drained {
                 // place the window learns an operation another frontend left stopped.
                 if let Ok(state) = &outcome.operation_state_result {
                     d.operation = Some(state.clone());
+                }
+                if let Some(lfs) = &outcome.lfs {
+                    d.lfs = Some(lfs.clone());
                 }
                 // The first outcome only says what the panels loaded themselves just now.
                 if !outcome.summary.first {
@@ -135,6 +140,9 @@ impl Workspace {
         }
         if drained.visibility {
             self.refs.update(cx, |r, cx| r.on_visibility_event(cx));
+        }
+        if let Some(lfs) = drained.lfs {
+            self.set_lfs_snapshot(lfs, cx);
         }
         if let Some(changed) = drained.changed {
             self.apply_changes(changed, cx);

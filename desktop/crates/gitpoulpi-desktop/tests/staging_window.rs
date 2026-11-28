@@ -199,6 +199,38 @@ fn the_sections_list_the_files_with_counts_and_stage_and_unstage_undo_as_one_ent
 }
 
 #[gpui_kit::test]
+fn a_plain_click_opens_the_diff_while_ctrl_and_shift_clicks_only_select(cx: &mut TestAppContext) {
+    let repo = dirty();
+    let (window, ws) = open_dirty(cx, &repo, 3, 0);
+    let diff_open = |cx: &mut TestAppContext| ws.read_with(cx, |ws, _| ws.diff_is_open());
+    assert!(!diff_open(cx));
+    // Ctrl and Shift clicks build a selection without opening anything.
+    click(cx, &ws, StatusSection::Unstaged, 0, CTRL);
+    click(cx, &ws, StatusSection::Unstaged, 1, CTRL);
+    cx.run_until_parked();
+    std::thread::sleep(Duration::from_millis(300));
+    cx.run_until_parked();
+    assert!(!diff_open(cx), "Ctrl+click does not open a diff");
+    let shift = Modifiers {
+        shift: true,
+        ..Default::default()
+    };
+    click(cx, &ws, StatusSection::Unstaged, 2, shift);
+    std::thread::sleep(Duration::from_millis(300));
+    cx.run_until_parked();
+    assert!(!diff_open(cx), "Shift+click does not open a diff");
+    assert!(ws.read_with(cx, |ws, cx| ws.right.read(cx).selection_len()) >= 2);
+    // A plain click selects that one row and opens its diff.
+    click(cx, &ws, StatusSection::Unstaged, 1, NONE);
+    wait_until(cx, "the diff", |cx| diff_open(cx));
+    assert_eq!(
+        ws.read_with(cx, |ws, cx| ws.right.read(cx).selection_len()),
+        1
+    );
+    let _ = window;
+}
+
+#[gpui_kit::test]
 fn a_multi_selection_stages_as_one_entry_that_one_undo_takes_back(cx: &mut TestAppContext) {
     let repo = dirty();
     let (window, ws) = open_dirty(cx, &repo, 3, 0);

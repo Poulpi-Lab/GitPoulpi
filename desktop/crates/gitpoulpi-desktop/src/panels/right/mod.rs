@@ -13,6 +13,7 @@
 mod commit;
 mod compare;
 mod composer;
+mod file_menu;
 mod files;
 mod stage;
 mod status;
@@ -57,6 +58,12 @@ pub enum RightEvent {
     SwapCompare,
     /// A parent of the shown commit was clicked: select it in the Log.
     SelectParent(Oid),
+    /// A right click (or the menu key) on a file row: the window opens the file menu there.
+    FileMenu {
+        path: String,
+        side: crate::ref_target::FileSide,
+        at: gpui_kit::Point<gpui_kit::Pixels>,
+    },
 }
 
 enum Mode {
@@ -74,6 +81,10 @@ pub struct RightPanel {
     files: Arc<Vec<FileDiff>>,
     rows: Vec<FileRow>,
     status: Vec<StatusEntry>,
+    /// The working tree as the daemon sent it; `status` is this minus what "LFS only" hides.
+    raw_status: Vec<StatusEntry>,
+    /// "LFS only": the files (repository-relative, `/`) the working-changes lists keep.
+    lfs_only: Option<std::collections::HashSet<String>>,
     branch: String,
     tree: bool,
     sort_az: bool,
@@ -158,6 +169,8 @@ impl RightPanel {
             files: Arc::default(),
             rows: Vec::new(),
             status: Vec::new(),
+            raw_status: Vec::new(),
+            lfs_only: None,
             branch: String::new(),
             tree: false,
             sort_az: true,
@@ -243,8 +256,9 @@ impl RightPanel {
     /// Takes a fresh working tree: the selection drops what left its list, and the link learns which
     /// files are one rename.
     fn set_status(&mut self, status: &[StatusEntry]) {
-        self.status = status.to_vec();
-        self.backend.set_rename_pairs(&self.status);
+        self.raw_status = status.to_vec();
+        self.apply_status_filter();
+        self.backend.set_rename_pairs(&self.raw_status);
         let status = &self.status;
         self.selection.retain(|section, path| {
             status::section_paths(status, section)

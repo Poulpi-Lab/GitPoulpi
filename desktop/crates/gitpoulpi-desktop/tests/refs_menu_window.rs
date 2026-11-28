@@ -36,8 +36,11 @@ fn the_context_menu_opens_from_the_keyboard_on_the_selected_row_and_runs_its_ite
     assert!(at("Reveal") < at("Check out") && at("Check out") < at("Merge"));
     assert!(at("Rename") < at("Delete topic"));
     // Rows the desktop cannot run yet are dimmed with the reason.
+    let reflog = at("eflog");
+    assert!(menu.read_with(cx, |m, _| m.refusal(reflog)).is_some());
+    // The worktree row runs (see repo_ops_window).
     let worktree = at("worktree");
-    assert!(menu.read_with(cx, |m, _| m.refusal(worktree)).is_some());
+    assert!(menu.read_with(cx, |m, _| m.refusal(worktree)).is_none());
     // Escape closes it.
     press(cx, window, "escape");
     assert!(ws.read_with(cx, |ws, _| ws.ref_menu().is_none()));

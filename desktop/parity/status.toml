@@ -80,6 +80,30 @@ id = "git_prefix.fetch_all"
 status = "done"
 
 [[action]]
+id = "git_prefix.lfs_checkout"
+status = "done"
+
+[[action]]
+id = "git_prefix.lfs_fetch_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.lfs_menu"
+status = "done"
+
+[[action]]
+id = "git_prefix.lfs_prune"
+status = "done"
+
+[[action]]
+id = "git_prefix.lfs_pull"
+status = "done"
+
+[[action]]
+id = "git_prefix.lfs_push_all"
+status = "done"
+
+[[action]]
 id = "git_prefix.new_branch"
 status = "done"
 
@@ -195,6 +219,10 @@ id = "log.compare_swap"
 status = "done"
 
 [[action]]
+id = "log.lfs_only"
+status = "done"
+
+[[action]]
 id = "log_columns.fit_all"
 status = "done"
 
@@ -234,6 +262,10 @@ note = "Opens the keybindings view."
 
 [[action]]
 id = "palette.abort_operation"
+status = "done"
+
+[[action]]
+id = "palette.add_remote"
 status = "done"
 
 [[action]]
@@ -294,6 +326,10 @@ id = "palette.copy_ref_field_target_sha"
 status = "done"
 
 [[action]]
+id = "palette.copy_remote_name"
+status = "done"
+
+[[action]]
 id = "palette.create_annotated_tag_at_selected_commit"
 status = "done"
 
@@ -303,6 +339,26 @@ status = "done"
 
 [[action]]
 id = "palette.create_tag_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_worktree_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_worktree_choose_branch"
+status = "done"
+
+[[action]]
+id = "palette.create_worktree_from_current_branch"
+status = "done"
+
+[[action]]
+id = "palette.create_worktree_from_selected_ref"
+status = "done"
+
+[[action]]
+id = "palette.create_worktree_menu"
 status = "done"
 
 [[action]]
@@ -338,6 +394,10 @@ id = "palette.drop_selected_ref_on_current"
 status = "done"
 
 [[action]]
+id = "palette.edit_remote"
+status = "done"
+
+[[action]]
 id = "palette.fast_forward_current_to_selected"
 status = "done"
 
@@ -346,7 +406,59 @@ id = "palette.fast_forward_selected_to_current"
 status = "done"
 
 [[action]]
+id = "palette.fetch_remote"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_copy_path"
+status = "done"
+
+[[action]]
 id = "palette.file_menu_discard"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_file_history"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_ignore_extension"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_ignore_file"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_open_in_default"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_open_in_editor"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_show_in_folder"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_stash_file"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_treat_extension_binary"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_treat_extension_text"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_treat_file_binary"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_treat_file_text"
 status = "done"
 
 [[action]]
@@ -391,6 +503,54 @@ status = "done"
 note = "Opens the keybindings view."
 
 [[action]]
+id = "palette.lfs_fetch"
+status = "done"
+
+[[action]]
+id = "palette.lfs_force_unlock_selected_file"
+status = "done"
+
+[[action]]
+id = "palette.lfs_initialize"
+status = "done"
+
+[[action]]
+id = "palette.lfs_lock_selected_file"
+status = "done"
+
+[[action]]
+id = "palette.lfs_open_install_page"
+status = "done"
+
+[[action]]
+id = "palette.lfs_push"
+status = "done"
+
+[[action]]
+id = "palette.lfs_show_locks"
+status = "done"
+
+[[action]]
+id = "palette.lfs_track_pattern"
+status = "done"
+
+[[action]]
+id = "palette.lfs_track_selected_extension"
+status = "done"
+
+[[action]]
+id = "palette.lfs_track_selected_file"
+status = "done"
+
+[[action]]
+id = "palette.lfs_unlock_selected_file"
+status = "done"
+
+[[action]]
+id = "palette.lfs_untrack_pattern"
+status = "done"
+
+[[action]]
 id = "palette.merge_selected_ref"
 status = "done"
 
@@ -399,11 +559,23 @@ id = "palette.next_hunk"
 status = "done"
 
 [[action]]
+id = "palette.open_worktree_in_tab"
+status = "done"
+
+[[action]]
 id = "palette.prev_hunk"
 status = "done"
 
 [[action]]
 id = "palette.push_selected_tag"
+status = "done"
+
+[[action]]
+id = "palette.remote_actions"
+status = "done"
+
+[[action]]
+id = "palette.remove_remote"
 status = "done"
 
 [[action]]
@@ -444,6 +616,22 @@ status = "done"
 
 [[action]]
 id = "palette.stash_drop"
+status = "done"
+
+[[action]]
+id = "palette.submodule_init_selected"
+status = "done"
+
+[[action]]
+id = "palette.submodule_open_selected"
+status = "done"
+
+[[action]]
+id = "palette.submodule_update_all"
+status = "done"
+
+[[action]]
+id = "palette.submodule_update_selected"
 status = "done"
 
 [[action]]
@@ -488,6 +676,18 @@ id = "palette.unstage_lines"
 status = "done"
 
 [[action]]
+id = "palette.worktree_open_in_selected"
+status = "done"
+
+[[action]]
+id = "palette.worktree_remove_selected"
+status = "done"
+
+[[action]]
+id = "refs.add_remote"
+status = "done"
+
+[[action]]
 id = "refs.clear_solo"
 status = "done"
 
@@ -497,6 +697,10 @@ status = "done"
 
 [[action]]
 id = "refs.expand_all"
+status = "done"
+
+[[action]]
+id = "refs.remotes"
 status = "done"
 
 [[action]]
@@ -537,6 +741,10 @@ status = "done"
 
 [[action]]
 id = "status.expand_below"
+status = "done"
+
+[[action]]
+id = "status.lfs_only"
 status = "done"
 
 [[action]]

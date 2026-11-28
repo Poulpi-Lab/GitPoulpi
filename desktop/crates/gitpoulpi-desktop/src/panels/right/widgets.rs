@@ -98,6 +98,7 @@ impl RightPanel {
                             let (glyph, class) = status_glyph(r.status);
                             let color: Hsla = [success, warning, danger, info][class as usize];
                             let me = me.clone();
+                            let me_menu = me.clone();
                             let is_selected = selected == Some(r.ix) && !r.folder && commit_list;
                             h_flex()
                                 .id((id, i))
@@ -149,8 +150,27 @@ impl RightPanel {
                                     )
                                 })
                                 .when(r.folder, |d| d.text_color(muted))
-                                .on_click(move |_, _, cx| {
-                                    if r.folder {
+                                .on_mouse_down(gpui_kit::MouseButton::Right, {
+                                    let (me, path, folder) = (me_menu, r.path.clone(), r.folder);
+                                    move |ev, _, cx| {
+                                        if folder {
+                                            return;
+                                        }
+                                        cx.stop_propagation();
+                                        let (path, at) = (path.clone(), ev.position);
+                                        let _ = me.update(cx, |this, cx| {
+                                            this.file_row_menu(
+                                                path,
+                                                crate::ref_target::FileSide::Commit,
+                                                at,
+                                                cx,
+                                            )
+                                        });
+                                    }
+                                })
+                                .on_click(move |ev, _, cx| {
+                                    let m = ev.modifiers();
+                                    if r.folder || m.shift || m.control || m.platform {
                                         return;
                                     }
                                     let _ = me.update(cx, |this, cx| match kind {

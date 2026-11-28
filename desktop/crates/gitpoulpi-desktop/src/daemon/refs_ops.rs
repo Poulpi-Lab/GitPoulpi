@@ -192,7 +192,7 @@ pub fn checkout_plan(target: &RefTarget, snap: &Snapshot) -> Plan {
                 }),
             }
         }
-        RefTarget::Stash(_) => Plan::Say(msg::input::SELECT_REF_REFS.get().to_string()),
+        _ => Plan::Say(msg::input::SELECT_REF_REFS.get().to_string()),
     }
 }
 

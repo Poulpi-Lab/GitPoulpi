@@ -5,12 +5,12 @@ Generated from the shared registry (`gitpoulpi_app::registry::parity_rows`, ever
 `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` from `desktop/` to rewrite it.
 The branch merges when `parity_is_complete` passes (see `desktop/parity/README.md`).
 
-**976 rows: 133 done, 8 terminal only, 835 to do.**
+**976 rows: 185 done, 8 terminal only, 783 to do.**
 
 | Kind | Rows | Done | Terminal only | To do |
 |---|---:|---:|---:|---:|
-| action | 375 | 70 | 0 | 305 |
-| palette command | 588 | 63 | 0 | 525 |
+| action | 375 | 80 | 0 | 295 |
+| palette command | 588 | 105 | 0 | 483 |
 | family | 13 | 0 | 8 | 5 |
 
 A palette command that is the only twin of a key action shares that action's row.
@@ -74,13 +74,13 @@ A palette command that is the only twin of a key action shares that action's row
 | `git_prefix.rebase_onto` | git_prefix | Rebase onto Selected Branch | r / Ctrl+G r | done |
 | `git_prefix.stash_pop` | git_prefix | Pop Stash | o / Ctrl+G o | done |
 | `git_prefix.delete_ref` | git_prefix | Delete Selected Ref or Drop Stash | d / Ctrl+G d | done |
-| `git_prefix.lfs_menu` | git_prefix | Open the LFS Menu | l | to do |
+| `git_prefix.lfs_menu` | git_prefix | Open the LFS Menu | l | done |
 | `git_prefix.flow_menu` | git_prefix | Open the Flow Menu | Shift+W | to do |
-| `git_prefix.lfs_fetch_all` | git_prefix | LFS: Fetch All Objects | Shift+F | to do |
-| `git_prefix.lfs_checkout` | git_prefix | LFS: Check Out All Files | Shift+K | to do |
-| `git_prefix.lfs_pull` | git_prefix | LFS: Pull Objects | Shift+L | to do |
-| `git_prefix.lfs_push_all` | git_prefix | LFS: Push All Objects | Shift+J | to do |
-| `git_prefix.lfs_prune` | git_prefix | LFS: Prune Local Objects | Shift+V | to do |
+| `git_prefix.lfs_fetch_all` | git_prefix | LFS: Fetch All Objects | Shift+F | done |
+| `git_prefix.lfs_checkout` | git_prefix | LFS: Check Out All Files | Shift+K | done |
+| `git_prefix.lfs_pull` | git_prefix | LFS: Pull Objects | Shift+L | done |
+| `git_prefix.lfs_push_all` | git_prefix | LFS: Push All Objects | Shift+J | done |
+| `git_prefix.lfs_prune` | git_prefix | LFS: Prune Local Objects | Shift+V | done |
 | `git_prefix.rewrite_workbench` | git_prefix | Open the History Rewrite Workbench | Shift+H | to do |
 | `nav_prefix.collapse_refs` | nav_prefix | Collapse or Restore Refs Pane | Shift+H / Ctrl+N H | done |
 | `nav_prefix.collapse_status` | nav_prefix | Collapse or Restore Status Pane | Shift+L / Ctrl+N L | done |
@@ -124,7 +124,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `refs.scroll_left` | refs | Scroll the Pane Left | Alt+Left | to do |
 | `refs.scroll_right` | refs | Scroll the Pane Right | Alt+Right | to do |
 | `log.toggle_file_mode` | log | Files: Path or Tree | m | to do |
-| `log.lfs_only` | log | Files: LFS Only | o | to do |
+| `log.lfs_only` | log | Files: LFS Only | o | done |
 | `log.view_all_files` | log | Files: View All Files | a | to do |
 | `log.compare_selection` | log | Compare the Selected Rows | v | done |
 | `log.compare_swap` | log | Swap the Comparison Ends | x | done |
@@ -156,7 +156,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `log_files.scroll_right` | log_files | Scroll the Pane Right | Alt+Right | to do |
 | `status.compose` | status | Focus the Commit Message | c | done |
 | `status.toggle_file_mode` | status | Files: Path or Tree | m | done |
-| `status.lfs_only` | status | Files: LFS Only | o | to do |
+| `status.lfs_only` | status | Files: LFS Only | o | done |
 | `status.view_all_files` | status | Files: View All Files | a | to do |
 | `status.amend` | status | Toggle Amend | Shift+A | done |
 | `status.skip_hooks` | status | Toggle Skip Hooks | Shift+H | done |
@@ -189,8 +189,8 @@ A palette command that is the only twin of a key action shares that action's row
 | `refs.hosting_filter` | refs | Pull Requests / Issues: Choose the Filter | v | to do |
 | `refs.hosting_edit` | refs | Pull Request: Edit on the Host | e | to do |
 | `refs.new_pull_request` | refs | Pull Requests: Create One | n | to do |
-| `refs.add_remote` | refs | Remotes: Add a Remote | + | to do |
-| `refs.remotes` | refs | Branch: Edit its Remotes | u | to do |
+| `refs.add_remote` | refs | Remotes: Add a Remote | + | done |
+| `refs.remotes` | refs | Branch: Edit its Remotes | u | done |
 | `diff.close` | diff | Close the Diff | q | done |
 | `diff.edit` | diff | Edit in Working Directory | e | to do |
 | `diff.lfs_raw` | diff | LFS: Card or Raw Pointer | r | to do |
@@ -435,21 +435,21 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.rename_selected_branch` | palette | Refs: Rename Selected Branch... |  | done |
 | `palette.fast_forward_selected_to_current` | palette | Refs: Fast-Forward Selected Branch to Current |  | done |
 | `palette.fast_forward_current_to_selected` | palette | Refs: Fast-Forward Current Branch to Selected |  | done |
-| `palette.create_worktree_from_selected_ref` | palette | Refs: Create Worktree from Selected Branch or Tag... |  | to do |
+| `palette.create_worktree_from_selected_ref` | palette | Refs: Create Worktree from Selected Branch or Tag... |  | done |
 | `palette.reflog_selected_branch` | palette | Refs: Reflog of the Selected Branch... |  | to do |
 | `palette.start_pull_request_from_selected_branch` | palette | Refs: Start a Pull Request from Selected Branch... |  | to do |
-| `palette.open_worktree_in_tab` | palette | Refs: Open Worktree in Tab |  | to do |
-| `palette.worktree_open_in_selected` | palette | Refs: Open Worktree In... |  | to do |
+| `palette.open_worktree_in_tab` | palette | Refs: Open Worktree in Tab |  | done |
+| `palette.worktree_open_in_selected` | palette | Refs: Open Worktree In... |  | done |
 | `palette.worktree_merge_selected` | palette | Refs: Merge Worktree Branch Into... |  | to do |
-| `palette.worktree_remove_selected` | palette | Refs: Remove Worktree... |  | to do |
-| `palette.create_worktree_menu` | palette | Refs: Create Worktree... | + | to do |
-| `palette.create_worktree_from_current_branch` | palette | Refs: Create Worktree from Current Branch |  | to do |
-| `palette.create_worktree_choose_branch` | palette | Refs: Create Worktree Choosing a Branch |  | to do |
-| `palette.submodule_update_selected` | palette | Refs: Submodule Update (Selected) |  | to do |
-| `palette.submodule_init_selected` | palette | Refs: Submodule Init (Selected) |  | to do |
-| `palette.submodule_open_selected` | palette | Refs: Submodule Open in Tab |  | to do |
-| `palette.submodule_update_all` | palette | Git: Update All Submodules |  | to do |
-| `palette.create_worktree_at_selected_commit` | palette | Git: Create Worktree at Selected Commit... |  | to do |
+| `palette.worktree_remove_selected` | palette | Refs: Remove Worktree... |  | done |
+| `palette.create_worktree_menu` | palette | Refs: Create Worktree... | + | done |
+| `palette.create_worktree_from_current_branch` | palette | Refs: Create Worktree from Current Branch |  | done |
+| `palette.create_worktree_choose_branch` | palette | Refs: Create Worktree Choosing a Branch |  | done |
+| `palette.submodule_update_selected` | palette | Refs: Submodule Update (Selected) |  | done |
+| `palette.submodule_init_selected` | palette | Refs: Submodule Init (Selected) |  | done |
+| `palette.submodule_open_selected` | palette | Refs: Submodule Open in Tab |  | done |
+| `palette.submodule_update_all` | palette | Git: Update All Submodules |  | done |
+| `palette.create_worktree_at_selected_commit` | palette | Git: Create Worktree at Selected Commit... |  | done |
 | `palette.create_patch_at_selected_commit` | palette | Git: Create Patch from Selected Commit... |  | to do |
 | `palette.create_patch_from_selected_commit_to_head` | palette | Git: Create Patch from Selected Commit to HEAD... |  | to do |
 | `palette.create_patch_from_wip` | palette | Git: Create Patch from Working Tree Changes... |  | to do |
@@ -482,19 +482,19 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.rewrite_rules_ai` | palette | Rewrite: Create Rules with AI... |  | to do |
 | `palette.rewrite_from_selected_commit` | palette | Rewrite: From the Selected Commit to HEAD... |  | to do |
 | `palette.rewrite_selected_commits` | palette | Rewrite: Selected Commits... |  | to do |
-| `palette.lfs_initialize` | palette | LFS: Initialize for This Repository |  | to do |
-| `palette.lfs_track_pattern` | palette | LFS: Track Pattern... |  | to do |
-| `palette.lfs_untrack_pattern` | palette | LFS: Untrack Pattern... |  | to do |
-| `palette.lfs_fetch` | palette | LFS: Fetch Objects |  | to do |
-| `palette.lfs_push` | palette | LFS: Push Objects |  | to do |
-| `palette.lfs_show_locks` | palette | LFS: Show Locks |  | to do |
-| `palette.lfs_open_install_page` | palette | LFS: Open Install Page |  | to do |
+| `palette.lfs_initialize` | palette | LFS: Initialize for This Repository |  | done |
+| `palette.lfs_track_pattern` | palette | LFS: Track Pattern... |  | done |
+| `palette.lfs_untrack_pattern` | palette | LFS: Untrack Pattern... |  | done |
+| `palette.lfs_fetch` | palette | LFS: Fetch Objects |  | done |
+| `palette.lfs_push` | palette | LFS: Push Objects |  | done |
+| `palette.lfs_show_locks` | palette | LFS: Show Locks |  | done |
+| `palette.lfs_open_install_page` | palette | LFS: Open Install Page |  | done |
 | `palette.lfs_toggle_raw_pointer` | palette | LFS: Toggle Raw Pointer in Diff | r | to do |
-| `palette.lfs_track_selected_file` | palette | LFS: Track Selected File |  | to do |
-| `palette.lfs_track_selected_extension` | palette | LFS: Track Selected File's Extension |  | to do |
-| `palette.lfs_lock_selected_file` | palette | LFS: Lock Selected File |  | to do |
-| `palette.lfs_unlock_selected_file` | palette | LFS: Unlock Selected File |  | to do |
-| `palette.lfs_force_unlock_selected_file` | palette | LFS: Force Unlock Selected File |  | to do |
+| `palette.lfs_track_selected_file` | palette | LFS: Track Selected File |  | done |
+| `palette.lfs_track_selected_extension` | palette | LFS: Track Selected File's Extension |  | done |
+| `palette.lfs_lock_selected_file` | palette | LFS: Lock Selected File |  | done |
+| `palette.lfs_unlock_selected_file` | palette | LFS: Unlock Selected File |  | done |
+| `palette.lfs_force_unlock_selected_file` | palette | LFS: Force Unlock Selected File |  | done |
 | `palette.delete_selected_remote_branch` | palette | Refs: Delete Selected Branch from Its Remote... |  | done |
 | `palette.delete_selected_branch_and_remote` | palette | Refs: Delete Selected Branch Locally and on Its Remote... |  | done |
 | `palette.copy_selected_branch_link` | palette | Refs: Copy Link to Selected Branch on Remote |  | to do |
@@ -517,20 +517,20 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.prev_ref_section` | palette | Refs: Previous Section | h | to do |
 | `palette.toggle_section_collapse` | palette | Refs: Expand or Collapse Active Section | Enter | done |
 | `palette.file_menu_discard` | palette | Working Changes: Discard Selected File... |  | done |
-| `palette.file_menu_ignore_file` | palette | Working Changes: Ignore Selected File |  | to do |
-| `palette.file_menu_ignore_extension` | palette | Working Changes: Ignore Selected File's Extension |  | to do |
-| `palette.file_menu_treat_file_binary` | palette | Working Changes: Treat Selected File as Binary... |  | to do |
-| `palette.file_menu_treat_file_text` | palette | Working Changes: Treat Selected File as Text... |  | to do |
-| `palette.file_menu_treat_extension_binary` | palette | Working Changes: Treat Selected File's Extension as Binary... |  | to do |
-| `palette.file_menu_treat_extension_text` | palette | Working Changes: Treat Selected File's Extension as Text... |  | to do |
-| `palette.file_menu_stash_file` | palette | Working Changes: Stash Selected File |  | to do |
-| `palette.file_menu_file_history` | palette | Working Changes: Selected File History |  | to do |
+| `palette.file_menu_ignore_file` | palette | Working Changes: Ignore Selected File |  | done |
+| `palette.file_menu_ignore_extension` | palette | Working Changes: Ignore Selected File's Extension |  | done |
+| `palette.file_menu_treat_file_binary` | palette | Working Changes: Treat Selected File as Binary... |  | done |
+| `palette.file_menu_treat_file_text` | palette | Working Changes: Treat Selected File as Text... |  | done |
+| `palette.file_menu_treat_extension_binary` | palette | Working Changes: Treat Selected File's Extension as Binary... |  | done |
+| `palette.file_menu_treat_extension_text` | palette | Working Changes: Treat Selected File's Extension as Text... |  | done |
+| `palette.file_menu_stash_file` | palette | Working Changes: Stash Selected File |  | done |
+| `palette.file_menu_file_history` | palette | Working Changes: Selected File History |  | done |
 | `palette.file_menu_file_blame` | palette | Working Changes: Selected File Blame |  | to do |
 | `palette.file_menu_external_diff` | palette | Working Changes: Open Selected File in External Diff Tool |  | to do |
-| `palette.file_menu_open_in_editor` | palette | Working Changes: Open Selected File in External Editor |  | to do |
-| `palette.file_menu_open_in_default` | palette | Working Changes: Open Selected File in Default Program |  | to do |
-| `palette.file_menu_show_in_folder` | palette | Working Changes: Show Selected File in Folder |  | to do |
-| `palette.file_menu_copy_path` | palette | Working Changes: Copy Selected File Path |  | to do |
+| `palette.file_menu_open_in_editor` | palette | Working Changes: Open Selected File in External Editor |  | done |
+| `palette.file_menu_open_in_default` | palette | Working Changes: Open Selected File in Default Program |  | done |
+| `palette.file_menu_show_in_folder` | palette | Working Changes: Show Selected File in Folder |  | done |
+| `palette.file_menu_copy_path` | palette | Working Changes: Copy Selected File Path |  | done |
 | `palette.file_menu_create_patch` | palette | Working Changes: Create Patch from Selected File... |  | to do |
 | `palette.file_menu_edit_file` | palette | Working Changes: Edit Selected File |  | to do |
 | `palette.file_menu_delete_file` | palette | Working Changes: Delete Selected File... |  | to do |
@@ -555,14 +555,14 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.retry_failed_pushes` | palette | Git: Retry Failed Pushes |  | to do |
 | `palette.force_push_with_lease` | palette | Git: Force Push (with lease)... |  | to do |
 | `palette.set_upstream` | palette | Git: Remotes of Branch... |  | done |
-| `palette.add_remote` | palette | Remote: Add Remote... |  | to do |
-| `palette.remove_remote` | palette | Remote: Remove Remote... |  | to do |
-| `palette.edit_remote` | palette | Remote: Edit Remote... |  | to do |
+| `palette.add_remote` | palette | Remote: Add Remote... |  | done |
+| `palette.remove_remote` | palette | Remote: Remove Remote... |  | done |
+| `palette.edit_remote` | palette | Remote: Edit Remote... |  | done |
 | `palette.set_default_remote` | palette | Remote: Set Default Remote... |  | to do |
-| `palette.copy_remote_name` | palette | Remote: Copy Remote Name |  | to do |
+| `palette.copy_remote_name` | palette | Remote: Copy Remote Name |  | done |
 | `palette.copy_remote_link` | palette | Remote: Copy Link to Remote |  | to do |
-| `palette.fetch_remote` | palette | Remote: Fetch Remote... |  | to do |
-| `palette.remote_actions` | palette | Remote: Actions for Selected Remote... | . | to do |
+| `palette.fetch_remote` | palette | Remote: Fetch Remote... |  | done |
+| `palette.remote_actions` | palette | Remote: Actions for Selected Remote... | . | done |
 | `palette.sparse_checkout` | palette | Repository: Sparse Checkout... |  | to do |
 | `palette.repo_auth_open` | palette | Repository: SSH & Credentials... |  | to do |
 | `palette.repo_auth_test` | palette | Repository: Test Connection |  | to do |

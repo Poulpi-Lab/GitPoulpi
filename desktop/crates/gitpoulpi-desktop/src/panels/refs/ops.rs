@@ -44,9 +44,34 @@ impl Render for DragPreview {
 /// Where the selected row was last drawn, in window coordinates.
 pub type RowBounds = Rc<RefCell<Option<Bounds<Pixels>>>>;
 
-/// The target a row stands for, `None` for a folder or a worktree.
+/// The command a section header's `+` runs: the REMOTE section adds a remote, WORKTREES opens its menu.
+pub fn plus_command(kind: Kind) -> Option<&'static str> {
+    match kind {
+        Kind::Remote => Some("refs.add_remote"),
+        Kind::Worktrees => Some("palette.create_worktree_menu"),
+        _ => None,
+    }
+}
+
+/// The target a row stands for, `None` for a plain folder.
 pub fn target_of(section: &Section, row: &Row) -> Option<RefTarget> {
     match (&row.kind, section.kind) {
+        (RowKind::Worktree, _) => row
+            .key
+            .strip_prefix("W:")
+            .map(|p| RefTarget::Worktree(p.to_string())),
+        (RowKind::Submodule, _) => row
+            .key
+            .strip_prefix("M:")
+            .map(|p| RefTarget::Submodule(p.to_string())),
+        (
+            RowKind::Folder {
+                path,
+                is_remote_root: true,
+                ..
+            },
+            _,
+        ) => Some(RefTarget::RemoteNode(path.clone())),
         (RowKind::Ref { full_name, .. }, kind) => {
             kind.ref_kind().map(|k| RefTarget::of_kind(k, full_name))
         }
@@ -63,6 +88,16 @@ impl RefsPanel {
     /// The refs and stashes as the panel shows them.
     pub fn snapshot(&self) -> Snapshot {
         Snapshot::new(self.refs.clone(), self.stashes.clone())
+    }
+
+    /// The linked and main worktrees as the panel lists them.
+    pub fn worktrees(&self) -> &[gitpoulpi_core::domain::Worktree] {
+        &self.worktrees
+    }
+
+    /// The submodules as the panel lists them.
+    pub fn submodules(&self) -> &[gitpoulpi_core::domain::Submodule] {
+        &self.submodules
     }
 
     /// The selected row as a target.
@@ -95,7 +130,7 @@ impl RefsPanel {
                 facts.tag_remote_only = place == Some(TagWhere::Remote);
                 facts.tag_differs = place == Some(TagWhere::Differs);
             }
-            None => {}
+            _ => {}
         }
         facts
     }

@@ -15,19 +15,6 @@ use gitpoulpi_i18n::msg;
 
 pub(crate) use gitpoulpi_link::undo_ui::*;
 
-pub(crate) fn avail(state: &JournalState, d: Direction, busy: bool) -> Avail {
-    if state.disabled {
-        return Avail::Off;
-    }
-    match side(state, d) {
-        _ if busy => Avail::Nothing,
-        (None, _) => Avail::Nothing,
-        (Some(_), Some(r)) if d == Direction::Undo && r.forgettable() => Avail::Stuck,
-        (Some(_), Some(_)) => Avail::Blocked,
-        (Some(_), None) => Avail::Ready,
-    }
-}
-
 /// What *Forget* asks the user to confirm for the latest undo entry.
 pub(crate) fn forget_prompt(state: &JournalState) -> Option<String> {
     let entry = state.undo.as_ref()?;

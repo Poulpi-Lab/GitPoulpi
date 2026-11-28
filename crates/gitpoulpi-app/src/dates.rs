@@ -132,7 +132,6 @@ pub struct DatePattern {
     with_day: bool,
 }
 
-
 fn date_text(english: bool, m: gitpoulpi_i18n::M) -> &'static str {
     if english {
         m.english()
@@ -223,8 +222,12 @@ impl DatePattern {
                 DatePiece::Month => write!(out, "{month}"),
                 DatePiece::Day2 => write!(out, "{day:02}"),
                 DatePiece::Day => write!(out, "{day}"),
-                DatePiece::WeekdayName => write!(out, "{}", date_text(english, weekday_name(weekday))),
-                DatePiece::WeekdayAbbr => write!(out, "{}", date_text(english, weekday_abbr(weekday))),
+                DatePiece::WeekdayName => {
+                    write!(out, "{}", date_text(english, weekday_name(weekday)))
+                }
+                DatePiece::WeekdayAbbr => {
+                    write!(out, "{}", date_text(english, weekday_abbr(weekday)))
+                }
                 DatePiece::Hour => write!(out, "{hour:02}"),
                 DatePiece::Minute => write!(out, "{minute:02}"),
                 DatePiece::Second => write!(out, "{second:02}"),
@@ -256,7 +259,6 @@ impl DatePattern {
         out
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -331,7 +333,9 @@ mod tests {
         let _g = gitpoulpi_i18n::override_lang(Lang::En);
         let p = DatePattern::parse("ddd");
         assert_eq!(p.render(0, false), "Thu");
-        let names: Vec<String> = (0..7).map(|d| p.render(4 * 86_400 + d * 86_400, false)).collect();
+        let names: Vec<String> = (0..7)
+            .map(|d| p.render(4 * 86_400 + d * 86_400, false))
+            .collect();
         assert_eq!(names, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
     }
 

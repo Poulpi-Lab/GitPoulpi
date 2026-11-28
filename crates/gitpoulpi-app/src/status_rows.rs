@@ -95,7 +95,7 @@ mod tests {
             path: path.into(),
             index,
             worktree,
-            renamed_from: None
+            renamed_from: None,
         }
     }
 
@@ -136,11 +136,7 @@ mod tests {
 
     #[test]
     fn the_status_follows_the_section() {
-        let e = entry(
-            "a.rs",
-            Some(FileStatus::Added),
-            Some(FileStatus::Modified),
-        );
+        let e = entry("a.rs", Some(FileStatus::Added), Some(FileStatus::Modified));
         assert_eq!(
             entry_status(&e, StatusSection::Staged),
             Some(FileStatus::Added)

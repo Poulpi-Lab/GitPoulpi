@@ -76,9 +76,7 @@ pub(crate) fn submit_commit(
                 *last_message = Some(error);
                 return;
             }
-            gitpoulpi_app::commit_form::CommitPlan::Commit { message, status } => {
-                (message, status)
-            }
+            gitpoulpi_app::commit_form::CommitPlan::Commit { message, status } => (message, status),
         };
     // An agent's proposed message the user is committing (unchanged or
     // edited): its record says so.

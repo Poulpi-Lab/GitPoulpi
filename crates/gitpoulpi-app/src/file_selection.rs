@@ -129,13 +129,7 @@ impl FileSelection {
     /// Ctrl+click / Space: flips row `at`. The row the cursor was on joins
     /// the selection the moment a second one is added, the way Ctrl+click
     /// extends what is already highlighted.
-    pub fn toggle(
-        &mut self,
-        list: FileList,
-        rows: &ListRows,
-        at: usize,
-        cursor: Option<usize>,
-    ) {
+    pub fn toggle(&mut self, list: FileList, rows: &ListRows, at: usize, cursor: Option<usize>) {
         let Some(row) = rows.rows.get(at) else {
             return;
         };

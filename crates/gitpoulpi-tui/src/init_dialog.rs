@@ -555,25 +555,7 @@ pub(crate) fn folder_name_error(name: &str) -> Option<String> {
     None
 }
 
-/// Why `name` is not a valid branch name, if it is not - the rules of
-/// `git check-ref-format --branch` a user can actually break by typing.
-pub(crate) fn branch_name_error(name: &str) -> Option<String> {
-    let bad = name.is_empty()
-        || name == "@"
-        || name.starts_with('-')
-        || name.starts_with('/')
-        || name.ends_with('/')
-        || name.ends_with('.')
-        || name.ends_with(".lock")
-        || name.contains("..")
-        || name.contains("//")
-        || name.contains("@{")
-        || name.split('/').any(|part| part.starts_with('.'))
-        || name
-            .chars()
-            .any(|c| c.is_whitespace() || c.is_control() || "~^:?*[\\".contains(c));
-    bad.then(|| msg::init::bad_branch(format!("{name:?}")))
-}
+pub(crate) use gitpoulpi_app::ref_rules::branch_name_error;
 
 #[cfg(test)]
 mod tests {

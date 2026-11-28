@@ -8,7 +8,9 @@
 //! confirmation, so the terminal UI and the desktop never disagree.
 
 use crate::refs_tree::RefRowKind;
-use gitpoulpi_core::domain::{CommitGraph, CommitNode, MergeFastForward, Oid, Ref, RefKind};
+use gitpoulpi_core::domain::{
+    CommitGraph, CommitNode, MergeFastForward, Oid, Ref, RefKind, Stash, StashId,
+};
 use gitpoulpi_i18n::msg::{menu_inline as inline, menu_ref};
 
 /// What a name box is naming.
@@ -340,6 +342,50 @@ pub fn ff_verdict(graph: &CommitGraph, moving: Oid, target: Oid) -> FfVerdict {
         (Some(false), Some(false)) => FfVerdict::Diverged,
         _ => FfVerdict::Unknown,
     }
+}
+
+/// The commit a ref created "here" points at: the checked-out branch's tip.
+/// `None` on a detached or unborn HEAD.
+pub fn head_oid(refs: &[Ref]) -> Option<Oid> {
+    refs.iter()
+        .find(|r| r.is_head && matches!(r.kind, RefKind::LocalBranch { .. }))
+        .map(|r| r.target)
+}
+
+/// Why `name` is not a valid branch name, if it is not - the rules of
+/// `git check-ref-format --branch` a user can actually break by typing.
+pub fn branch_name_error(name: &str) -> Option<String> {
+    let bad = name.is_empty()
+        || name == "@"
+        || name.starts_with('-')
+        || name.starts_with('/')
+        || name.ends_with('/')
+        || name.ends_with('.')
+        || name.ends_with(".lock")
+        || name.contains("..")
+        || name.contains("//")
+        || name.contains("@{")
+        || name.split('/').any(|part| part.starts_with('.'))
+        || name
+            .chars()
+            .any(|c| c.is_whitespace() || c.is_control() || "~^:?*[\\".contains(c));
+    bad.then(|| gitpoulpi_i18n::msg::init::bad_branch(format!("{name:?}")))
+}
+
+/// Which stash a "stash pop/apply/drop" command acts on: the one selected
+/// in the stash list (`selected` is its index) when the list has the focus,
+/// otherwise the most recent (`stash@{0}`).
+pub fn default_stash(stashes: &[Stash], selected: Option<usize>) -> Option<&Stash> {
+    selected
+        .and_then(|i| stashes.get(i))
+        .or_else(|| stashes.first())
+}
+
+/// The stash rows carry their stash id as the context menu's row identity
+/// (refs carry their name there instead), so acting on one means parsing it
+/// back.
+pub fn parse_stash_id(raw: &str) -> Option<StashId> {
+    raw.parse().ok().map(StashId)
 }
 
 #[cfg(test)]

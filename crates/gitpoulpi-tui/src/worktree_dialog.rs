@@ -49,32 +49,9 @@ use ratatui::style::Style;
 
 use crate::combo::{Combo, ComboOption, ComboOutcome};
 use crate::dialog_kit::{self, ButtonState, CheckState};
-use crate::init_dialog::branch_name_error;
 use crate::keymap::chord::Key;
 
-/// What a context menu or a palette command hands the dialog: where the
-/// worktree starts and how to word it.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct WorktreeSeed {
-    pub(crate) start: WorktreeStart,
-    /// What the dialog calls the start: `feature`, `origin/feature`,
-    /// `v1.0`, `a1b2c3d`.
-    pub(crate) label: String,
-    /// A branch name the caller wants for the worktree (a remote branch's
-    /// local name); empty = the dialog proposes `worktree-<id>`.
-    pub(crate) new_branch: String,
-    /// The start branch is already checked out in a worktree, so git
-    /// would refuse to check it out again: a new branch is required.
-    pub(crate) branch_busy: bool,
-}
-
-/// A local branch the Ref combobox offers, and whether it is checked out in
-/// a worktree already.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct BranchChoice {
-    pub(crate) name: String,
-    pub(crate) busy: bool,
-}
+pub(crate) use gitpoulpi_app::worktree_form::{BranchChoice, WorktreeSeed};
 
 /// The next dialog opens with the branch combobox open ("Choose a branch...").
 static PICK_REF: AtomicBool = AtomicBool::new(false);
@@ -170,31 +147,7 @@ pub(crate) struct WorktreeDialog {
     edit: crate::text_edit::FieldEditor<WtFocus>,
 }
 
-/// `name` made folder-safe: letters, digits, `-`, `_` and `.` stay, the rest
-/// becomes `-`.
-pub(crate) fn folder_safe(name: &str) -> String {
-    name.chars()
-        .map(|c| {
-            if c.is_alphanumeric() || "-_.".contains(c) {
-                c
-            } else {
-                '-'
-            }
-        })
-        .collect()
-}
-
-/// `<repo parent>/<repo name>-<label>`, the label made folder-safe: a
-/// sibling of the repository, named after what it holds.
-pub(crate) fn default_worktree_path(repo_root: &Path, label: &str) -> PathBuf {
-    let safe = folder_safe(label);
-    let name = repo_root
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "worktree".into());
-    let parent = repo_root.parent().unwrap_or(repo_root);
-    parent.join(format!("{name}-{safe}"))
-}
+pub(crate) use gitpoulpi_app::worktree_form::default_worktree_path;
 
 #[cfg(test)]
 thread_local! {
@@ -219,43 +172,7 @@ fn next_id() -> String {
     worktree_id(bytes)
 }
 
-/// The seed of "From the current branch": the checked-out branch cannot be
-/// checked out twice, so the dialog proposes a new branch on it (the
-/// dialog names it `worktree-<id>`); a detached HEAD starts a detached
-/// worktree there.
-pub(crate) fn seed_from_head(
-    refs: &[gitpoulpi_core::domain::Ref],
-    worktrees: &[gitpoulpi_core::domain::Worktree],
-) -> Option<WorktreeSeed> {
-    use gitpoulpi_core::domain::RefKind;
-    if let Some(head) = refs.iter().find(|r| r.is_head) {
-        if let RefKind::LocalBranch { name } = &head.kind {
-            return Some(WorktreeSeed {
-                start: WorktreeStart::Branch(name.clone()),
-                label: name.clone(),
-                new_branch: String::new(),
-                branch_busy: true,
-            });
-        }
-    }
-    // Detached: the main worktree's HEAD.
-    let _ = worktrees;
-    let oid = crate::refs_sidebar::head_oid(refs)?;
-    Some(WorktreeSeed {
-        start: WorktreeStart::Commit(oid),
-        label: short(oid),
-        new_branch: String::new(),
-        branch_busy: false,
-    })
-}
-
-/// The seed of "Choose a branch...": the dialog opens on its branch list.
-pub(crate) fn seed_to_choose(
-    refs: &[gitpoulpi_core::domain::Ref],
-    worktrees: &[gitpoulpi_core::domain::Worktree],
-) -> Option<WorktreeSeed> {
-    seed_from_head(refs, worktrees)
-}
+pub(crate) use gitpoulpi_app::worktree_form::{seed_from_head, seed_to_choose};
 
 /// The Ref combobox's value for a start.
 fn choice_value(start: &WorktreeStart) -> String {
@@ -565,70 +482,19 @@ impl WorktreeDialog {
         )
     }
 
-    /// The worktree Create would add, or why it cannot.
+    /// The worktree Create would add, or why it cannot (the rules live in
+    /// `gitpoulpi_app::worktree_form`).
     pub(crate) fn plan(&self) -> Result<(PathBuf, WorktreeAddOptions), String> {
-        let name = self.name.trim();
-        if name.is_empty() {
-            return Err(msg::worktree::NEED_NAME.get().into());
+        gitpoulpi_app::worktree_form::WorktreeFields {
+            name: &self.name,
+            path: &self.path,
+            branch: &self.branch,
+            start: &self.start,
+            seed: &self.seed,
+            start_busy: self.branch_busy,
+            branches: &self.branches,
         }
-        if name.contains(['/', '\\']) || name == "." || name == ".." {
-            return Err(msg::worktree::BAD_NAME.get().into());
-        }
-        let path = self.path.trim();
-        if path.is_empty() {
-            return Err(msg::worktree::CHOOSE_FOLDER.get().into());
-        }
-        let path = PathBuf::from(path);
-        if !path.is_absolute() {
-            return Err(msg::worktree::NOT_ABSOLUTE.get().into());
-        }
-        if path.is_file() {
-            return Err(msg::worktree::is_a_file(path.display()));
-        }
-        if std::fs::read_dir(&path).is_ok_and(|mut d| d.next().is_some()) {
-            return Err(msg::worktree::not_empty(path.display()));
-        }
-        let branch = self.branch.trim();
-        if branch.is_empty() {
-            if self.branch_busy {
-                let label = match &self.start {
-                    WorktreeStart::Branch(b) => b.clone(),
-                    WorktreeStart::Commit(_) => self.seed.label.clone(),
-                };
-                return Err(msg::worktree::already_checked_out(label));
-            }
-            return Ok((
-                path,
-                WorktreeAddOptions {
-                    start: self.start.clone(),
-                    new_branch: None,
-                },
-            ));
-        }
-        match self.branch_status(branch) {
-            // An existing branch another worktree has: git would refuse.
-            Some(true) => Err(msg::worktree::already_checked_out(branch)),
-            // An existing branch: checked out as it is, whatever the Ref.
-            Some(false) => Ok((
-                path,
-                WorktreeAddOptions {
-                    start: WorktreeStart::Branch(branch.to_string()),
-                    new_branch: None,
-                },
-            )),
-            None => {
-                if let Some(reason) = branch_name_error(branch) {
-                    return Err(reason);
-                }
-                Ok((
-                    path,
-                    WorktreeAddOptions {
-                        start: self.start.clone(),
-                        new_branch: Some(branch.to_string()),
-                    },
-                ))
-            }
-        }
+        .plan()
     }
 
     /// The parts `Tab` visits, in order.

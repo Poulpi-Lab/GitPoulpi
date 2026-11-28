@@ -850,20 +850,13 @@ pub(crate) fn target_stash(
     stash_state: &ListState,
 ) -> Option<gitpoulpi_core::domain::Stash> {
     let stashes = stashes.as_ref().ok()?;
-    if focus == Focus::Refs && active == SidebarSection::Stashes {
-        if let Some(selected) = stash_state.selected().and_then(|i| stashes.get(i)) {
-            return Some(selected.clone());
-        }
-    }
-    stashes.first().cloned()
+    let selected = (focus == Focus::Refs && active == SidebarSection::Stashes)
+        .then(|| stash_state.selected())
+        .flatten();
+    gitpoulpi_app::ref_rules::default_stash(stashes, selected).cloned()
 }
 
-/// The STASHES sidebar rows carry their stash id as the context menu's
-/// row identity (refs carry their name there instead), so acting on one
-/// means parsing it back.
-pub(crate) fn parse_stash_id(raw: &str) -> Option<gitpoulpi_core::domain::StashId> {
-    raw.parse().ok().map(gitpoulpi_core::domain::StashId)
-}
+pub(crate) use gitpoulpi_app::ref_rules::parse_stash_id;
 
 #[cfg(test)]
 mod tests;

@@ -206,7 +206,7 @@ backup = "Alt+B"
 ## シーケンスの実行
 
 シーケンスは、ステップの名前付きの一覧で、各ステップはパレットのコマンドです（すべてステージ、AI で commit メッセージを書く、commit、push など）。
-パレット（`シーケンス: <name>`）から、設定 > キーボードとマウスで割り当てたキー（`config.toml` の `[keybindings.sequence]`）で、
+パレット（`シーケンス: <name>`）から、設定 > キーボードとマウスで割り当てたキー（`tui.toml` の `[keybindings.sequence]`）で、
 またはコマンドライン（`gitpoulpi sequence run`）から実行します。
 
 実行中は、Log の上端のストリップに `<name> k/n`、ステップ、待っている内容が表示されます。実行はジョブパネルにも

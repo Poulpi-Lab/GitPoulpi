@@ -141,7 +141,9 @@ GitPoulpi はネットワーク通信に、お使いの `git` 自身の認証情
 
 **GitPoulpi が勝手に終了しました。** 終了はすべて記録されています。設定ディレクトリで `gitpoulpi-tui-exit.log`（クラッシュ後は `gitpoulpi-tui-panic.txt` も）を探してください（`gitpoulpi config path` が表示する設定ファイルはそこにあります）。それを Issue に添付してください。
 
-**設定はどこにありますか？** `gitpoulpi config path` で分かります。リポジトリごとの状態は、リポジトリ内の `.gitpoulpi/repo-state.toml` にあります。
+**設定はどこにありますか？** `gitpoulpi config path` は、同じフォルダーにある `config.toml`（共通の設定）と `tui.toml`（ターミナル UI のインターフェース設定：テーマ、レイアウト、列、ショートカットなど）を表示します。`gitpoulpi config get <key>` で、キーが 2つのうちどちらにあるかが分かります。リポジトリごとの状態は、リポジトリ内の `.gitpoulpi/repo-state.toml` にあります。[2つのファイル](config-reference.md#2つのファイルconfigtoml-と-tuitoml)を参照してください。
+
+**古い GitPoulpi に戻したら、インターフェース設定が変わってしまいました（または、新しいほうが古いほうで設定した内容を無視します）。** GitPoulpi はインターフェース設定を `tui.toml` に保存します。これは `config.toml` の内容のコピーとして作られ、`config.toml` から取り除かれることはありません。新しいバージョンの隣にインストールされた古い GitPoulpi は `tui.toml` を知らず、自分の完全な `config.toml` を読み書きし続けます。`tui.toml` が作られた後は、新しいほうはインターフェース設定をそこからだけ読み込むため、その後に古いバージョンで変更したテーマやレイアウトは反映されず、`tui.toml` にないキーは `config.toml` の古い値ではなく既定値になります。新しいバージョンを合わせるには、そちらで設定を変更してください（設定画面、または `gitpoulpi config set`）。インターフェース設定を `config.toml` からやり直すには、GitPoulpi を終了して `tui.toml` を削除します（次の起動時に、新しいコピーとして再び作られます）。
 
 **GitPoulpi はどこかにデータを送信しますか？** ユーザーが求めたことだけです。リモートへの git 操作、アカウントを接続した後のホスティングへのリクエスト、AI ボタンを押した後の AI へのリクエスト、そしてアバターをオンにした場合の、作成者のメールアドレスのハッシュの Gravatar への送信です。テレメトリはありません。[AI アシスタント](ai.md#プライバシー)を参照してください。
 

@@ -1,6 +1,8 @@
 //! Comparing what the Log's multi-select holds ("select two
 //! commits and the right panel shows the differences between them").
 //!
+//! (Shared by every frontend.)
+//!
 //! The comparison is a pure function of the selection (`log_multiselect`),
 //! the Log's rows and the graph; nothing is stored but whether the user
 //! swapped the two ends. [`resolve`] turns the selected rows into one
@@ -23,7 +25,11 @@ use gitpoulpi_core::domain::{CommitGraph, CommitNode, DiffTarget, Oid, Stash};
 use gitpoulpi_i18n::msg;
 
 use crate::log_multiselect::{LogSelection, RowKey};
-use crate::ui_kit::short_oid;
+
+/// The 7 hex characters git itself shows by default.
+fn short_oid(oid: Oid) -> String {
+    oid.to_hex()[..7].to_string()
+}
 
 /// One end of a comparison, as the Log row it came from.
 struct End {
@@ -37,14 +43,14 @@ struct End {
 
 /// Which end of the comparison a card is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum EndMark {
+pub enum EndMark {
     From,
     To,
 }
 
 /// What kind of Log row a card stands for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum CardKind {
+pub enum CardKind {
     Wip,
     Commit,
     Stash,
@@ -53,47 +59,47 @@ pub(crate) enum CardKind {
 /// One selected Log row as the comparison panel's card (each compared
 /// commit has its own zone): who, when, which sha, what.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Card {
+pub struct Card {
     /// The row's display index in the Log (the click target's destination).
-    pub(crate) row: usize,
-    pub(crate) kind: CardKind,
+    pub row: usize,
+    pub kind: CardKind,
     /// The commit (or stash commit); `None` for the WIP row.
-    pub(crate) id: Option<Oid>,
+    pub id: Option<Oid>,
     /// A commit's author, or a stash's `stash@{n}` handle.
-    pub(crate) author_name: String,
-    pub(crate) author_email: String,
-    pub(crate) timestamp: i64,
-    pub(crate) summary: String,
-    pub(crate) mark: Option<EndMark>,
+    pub author_name: String,
+    pub author_email: String,
+    pub timestamp: i64,
+    pub summary: String,
+    pub mark: Option<EndMark>,
 }
 
 /// What the right pane compares and how the center diff reads it.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct CompareSpec {
+pub struct CompareSpec {
     /// The key the changed files are published under (`CommitFilesOutcome::commit`).
-    pub(crate) id: Oid,
-    pub(crate) target: DiffTarget,
+    pub id: Oid,
+    pub target: DiffTarget,
     /// "from" and "to" ends, ready to show.
-    pub(crate) from_label: String,
-    pub(crate) to_label: String,
+    pub from_label: String,
+    pub to_label: String,
     /// How many Log rows are selected.
-    pub(crate) rows: usize,
+    pub rows: usize,
     /// Whether the two ends can trade places (two rows, no WIP).
-    pub(crate) can_swap: bool,
-    pub(crate) swapped: bool,
+    pub can_swap: bool,
+    pub swapped: bool,
     /// Every selected row in Log order (newest first), one per card.
-    pub(crate) cards: Vec<Card>,
+    pub cards: Vec<Card>,
 }
 
 impl CompareSpec {
     /// The comparison reads the working tree, so its file list goes stale
     /// whenever a file is saved and must be asked again on a refresh.
-    pub(crate) fn reads_worktree(&self) -> bool {
+    pub fn reads_worktree(&self) -> bool {
         matches!(self.target, DiffTarget::CommitVsWorkingTree(_))
     }
 
     /// Lines for the message block: both ends, and for a range what it means.
-    pub(crate) fn lines(&self) -> Vec<String> {
+    pub fn lines(&self) -> Vec<String> {
         let mut lines = vec![
             msg::compare::from_line(&self.from_label),
             msg::compare::to_line(&self.to_label),
@@ -106,7 +112,7 @@ impl CompareSpec {
 
     /// The pseudo-commit the right pane's detail code is handed in place of
     /// a selected commit: only its `id` matters to the file list.
-    pub(crate) fn node(&self) -> CommitNode {
+    pub fn node(&self) -> CommitNode {
         CommitNode {
             id: self.id,
             parents: Vec::new(),
@@ -222,7 +228,7 @@ fn card(
 }
 
 /// How long ago `ts` was at `now`, in the app's relative wording.
-pub(crate) fn relative_age(now: i64, ts: i64) -> String {
+pub fn relative_age(now: i64, ts: i64) -> String {
     use msg::reltime as r;
     let secs = (now - ts).max(0);
     let n = |d: i64| d as u64;
@@ -239,7 +245,7 @@ pub(crate) fn relative_age(now: i64, ts: i64) -> String {
 
 /// The comparison the selection stands for, if it holds two rows or more
 /// that the Log can still name.
-pub(crate) fn resolve(
+pub fn resolve(
     selection: &LogSelection,
     display: &[Option<RowKey>],
     log_result: &gitpoulpi_core::Result<CommitGraph>,
@@ -332,7 +338,23 @@ pub(crate) fn resolve(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_support::*;
+
+    fn oid(n: u8) -> Oid {
+        Oid([n; 20])
+    }
+
+    fn commit(id: u8, parents: &[u8]) -> CommitNode {
+        CommitNode {
+            id: oid(id),
+            parents: parents.iter().map(|&p| oid(p)).collect(),
+            summary: format!("commit {id}"),
+            message: format!("commit {id}"),
+            author_name: "a".into(),
+            author_email: "a@example.com".into(),
+            timestamp: 0,
+            refs: Vec::new(),
+        }
+    }
 
     fn graph() -> gitpoulpi_core::Result<CommitGraph> {
         Ok(CommitGraph {

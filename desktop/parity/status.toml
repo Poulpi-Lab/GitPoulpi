@@ -8,7 +8,19 @@
 # See README.md.
 
 [[action]]
+id = "composer.commit"
+status = "done"
+
+[[action]]
 id = "diff.close"
+status = "done"
+
+[[action]]
+id = "diff.discard_hunk"
+status = "done"
+
+[[action]]
+id = "diff.discard_lines"
 status = "done"
 
 [[action]]
@@ -17,6 +29,18 @@ status = "done"
 
 [[action]]
 id = "diff.prev_hunk"
+status = "done"
+
+[[action]]
+id = "diff.select_lines"
+status = "done"
+
+[[action]]
+id = "diff.stage_hunk"
+status = "done"
+
+[[action]]
+id = "diff.stage_lines"
 status = "done"
 
 [[action]]
@@ -32,6 +56,18 @@ id = "diff.toggle_wrap"
 status = "done"
 
 [[action]]
+id = "git_prefix.commit_now"
+status = "done"
+
+[[action]]
+id = "git_prefix.compose_commit"
+status = "done"
+
+[[action]]
+id = "git_prefix.discard_all"
+status = "done"
+
+[[action]]
 id = "git_prefix.fetch_all"
 status = "done"
 
@@ -41,6 +77,18 @@ status = "done"
 
 [[action]]
 id = "git_prefix.push"
+status = "done"
+
+[[action]]
+id = "git_prefix.stage_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.stage_file"
+status = "done"
+
+[[action]]
+id = "git_prefix.unstage_file"
 status = "done"
 
 [[action]]
@@ -142,6 +190,30 @@ id = "palette.diff_mode_split"
 status = "done"
 
 [[action]]
+id = "palette.discard_hunk"
+status = "done"
+
+[[action]]
+id = "palette.discard_lines"
+status = "done"
+
+[[action]]
+id = "palette.file_menu_discard"
+status = "done"
+
+[[action]]
+id = "palette.files_clear_selection"
+status = "done"
+
+[[action]]
+id = "palette.files_select_all"
+status = "done"
+
+[[action]]
+id = "palette.files_toggle_selection"
+status = "done"
+
+[[action]]
 id = "palette.focus_log"
 status = "done"
 
@@ -158,6 +230,14 @@ id = "palette.focus_status"
 status = "done"
 
 [[action]]
+id = "palette.focus_status_section_staged"
+status = "done"
+
+[[action]]
+id = "palette.focus_status_section_unstaged"
+status = "done"
+
+[[action]]
 id = "palette.keybindings"
 status = "done"
 note = "Opens the keybindings view."
@@ -168,6 +248,18 @@ status = "done"
 
 [[action]]
 id = "palette.prev_hunk"
+status = "done"
+
+[[action]]
+id = "palette.select_lines"
+status = "done"
+
+[[action]]
+id = "palette.stage_hunk"
+status = "done"
+
+[[action]]
+id = "palette.stage_lines"
 status = "done"
 
 [[action]]
@@ -204,6 +296,14 @@ id = "palette.toggle_word_wrap"
 status = "done"
 
 [[action]]
+id = "palette.unstage_hunk"
+status = "done"
+
+[[action]]
+id = "palette.unstage_lines"
+status = "done"
+
+[[action]]
 id = "refs.clear_solo"
 status = "done"
 
@@ -221,4 +321,48 @@ status = "done"
 
 [[action]]
 id = "refs.solo"
+status = "done"
+
+[[action]]
+id = "status.amend"
+status = "done"
+
+[[action]]
+id = "status.collapse_all"
+status = "done"
+
+[[action]]
+id = "status.collapse_all_folders"
+status = "done"
+
+[[action]]
+id = "status.collapse_below"
+status = "done"
+
+[[action]]
+id = "status.compose"
+status = "done"
+
+[[action]]
+id = "status.expand_all"
+status = "done"
+
+[[action]]
+id = "status.expand_below"
+status = "done"
+
+[[action]]
+id = "status.open_diff"
+status = "done"
+
+[[action]]
+id = "status.skip_hooks"
+status = "done"
+
+[[action]]
+id = "status.stage_toggle"
+status = "done"
+
+[[action]]
+id = "status.toggle_file_mode"
 status = "done"

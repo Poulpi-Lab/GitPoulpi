@@ -8,6 +8,8 @@
 //! | `app`     | startup, the main window, chrome (title bar, tabs, toolbar, status line), palette, actions |
 //! | `daemon`  | the link to the session daemon (`gitpoulpi-link`): typed reads, the link host, Fetch/Pull/Push/Undo/Redo, the Log's page fetching (paging itself is `gitpoulpi_app::graph::LazyLog`) |
 //! | `panels`  | Refs sidebar, Log, right pane, diff view |
+//! | `dialogs` | question dialogs (a title, lines, numbered answers): the discard confirmation, the sensitive-files question |
+//! | `sensitive` | the sensitive-files question a refused stage raises |
 //! | `commands`| the shared command registry in use: key bindings, command palette, the one dispatcher |
 //! | `menu`    | the menu bar generated from the registry |
 //! | `help`    | the keybindings view |
@@ -24,6 +26,7 @@ pub mod app;
 pub mod cli;
 pub mod commands;
 pub mod daemon;
+pub mod dialogs;
 pub mod fonts;
 pub mod graph;
 pub mod help;
@@ -31,6 +34,7 @@ pub mod menu;
 pub mod panels;
 pub mod parity;
 pub mod prefs;
+pub mod sensitive;
 pub mod strings;
 pub mod theme;
 pub mod util;

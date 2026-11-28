@@ -13,6 +13,8 @@ pub struct FileRow {
     /// Tree mode: nesting depth.
     pub depth: usize,
     pub folder: bool,
+    /// The old name of a moved file (the row stands for both names).
+    pub renamed_from: Option<String>,
     /// Index into the diff set (commit mode) or status list (working mode); `usize::MAX` for folders.
     pub ix: usize,
 }
@@ -26,6 +28,7 @@ impl FileRow {
             dels,
             depth: 0,
             folder: false,
+            renamed_from: None,
             ix,
         }
     }
@@ -44,6 +47,8 @@ impl FileRow {
             } else {
                 name
             }
+        } else if let Some(old) = &self.renamed_from {
+            format!("{} <- {old}", self.path)
         } else {
             self.path.clone()
         }
@@ -96,6 +101,7 @@ pub fn tree_rows(rows: Vec<FileRow>) -> Vec<FileRow> {
                     dels: 0,
                     depth,
                     folder: true,
+                    renamed_from: None,
                     ix: usize::MAX,
                 });
             }

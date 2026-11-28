@@ -8,6 +8,7 @@ use gpui_kit::{App, Focusable as _, Window};
 use super::catalog::{command_for_id, Command};
 use super::keys;
 use super::ops::{op_for, Op};
+use super::staging;
 use super::{palette, status};
 use crate::app::{workspace_of, Workspace};
 use crate::strings;
@@ -178,6 +179,17 @@ pub fn execute(op: Op, window: &mut Window, cx: &mut App) {
         }),
         Op::DiffStepHunk { forward } => with_workspace(window, cx, move |ws, _, cx| {
             ws.diff.update(cx, |d, cx| d.step_hunk(forward, cx))
+        }),
+        Op::Status(op) => with_workspace(window, cx, move |ws, window, cx| {
+            ws.right
+                .update(cx, |r, cx| staging::run_status(r, op, window, cx))
+        }),
+        Op::DiffPart(op) => with_workspace(window, cx, move |ws, _, cx| {
+            if !ws.diff_is_open() {
+                let why = gitpoulpi_i18n::msg::palette::WHY_THE_DIFF_VIEW_ISN_T_OPEN.get();
+                return ws.say(why, cx);
+            }
+            ws.diff.update(cx, |d, cx| staging::run_part(d, op, cx))
         }),
     }
 }

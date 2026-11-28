@@ -5,12 +5,12 @@ Generated from the shared registry (`gitpoulpi_app::registry::parity_rows`, ever
 `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` from `desktop/` to rewrite it.
 The branch merges when `parity_is_complete` passes (see `desktop/parity/README.md`).
 
-**976 rows: 50 done, 8 terminal only, 918 to do.**
+**976 rows: 86 done, 8 terminal only, 882 to do.**
 
 | Kind | Rows | Done | Terminal only | To do |
 |---|---:|---:|---:|---:|
-| action | 375 | 31 | 0 | 344 |
-| palette command | 588 | 19 | 0 | 569 |
+| action | 375 | 54 | 0 | 321 |
+| palette command | 588 | 32 | 0 | 556 |
 | family | 13 | 0 | 8 | 5 |
 
 A palette command that is the only twin of a key action shares that action's row.
@@ -46,16 +46,16 @@ A palette command that is the only twin of a key action shares that action's row
 | `global.commit_column` | global | Show or Hide the Commit Column | Alt+C | to do |
 | `global.undo_offer` | global | Restore the Branch to Where the Blocked Action Left It | Alt+Shift+Z | to do |
 | `global.context_menu` | global | Context Menu | . / Menu / Shift+F10 | to do |
-| `git_prefix.compose_commit` | git_prefix | Compose Commit Message | c / Ctrl+G c | to do |
-| `git_prefix.commit_now` | git_prefix | Commit Staged Changes Now | Enter / Ctrl+G Enter | to do |
+| `git_prefix.compose_commit` | git_prefix | Compose Commit Message | c / Ctrl+G c | done |
+| `git_prefix.commit_now` | git_prefix | Commit Staged Changes Now | Enter / Ctrl+G Enter | done |
 | `git_prefix.ai_compose` | git_prefix | AI: Split Changes into Commits | Shift+C | to do |
 | `git_prefix.ai_explain` | git_prefix | AI: Explain Changes | w | to do |
 | `git_prefix.stash_message` | git_prefix | Stash with Message | m / Ctrl+G m | to do |
 | `git_prefix.ai_commit_message` | git_prefix | AI: Write Commit Message | i | to do |
-| `git_prefix.stage_all` | git_prefix | Stage All Changes | a / Ctrl+G a | to do |
-| `git_prefix.discard_all` | git_prefix | Discard All Changes | x / Ctrl+G x | to do |
-| `git_prefix.stage_file` | git_prefix | Stage Selected File | s / Ctrl+G s | to do |
-| `git_prefix.unstage_file` | git_prefix | Unstage Selected File | u / Ctrl+G u | to do |
+| `git_prefix.stage_all` | git_prefix | Stage All Changes | a / Ctrl+G a | done |
+| `git_prefix.discard_all` | git_prefix | Discard All Changes | x / Ctrl+G x | done |
+| `git_prefix.stage_file` | git_prefix | Stage Selected File | s / Ctrl+G s | done |
+| `git_prefix.unstage_file` | git_prefix | Unstage Selected File | u / Ctrl+G u | done |
 | `git_prefix.pull` | git_prefix | Pull | p / Ctrl+G p | done |
 | `git_prefix.pull_all_branches` | git_prefix | Pull All Branches | Ctrl+P / Ctrl+G Ctrl+P | to do |
 | `git_prefix.push` | git_prefix | Push | Shift+P / Ctrl+G P | done |
@@ -154,19 +154,19 @@ A palette command that is the only twin of a key action shares that action's row
 | `log_files.collapse_below` | log_files | Collapse the Folder and Its Subfolders | _ / Shift+Left | to do |
 | `log_files.scroll_left` | log_files | Scroll the Pane Left | Alt+Left | to do |
 | `log_files.scroll_right` | log_files | Scroll the Pane Right | Alt+Right | to do |
-| `status.compose` | status | Focus the Commit Message | c | to do |
-| `status.toggle_file_mode` | status | Files: Path or Tree | m | to do |
+| `status.compose` | status | Focus the Commit Message | c | done |
+| `status.toggle_file_mode` | status | Files: Path or Tree | m | done |
 | `status.lfs_only` | status | Files: LFS Only | o | to do |
 | `status.view_all_files` | status | Files: View All Files | a | to do |
-| `status.amend` | status | Toggle Amend | Shift+A | to do |
-| `status.skip_hooks` | status | Toggle Skip Hooks | Shift+H | to do |
-| `status.collapse_all` | status | Collapse or Expand All Folders | z | to do |
-| `status.stage_toggle` | status | Stage or Unstage the Selected Row | Ctrl+Space | to do |
-| `status.open_diff` | status | Open the Selected File's Diff | d | to do |
-| `status.expand_all` | status | Expand All Folders | = | to do |
-| `status.collapse_all_folders` | status | Collapse All Folders | - | to do |
-| `status.expand_below` | status | Expand the Folder and Its Subfolders | * / Shift+Right | to do |
-| `status.collapse_below` | status | Collapse the Folder and Its Subfolders | _ / Shift+Left | to do |
+| `status.amend` | status | Toggle Amend | Shift+A | done |
+| `status.skip_hooks` | status | Toggle Skip Hooks | Shift+H | done |
+| `status.collapse_all` | status | Collapse or Expand All Folders | z | done |
+| `status.stage_toggle` | status | Stage or Unstage the Selected Row | Ctrl+Space | done |
+| `status.open_diff` | status | Open the Selected File's Diff | d | done |
+| `status.expand_all` | status | Expand All Folders | = | done |
+| `status.collapse_all_folders` | status | Collapse All Folders | - | done |
+| `status.expand_below` | status | Expand the Folder and Its Subfolders | * / Shift+Right | done |
+| `status.collapse_below` | status | Collapse the Folder and Its Subfolders | _ / Shift+Left | done |
 | `status.scroll_left` | status | Scroll the Pane Left | Alt+Left | to do |
 | `status.scroll_right` | status | Scroll the Pane Right | Alt+Right | to do |
 | `home.favorite` | home | Star or Unstar the Repository | f / * | to do |
@@ -195,11 +195,11 @@ A palette command that is the only twin of a key action shares that action's row
 | `diff.edit` | diff | Edit in Working Directory | e | to do |
 | `diff.lfs_raw` | diff | LFS: Card or Raw Pointer | r | to do |
 | `diff.copy` | diff | Copy the Selection or Line | y / Ctrl+C | to do |
-| `diff.stage_hunk` | diff | Stage or Unstage the Hunk | Space | to do |
-| `diff.stage_lines` | diff | Stage or Unstage the Selected Lines | Enter | to do |
-| `diff.discard_hunk` | diff | Discard the Hunk | x | to do |
-| `diff.discard_lines` | diff | Discard the Selected Lines | Shift+X | to do |
-| `diff.select_lines` | diff | Start or Drop a Line Selection | v | to do |
+| `diff.stage_hunk` | diff | Stage or Unstage the Hunk | Space | done |
+| `diff.stage_lines` | diff | Stage or Unstage the Selected Lines | Enter | done |
+| `diff.discard_hunk` | diff | Discard the Hunk | x | done |
+| `diff.discard_lines` | diff | Discard the Selected Lines | Shift+X | done |
+| `diff.select_lines` | diff | Start or Drop a Line Selection | v | done |
 | `diff.next_hunk` | diff | Next Hunk | n | done |
 | `diff.prev_hunk` | diff | Previous Hunk | p | done |
 | `diff.toggle_layout` | diff | Layout: Unified or Side by Side | m | done |
@@ -359,7 +359,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `rewrite.ai_rules` | rewrite | Create Rewrite Rules with AI | Alt+I | to do |
 | `reword.apply` | reword | Apply the New Message | Ctrl+Enter / Ctrl+S | to do |
 | `reword.deeper` | reword | Modify History Deeper | Alt+H | to do |
-| `composer.commit` | composer | Commit from the Composer | Ctrl+Enter / Alt+Enter | to do |
+| `composer.commit` | composer | Commit from the Composer | Ctrl+Enter / Alt+Enter | done |
 | `composer.insert_issue_ref` | composer | Insert an Issue Reference | Alt+R | to do |
 | `md_editor.preview` | md_editor | Markdown Editor: Toggle Write and Preview | Alt+P | to do |
 | `md_editor.split` | md_editor | Markdown Editor: Toggle the Split View | Alt+L | to do |
@@ -414,8 +414,8 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.toggle_sidebar_section_pull_requests` | palette | Left pane: Show/Hide Pull requests |  | to do |
 | `palette.toggle_sidebar_section_issues` | palette | Left pane: Show/Hide Issues |  | to do |
 | `palette.toggle_sidebar_section_submodules` | palette | Left pane: Show/Hide Submodules |  | to do |
-| `palette.focus_status_section_unstaged` | palette | Navigation: Focus Status > Unstaged | Ctrl+N <badge> | to do |
-| `palette.focus_status_section_staged` | palette | Navigation: Focus Status > Staged | Ctrl+N <badge> | to do |
+| `palette.focus_status_section_unstaged` | palette | Navigation: Focus Status > Unstaged | Ctrl+N <badge> | done |
+| `palette.focus_status_section_staged` | palette | Navigation: Focus Status > Staged | Ctrl+N <badge> | done |
 | `palette.cycle_focus` | palette | Navigation: Cycle Focus to Next Pane | Tab | to do |
 | `palette.cycle_focus_back` | palette | Navigation: Cycle Focus to Previous Pane | Shift+Tab | to do |
 | `palette.clear_author_filter` | palette | Log: Clear Author Filter |  | to do |
@@ -516,7 +516,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.next_ref_section` | palette | Refs: Next Section | l | to do |
 | `palette.prev_ref_section` | palette | Refs: Previous Section | h | to do |
 | `palette.toggle_section_collapse` | palette | Refs: Expand or Collapse Active Section | Enter | done |
-| `palette.file_menu_discard` | palette | Working Changes: Discard Selected File... |  | to do |
+| `palette.file_menu_discard` | palette | Working Changes: Discard Selected File... |  | done |
 | `palette.file_menu_ignore_file` | palette | Working Changes: Ignore Selected File |  | to do |
 | `palette.file_menu_ignore_extension` | palette | Working Changes: Ignore Selected File's Extension |  | to do |
 | `palette.file_menu_treat_file_binary` | palette | Working Changes: Treat Selected File as Binary... |  | to do |
@@ -854,13 +854,13 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.close_diff` | palette | Diff: Close Diff View | Esc | done |
 | `palette.next_hunk` | palette | Diff: Next Hunk | n | done |
 | `palette.prev_hunk` | palette | Diff: Previous Hunk | p | done |
-| `palette.stage_hunk` | palette | Diff: Stage Hunk Under Cursor | Space | to do |
-| `palette.unstage_hunk` | palette | Diff: Unstage Hunk Under Cursor | Space | to do |
-| `palette.select_lines` | palette | Diff: Select Lines (or clear the selection) | v | to do |
-| `palette.stage_lines` | palette | Diff: Stage Selected Lines | Enter | to do |
-| `palette.unstage_lines` | palette | Diff: Unstage Selected Lines | Enter | to do |
-| `palette.discard_hunk` | palette | Diff: Discard Hunk Under Cursor... | x | to do |
-| `palette.discard_lines` | palette | Diff: Discard Selected Lines... | X | to do |
+| `palette.stage_hunk` | palette | Diff: Stage Hunk Under Cursor | Space | done |
+| `palette.unstage_hunk` | palette | Diff: Unstage Hunk Under Cursor | Space | done |
+| `palette.select_lines` | palette | Diff: Select Lines (or clear the selection) | v | done |
+| `palette.stage_lines` | palette | Diff: Stage Selected Lines | Enter | done |
+| `palette.unstage_lines` | palette | Diff: Unstage Selected Lines | Enter | done |
+| `palette.discard_hunk` | palette | Diff: Discard Hunk Under Cursor... | x | done |
+| `palette.discard_lines` | palette | Diff: Discard Selected Lines... | X | done |
 | `palette.copy_selected_text` | palette | Copy: Selected Text (drag over the text first) | Ctrl+C | to do |
 | `palette.copy_line` | palette | Copy: Line Under the Cursor (or the selected lines) | y | to do |
 | `palette.copy_hunk` | palette | Diff: Copy Hunk Under the Cursor |  | to do |
@@ -868,9 +868,9 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.diff_mode_split` | palette | Diff: Layout Split (before and after) | m | done |
 | `palette.toggle_diff_hunks_only` | palette | Diff: Toggle Hunks Only (whole file / only the changes) | H | to do |
 | `palette.files_open_menu` | palette | Files: Open Menu of the Row or Selection | . | to do |
-| `palette.files_select_all` | palette | Files: Select All |  | to do |
-| `palette.files_clear_selection` | palette | Files: Clear Selection |  | to do |
-| `palette.files_toggle_selection` | palette | Files: Toggle Selection of the Current Row |  | to do |
+| `palette.files_select_all` | palette | Files: Select All |  | done |
+| `palette.files_clear_selection` | palette | Files: Clear Selection |  | done |
+| `palette.files_toggle_selection` | palette | Files: Toggle Selection of the Current Row |  | done |
 | `palette.toggle_word_wrap` | palette | Diff: Toggle Word Wrap | w | done |
 | `palette.diff_choose_encoding` | palette | Diff: Choose Encoding... | C | to do |
 | `palette.toggle_minimap` | palette | View: Toggle Minimap | M | to do |

@@ -1,16 +1,29 @@
 //! The right pane: it follows the Log's selection. A commit shows **Commit details** (hash, author,
 //! parent, date, change counts, message) above the **Changed files** list with its controls; the WIP
 //! row shows the working changes (Unstaged / Staged Files) over the commit form.
+//!
+//! | Module     | Role |
+//! |------------|------|
+//! | `status`   | the working-tree lists and their selection as plain data |
+//! | `stage`    | stage, unstage, discard and the selection gestures (each one submitted action = one undo entry) |
+//! | `wip`      | the working-changes view: the two lists with their buttons, drag and drop |
+//! | `composer` | the commit form: rules, commit, amend, skip hooks, the template |
+//! | `commit`   | the selected commit's details and files |
 
 mod commit;
+mod composer;
 mod files;
+mod stage;
+mod status;
 mod widgets;
 mod wip;
 
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{CommitNode, FileDiff, Oid, StatusEntry};
 use gitpoulpi_i18n::msg;
+use gitpoulpi_link::commit_settings::CommitSettings;
 use gpui_kit::component::input::{InputEvent, InputState, TextareaState};
 use gpui_kit::{
     div, px, App, AppContext as _, Context, Entity, EventEmitter, FocusHandle, Focusable,
@@ -18,18 +31,25 @@ use gpui_kit::{
     Task, UniformListScrollHandle, Window,
 };
 
-use super::log::Selection;
+pub use stage::DraggedFiles;
+
+use super::diff::DiffSource;
+use super::log::Selection as LogSelection;
 use crate::daemon::Shared;
 use crate::strings;
 use crate::theme::Skin;
 use files::{count_lines, tree_rows, FileRow};
+use status::Selection;
 
 pub enum RightEvent {
     /// Open file `ix` of this diff set in the centre pane.
     Open {
         files: Arc<Vec<FileDiff>>,
         ix: usize,
+        source: DiffSource,
     },
+    /// A line for the status line (why a command did nothing, what it started).
+    Say(String),
 }
 
 enum Mode {
@@ -55,6 +75,15 @@ pub struct RightPanel {
     summary_len: usize,
     amend: bool,
     skip_hooks: bool,
+    /// The repository's commit settings and the identity the commit is made as.
+    settings: CommitSettings,
+    author: Option<String>,
+    template_applied: bool,
+    /// The commit that was sent and has not been answered yet.
+    commit_ticket: Option<gitpoulpi_link::Ticket>,
+    selection: Selection,
+    /// Folders folded in Tree mode.
+    collapsed: HashSet<String>,
     selected: Option<usize>,
     scroll: UniformListScrollHandle,
     scroll_staged: UniformListScrollHandle,
@@ -82,12 +111,37 @@ impl RightPanel {
                     this.rebuild_rows(cx);
                 }
             }),
-            cx.subscribe(&summary, |this, s, ev: &InputEvent, cx| {
-                if matches!(ev, InputEvent::Change) {
-                    this.summary_len = s.read(cx).value().chars().count();
-                    cx.notify();
-                }
-            }),
+            cx.subscribe_in(
+                &summary,
+                window,
+                |this, s, ev: &InputEvent, window, cx| match ev {
+                    InputEvent::Change => {
+                        this.summary_len = s.read(cx).value().chars().count();
+                        cx.notify();
+                    }
+                    // Enter in the summary moves on to the description; Ctrl+Enter commits.
+                    InputEvent::PressEnter { secondary, .. } => {
+                        if *secondary {
+                            this.commit(window, cx);
+                        } else {
+                            this.description.read(cx).focus_handle(cx).focus(window, cx);
+                        }
+                    }
+                    _ => {}
+                },
+            ),
+            cx.subscribe_in(
+                &description,
+                window,
+                |this, _, ev: &InputEvent, window, cx| {
+                    if let InputEvent::PressEnter {
+                        secondary: true, ..
+                    } = ev
+                    {
+                        this.commit(window, cx);
+                    }
+                },
+            ),
         ];
         Self {
             backend,
@@ -105,6 +159,12 @@ impl RightPanel {
             summary_len: 0,
             amend: false,
             skip_hooks: false,
+            settings: CommitSettings::default(),
+            author: None,
+            template_applied: false,
+            commit_ticket: None,
+            selection: Selection::default(),
+            collapsed: HashSet::new(),
             selected: None,
             scroll: UniformListScrollHandle::new(),
             scroll_staged: UniformListScrollHandle::new(),
@@ -119,18 +179,28 @@ impl RightPanel {
         self.branch = branch.unwrap_or_default();
     }
 
+    /// Whether the working changes are what the pane shows.
+    pub fn shows_working_changes(&self) -> bool {
+        matches!(self.mode, Mode::Wip)
+    }
+
+    fn say(&mut self, text: impl Into<String>, cx: &mut Context<Self>) {
+        cx.emit(RightEvent::Say(text.into()));
+    }
+
     /// Shows what the Log's selection stands for.
-    pub fn show(&mut self, sel: Selection, status: &[StatusEntry], cx: &mut Context<Self>) {
-        self.status = status.to_vec();
+    pub fn show(&mut self, sel: LogSelection, status: &[StatusEntry], cx: &mut Context<Self>) {
+        self.set_status(status);
         self.selected = None;
         match sel {
-            Selection::Wip => {
+            LogSelection::Wip => {
                 self.mode = Mode::Wip;
                 self.files = Arc::default();
                 self.rebuild_rows(cx);
+                self.load_commit_context(cx);
             }
-            Selection::Commit(node) => self.load_commit(node.id, Mode::Commit(node, None), cx),
-            Selection::Stash(st) => {
+            LogSelection::Commit(node) => self.load_commit(node.id, Mode::Commit(node, None), cx),
+            LogSelection::Stash(st) => {
                 if let Some(c) = st.commit {
                     let stand_in = CommitNode {
                         id: c,
@@ -154,10 +224,24 @@ impl RightPanel {
     }
 
     pub fn update_status(&mut self, status: &[StatusEntry], cx: &mut Context<Self>) {
-        self.status = status.to_vec();
+        self.set_status(status);
         if matches!(self.mode, Mode::Wip) {
             self.rebuild_rows(cx);
         }
+        self.settle(cx);
+    }
+
+    /// Takes a fresh working tree: the selection drops what left its list, and the link learns which
+    /// files are one rename.
+    fn set_status(&mut self, status: &[StatusEntry]) {
+        self.status = status.to_vec();
+        self.backend.set_rename_pairs(&self.status);
+        let status = &self.status;
+        self.selection.retain(|section, path| {
+            status::section_paths(status, section)
+                .iter()
+                .any(|p| p == path)
+        });
     }
 
     fn load_commit(&mut self, oid: Oid, mode: Mode, cx: &mut Context<Self>) {
@@ -209,12 +293,19 @@ impl RightPanel {
         cx.emit(RightEvent::Open {
             files: self.files.clone(),
             ix,
+            source: DiffSource::Commit,
         });
         cx.notify();
     }
 
+    /// Opens the diff of a working-tree file: the unstaged half or the staged one.
     fn open_working(&mut self, path: String, staged: bool, cx: &mut Context<Self>) {
         let fut = self.backend.working_diff(staged);
+        let source = if staged {
+            DiffSource::Staged
+        } else {
+            DiffSource::Unstaged
+        };
         cx.spawn(async move |this, cx| {
             let files = fut.await.unwrap_or_default();
             let ix = files
@@ -225,6 +316,7 @@ impl RightPanel {
                 cx.emit(RightEvent::Open {
                     files: Arc::new(files),
                     ix,
+                    source,
                 })
             });
         })
@@ -239,11 +331,11 @@ impl Focusable for RightPanel {
 }
 
 impl Render for RightPanel {
-    fn render(&mut self, _w: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let skin = cx.global::<Skin>().clone();
         let body = match &self.mode {
             Mode::Empty => div().into_any_element(),
-            Mode::Wip => self.wip_view(&skin, cx).into_any_element(),
+            Mode::Wip => self.wip_view(window, &skin, cx).into_any_element(),
             Mode::Commit(node, stash) => {
                 let (node, stash) = (node.clone(), stash.clone());
                 self.commit_view(&node, &stash, &skin, cx)
@@ -251,10 +343,13 @@ impl Render for RightPanel {
             }
         };
         div()
+            .id("right-pane")
             .size_full()
             .p(px(6.0))
             .bg(skin.side_bg)
+            .key_context("GpStatusPane")
             .track_focus(&self.focus)
+            .on_key_down(cx.listener(|this, ev, window, cx| this.key_down(ev, window, cx)))
             .child(body)
     }
 }

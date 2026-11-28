@@ -10,6 +10,7 @@
 mod history;
 pub mod host;
 mod queries;
+pub mod staging;
 pub mod transfer;
 
 use std::future::Future;

@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use gitpoulpi_app::keymap::Ctx;
+use gitpoulpi_app::palette::vocab::status_pane::StatusSection;
 use gpui_kit::component::{
     resizable::{h_resizable, resizable_panel, ResizablePanelEvent, ResizableState},
     v_flex,
@@ -15,12 +16,14 @@ use gpui_kit::{
     Task, Window,
 };
 
+mod stage;
+
 use super::actions::WorkspaceHandle;
 use super::live::{LiveState, Notice};
 use crate::commands::context::WindowState;
 use crate::daemon::Shared;
 use crate::menu::MenuBar;
-use crate::panels::diff::{DiffPane, DiffPaneEvent};
+use crate::panels::diff::{DiffPane, DiffPaneEvent, DiffSource};
 use crate::panels::log::{LogEvent, LogPanel, Selection, Summary};
 use crate::panels::refs::{RefsEvent, RefsPanel};
 use crate::panels::right::{RightEvent, RightPanel};
@@ -48,7 +51,7 @@ pub struct Workspace {
     pub refs: Entity<RefsPanel>,
     pub log: Entity<LogPanel>,
     pub right: Entity<RightPanel>,
-    pub(crate) diff: Entity<DiffPane>,
+    pub diff: Entity<DiffPane>,
     center: Center,
     show_left: bool,
     show_right: bool,
@@ -92,10 +95,15 @@ impl Workspace {
                 &right,
                 window,
                 |this, _, ev: &RightEvent, window, cx| match ev {
-                    RightEvent::Open { files, ix } => {
-                        this.diff.update(cx, |d, cx| d.show(files.clone(), *ix, cx));
+                    RightEvent::Open { files, ix, source } => {
+                        this.diff
+                            .update(cx, |d, cx| d.show(files.clone(), *ix, *source, cx));
                         this.center = Center::Diff;
                         this.diff.read(cx).focus_handle(cx).focus(window, cx);
+                        cx.notify();
+                    }
+                    RightEvent::Say(text) => {
+                        this.notice = Some(Notice::info(text.clone()));
                         cx.notify();
                     }
                 },
@@ -105,6 +113,11 @@ impl Workspace {
                 window,
                 |this, _, ev: &DiffPaneEvent, window, cx| match ev {
                     DiffPaneEvent::Close => this.close_diff(window, cx),
+                    DiffPaneEvent::Part(req) => this.on_part(req.clone(), window, cx),
+                    DiffPaneEvent::Say(text) => {
+                        this.notice = Some(Notice::info(text.clone()));
+                        cx.notify();
+                    }
                 },
             ),
             cx.subscribe(&panes, |this, _, _: &ResizablePanelEvent, cx| {
@@ -193,6 +206,17 @@ impl Workspace {
         self.log.read(cx).focus_handle(cx).focus(window, cx);
     }
 
+    /// The open diff replaces the Log in the centre.
+    pub fn diff_is_open(&self) -> bool {
+        self.center == Center::Diff
+    }
+
+    /// Puts a line in the status line.
+    pub(crate) fn say(&mut self, text: impl Into<String>, cx: &mut Context<Self>) {
+        self.notice = Some(Notice::info(text));
+        cx.notify();
+    }
+
     /// The menu bar.
     pub fn menu_bar(&self) -> &Entity<MenuBar> {
         &self.menu_bar
@@ -201,7 +225,10 @@ impl Workspace {
     /// What the command layer needs to know: the pane with the keyboard and a few facts for the palette.
     pub(crate) fn command_state(&self, window: &Window, cx: &App) -> WindowState {
         let has = |handle: gpui_kit::FocusHandle| handle.contains_focused(window, cx);
-        let pane = if has(self.refs.read(cx).focus_handle(cx)) {
+        let right = self.right.read(cx);
+        let pane = if right.composer_focused(window, cx) {
+            Ctx::Composer
+        } else if has(self.refs.read(cx).focus_handle(cx)) {
             Ctx::Refs
         } else if has(self.log.read(cx).focus_handle(cx)) {
             Ctx::Log
@@ -212,9 +239,17 @@ impl Workspace {
         } else {
             Ctx::Global
         };
+        let right = self.right.read(cx);
+        let source = self.diff.read(cx).source();
+        let diff_open = self.center == Center::Diff;
         WindowState {
             pane,
-            diff_open: self.center == Center::Diff,
+            unstaged_selected: right.selected_in(StatusSection::Unstaged),
+            staged_selected: right.selected_in(StatusSection::Staged),
+            has_conflicts: right.conflict_count() > 0,
+            stageable_diff: diff_open && source.is_working(),
+            diff_stages: diff_open && source == DiffSource::Unstaged,
+            diff_open,
             selected_commit: self.selected_commit,
             has_wip: self.summary.as_ref().is_some_and(|s| !s.status.is_empty()),
             undo: self.undo_avail(Direction::Undo),

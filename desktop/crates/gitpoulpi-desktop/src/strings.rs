@@ -32,13 +32,6 @@ pub const PUSH_NO_REMOTE: &str = "Nothing to push to: the repository has no remo
 pub const PUSH_CHOOSE_REMOTE: &str =
     "This branch has no upstream and the repository has several remotes: push it once from the terminal UI or the CLI to choose";
 
-/// The staging guard found files that look like secrets and the desktop has no dialog for it yet.
-pub fn sensitive_stage(files: usize) -> String {
-    format!(
-        "Not staged: {files} file(s) look like secrets. Stage them from the terminal UI or the CLI to confirm"
-    )
-}
-
 /// Status line after an action finished: `title` is the button's label.
 pub fn finished(title: &str) -> String {
     format!("{title}: done")

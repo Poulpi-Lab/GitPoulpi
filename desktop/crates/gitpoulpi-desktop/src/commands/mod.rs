@@ -12,6 +12,7 @@
 //! | `context`  | the palette's availability context and the key context of the focused pane |
 //! | `picker`   | the searchable list dialog (command palette, theme / language pickers) |
 //! | `palette`  | the command palette: shared entries, shortcuts, fuzzy matching, reasons |
+//! | `staging`  | running the staging and commit ops on the working-changes pane and the diff |
 //! | `status`   | the one-line message shown in the status line |
 
 pub mod catalog;
@@ -21,8 +22,9 @@ pub mod keys;
 pub mod ops;
 pub mod palette;
 pub mod picker;
+pub mod staging;
 pub mod status;
 
 pub use catalog::Command;
 pub use exec::{run, run_id, Outcome};
-pub use ops::{implemented_ids, op_for, Op};
+pub use ops::{implemented_ids, op_for, DiffPartOp, Op, StatusOp};

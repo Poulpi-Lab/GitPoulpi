@@ -159,82 +159,9 @@ use gitpoulpi_config::GraphRowTintStrength;
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::Span;
 
-/// Which of its four edges a part draws a stroke out to.
-///
-/// This is *topology*, not ink: a [`NodeKind::Commit`] circle declares `up`
-/// and `down` because the lane runs through it, even though the circle's
-/// own outline stops short of the cell edge. What the declaration buys is
-/// the mutual-connection invariant - whatever is in the cell above must
-/// itself reach down, so the stroke arrives at the node's doorstep rather
-/// than stopping a cell short, which is the defect that kept recurring.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Hash)]
-pub(crate) struct Sides {
-    pub up: bool,
-    pub down: bool,
-    pub left: bool,
-    pub right: bool,
-}
-
-// The named side-sets and `TreePart::sides` are the *definition* of the
-// connectivity invariant. Only the tests read them, so they would otherwise
-// read as dead in a release build.
-impl Sides {
-    pub(crate) const NONE: Sides = Sides {
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-    };
-    pub(crate) const VERTICAL: Sides = Sides {
-        up: true,
-        down: true,
-        left: false,
-        right: false,
-    };
-    pub(crate) const HORIZONTAL: Sides = Sides {
-        up: false,
-        down: false,
-        left: true,
-        right: true,
-    };
-    pub(crate) const ALL: Sides = Sides {
-        up: true,
-        down: true,
-        left: true,
-        right: true,
-    };
-
-    pub(crate) const fn new(up: bool, down: bool, left: bool, right: bool) -> Sides {
-        Sides {
-            up,
-            down,
-            left,
-            right,
-        }
-    }
-}
-
-/// The three commit markers, and nothing else. Adding a fourth means
-/// adding a glyph to every [`NodeSet`], which is the point: the sets stay
-/// in step because the match is exhaustive.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum NodeKind {
-    /// An ordinary commit: hollow circle.
-    Commit,
-    /// A commit a branch, tag or HEAD points at: filled circle.
-    Ref,
-    /// A merge commit: double circle.
-    Merge,
-    /// The working tree's uncommitted changes - the WIP row. Not a
-    /// commit, so it gets the one outline that is not solid: `◌` in text,
-    /// a dashed ring in pixels.
-    Wip,
-    /// A stash, on a lane of its own beside the commit it was made on:
-    /// A little box. `□` in text, a drawn box in pixels.
-    /// Solid - a stash is recorded, not pending; only its
-    /// connector down to the base is dashed.
-    Stash,
-}
+// The topology vocabulary is frontend-neutral and lives in `gitpoulpi-app`;
+// this file is the terminal's reading of it (glyphs, colours, spans).
+pub(crate) use gitpoulpi_app::graph::{ColorRef, NodeKind, Sides, TreePart};
 
 /// Which marker family the graph draws commits with. Only the circles exist
 /// today; the type stays so [`super::GraphSettings`] has one place to choose it.
@@ -256,50 +183,6 @@ pub enum LaneBackground {
     Off,
     /// Each commit row is tinted ([`row_tint_bg`]), from its node to the Graph column's right edge.
     RowTint,
-}
-
-/// One distinct visual piece a Graph cell can hold.
-///
-/// Exhaustive on purpose. If a layout decision cannot be expressed as one
-/// of these, the right move is to add a variant here - with its glyph and
-/// its [`Sides`] - not to push a string from the layout code.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum TreePart {
-    /// Nothing here.
-    Empty,
-    /// A lane running straight down through a row that is not its own
-    /// commit: `│`.
-    Vertical,
-    /// A horizontal run crossing a column that holds no live lane: `─`.
-    Horizontal,
-    /// A horizontal run crossing a column that *does* hold a live lane:
-    /// `┼`. Both strokes are drawn whole. Deliberately a glyph no
-    /// node kind uses - a crossing that looked like a node would claim
-    /// a commit sits on the crossed lane.
-    Crossing,
-    /// A commit. `sides` is the topology this particular commit has: which
-    /// way its lane continues, and whether it has a transition running out
-    /// of it to the left or the right.
-    Node { kind: NodeKind, sides: Sides },
-    /// A lane branching off *to the left* of the node it leaves: `╭`. The
-    /// run arrives from the right, the new lane continues down.
-    BranchOutLeft,
-    /// A lane branching off to the right: `╮`.
-    BranchOutRight,
-    /// A lane converging *from the left* into the node it joins: `╰`. The
-    /// lane arrived from above, the run leaves to the right.
-    MergeInLeft,
-    /// A lane converging from the right: `╯`.
-    MergeInRight,
-    /// [`TreePart::BranchOutLeft`]/[`TreePart::BranchOutRight`] with a
-    /// *third* arm, because another run on the same row passes straight
-    /// over this column: `┬`. An elbow inks only the half of its cell its
-    /// own two arms reach, so a run crossing it would come out cut in two.
-    /// Unicode has no rounded `┬`, which is why corners lose their curve in
-    /// exactly this case and nowhere else.
-    BranchOutCrossed,
-    /// The mirror: a converging elbow another run passes over, `┴`.
-    MergeInCrossed,
 }
 
 /// Box Drawing, U+2500..U+257F. Mandatory for a terminal font - Cascadia
@@ -396,73 +279,16 @@ pub(crate) fn row_tint_mix(strength: GraphRowTintStrength) -> f64 {
 /// How much more of the lane a row tint takes on a light theme.
 const LIGHT_TINT_BOOST: f64 = 2.0;
 
-impl TreePart {
-    /// Every variant, with representative `sides` for the node cases. The
-    /// width / code-point / connectivity guards iterate this, so a new
-    /// variant that is not listed here fails `every_tree_part_is_listed`.
-    #[cfg(test)]
-    pub(crate) const ALL: [TreePart; 16] = [
-        TreePart::Empty,
-        TreePart::Vertical,
-        TreePart::Horizontal,
-        TreePart::Crossing,
-        TreePart::Node {
-            kind: NodeKind::Commit,
-            sides: Sides::VERTICAL,
-        },
-        TreePart::Node {
-            kind: NodeKind::Ref,
-            sides: Sides::VERTICAL,
-        },
-        TreePart::Node {
-            kind: NodeKind::Merge,
-            sides: Sides::ALL,
-        },
-        TreePart::Node {
-            kind: NodeKind::Commit,
-            sides: Sides::NONE,
-        },
-        TreePart::Node {
-            kind: NodeKind::Wip,
-            sides: Sides::new(false, true, false, false),
-        },
-        TreePart::Node {
-            kind: NodeKind::Stash,
-            sides: Sides::new(false, true, false, false),
-        },
-        TreePart::BranchOutLeft,
-        TreePart::BranchOutRight,
-        TreePart::MergeInLeft,
-        TreePart::MergeInRight,
-        TreePart::BranchOutCrossed,
-        TreePart::MergeInCrossed,
-    ];
-
-    /// The edges this part draws a stroke out to. The whole connectivity
-    /// invariant rests on this function, so it is a plain exhaustive match
-    /// with no defaulting.
-    pub(crate) const fn sides(self) -> Sides {
-        match self {
-            TreePart::Empty => Sides::NONE,
-            TreePart::Vertical => Sides::VERTICAL,
-            TreePart::Horizontal => Sides::HORIZONTAL,
-            TreePart::Crossing => Sides::ALL,
-            TreePart::Node { sides, .. } => sides,
-            // down + right: the new lane continues down, the run reaches
-            // back across to the node on its right.
-            TreePart::BranchOutLeft => Sides::new(false, true, false, true),
-            TreePart::BranchOutRight => Sides::new(false, true, true, false),
-            TreePart::MergeInLeft => Sides::new(true, false, false, true),
-            TreePart::MergeInRight => Sides::new(true, false, true, false),
-            TreePart::BranchOutCrossed => Sides::new(false, true, true, true),
-            TreePart::MergeInCrossed => Sides::new(true, false, true, true),
-        }
-    }
-
+/// The terminal's spelling of a [`TreePart`].
+pub(crate) trait TreePartGlyph {
     /// The characters this part paints, under `set`. Exactly one cell wide
     /// and exactly one code point for every variant - pinned by
     /// `every_tree_part_is_one_cell_and_one_code_point`.
-    pub(crate) const fn glyph(self, set: NodeSet) -> &'static str {
+    fn glyph(self, set: NodeSet) -> &'static str;
+}
+
+impl TreePartGlyph for TreePart {
+    fn glyph(self, set: NodeSet) -> &'static str {
         match self {
             TreePart::Empty => " ",
             TreePart::Vertical => LANE,
@@ -485,28 +311,20 @@ impl TreePart {
     }
 }
 
-/// A part plus the lane color it carries. This is what a graph row is
-/// made of.
+/// A part plus the terminal colour of its lane: [`gitpoulpi_app::graph::TreeCell`]
+/// with the [`ColorRef`] resolved against the palette in force.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct TreeCell {
     pub part: TreePart,
     pub color: Color,
-    /// Bold is used for two things and only two: a transition (a corner or
-    /// its horizontal run), so a branch leaving or joining is legible at
-    /// 7 px, and a node whose commit carries a ref or is a merge.
+    /// See [`gitpoulpi_app::graph::TreeCell::bold`].
     pub bold: bool,
-    /// Which of this cell's strokes are **pending** rather than history,
-    /// drawn dashed instead of solid. Two connectors set it: the WIP row's
-    /// down to HEAD (the WIP node's `down`, every lane cell it passes
-    /// through, HEAD's own `up`), and each stash's down to its base (the
-    /// stash node's `down`, its lane cells, the elbow and the run into the
-    /// base, and the base's arm on that side). Always a subset
-    /// of [`TreePart::sides`] - it changes the ink, never the topology,
-    /// so the connectivity invariant does not see it.
+    /// See [`gitpoulpi_app::graph::TreeCell::dashed`].
     pub dashed: Sides,
 }
 
 impl TreeCell {
+    #[cfg(test)]
     pub(crate) fn new(part: TreePart, color: Color) -> TreeCell {
         TreeCell {
             part,
@@ -516,12 +334,8 @@ impl TreeCell {
         }
     }
 
-    pub(crate) fn bold(mut self) -> TreeCell {
-        self.bold = true;
-        self
-    }
-
-    /// The same cell with `sides` drawn dashed. See [`TreeCell::dashed`].
+    /// The same cell with `sides` drawn dashed.
+    #[cfg(test)]
     pub(crate) fn with_dashed(mut self, sides: Sides) -> TreeCell {
         self.dashed = sides;
         self
@@ -536,22 +350,24 @@ impl TreeCell {
         }
     }
 
-    /// Whether this cell is pending work *as a whole* - the WIP marker,
-    /// or a cell that only carries a dashed connector (a lane, a run, a
-    /// stash connector's elbow) - and so is drawn dimmed. HEAD's node has
-    /// a dashed `up` too, but it is a real commit and keeps its full
-    /// color; a stash's box is recorded work and is not dimmed either.
-    pub(crate) fn is_pending(self) -> bool {
-        match self.part {
-            TreePart::Node { kind, .. } => matches!(kind, NodeKind::Wip),
-            TreePart::Vertical => self.dashed.up || self.dashed.down,
-            TreePart::Horizontal => self.dashed.left || self.dashed.right,
-            TreePart::BranchOutLeft
-            | TreePart::BranchOutRight
-            | TreePart::MergeInLeft
-            | TreePart::MergeInRight => self.dashed.up || self.dashed.down,
-            _ => false,
+    /// The neutral cell with its colour resolved by `color_of`.
+    pub(crate) fn resolve(
+        cell: gitpoulpi_app::graph::TreeCell,
+        color_of: impl Fn(ColorRef) -> Color,
+    ) -> TreeCell {
+        TreeCell {
+            part: cell.part,
+            color: color_of(cell.color),
+            bold: cell.bold,
+            dashed: cell.dashed,
         }
+    }
+
+    /// [`gitpoulpi_app::graph::TreeCell::is_pending`], for the terminal cell.
+    pub(crate) fn is_pending(self) -> bool {
+        let mut neutral = gitpoulpi_app::graph::TreeCell::new(self.part, ColorRef::None);
+        neutral.dashed = self.dashed;
+        neutral.is_pending()
     }
 
     /// The single place a `TreePart` becomes something a terminal draws.

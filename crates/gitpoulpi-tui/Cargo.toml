@@ -125,6 +125,8 @@ gitpoulpi-update.workspace = true
 # uses -- `gitpoulpi-config` does not carry that table yet).
 toml.workspace = true
 gitpoulpi-session.workspace = true
+# The frontend-neutral graph model (lanes, stash rows, lazy paging) shared with the desktop UI.
+gitpoulpi-app.workspace = true
 crossterm.workspace = true
 ratatui.workspace = true
 tokio.workspace = true

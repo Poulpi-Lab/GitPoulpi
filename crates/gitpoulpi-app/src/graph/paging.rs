@@ -52,19 +52,19 @@ use std::collections::HashSet;
 
 use gitpoulpi_core::domain::{CommitNode, Oid};
 
-use super::LogLoadSettings;
+use super::load::LogLoadSettings;
 
 /// How many rows below the view the fetch is triggered at: three
 /// screenfuls, and never fewer than 200 rows, so wheel/scrollbar-drag
 /// users rarely reach the end while a page is still in flight.
-pub(crate) fn lookahead_rows(visible_rows: usize) -> usize {
+pub fn lookahead_rows(visible_rows: usize) -> usize {
     (visible_rows.max(1) * 3).max(200)
 }
 
 /// One page to fetch: hand it straight to
 /// `DaemonLink::request_log_page`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct LogPageRequest {
+pub struct LogPageRequest {
     /// How many commits of the walk to drop, i.e. how many are already held.
     /// `LogOptions::skip`.
     pub skip: usize,
@@ -74,7 +74,7 @@ pub(crate) struct LogPageRequest {
 
 /// The lazy loader's whole state. One per Log.
 #[derive(Debug, Clone)]
-pub(crate) struct LazyLog {
+pub struct LazyLog {
     settings: LogLoadSettings,
     /// Commits currently held by the client, i.e. the next page's `skip`.
     loaded: usize,
@@ -87,7 +87,7 @@ pub(crate) struct LazyLog {
 }
 
 impl LazyLog {
-    pub(crate) fn new(settings: LogLoadSettings) -> LazyLog {
+    pub fn new(settings: LogLoadSettings) -> LazyLog {
         LazyLog {
             settings,
             loaded: 0,
@@ -101,8 +101,7 @@ impl LazyLog {
     /// everything the client shows in one contiguous walk instead of
     /// truncating back to the initial page under a user who scrolled into
     /// page three.
-    #[cfg(test)]
-    pub(crate) fn refresh_depth(&self) -> usize {
+    pub fn refresh_depth(&self) -> usize {
         // Deliberately *not* clamped to `max_commits`: `loaded` never
         // exceeds the ceiling (`next_page` shortens the last page to land on
         // it, and `GeneralConfig::max_commits_in_graph_effective` refuses a
@@ -118,7 +117,7 @@ impl LazyLog {
     /// raising the ceiling (or enabling lazy loading) must make the loader
     /// willing to ask again. `in_flight` survives: dropping it would let a
     /// second request for the same range go out and open a hole.
-    pub(crate) fn apply_settings(&mut self, settings: LogLoadSettings) {
+    pub fn apply_settings(&mut self, settings: LogLoadSettings) {
         self.settings = settings;
         self.exhausted = false;
     }
@@ -127,20 +126,20 @@ impl LazyLog {
     /// loader (the hidden-refs filter moved), so nothing held, in flight or
     /// latched as "the end" describes it any more. The next refresh that
     /// lands starts it again.
-    pub(crate) fn restart(&mut self) {
+    pub fn restart(&mut self) {
         self.loaded = 0;
         self.in_flight = None;
         self.exhausted = false;
     }
 
-    pub(crate) fn is_loading(&self) -> bool {
+    pub fn is_loading(&self) -> bool {
         self.in_flight.is_some()
     }
 
     /// Whether history has been walked to its root. The bottom of history
     /// is deliberately silent in the Log, but the status bar's total reads
     /// it: fully loaded means loaded == total, no count needed.
-    pub(crate) fn is_exhausted(&self) -> bool {
+    pub fn is_exhausted(&self) -> bool {
         self.exhausted
     }
 
@@ -148,11 +147,11 @@ impl LazyLog {
     /// [`is_exhausted`](LazyLog::is_exhausted) this one *is* surfaced: the
     /// user has to be able to see that more history exists but the client
     /// declines to hold it, or the graph just looks truncated.
-    pub(crate) fn is_at_ceiling(&self) -> bool {
+    pub fn is_at_ceiling(&self) -> bool {
         matches!(self.settings.max_commits, Some(max) if self.loaded >= max)
     }
 
-    pub(crate) fn loaded(&self) -> usize {
+    pub fn loaded(&self) -> usize {
         self.loaded
     }
 
@@ -161,8 +160,7 @@ impl LazyLog {
     /// Short of what was asked for means all of history fits in it, so there
     /// is nothing left to page. This is also how `exhausted` *un*-latches: a
     /// repository that grows past its initial page (a fetch) pages again.
-    #[cfg(test)]
-    pub(crate) fn on_refresh(&mut self, loaded: usize) {
+    pub fn on_refresh(&mut self, loaded: usize) {
         let asked = self.refresh_depth();
         self.on_refresh_asked(loaded, asked);
     }
@@ -173,7 +171,7 @@ impl LazyLog {
     /// against the deeper depth of its arrival read a full answer as the end
     /// of history (paging stopped, the status bar lost its total, until the
     /// next refresh).
-    pub(crate) fn on_refresh_asked(&mut self, loaded: usize, asked: usize) {
+    pub fn on_refresh_asked(&mut self, loaded: usize, asked: usize) {
         self.loaded = loaded;
         self.exhausted = loaded < asked;
     }
@@ -195,11 +193,7 @@ impl LazyLog {
     /// Returns `None` (and is cheap enough to call every frame) when lazy
     /// loading is off, a request is in flight, history is exhausted, the
     /// ceiling has been reached, or nothing is loaded yet.
-    pub(crate) fn next_page(
-        &self,
-        rows_below_view: usize,
-        visible_rows: usize,
-    ) -> Option<LogPageRequest> {
+    pub fn next_page(&self, rows_below_view: usize, visible_rows: usize) -> Option<LogPageRequest> {
         if !self.settings.lazy_load
             || self.exhausted
             || self.in_flight.is_some()
@@ -231,7 +225,7 @@ impl LazyLog {
 
     /// Records that `request` was submitted. Split from
     /// [`next_page`](LazyLog::next_page) so the decision stays a pure query.
-    pub(crate) fn mark_requested(&mut self, request: LogPageRequest) {
+    pub fn mark_requested(&mut self, request: LogPageRequest) {
         self.in_flight = Some(request.skip);
     }
 
@@ -249,7 +243,7 @@ impl LazyLog {
     ///   refresh and the page shifts the walk by one, so a page can
     ///   re-deliver a held commit. The layout assumes each commit appears
     ///   once, and a repeat corrupts lane bookkeeping for every row below.
-    pub(crate) fn on_page(
+    pub fn on_page(
         &mut self,
         request: LogPageRequest,
         page: Vec<CommitNode>,

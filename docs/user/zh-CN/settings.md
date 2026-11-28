@@ -4,7 +4,7 @@
 
 使用 `Ctrl+,`、`Ctrl+N` 然后 `,`、标题栏中 × 左侧的齿轮，或 `Ctrl+P` > *设置* 打开设置。设置界面打开时会取代整个窗口。点击右上角的 `✕`、按 `Esc` 或 `q` 即可关闭。只有关闭会丢失内容时，它才会先询问（见[关闭设置](#关闭设置)）。
 
-更改会立即保存到 `config.toml`。[配置参考](config-reference.md)描述了每个键、其默认值及其环境变量。本页描述设置界面。
+更改会立即保存：界面设置（主题、布局、列、差异和图片显示、快捷键等）保存到 `tui.toml`，其余保存到 `config.toml`，两者都在你的配置文件夹中（[为什么有两个文件](config-reference.md#两个文件configtoml-和-tuitoml)）。[配置参考](config-reference.md)描述了每个键、其默认值及其环境变量。本页描述设置界面。
 
 ![设置界面：左侧是搜索框和页面列表，右侧是“常规”页](../images/settings.png)
 
@@ -106,7 +106,7 @@
 
 ![按 Settings: 过滤的命令面板：每项设置一行，右侧是它的当前值](../images/palette-settings.png)
 
-值会保存到 `config.toml`，并与页面完全一样地生效。设置键的英文单词（`remember tabs`）在任何语言下都能找到该行。
+值会保存到它所属的文件（`tui.toml` 或 `config.toml`），并与页面完全一样地生效。设置键的英文单词（`remember tabs`）在任何语言下都能找到该行。
 
 ## 各个页面
 
@@ -367,11 +367,11 @@ AI 代理在此窗口中可以做什么、MCP 服务器是否可以运行，以�
 | **状态栏位置** | `ui.statusbar_position`：状态栏（分支、计数、消息、按键提示）的位置：顶部（位于仓库标签页上方）或底部（默认）。主页标签页在底部保留自己的状态栏。立即生效。 |
 | **标签栏位置** | `ui.tabs_position`：仓库标签页的位置：顶部（默认）、底部或左侧，左侧是窗口左边缘的列表，每行一个标签页。窗口窄于 80 列时改为画在顶部。与竖排工具栏并用时，标签页位于最外侧。立即生效。 |
 | **日期/时间区域** | **系统**（默认）：月份和星期名称使用界面语言。**english**：始终使用英文名称。 |
-| **日期格式**、**日期/时间格式**、**日期详细格式** | 文件历史和 Blame 日期列、Log 的日期列，以及 commit 详情的日期模式。每个都显示实时预览。各记号参见[配置参考](config-reference.md#ui)。 |
+| **日期格式**、**日期/时间格式**、**日期详细格式** | 文件历史和 Blame 日期列、Log 的日期列，以及 commit 详情的日期模式。每个都显示实时预览。各记号参见[配置参考](config-reference.md#tuitoml-中的-ui)。 |
 
 ![“图配色主题”下拉列表：跟随主题，然后是每个泳道调色板及其若干颜色](../images/settings-log-graph-lanes.png)
 
-主题和图配色（主题、图配色主题、泳道着色与背景、行底色强度）属于每个安装：当多个安装共用同一个 `config.toml` 时，在一个安装中更改它们绝不会改变其他安装。只有主安装还会写入共享的 `ui.*` 键。
+主题和图配色（主题、图配色主题、泳道着色与背景、行底色强度）属于每个安装：当多个安装共用同一个设置文件夹时，在一个安装中更改它们绝不会改变其他安装。只有主安装还会在 `tui.toml` 中写入共享的 `ui.*` 键；其他安装把它们的保存在 `config.toml` 中各自的条目里。
 
 ### 键盘与鼠标
 
@@ -388,7 +388,7 @@ AI 代理在此窗口中可以做什么、MCP 服务器是否可以运行，以�
 | `R` | 在确认后重置所有快捷键。 |
 | `c`，或点击该行的 `!` | 列出该操作以及与其按键冲突的所有操作；`Esc` 重新显示全部。与其他操作冲突的按键显示为红色，仅关于按键本身的警告（终端无法发送）显示为橙色。 |
 
-可用它解决与 tmux、AutoHotkey、herdr 或你终端的冲突。相同的设置也存在于 `config.toml` 的 `[keybindings]` 表中；参见[配置参考](config-reference.md#keybindings)和[键位绑定](keybindings.md)。
+可用它解决与 tmux、AutoHotkey、herdr 或你终端的冲突。相同的设置也存在于 `tui.toml` 的 `[keybindings]` 表中；参见[配置参考](config-reference.md#keybindings)和[键位绑定](keybindings.md)。
 
 ![在 Quit 上按 c 之后的“键盘和鼠标”页：互相冲突的两个操作 Quit 和 Stage or Unstage the Selected Row 的 q 键都显示为红色](../images/settings-keyboard-conflicts.png)
 
@@ -631,7 +631,7 @@ commit 表单开头预填的一段消息（`gitpoulpi ui show settings commit-te
 
 ## 文件、环境变量和 CLI
 
-- 设置文件是你操作系统配置文件夹中的 `config.toml`。`gitpoulpi config path` 会打印其位置。
+- 设置文件是你操作系统配置文件夹中的 `config.toml`（通用设置）和 `tui.toml`（终端界面的界面设置）。`gitpoulpi config path` 会打印它们的位置；`gitpoulpi config get <key>` 会告诉你某个键在哪个文件中。
 - 每个仓库的状态保存在仓库内的 `.gitpoulpi/repo-state.toml` 中。
 - `gitpoulpi config get <key>` 和 `gitpoulpi config set <key> <value>` 读取和写入每一项设置。
 - 环境变量和命令行标志会覆盖该文件。

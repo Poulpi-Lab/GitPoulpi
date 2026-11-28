@@ -2,15 +2,32 @@
 
 # 配置参考
 
-`config.toml` 的每一个键、它的默认值以及作用。你很少需要手动编辑这个文件：[设置界面](settings.md)（`Ctrl+,`）会在你更改时写入它，`gitpoulpi config set` 也会。
+配置文件的每一个键、它的默认值以及作用。你很少需要手动编辑文件：[设置界面](settings.md)（`Ctrl+,`）会在你更改时写入它们，`gitpoulpi config set` 也会。
+
+## 两个文件：`config.toml` 和 `tui.toml`
+
+设置保存在同一个文件夹中的两个文件里。
+
+| 文件 | 内容 |
+|---|---|
+| `config.toml` | 使用 GitPoulpi 的每种方式共有的一切：仓库、账户与集成、git 行为、AI、MCP、更新、安装、外部工具，以及[`config.toml` 中的 `[ui]`](#configtoml-中的-ui)下列出的少数几个 `[ui]` 键。 |
+| `tui.toml` | 终端界面的界面设置：`[ui]` 的大部分（主题、布局、列、diff 与图像显示、语言、鼠标与终端选项等）、整个 `[keybindings]` 表和 `merge.side_by_side_min_width`。它们列在 [`tui.toml` 中的 `[ui]`](#tuitoml-中的-ui)、[`[keybindings]`](#keybindings) 和 [`[merge]`](#merge) 下。 |
+
+- **`tui.toml` 如何出现。** GitPoulpi 会自己创建它，内容是 `config.toml` 中已有界面设置的副本：在终端界面启动且 `config.toml` 存在时，或在第一次更改界面设置时。`config.toml` 不会因此被修改。
+- **一旦它存在，它就是它所拥有的键的唯一来源。** 它没有提到的键取默认值，而不是旧的 `config.toml` 可能仍带有的值。要重置这样的键，请把它从 `tui.toml` 中删除。
+- **较旧的 GitPoulpi** 与此版本并存时，会继续读取它自己完整的 `config.toml`。之后在较旧版本中更改的设置不会被较新的版本采用，反过来也一样。
+- **某个键在哪个文件中。** `gitpoulpi config get <key>` 会在 JSON 字段 `file` 中打印该文件（使用 `--json`），`gitpoulpi config set <key> <value>` 会写入它，`gitpoulpi config path` 会打印 `path`（`config.toml`）和 `tui_file`（`tui.toml`）。无论键在哪个文件中，`gitpoulpi config get`、`set` 和 `GITPOULPI_UI_*` 变量都使用相同的键名（`ui.theme`）；变量仍然优先于两个文件。
+- **安装。** 主安装以外的安装，其外观保存在 `config.toml` 中它自己的 `[installation.settings.<id>]` 条目里（见 [`[installation]`](#installation这台电脑上每个-gitpoulpi-一条记录)）。
+
+下文的各节会说明各自在哪个文件中。展示表的示例（`[ui]`、`[[ui.open_in]]`）要写入节标题所指明的文件。
 
 ## 文件位置，以及取值如何确定
 
 | | |
 |---|---|
-| 文件 | `%APPDATA%\GitPoulpi\config.toml`（Windows）、`~/.config/gitpoulpi/config.toml`（Linux）、`~/Library/Application Support/GitPoulpi/config.toml`（macOS）。`gitpoulpi config path` 会打印它。 |
-| 另一个文件夹 | `GITPOULPI_CONFIG_DIR=<dir>` 会移动整个配置文件夹（该文件、`sessions/`、守护进程的端口文件）：用于便携安装、测试，或让代理远离你自己的设置。 |
-| 优先级 | 内置默认值，然后是 `config.toml`，然后是 `GITPOULPI_*` 变量，然后是命令行标志。优先级最高者生效。错误的值（文件中拼错的选项、错误的变量）会报错，绝不会被悄悄忽略。 |
+| 文件 | `%APPDATA%\GitPoulpi\config.toml`（Windows）、`~/.config/gitpoulpi/config.toml`（Linux）、`~/Library/Application Support/GitPoulpi/config.toml`（macOS），以及它旁边的 `tui.toml`。`gitpoulpi config path` 会打印这两个文件。 |
+| 另一个文件夹 | `GITPOULPI_CONFIG_DIR=<dir>` 会移动整个配置文件夹（这些文件、`sessions/`、守护进程的端口文件）：用于便携安装、测试，或让代理远离你自己的设置。 |
+| 优先级 | 内置默认值，然后是 `config.toml`（它所拥有的键则是 `tui.toml`），然后是 `GITPOULPI_*` 变量，然后是命令行标志。优先级最高者生效。错误的值（文件中拼错的选项、错误的变量）会报错，绝不会被悄悄忽略。 |
 | 变量 | 将键名转为大写并把点号换成下划线：`general.auto_prune` 对应 `GITPOULPI_GENERAL_AUTO_PRUNE`。仅适用于 GitPoulpi 实际读取的键（不包括下文标注为*未使用*的键，也不包括 `ui.log_columns_hidden` 之类的列表）。 |
 | 标志 | `--backend git2\|system` 会覆盖该命令所启动的守护进程的 `general.default_backend`。 |
 | 令牌和密钥 | 绝不在此文件中。托管平台令牌和 AI API 密钥会交给你系统的凭据助手（Git Credential Manager、libsecret / `pass`、钥匙串）；文件中只保存一个引用（`token_ref`）。没有凭据助手时，保存令牌会失败并给出提示，令牌仅在本次会话中有效。 |
@@ -75,7 +92,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `tui.toml` 中的 `[ui]`
 
 **Log 与图**
 
@@ -113,14 +130,12 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` 会把鼠标（以及文本选择）留给终端。**重启。** |
 | `ui.mouse_scroll_lines` | `3` | 滚轮每格滚动的 Log 行数，1 到 20。**重启。** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` 会向终端请求 kitty 键盘协议（这样 `Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` 才能送达；仅限 Unix，tmux 从不应答：见[多路复用器](multiplexers.md#tmux)）；`off` 从不请求。**重启。** |
-| `ui.logo_color` | `""` | “关于”窗口中徽标的配色方案，一个 slug（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）；留空或未知表示使用构建的默认值（`lavender`）。在你点击徽标或在“关于”中选择颜色时写入。 |
 
 **头像**（默认关闭；开启后会把作者邮箱的 SHA-256 哈希发送给 Gravatar，并向你已连接的 GitHub/GitLab 账号查询）
 
 | 键 | 默认值 | 取值与作用 |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph`（在图片图的 commit 圆圈中）、`author`（在作者列中）、`off`。在 `ui.avatars` 不存在时，旧的 `ui.show_avatars`（`true`）仍按 `author` 读取。 |
-| `ui.avatar_sources` | `"gravatar_hosting"` | 查询顺序：`hosting_gravatar`、`gravatar_hosting`、`gravatar`、`hosting`。GitLab 主机只会通过已连接的配置来查询。 |
 | `ui.avatar_fallback` | `"identicon"` | `identicon`（在本地生成）或 `initials`。在没有图片协议的终端上，始终使用首字母徽章。 |
 
 **Diff 与编辑器显示**
@@ -133,10 +148,6 @@ author_email = "jane@work.example"
 | `ui.diff_word_wrap` | `false` | 对过长的 diff 行自动换行（`w`；设置 > Diff 与编辑器）。 |
 | `ui.diff_intraline` | `true` | 用更深的背景色标出变更行中变更的词（命令面板 `Diff：切换变更词高亮`；设置 > Diff 与编辑器）。 |
 | `ui.minimap` | `false` | 在 diff 和编辑器的滚动条旁显示缩略图（`M`）。 |
-| `ui.mermaid_detail` | `refs` | Log 的“复制为 Mermaid gitGraph”的详细程度：`structure`、`refs`、`subjects`、`full`（会从弹窗中记住；也是 `log --format mermaid` 的默认值）。 |
-| `ui.mermaid_orientation` | `lr` | 该图的方向：`lr`（从左到右）或 `tb`（从上到下）。 |
-| `ui.mermaid_fence` | `false` | 用 `mermaid` 代码围栏包住所复制的 Mermaid 脚本。 |
-| `ui.mermaid_subject_width` | `40` | Mermaid id 中的 commit 标题会截断到这么多个字符（`subjects`、`full`）。 |
 | `ui.text_cursor` | `"terminal"` | 获得焦点的文本框的插入符显示在哪里：`terminal` 把终端自身的光标放在那里（闪烁的竖线，因此终端的光标设置和输入法的候选窗口会跟随它；没有文本框拥有键盘时隐藏，退出时恢复为你自己的光标样式），`drawn` 绘制 GitPoulpi 自己的插入符字形并保持终端光标隐藏。实时生效。 |
 | `ui.color_depth` | `"auto"` | `auto`、`truecolor`、`256` 或 `16`：使用多少种颜色绘制。`auto` 为 truecolor，但 Apple Terminal（256）、Linux 控制台（16）以及没有 `COLORTERM` 的 `*-256color` 终端（256）除外。即时生效。参见[主题](themes.md)。 |
 | `ui.input_color` | `"theme"` | 文本框背景：`theme`（主题自带的）、`gray`、`blue`、`slate`、`dark`、`custom`。 |
@@ -159,16 +170,35 @@ author_email = "jane@work.example"
 | `ui.launch` | `"off"` | 在没有窗口打开时，代理是否可以打开 GitPoulpi 窗口：`off`、一个预设（`kitty`、`foot`、`alacritty`、`wezterm`、`wezterm-tab`、`ghostty`、`gnome-terminal`、`xdg-terminal-exec`、`windows-terminal`、`windows-terminal-tab`、`tmux`、`zellij`、`cmux`）或 `custom`。 |
 | `ui.launch_command` | `""` | `custom` 模板：`{repo}`、`{session}`、`{gitpoulpi}`。会被拆分为参数，不涉及 shell。 |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons`（标签页行提供*退出并 cd 到此*）或 `auto`（每次退出都会更改 shell 的文件夹，新标签页会运行默认的*打开方式*条目）。参见[跟随标签页文件夹](following-the-tab-folder.md)。 |
-| `ui.terminal_launch` | `"auto"` | 旧版，见下文以及[打开方式](open-in.md)。旧的*在此打开终端*如何打开终端：`auto`（`ui.launch` 预设，否则是 `$TERMINAL`、`xdg-terminal-exec`、Windows Terminal、Terminal）、一个预设，或 `custom`。 |
-| `ui.terminal_launch_command` | `""` | `custom` 模板；`{repo}` 是文件夹。 |
-| `ui.open_in` | *（不存在）* | [打开方式](open-in.md)列表，由表组成的数组 `[[ui.open_in]]`，含 `label` 和 `command`。不存在表示“尚未配置”：列表由旧的 `ui.terminal_launch*` 键（非 `auto` 的值会成为第一项）、操作系统的文件管理器、从环境中检测到的多路复用器和终端（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal 等）以及 `PATH` 上找到的编辑器计算得出。首次从设置保存时会写入该列表。`open_in = []` 是空列表。无法用 `config set` 设置（请编辑文件）。 |
-| `ui.open_in_default` | `""` | “用默认方式打开”所运行条目的标签；留空或未知表示第一项。 |
 | `ui.launch_terminal` | `"auto"` | 桌面快捷方式（设置 > 启动器）和 Windows 上的重新打开用来启动 GitPoulpi 的终端。`auto` 从已安装的终端中选择（Windows：Windows Terminal，否则依次为 WezTerm、Alacritty、普通控制台；Linux：`xdg-terminal-exec`，否则为找到的第一个终端；macOS：如果安装了 iTerm2、Ghostty、WezTerm 或 kitty 则使用它，否则使用 Terminal），`default` 为系统自身的默认终端，也可以是终端 ID，例如 `windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal`。 |
-| `ui.launcher_build` | `"current"` | 仅限开发模式（见 `general.dev_mode`；只有这时才在设置 > 启动器中显示，否则会被忽略）。`"current"`：快捷方式和命令别名启动创建它们的那个构建。`"newest"`：它们启动检出目录中 `target/dist` 和 `target/release` 里最近构建的那一个，每次点击时决定，并且启动任何一个构建都不会改写它们。 |
-| `ui.command_alias` | `""` | 在终端中启动 GitPoulpi 的命令名称，例如 `gp`（设置 > 启动器，`gitpoulpi alias create`）。留空：无。只能使用字母、数字、`-`、`_` 和 `.`。它只是 **创建：命令别名** 按钮所用的名称；在你创建之前什么都不存在。 |
-| `ui.command_alias_add` | `""` | 第二个命令的名称，例如 `gpa`，它运行 `gitpoulpi --add`：把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（设置 > 启动器，`gitpoulpi alias create gpa --add`）。留空：无。名称规则相同；由 **创建** 按钮与 `ui.command_alias` 一起创建。 |
 | `ui.relaunch_in_terminal` | `true` | 仅限 Windows：当 exe 通过双击在自己的控制台中启动时，GitPoulpi 会在 `ui.launch_terminal` 中重新打开并退出。直接运行 exe 的终端（`wezterm-gui start -- gitpoulpi.exe`、`wt.exe gitpoulpi.exe`、Rio、Tabby、Alacritty `-e`）同样是自己的控制台，但不是传统的控制台窗口：它们绝不会被重新启动。关闭：留在该控制台中。 |
 | `ui.reuse_window` | `true` | 点击 GitPoulpi 快捷方式（`gitpoulpi launch`）时，显示已打开的 GitPoulpi 的窗口，而不是再启动一个。 关闭：每次点击都会启动新窗口。 |
+
+### 图像
+
+| 键 | 默认值 | 含义 |
+|---|---|---|
+| `ui.image_view` | `true` | 在 Diff 视图和文件视图中，将属于图像的二进制文件（PNG、JPEG、GIF、WebP、BMP 等）显示为图片。关闭：显示普通的二进制提示。 |
+| `ui.image_view_max_mib` | `32` | 大于此值（MiB）的图像不会被解码；改为显示信息卡片。 |
+| `ui.image_view_max_unit` | `"auto"` | 设置中显示该上限所用的单位：`mib`、`gib`（1024 MiB）或 `auto`。仅影响显示：上限始终是 `image_view_max_mib` MiB，范围 1 到 1024。 |
+| `ui.image_view_text_fallback` | `"halfblock"` | 在没有图像协议的终端上：`halfblock`（彩色半块字符）或 `card`（仅信息卡片）。 |
+| `ui.image_view_pixelated_from` | `"2x"` | 从该缩放比例起，放大时显示方形像素而不是平滑处理：`1x`、`2x`、`never`。 |
+| `ui.image_view_sync` | `true` | 更改前和更改后的窗格共用同一个缩放比例和滚动位置。 |
+
+**尚未使用**（会被接受和保存，但没有任何东西读取它们）：`ui.graph_colorization`（已从设置中移除；加载时仍被接受）、`ui.date_word_format`（已从设置中移除；加载时仍被接受）。旧的 `ui.diff_view_mode` 会被一次性读取为 `diff_layout` / `diff_hunks_only`。
+
+## `config.toml` 中的 `[ui]`
+
+无论使用哪种界面都相同的少数几个 `[ui]` 键：这台电脑的外部工具、此安装的身份、向哪些网络服务查询头像，以及 `log --format mermaid` 的默认值。它们只从 `config.toml` 读取；其余的 `[ui]` 键在 [`tui.toml`](#tuitoml-中的-ui) 中。
+
+**在别处打开文件夹**
+
+| 键 | 默认值 | 取值与作用 |
+|---|---|---|
+| `ui.open_in` | *（不存在）* | [打开方式](open-in.md)列表，由表组成的数组 `[[ui.open_in]]`，含 `label` 和 `command`。不存在表示“尚未配置”：列表由旧的 `ui.terminal_launch*` 键（非 `auto` 的值会成为第一项）、操作系统的文件管理器、从环境中检测到的多路复用器和终端（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal 等）以及 `PATH` 上找到的编辑器计算得出。首次从设置保存时会写入该列表。`open_in = []` 是空列表。无法用 `config set` 设置（请编辑文件）。 |
+| `ui.open_in_default` | `""` | “用默认方式打开”所运行条目的标签；留空或未知表示第一项。 |
+| `ui.terminal_launch` | `"auto"` | 旧版，见下文以及[打开方式](open-in.md)。旧的*在此打开终端*如何打开终端：`auto`（`ui.launch` 预设，否则是 `$TERMINAL`、`xdg-terminal-exec`、Windows Terminal、Terminal）、一个预设，或 `custom`。 |
+| `ui.terminal_launch_command` | `""` | `custom` 模板；`{repo}` 是文件夹。 |
 
 **`ui.open_in` 命令**会先被拆分为参数（空白、`'...'`、`"..."`），然后在每个参数内部替换变量，因此带空格的文件夹仍然是一个参数；除非命令自己启动了 shell（`sh -c '... "$GITPOULPI_CWD"'`），否则不涉及 shell。变量：`${cwd}`（标签页的文件夹）、`${repo}`（仓库根目录）、`${name}`（文件夹的基本名称）、`${branch}`（分离 HEAD 时为空）、`${web_url}`（`origin` 远程的网页，当它是 GitHub 或 GitLab 项目时；否则为空；使用它的条目在其为空时会拒绝运行）、`${env:NAME}`（未设置时为空）。旧的 `{repo}` 仍表示 `${cwd}`。任何其他 `${...}` 都是错误，并会指出其名称。示例：
 
@@ -187,16 +217,10 @@ command = "code ${cwd}"
 
 旧版：`ui.terminal_launch` 和 `ui.terminal_launch_command` 仍会被读取（在 `ui.open_in` 不存在时，它们用于生成列表：`custom` 会变成 “Terminal (custom)”，其中的 `{repo}` 会被改写为 `${cwd}`，预设 id 会变成对应的预设），但已被 `ui.open_in` 取代。
 
-### 图像
+**图像编辑器**
 
-| 键 | 默认值 | 含义 |
+| 键 | 默认值 | 取值与作用 |
 |---|---|---|
-| `ui.image_view` | `true` | 在 Diff 视图和文件视图中，将属于图像的二进制文件（PNG、JPEG、GIF、WebP、BMP 等）显示为图片。关闭：显示普通的二进制提示。 |
-| `ui.image_view_max_mib` | `32` | 大于此值（MiB）的图像不会被解码；改为显示信息卡片。 |
-| `ui.image_view_max_unit` | `"auto"` | 设置中显示该上限所用的单位：`mib`、`gib`（1024 MiB）或 `auto`。仅影响显示：上限始终是 `image_view_max_mib` MiB，范围 1 到 1024。 |
-| `ui.image_view_text_fallback` | `"halfblock"` | 在没有图像协议的终端上：`halfblock`（彩色半块字符）或 `card`（仅信息卡片）。 |
-| `ui.image_view_pixelated_from` | `"2x"` | 从该缩放比例起，放大时显示方形像素而不是平滑处理：`1x`、`2x`、`never`。 |
-| `ui.image_view_sync` | `true` | 更改前和更改后的窗格共用同一个缩放比例和滚动位置。 |
 | `ui.image_editors` | *（不存在）* | “编辑方式”图像编辑器，由表组成的数组 `[[ui.image_editors]]`，含 `label` 和 `command`。不存在表示“尚未配置”：列表是在这台机器上检测到的编辑器（`PATH` 上的程序、Flatpak 安装、Windows 上已知的安装文件夹、macOS 上的 `/Applications`），然后是操作系统的默认应用。首次从设置保存时会写入该列表。`image_editors = []` 是空列表。无法用 `config set` 设置（请编辑文件）。 |
 | `ui.image_editor_default` | `""` | “用默认编辑器编辑”所运行编辑器的标签；留空或未知表示第一项。 |
 
@@ -215,7 +239,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**尚未使用**（会被接受和保存，但没有任何东西读取它们）：`ui.graph_colorization`（已从设置中移除；加载时仍被接受）、`ui.date_word_format`（已从设置中移除；加载时仍被接受）。旧的 `ui.diff_view_mode` 会被一次性读取为 `diff_layout` / `diff_hunks_only`。
+**启动器与身份**
+
+| 键 | 默认值 | 取值与作用 |
+|---|---|---|
+| `ui.logo_color` | `""` | “关于”窗口中徽标的配色方案，一个 slug（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）；留空或未知表示使用构建的默认值（`lavender`）。在你点击徽标或在“关于”中选择颜色时写入。 |
+| `ui.command_alias` | `""` | 在终端中启动 GitPoulpi 的命令名称，例如 `gp`（设置 > 启动器，`gitpoulpi alias create`）。留空：无。只能使用字母、数字、`-`、`_` 和 `.`。它只是 **创建：命令别名** 按钮所用的名称；在你创建之前什么都不存在。 |
+| `ui.command_alias_add` | `""` | 第二个命令的名称，例如 `gpa`，它运行 `gitpoulpi --add`：把当前文件夹作为新标签页在已运行的 GitPoulpi 中打开（设置 > 启动器，`gitpoulpi alias create gpa --add`）。留空：无。名称规则相同；由 **创建** 按钮与 `ui.command_alias` 一起创建。 |
+| `ui.launcher_build` | `"current"` | 仅限开发模式（见 `general.dev_mode`；只有这时才在设置 > 启动器中显示，否则会被忽略）。`"current"`：快捷方式和命令别名启动创建它们的那个构建。`"newest"`：它们启动检出目录中 `target/dist` 和 `target/release` 里最近构建的那一个，每次点击时决定，并且启动任何一个构建都不会改写它们。 |
+
+**头像查询**
+
+| 键 | 默认值 | 取值与作用 |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | 查询顺序：`hosting_gravatar`、`gravatar_hosting`、`gravatar`、`hosting`。GitLab 主机只会通过已连接的配置来查询。 |
+
+**Mermaid 默认值**（`log --format mermaid`；Log 的“复制为 Mermaid gitGraph”会记住你在弹窗中的选择）
+
+| 键 | 默认值 | 取值与作用 |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Log 的“复制为 Mermaid gitGraph”的详细程度：`structure`、`refs`、`subjects`、`full`（会从弹窗中记住；也是 `log --format mermaid` 的默认值）。 |
+| `ui.mermaid_orientation` | `lr` | 该图的方向：`lr`（从左到右）或 `tb`（从上到下）。 |
+| `ui.mermaid_fence` | `false` | 用 `mermaid` 代码围栏包住所复制的 Mermaid 脚本。 |
+| `ui.mermaid_subject_width` | `40` | Mermaid id 中的 commit 标题会截断到这么多个字符（`subjects`、`full`）。 |
 
 ## `[editor]`
 
@@ -228,6 +274,8 @@ command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 | `editor.follow_selection` | `true` | 编辑器打开时，在右侧窗格中选择其他文件也会在编辑器中打开它，并会先询问是否保存未保存的更改。无法编辑的文件会在其常规视图中打开；某个 commit 的文件则会离开编辑器，显示其 diff。 |
 
 ## `[merge]`
+
+文件：`tui.toml`。
 
 merge 冲突编辑器（[解决 merge 冲突](merge-conflicts.md)）。设置 > Diff 与编辑器中会显示它。
 
@@ -517,7 +565,11 @@ open_tab = true
 
 序列或步骤上的未知键，在 GitPoulpi 重写文件时会保留。你能看到的序列之间如果有重复的 id，会被报告。用 `[keybindings.sequence] <id> = "<chord>"` 绑定一个序列，例如 `backup = "Ctrl+G b"`。
 
+文件：`tui.toml`。
+
 ## `[keybindings]`
+
+文件：`tui.toml`。
 
 重新绑定 TUI 的快捷键；设置 > 键盘与鼠标可编辑它。
 

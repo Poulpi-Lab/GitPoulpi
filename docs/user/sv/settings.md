@@ -6,7 +6,9 @@
 titelraden (till vänster om `×`), eller `Ctrl+P` > *Inställningar*. Inställningsskärmen ersätter
 fönstret medan den är öppen. Stäng den med `✕` uppe till höger, `Esc` eller `q`. Den frågar först bara när en stängning skulle förlora något (se [Stänga Inställningar](#stänga-inställningar)).
 
-Ändringar sparas direkt i `config.toml`. [Konfigurationsreferensen](config-reference.md)
+Ändringar sparas direkt: gränssnittsinställningar (tema, layout, kolumner, diff- och
+bildvisning, genvägar...) i `tui.toml`, allt annat i `config.toml`, båda i din
+konfigurationsmapp ([varför två filer](config-reference.md#två-filer-configtoml-och-tuitoml)). [Konfigurationsreferensen](config-reference.md)
 beskriver varje nyckel, dess standardvärde och dess miljövariabel. Den här sidan
 beskriver inställningsskärmen.
 
@@ -146,7 +148,7 @@ De flesta inställningar kan ändras utan att öppna den här skärmen: skriv `I
 
 ![Kommandopaletten filtrerad på Settings: med en rad per inställning och dess aktuella värde till höger](../images/palette-settings.png)
 
-Ett värde sparas i `config.toml` och tillämpas precis som sidan gör. De engelska orden i inställningens nyckel (`remember tabs`) hittar raden på alla språk.
+Ett värde sparas i sin fil (`tui.toml` eller `config.toml`) och tillämpas precis som sidan gör. De engelska orden i inställningens nyckel (`remember tabs`) hittar raden på alla språk.
 
 ## Sidorna
 
@@ -452,11 +454,11 @@ servern; se [MCP och agenter](mcp-and-agents.md).
 | **Statusradens position** | `ui.statusbar_position`: Var statusraden (gren, antal, meddelanden, tangenttips) sitter: Överst, ovanför repositoryfliken, eller Nederst (standard). Fliken Hem behåller sin egen statusrad nederst. Gäller direkt. |
 | **Flikradens position** | `ui.tabs_position`: Var repositorieflikarna sitter: Överst (standard), Nederst eller Vänster, en lista med en flik per rad vid fönstrets vänsterkant. I ett fönster smalare än 80 kolumner ritas de överst. Bredvid ett verktygsfält som kolumn ligger flikarna ytterst. Gäller direkt. |
 | **Språk för datum/tid** | **system** (standard): månads- och veckodagsnamn på gränssnittsspråket. **english**: alltid engelska namn. |
-| **Datumformat**, **Datum-/tidsformat**, **Utförligt datumformat** | Datummönstren för datumkolumnen i Filhistorik och Blame, för kolumnen Datum i Log och för commitdetaljerna. Var och en visar en live-förhandsvisning. Se [Konfigurationsreferens](config-reference.md#ui) för tecknen. |
+| **Datumformat**, **Datum-/tidsformat**, **Utförligt datumformat** | Datummönstren för datumkolumnen i Filhistorik och Blame, för kolumnen Datum i Log och för commitdetaljerna. Var och en visar en live-förhandsvisning. Se [Konfigurationsreferens](config-reference.md#ui-i-tuitoml) för tecknen. |
 
 ![Kombinationsrutan Färgtema för grafen: Följ temat, sedan varje spårpalett med några av sina färger](../images/settings-log-graph-lanes.png)
 
-Temat och grafens färger (temat, grafens färgtema, banornas färgläggning och bakgrund, radnyansens styrka) hör till varje installation: när flera installationer delar en `config.toml` ändrar en ändring i en av dem aldrig de andra. Bara den primära installationen skriver också de delade `ui.*`-nycklarna.
+Temat och grafens färger (temat, grafens färgtema, banornas färgläggning och bakgrund, radnyansens styrka) hör till varje installation: när flera installationer delar en inställningsmapp ändrar en ändring i en av dem aldrig de andra. Bara den primära installationen skriver också de delade `ui.*`-nycklarna, i `tui.toml`; de andra behåller sina i sin egen post i `config.toml`.
 ### Tangentbord & mus
 
 ![Sidan Tangentbord & mus: varje åtgärd per kontext med sina tangenter, en sökruta och filter](../images/settings-keyboard.png)
@@ -475,7 +477,7 @@ listar varje kortkommando per kontext, med en sökruta (`/`) och filter. På en 
 | `c` eller ett klick på radens `!` | Visar åtgärden med alla åtgärder som dess tangent krockar med; `Esc` visar alla igen. En tangent som krockar med en annan åtgärds är röd, en varning om bara tangenten (terminalen kan inte skicka den) orange. |
 
 Använd den för att lösa krockar med tmux, AutoHotkey, herdr eller din terminal.
-Samma inställningar finns i tabellen `[keybindings]` i `config.toml`; se
+Samma inställningar finns i tabellen `[keybindings]` i `tui.toml`; se
 [konfigurationsreferensen](config-reference.md#keybindings) och
 [Kortkommandon](keybindings.md).
 
@@ -834,8 +836,10 @@ längst ned på sidan visar **● Osparat** (eller **Inga ändringar**) med **Sp
 
 ## Filer, miljövariabler och CLI
 
-- Inställningsfilen är `config.toml` i operativsystemets konfigurationsmapp.
-  `gitpoulpi config path` skriver ut dess plats.
+- Inställningsfilerna är `config.toml` (gemensamma inställningar) och `tui.toml`
+  (terminalgränssnittets gränssnittsinställningar) i operativsystemets
+  konfigurationsmapp. `gitpoulpi config path` skriver ut deras platser;
+  `gitpoulpi config get <key>` anger vilken fil en nyckel finns i.
 - Tillstånd per repository finns i `.gitpoulpi/repo-state.toml` inuti
   repositoryt.
 - `gitpoulpi config get <key>` och `gitpoulpi config set <key> <value>` läser och

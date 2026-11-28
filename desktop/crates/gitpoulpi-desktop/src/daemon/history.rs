@@ -2,131 +2,78 @@
 //!
 //! Paging itself is the shared `gitpoulpi_app::graph::LazyLog` (page size, ceiling, lazy on/off from
 //! `LogLoadSettings`); this file only fetches. The Log walks every ref (`--branches --tags --remotes`)
-//! minus the hidden ones. On a detached HEAD that walk can miss HEAD itself: a clone checked out at a
-//! tag or a commit has no local branch, and a repository whose only branch was deleted has no ref at
-//! all. A refresh therefore also asks for the history of HEAD and puts the commits only HEAD reaches
-//! in front (`LazyLog::set_front`), which keeps every child before its parents for the graph layout.
-//! When no ref reaches any commit the history of HEAD is the walk and pages on its own.
+//! minus the hidden ones. Both backends seed that walk with a detached HEAD, so a clone checked out at a
+//! tag or a commit, or a repository whose only branch was deleted, lists its history through the same
+//! walk and pages like any other.
 //!
 //! The fetching of one page is [`Backend::history_page`]; the rest of the daemon link is not touched.
 
-use std::collections::HashSet;
 use std::future::Future;
 use std::pin::Pin;
 
 use gitpoulpi_app::graph::LogPageRequest;
-use gitpoulpi_core::domain::{CommitGraph, CommitNode, Oid, OperationKind, Ref, RefFilter};
+use gitpoulpi_core::domain::{CommitGraph, CommitNode, LogOptions, OperationKind, RefFilter};
 
-use super::queries::LogSource;
 use super::Backend;
 
 type Fut<T> = Pin<Box<dyn Future<Output = Result<T, String>> + Send + 'static>>;
 
-/// What the pages of one Log walk continue: where it starts and which refs it leaves out.
+/// What the pages of one Log walk continue: which refs it leaves out.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Walk {
-    pub source: LogSource,
     pub filter: RefFilter,
+}
+
+impl Walk {
+    fn options(&self, skip: usize, limit: Option<usize>) -> LogOptions {
+        LogOptions {
+            limit: limit.map(|l| l as u32),
+            skip: skip as u32,
+            all_refs: true,
+            hidden: self.filter.clone(),
+            ..LogOptions::default()
+        }
+    }
 }
 
 /// A full refresh: the held list from the top.
 pub struct Refresh {
-    /// The detached-HEAD commits first (`front` of them), then the walk.
     pub nodes: Vec<CommitNode>,
-    /// How many leading commits the paged walk does not contain.
-    pub front: usize,
-    /// How many walk commits were asked for (the `LazyLog` refresh depth at the time of the request).
+    /// How many commits were asked for (the `LazyLog` refresh depth at the time of the request).
     pub asked: usize,
     pub walk: Walk,
 }
 
-/// Pure part of the detached-HEAD handling: puts the commits only HEAD reaches in front of the ref walk.
-pub fn merge_head_history(
-    refs_walk: Vec<CommitNode>,
-    head_walk: Vec<CommitNode>,
-) -> (Vec<CommitNode>, usize) {
-    let known: HashSet<Oid> = refs_walk.iter().map(|n| n.id).collect();
-    let mut out: Vec<CommitNode> = head_walk
-        .into_iter()
-        .filter(|n| !known.contains(&n.id))
-        .collect();
-    let head_only = out.len();
-    out.extend(refs_walk);
-    (out, head_only)
-}
-
-/// True when no ref is the checked-out branch: HEAD is detached (or the repository has no commits).
-pub fn is_detached(refs: &[Ref]) -> bool {
-    !refs.iter().any(|r| r.is_head)
-}
-
 impl Backend {
     fn walk_page(&self, walk: &Walk, skip: usize, limit: Option<usize>) -> Fut<Vec<CommitNode>> {
-        let mut opts = walk.source.options(skip as u32, limit.map(|l| l as u32));
-        if walk.source == LogSource::AllRefs {
-            opts.hidden = walk.filter.clone();
-        }
+        let opts = walk.options(skip, limit);
         let fut = self.call::<CommitGraph>(OperationKind::Log, serde_json::json!({ "opts": opts }));
         Box::pin(async move { fut.await.map(|g| g.nodes) })
     }
 
-    /// The one page fetch: the commits of `walk` from `request.skip` (the walk offset, front commits
-    /// not counted), `request.limit` of them.
+    /// The one page fetch: the commits of `walk` from `request.skip`, `request.limit` of them.
     pub fn history_page(&self, walk: &Walk, request: LogPageRequest) -> Fut<Vec<CommitNode>> {
         self.walk_page(walk, request.skip, Some(request.limit))
     }
 
-    /// How many commits the whole walk holds, `front` detached-HEAD commits included.
-    pub fn history_total(&self, walk: &Walk, front: usize) -> Fut<u64> {
-        let mut opts = walk.source.options(0, None);
-        if walk.source == LogSource::AllRefs {
-            opts.hidden = walk.filter.clone();
-        }
-        let fut = self.call::<u64>(
+    /// How many commits the whole walk holds.
+    pub fn history_total(&self, walk: &Walk) -> Fut<u64> {
+        let opts = walk.options(0, None);
+        Box::pin(self.call::<u64>(
             OperationKind::CountCommits,
             serde_json::json!({ "opts": opts }),
-        );
-        Box::pin(async move { fut.await.map(|n| n + front as u64) })
+        ))
     }
 
-    /// The list from the top, `depth` walk commits deep (`LazyLog::refresh_depth`).
-    pub fn history_refresh(&self, refs: &[Ref], filter: RefFilter, depth: usize) -> Fut<Refresh> {
-        let all = Walk {
-            source: LogSource::AllRefs,
-            filter,
-        };
-        let head = Walk {
-            source: LogSource::Head,
-            filter: RefFilter::default(),
-        };
-        let refs_walk = self.walk_page(&all, 0, Some(depth));
-        let head_walk = is_detached(refs).then(|| self.walk_page(&head, 0, Some(depth)));
+    /// The list from the top, `depth` commits deep (`LazyLog::refresh_depth`).
+    pub fn history_refresh(&self, filter: RefFilter, depth: usize) -> Fut<Refresh> {
+        let walk = Walk { filter };
+        let page = self.walk_page(&walk, 0, Some(depth));
         Box::pin(async move {
-            let refs_nodes = refs_walk.await?;
-            let Some(head_walk) = head_walk else {
-                return Ok(Refresh {
-                    nodes: refs_nodes,
-                    front: 0,
-                    asked: depth,
-                    walk: all,
-                });
-            };
-            let head_nodes = head_walk.await.unwrap_or_default();
-            if refs_nodes.is_empty() {
-                // No ref reaches any commit: the history of HEAD is the history, and it pages on its own.
-                return Ok(Refresh {
-                    nodes: head_nodes,
-                    front: 0,
-                    asked: depth,
-                    walk: head,
-                });
-            }
-            let (nodes, front) = merge_head_history(refs_nodes, head_nodes);
             Ok(Refresh {
-                nodes,
-                front,
+                nodes: page.await?,
                 asked: depth,
-                walk: all,
+                walk,
             })
         })
     }
@@ -137,27 +84,6 @@ mod tests {
     use super::*;
     use gitpoulpi_app::graph::{LazyLog, LogLoadSettings};
     use gitpoulpi_testkit::{FixtureRepo, FixtureRepoBuilder};
-
-    fn node(n: u8) -> CommitNode {
-        CommitNode {
-            id: Oid([n; 20]),
-            parents: vec![],
-            summary: format!("c{n}"),
-            message: format!("c{n}"),
-            author_name: String::new(),
-            author_email: String::new(),
-            timestamp: 0,
-            refs: vec![],
-        }
-    }
-
-    #[test]
-    fn head_only_commits_go_first_and_known_ones_are_not_repeated() {
-        let (nodes, head_only) = merge_head_history(vec![node(1), node(2)], vec![node(9), node(2)]);
-        let ids: Vec<u8> = nodes.iter().map(|n| n.id.0[0]).collect();
-        assert_eq!(ids, vec![9, 1, 2]);
-        assert_eq!(head_only, 1);
-    }
 
     fn run<T>(fut: impl Future<Output = T>) -> T {
         tokio::runtime::Builder::new_current_thread()
@@ -188,11 +114,9 @@ mod tests {
         fn open(repo: &FixtureRepo, settings: LogLoadSettings, filter: RefFilter) -> Self {
             let backend = Backend::start(repo.root()).unwrap();
             let mut lazy = LazyLog::new(settings);
-            let refs = run(backend.refs()).unwrap();
             let depth = lazy.refresh_depth();
-            let r = run(backend.history_refresh(&refs, filter, depth)).unwrap();
+            let r = run(backend.history_refresh(filter, depth)).unwrap();
             lazy.restart();
-            lazy.set_front(r.front);
             lazy.on_refresh_asked(r.nodes.len(), r.asked);
             Self {
                 backend,
@@ -238,18 +162,17 @@ mod tests {
     }
 
     #[test]
-    fn attached_head_shows_the_history_with_no_front_and_a_total() {
+    fn attached_head_shows_the_history_and_a_total() {
         gitpoulpi_testkit::isolate_process_env();
         let repo = three_commits().build();
         let mut d = Driver::open(&repo, LogLoadSettings::default(), RefFilter::default());
         assert_eq!(d.nodes.len(), 3);
-        assert_eq!(d.lazy.front(), 0);
         assert!(
             d.lazy.is_exhausted(),
             "a short first page is the whole history"
         );
         assert!(d.page().is_none());
-        assert_eq!(run(d.backend.history_total(&d.walk, 0)).unwrap(), 3);
+        assert_eq!(run(d.backend.history_total(&d.walk)).unwrap(), 3);
     }
 
     #[test]
@@ -305,13 +228,12 @@ mod tests {
         repo.git(&["branch", "-D", &branch]);
         let d = Driver::open(&repo, LogLoadSettings::default(), RefFilter::default());
         assert_eq!(d.nodes.len(), 3, "the three commits of HEAD");
-        assert_eq!(d.walk.source, LogSource::Head);
         assert_eq!(d.nodes[0].summary, "third");
-        assert_eq!(run(d.backend.history_total(&d.walk, 0)).unwrap(), 3);
+        assert_eq!(run(d.backend.history_total(&d.walk)).unwrap(), 3);
     }
 
     #[test]
-    fn detached_head_off_every_ref_keeps_its_own_commits_in_front() {
+    fn detached_head_off_every_ref_lists_its_own_commits_first() {
         gitpoulpi_testkit::isolate_process_env();
         let repo = three_commits().build();
         repo.git(&["checkout", "--detach", "HEAD"]);
@@ -325,15 +247,11 @@ mod tests {
             "three on the branch plus the detached commit"
         );
         assert_eq!(d.nodes[0].summary, "detached work");
-        assert_eq!(d.lazy.front(), 1);
-        assert_eq!(
-            run(d.backend.history_total(&d.walk, d.lazy.front())).unwrap(),
-            4
-        );
+        assert_eq!(run(d.backend.history_total(&d.walk)).unwrap(), 4);
     }
 
     #[test]
-    fn the_front_does_not_count_towards_the_page_offset() {
+    fn a_detached_commit_pages_like_any_other() {
         gitpoulpi_testkit::isolate_process_env();
         let repo = three_commits().build();
         repo.git(&["checkout", "--detach", "HEAD"]);
@@ -341,19 +259,19 @@ mod tests {
         repo.git(&["add", "d.txt"]);
         repo.git(&["commit", "-m", "detached work"]);
         let mut d = Driver::open(&repo, small(2, 2, None), RefFilter::default());
-        assert_eq!(d.lazy.front(), 1);
-        assert_eq!(d.nodes.len(), 3, "one in front, two of the walk");
+        assert_eq!(d.nodes.len(), 2, "the detached commit is in the first page");
         let req = d.page().unwrap();
-        assert_eq!(
-            req.skip, 2,
-            "two walk commits held, the front one not counted"
-        );
+        assert_eq!(req.skip, 2, "the page boundary is the held count");
         assert_eq!(d.nodes.len(), 4);
         let mut ids: Vec<_> = d.nodes.iter().map(|n| n.id).collect();
         ids.sort_by_key(|i| i.0);
         ids.dedup();
         assert_eq!(ids.len(), 4, "no commit twice");
-        assert!(d.lazy.is_exhausted());
+        assert!(d.page().is_some(), "a full page leaves the end unknown");
+        assert!(
+            d.lazy.is_exhausted(),
+            "the empty page after it ends the walk"
+        );
         assert_eq!(
             d.summaries(),
             vec!["detached work", "third", "second", "initial"]
@@ -367,7 +285,6 @@ mod tests {
         repo.git(&["checkout", "--detach", "HEAD~1"]);
         let d = Driver::open(&repo, LogLoadSettings::default(), RefFilter::default());
         assert_eq!(d.nodes.len(), 3);
-        assert_eq!(d.lazy.front(), 0);
     }
 
     #[test]
@@ -392,6 +309,6 @@ mod tests {
         let d = Driver::open(&repo, LogLoadSettings::default(), hidden);
         assert_eq!(d.nodes.len(), 3);
         assert!(d.summaries().iter().all(|s| *s != "side work"));
-        assert_eq!(run(d.backend.history_total(&d.walk, 0)).unwrap(), 3);
+        assert_eq!(run(d.backend.history_total(&d.walk)).unwrap(), 3);
     }
 }

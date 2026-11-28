@@ -84,7 +84,7 @@ fn press(cx: &mut TestAppContext, o: &Opened, what: Transfer) {
 }
 
 fn notice_text(cx: &mut TestAppContext, ws: &Entity<Workspace>) -> Option<String> {
-    ws.read_with(cx, |ws, _| ws.notice().map(|n| n.text.clone()))
+    ws.read_with(cx, |ws, cx| ws.notice(cx).map(|n| n.text))
 }
 
 fn can(cx: &mut TestAppContext, ws: &Entity<Workspace>, direction: Direction) -> bool {
@@ -103,7 +103,7 @@ fn commit_through_another_client(repo: &FixtureRepo, session: &str, file: &str, 
     let link = gitpoulpi_link::start(
         session.to_string(),
         RepoRef::from_root(repo.root()),
-        DesktopHost::global(),
+        DesktopHost::detached(),
     );
     link.submit_action(Action::StageAll);
     link.submit_action(Action::Commit {
@@ -212,7 +212,7 @@ fn undo_with_nothing_to_undo_says_why_and_changes_nothing(cx: &mut TestAppContex
     wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
     press(cx, &o, Transfer::Undo);
     wait_for(cx, "the refusal", |cx| {
-        o.ws.read_with(cx, |ws, _| ws.notice().is_some_and(|n| n.error))
+        o.ws.read_with(cx, |ws, cx| ws.notice(cx).is_some_and(|n| n.error))
     });
     assert_eq!(commits(cx, &o.ws), 3);
 }
@@ -232,9 +232,13 @@ fn push_fetch_and_pull_run_through_the_link(cx: &mut TestAppContext) {
     });
     wait_for(cx, "the push result on the status line", |cx| {
         // The link words the result itself ("pushed ..."); the "started" line is gone by then.
-        o.ws.read_with(cx, |ws, _| {
-            ws.notice()
-                .is_some_and(|n| !n.error && n.text != gitpoulpi_i18n::msg::link::ACT_PUSHING.get())
+        let started = Action::Push {
+            remote: String::new(),
+            opts: Default::default(),
+        }
+        .activity_label();
+        o.ws.read_with(cx, |ws, cx| {
+            ws.notice(cx).is_some_and(|n| !n.error && n.text != started)
         })
     });
 
@@ -263,4 +267,20 @@ fn push_without_a_remote_says_so(cx: &mut TestAppContext) {
     wait_for(cx, "the refusal", |cx| {
         notice_text(cx, &o.ws).is_some_and(|t| t == gitpoulpi_desktop::strings::PUSH_NO_REMOTE)
     });
+}
+
+#[test]
+fn every_link_has_its_own_host() {
+    let (first, second) = (fixture(false), fixture(false));
+    let a = Backend::start(first.root()).unwrap();
+    let b = Backend::start(second.root()).unwrap();
+    assert!(
+        !std::sync::Arc::ptr_eq(&a.host(), &b.host()),
+        "one host per link, not one per process"
+    );
+    // A repository switch gives the window a fresh host (no jobs or lines of the old link) while the
+    // window keeps waiting on the same notifier.
+    let before = a.host();
+    assert!(a.set_repo(second.root()));
+    assert!(!std::sync::Arc::ptr_eq(&before, &a.host()));
 }

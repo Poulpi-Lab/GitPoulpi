@@ -12,8 +12,8 @@ use gitpoulpi_i18n::msg::stage_guard as msg;
 use gitpoulpi_link::{report_ticket, Action, StepOutcome};
 use gpui_kit::{App, Window};
 
-use crate::app::workspace_of;
 use crate::daemon::host::SensitivePrompt;
+use crate::daemon::Shared;
 use crate::dialogs::{self, Choice, Spec};
 
 /// One line of the list: the path (with the line of a secret) and why it was flagged.
@@ -48,7 +48,7 @@ pub fn spec_of(files: &[Sensitive]) -> Spec {
 
 /// Asks the person. "Stage anyway" sends the action again with sensitive files allowed, under the same
 /// ticket; every other way out ends the ticket as canceled.
-pub fn ask(prompt: SensitivePrompt, window: &mut Window, cx: &mut App) {
+pub fn ask(prompt: SensitivePrompt, backend: Shared, window: &mut Window, cx: &mut App) {
     let SensitivePrompt {
         action,
         files,
@@ -60,15 +60,11 @@ pub fn ask(prompt: SensitivePrompt, window: &mut Window, cx: &mut App) {
         window,
         cx,
         spec,
-        move |ix, cx| {
+        move |ix, _| {
             if ix == 0 {
-                if let Some(ws) = workspace_of(cx) {
-                    let again = Action::AllowSensitive(Box::new(action));
-                    ws.read(cx)
-                        .backend()
-                        .with_link(|link| link.submit_as(ticket, again));
-                    return;
-                }
+                let again = Action::AllowSensitive(Box::new(action));
+                backend.with_link(|link| link.submit_as(ticket, again));
+                return;
             }
             report_ticket(ticket, StepOutcome::Canceled);
         },

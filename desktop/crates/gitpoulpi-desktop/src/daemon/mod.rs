@@ -4,8 +4,9 @@
 //! [`gitpoulpi_link::DaemonLink`] (which finds the session's running daemon through its discovery file
 //! or starts one inside this process), so a terminal UI, the CLI and this window on the same session
 //! see each other's changes live. Reads go through the link's own connection ([`Backend::call`]);
-//! refreshes the daemon pushes arrive on the link's receivers, which the window drains when
-//! [`host::DesktopHost`] wakes it (`app::live`); writes are link actions (`transfer`).
+//! what the daemon pushes arrives as typed events of [`DaemonLink::drain`], which the window takes
+//! when the link's own [`host::DesktopHost`] wakes it (`app::live`); writes are link actions
+//! (`transfer`).
 
 mod history;
 pub mod host;
@@ -23,19 +24,21 @@ use gitpoulpi_core::domain::{OperationKind, RepoRef};
 use gitpoulpi_link::{DaemonLink, Reply, Requester};
 use serde::de::DeserializeOwned;
 
-pub use history::{is_detached, merge_head_history, Refresh, Walk};
-pub use host::DesktopHost;
-pub use queries::LogSource;
+pub use history::{Refresh, Walk};
+pub use host::{DesktopHost, Notifier};
 
 struct Open {
     link: DaemonLink,
     repo: RepoRef,
     requester: Requester,
+    /// The host of this link alone.
+    host: Arc<DesktopHost>,
 }
 
 pub struct Backend {
     session: String,
-    host: Arc<DesktopHost>,
+    /// What the window waits on; it outlives a repository switch, each link's host bumps it.
+    notifier: Arc<Notifier>,
     open: Mutex<Open>,
 }
 
@@ -53,11 +56,11 @@ impl Backend {
     /// [`Backend::start`] in a named session (`--session`).
     pub fn start_in(session: String, repo_path: &Path) -> anyhow::Result<Shared> {
         let root = find_root(repo_path).ok_or_else(|| anyhow::anyhow!("not a git repository"))?;
-        let host = DesktopHost::global();
-        let open = open_link(&session, &root, &host);
+        let notifier = Arc::new(Notifier::default());
+        let open = open_link(&session, &root, &notifier);
         Ok(Arc::new(Self {
             session,
-            host,
+            notifier,
             open: Mutex::new(open),
         }))
     }
@@ -70,7 +73,7 @@ impl Backend {
     pub fn set_repo(&self, root: &Path) -> bool {
         match find_root(root) {
             Some(r) => {
-                *self.open() = open_link(&self.session, &r, &self.host);
+                *self.open() = open_link(&self.session, &r, &self.notifier);
                 true
             }
             None => false,
@@ -85,8 +88,14 @@ impl Backend {
         &self.session
     }
 
-    pub fn host(&self) -> &Arc<DesktopHost> {
-        &self.host
+    /// The host of the repository's link now.
+    pub fn host(&self) -> Arc<DesktopHost> {
+        self.open().host.clone()
+    }
+
+    /// What the window waits on for news of the link.
+    pub fn notifier(&self) -> &Arc<Notifier> {
+        &self.notifier
     }
 
     /// Runs `f` on the repository's link: the receivers to drain and the request methods.
@@ -104,7 +113,7 @@ impl Backend {
         let reply = self.open().requester.call::<T>(command, args);
         Answer {
             reply,
-            host: self.host.clone(),
+            notifier: self.notifier.clone(),
         }
     }
 }
@@ -112,7 +121,7 @@ impl Backend {
 /// The pending answer of one request.
 struct Answer<T> {
     reply: Reply<T>,
-    host: Arc<DesktopHost>,
+    notifier: Arc<Notifier>,
 }
 
 impl<T> Future for Answer<T> {
@@ -120,7 +129,7 @@ impl<T> Future for Answer<T> {
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         // Registered before the look, so an answer that lands in between wakes this poll again.
-        self.host.register(cx.waker());
+        self.notifier.register(cx.waker());
         match self.reply.take() {
             Some(result) => Poll::Ready(result.map_err(|e| host::failure_text(&e))),
             None => Poll::Pending,
@@ -128,14 +137,16 @@ impl<T> Future for Answer<T> {
     }
 }
 
-fn open_link(session: &str, root: &Path, host: &Arc<DesktopHost>) -> Open {
+fn open_link(session: &str, root: &Path, notifier: &Arc<Notifier>) -> Open {
     let repo = RepoRef::from_root(root);
+    let host = DesktopHost::new(notifier.clone());
     let link = gitpoulpi_link::start(session.to_string(), repo.clone(), host.clone());
     let requester = link.activity_handle().raw.requester();
     Open {
         link,
         repo,
         requester,
+        host,
     }
 }
 

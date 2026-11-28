@@ -15,9 +15,9 @@ use gpui_kit::{
 };
 
 use super::actions::{OpenRecent, RunCommand, SetLaneTheme, SetLang, SetTheme};
-use super::live::Notice;
 use super::workspace::Workspace;
 use crate::commands;
+use crate::commands::status::{self, Notice};
 use crate::prefs::PrefsStore;
 use crate::strings;
 use crate::theme::{self, CurrentTheme, Skin};
@@ -415,9 +415,12 @@ impl Workspace {
         row
     }
 
-    /// What the status line says about writes: a running action or job first, else the last result.
-    /// `true` marks a failure.
-    fn activity_text(&self, _cx: &Context<Self>) -> Option<(String, bool)> {
+    /// What the status line says: the one message (a command's answer, a pending chord, an action's
+    /// result) first, else a running action or job. `true` marks a failure.
+    fn activity_text(&self, cx: &Context<Self>) -> Option<(String, bool)> {
+        if let Some(Notice { text, error }) = status::notice(cx) {
+            return Some((text, error));
+        }
         let running = self.backend.with_link(|l| {
             l.activity_handle()
                 .in_flight_text(std::time::Duration::ZERO)
@@ -429,9 +432,7 @@ impl Workspace {
         if !jobs.is_empty() {
             return Some((strings::jobs_running(jobs.len()), false));
         }
-        self.notice
-            .as_ref()
-            .map(|Notice { text, error }| (text.clone(), *error))
+        None
     }
 
     pub(super) fn status_line(&self, cx: &mut Context<Self>) -> impl IntoElement {
@@ -488,10 +489,6 @@ impl Workspace {
             )
             .child("\u{2022}")
             .child(div().child(msg::footer::session(self.backend.session())))
-            .when_some(crate::commands::status::current(cx), |d, message| {
-                d.child("\u{2022}")
-                    .child(div().text_color(text).child(message))
-            })
             .child("\u{2022}")
             .children(self.activity_text(cx).map(|(text, error)| {
                 div()

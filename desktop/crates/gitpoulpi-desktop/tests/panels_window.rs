@@ -111,6 +111,39 @@ fn the_refs_sidebar_lists_the_terminal_uis_sections_and_folders(cx: &mut TestApp
 }
 
 #[gpui_kit::test]
+fn stashes_and_linked_worktrees_get_their_sections_in_the_shared_order(cx: &mut TestAppContext) {
+    let repo = three_commits().build();
+    repo.git(&["tag", "v1"]);
+    std::fs::write(repo.root().join("a.txt"), "changed").unwrap();
+    repo.git(&["stash", "push", "-m", "parked"]);
+    let linked = repo.root().with_extension("linked");
+    repo.git(&["worktree", "add", linked.to_str().unwrap(), "-b", "other"]);
+    let prefs = tempfile::tempdir().unwrap();
+    let (_window, ws) = open(cx, repo.root(), prefs.path());
+    wait_until(cx, "the stash and worktree sections", |cx| {
+        ws.read_with(cx, |ws, cx| ws.refs.read(cx).section_titles().len() == 5)
+    });
+    let titles = ws.read_with(cx, |ws, cx| ws.refs.read(cx).section_titles());
+    let names: Vec<&str> = titles
+        .iter()
+        .map(|t| t.split(" (").next().unwrap_or(""))
+        .collect();
+    use gitpoulpi_app::palette::vocab::refs_sidebar::SidebarSection as S;
+    assert_eq!(
+        names,
+        vec![
+            S::Local.display_title(),
+            S::Remote.display_title(),
+            S::Worktrees.display_title(),
+            S::Stashes.display_title(),
+            S::Tags.display_title(),
+        ],
+        "the shared order, no placeholder for pull requests or issues: {titles:?}"
+    );
+    let _ = std::fs::remove_dir_all(&linked);
+}
+
+#[gpui_kit::test]
 fn hiding_a_ref_leaves_its_commits_out_of_the_log_and_is_remembered(cx: &mut TestAppContext) {
     let repo = with_side_branch();
     let prefs = tempfile::tempdir().unwrap();

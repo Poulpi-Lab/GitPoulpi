@@ -11,16 +11,17 @@ use gpui_kit::component::{
     v_flex,
 };
 use gpui_kit::{
-    div, px, App, AppContext as _, Context, Entity, Focusable as _, Image, ImageFormat,
-    InteractiveElement as _, IntoElement, ParentElement as _, Render, Styled as _, Subscription,
-    Task, Window,
+    div, px, AnyWindowHandle, App, AppContext as _, Context, Entity, Focusable as _, Image,
+    ImageFormat, InteractiveElement as _, IntoElement, ParentElement as _, Render, Styled as _,
+    Subscription, Task, Window,
 };
 
 mod stage;
 
 use super::actions::WorkspaceHandle;
-use super::live::{LiveState, Notice};
+use super::live::LiveState;
 use crate::commands::context::WindowState;
+use crate::commands::status;
 use crate::daemon::Shared;
 use crate::menu::MenuBar;
 use crate::panels::diff::{DiffPane, DiffPaneEvent, DiffSource};
@@ -59,10 +60,10 @@ pub struct Workspace {
     menu_bar: Entity<MenuBar>,
     selected_commit: bool,
     pub(super) summary: Option<Summary>,
-    /// What the last action said, for the status line.
-    pub(super) notice: Option<Notice>,
     pub(super) live: LiveState,
     pub(super) _pump: Option<Task<()>>,
+    /// The window this workspace is shown in: where the link's questions (the sensitive-files one) go.
+    pub(super) window: AnyWindowHandle,
     pub(super) logo: Arc<Image>,
     _save_window: Option<Task<()>>,
     _subs: Vec<Subscription>,
@@ -102,10 +103,7 @@ impl Workspace {
                         this.diff.read(cx).focus_handle(cx).focus(window, cx);
                         cx.notify();
                     }
-                    RightEvent::Say(text) => {
-                        this.notice = Some(Notice::info(text.clone()));
-                        cx.notify();
-                    }
+                    RightEvent::Say(text) => this.say(text.clone(), cx),
                 },
             ),
             cx.subscribe_in(
@@ -114,10 +112,7 @@ impl Workspace {
                 |this, _, ev: &DiffPaneEvent, window, cx| match ev {
                     DiffPaneEvent::Close => this.close_diff(window, cx),
                     DiffPaneEvent::Part(req) => this.on_part(req.clone(), window, cx),
-                    DiffPaneEvent::Say(text) => {
-                        this.notice = Some(Notice::info(text.clone()));
-                        cx.notify();
-                    }
+                    DiffPaneEvent::Say(text) => this.say(text.clone(), cx),
                 },
             ),
             cx.subscribe(&panes, |this, _, _: &ResizablePanelEvent, cx| {
@@ -143,9 +138,9 @@ impl Workspace {
             menu_bar,
             selected_commit: false,
             summary: None,
-            notice: None,
             live: LiveState::default(),
             _pump: None,
+            window: window.window_handle(),
             logo: Arc::new(Image::from_bytes(ImageFormat::Png, LOGO_PNG.to_vec())),
             _save_window: None,
             _subs: subs,
@@ -213,7 +208,7 @@ impl Workspace {
 
     /// Puts a line in the status line.
     pub(crate) fn say(&mut self, text: impl Into<String>, cx: &mut Context<Self>) {
-        self.notice = Some(Notice::info(text));
+        status::set(cx, text);
         cx.notify();
     }
 
@@ -284,7 +279,7 @@ impl Workspace {
         if self.backend.set_repo(path) {
             let root = self.backend.repo_root().to_string_lossy().into_owned();
             PrefsStore::update(cx, |p| p.remember_recent(&root));
-            self.reset_live();
+            self.reset_live(cx);
             self.refs.update(cx, |r, cx| r.reload(cx));
             self.log.update(cx, |l, cx| l.reload(cx));
             cx.notify();

@@ -8,7 +8,10 @@ Ekran Ustawień zastępuje okno na czas, gdy jest otwarty. Zamykasz go przez `�
 górnym rogu, `Esc` lub `q`. Pyta wcześniej tylko wtedy, gdy zamknięcie coś by zgubiło (zob.
 [Zamykanie Ustawień](#zamykanie-ustawień)).
 
-Zmiany są od razu zapisywane w `config.toml`. [Opis konfiguracji](config-reference.md)
+Zmiany są od razu zapisywane: ustawienia interfejsu (motyw, układ, kolumny, wyświetlanie
+diffów i obrazów, skróty...) w `tui.toml`, wszystko inne w `config.toml`, oba w twoim
+folderze konfiguracji ([dlaczego dwa pliki](config-reference.md#dwa-pliki-configtoml-i-tuitoml)).
+[Opis konfiguracji](config-reference.md)
 podaje każdy klucz, jego wartość domyślną i zmienną środowiskową. Ta strona
 opisuje sam ekran Ustawień.
 
@@ -147,7 +150,7 @@ Większość ustawień można zmienić bez otwierania tego ekranu: wpisz `Ustawi
 
 ![Paleta poleceń przefiltrowana na Settings: z jednym wierszem na ustawienie i jego bieżącą wartością po prawej](../images/palette-settings.png)
 
-Wartość jest zapisywana w `config.toml` i stosowana dokładnie tak jak na stronie. Angielskie słowa klucza ustawienia (`remember tabs`) znajdują wiersz w każdym języku.
+Wartość jest zapisywana do swojego pliku (`tui.toml` lub `config.toml`) i stosowana dokładnie tak jak na stronie. Angielskie słowa klucza ustawienia (`remember tabs`) znajdują wiersz w każdym języku.
 
 ## Strony
 
@@ -458,11 +461,11 @@ punkt końcowy HTTP. Wiersze MCP są widoczne tylko w kompilacjach zawierającyc
 | **Położenie paska stanu** | `ui.statusbar_position`: Gdzie leży pasek stanu (gałąź, liczniki, komunikaty, podpowiedzi klawiszy): U góry, nad kartami repozytoriów, lub Na dole (domyślnie). Karta Home zachowuje własny pasek stanu na dole. Działa od razu. |
 | **Położenie paska kart** | `ui.tabs_position`: Gdzie leżą karty repozytoriów: U góry (domyślnie), Na dole lub Po lewej, lista z jedną kartą w wierszu przy lewej krawędzi okna. W oknie węższym niż 80 kolumn są rysowane u góry. Obok paska narzędzi w kolumnie karty zostają na zewnątrz. Działa od razu. |
 | **Ustawienia regionalne daty/czasu** | **systemowy** (domyślnie): nazwy miesięcy i dni tygodnia w języku interfejsu. **english**: zawsze angielskie nazwy. |
-| **Format daty**, **Format daty/czasu**, **Format daty rozszerzony** | Wzorce dat dla kolumny daty w Historii pliku i Blame, dla kolumny Data w Logu oraz dla szczegółów commita. Każdy pokazuje podgląd na żywo. Znaczniki opisuje [Opis konfiguracji](config-reference.md#ui). |
+| **Format daty**, **Format daty/czasu**, **Format daty rozszerzony** | Wzorce dat dla kolumny daty w Historii pliku i Blame, dla kolumny Data w Logu oraz dla szczegółów commita. Każdy pokazuje podgląd na żywo. Znaczniki opisuje [Opis konfiguracji](config-reference.md#ui-w-tuitoml). |
 
 ![Lista Motyw kolorów grafu: Zgodnie z motywem, a potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
 
-Motyw i kolory grafu (Motyw, motyw kolorów grafu, kolorowanie i tło ścieżek, siła podkreślenia wierszy) należą do każdej instalacji: gdy kilka instalacji współdzieli jeden `config.toml`, zmiana ich w jednej nigdy nie zmienia pozostałych. Tylko instalacja główna zapisuje też wspólne klucze `ui.*`.
+Motyw i kolory grafu (Motyw, motyw kolorów grafu, kolorowanie i tło ścieżek, siła podkreślenia wierszy) należą do każdej instalacji: gdy kilka instalacji współdzieli jeden `config.toml`, zmiana ich w jednej nigdy nie zmienia pozostałych. Tylko instalacja główna zapisuje też wspólne klucze `ui.*`, w `tui.toml`; pozostałe trzymają swoje we własnym wpisie `config.toml`.
 ### Klawiatura i mysz
 
 ![Strona Klawiatura i mysz: każda akcja według kontekstu z jej klawiszami, pole wyszukiwania i filtry](../images/settings-keyboard.png)
@@ -481,7 +484,7 @@ wylicza każdy skrót według kontekstu, z polem wyszukiwania (`/`) i filtrami. 
 | `c` lub kliknięcie `!` w wierszu | Pokazuje akcję ze wszystkimi akcjami, z którymi koliduje jej klawisz; `Esc` znów pokazuje wszystko. Klawisz kolidujący z klawiszem innej akcji jest czerwony, ostrzeżenie dotyczące samego klawisza (terminal nie może go wysłać) pomarańczowe. |
 
 Użyj tego do rozwiązywania kolizji z tmux, AutoHotkey, herdr lub terminalem.
-Te same ustawienia znajdują się w tabeli `[keybindings]` pliku `config.toml`;
+Te same ustawienia znajdują się w tabeli `[keybindings]` pliku `tui.toml`;
 zob. [Opis konfiguracji](config-reference.md#keybindings) i
 [Skróty klawiszowe](keybindings.md).
 
@@ -840,8 +843,10 @@ wersją roboczą najpierw pyta.
 
 ## Pliki, zmienne środowiskowe i CLI
 
-- Plik ustawień to `config.toml` w katalogu konfiguracji systemu.
-  `gitpoulpi config path` wypisuje jego położenie.
+- Pliki ustawień to `config.toml` (ustawienia wspólne) i `tui.toml` (ustawienia
+  interfejsu terminalowego UI) w katalogu konfiguracji systemu.
+  `gitpoulpi config path` wypisuje ich położenie; `gitpoulpi config get <key>`
+  mówi, w którym pliku jest klucz.
 - Stan poszczególnych repozytoriów jest w `.gitpoulpi/repo-state.toml` wewnątrz
   repozytorium.
 - `gitpoulpi config get <key>` i `gitpoulpi config set <key> <value>` czytają

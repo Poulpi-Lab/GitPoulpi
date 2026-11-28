@@ -211,8 +211,25 @@ AI](ai.md#rozwiązywanie-problemów).
 `gitpoulpi-tui-exit.log` (oraz `gitpoulpi-tui-panic.txt` po awarii) w
 katalogu konfiguracji (`gitpoulpi config path` wypisuje plik ustawień, który tam leży), i dołącz go do zgłoszenia.
 
-**Gdzie są ustawienia?** `gitpoulpi config path`. Stan dla repozytorium jest w
-`.gitpoulpi/repo-state.toml` wewnątrz repozytorium.
+**Gdzie są ustawienia?** `gitpoulpi config path` wypisuje `config.toml` (ustawienia
+wspólne) i `tui.toml` (ustawienia interfejsu terminalowego UI: motyw, układ,
+kolumny, skróty...), które leżą w tym samym folderze. `gitpoulpi config get <key>`
+mówi, w którym z nich jest klucz. Stan dla repozytorium jest w
+`.gitpoulpi/repo-state.toml` wewnątrz repozytorium. Zob.
+[Dwa pliki](config-reference.md#dwa-pliki-configtoml-i-tuitoml).
+
+**Wróciłem do starszego GitPoulpi i moje ustawienia interfejsu się zmieniły (albo
+nowsze ignoruje to, co ustawiłem w starszym).** GitPoulpi trzyma ustawienia
+interfejsu w `tui.toml`, tworzonym jako kopia tego, co zawierał `config.toml`, a
+niczego nie usuwa z `config.toml`. Starsze GitPoulpi zainstalowane obok nowszego
+nie zna `tui.toml`: nadal czyta i zapisuje swój własny pełny `config.toml`. Gdy
+`tui.toml` istnieje, nowsze czyta z niego ustawienia interfejsu wyłącznie, więc motyw
+lub układ zmieniony później w starszej wersji nie jest przejmowany, a klucz
+brakujący w `tui.toml` przyjmuje wartość domyślną, a nie starą wartość z
+`config.toml`. Aby zrównać nowszą wersję, zmień ustawienie w niej (Ustawienia albo
+`gitpoulpi config set`); aby zacząć ustawienia interfejsu od nowa z `config.toml`,
+zamknij GitPoulpi i usuń `tui.toml` (zostanie utworzony ponownie, jako świeża
+kopia, przy następnym starcie).
 
 **Czy GitPoulpi coś gdzieś wysyła?** Tylko to, o co prosisz: operacje git
 do twoich zdalnych repozytoriów, żądania hostingu po podłączeniu konta, żądania AI

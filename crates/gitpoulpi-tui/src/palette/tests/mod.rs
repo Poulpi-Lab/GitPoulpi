@@ -10,4 +10,5 @@ mod matching;
 mod pure_files;
 mod sequences;
 mod settings;
+mod settings_pinned;
 mod shortcuts;

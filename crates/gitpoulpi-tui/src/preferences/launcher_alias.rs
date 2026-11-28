@@ -227,25 +227,6 @@ pub(super) fn name_error_text(e: NameError) -> &'static str {
     }
 }
 
-/// Whether `reason` is one of these rows' own notes (shown as is, not behind
-/// "coming").
-pub(super) fn is_note(reason: &str) -> bool {
-    [
-        t::ALIAS_SET_NAME,
-        t::ALIAS_BAD_SPACE,
-        t::ALIAS_BAD_SEPARATOR,
-        t::ALIAS_BAD_CHAR,
-        t::ALIAS_BAD_START,
-        t::ALIAS_BAD_LONG,
-        t::ALIAS_CREATED,
-        t::PATH_STATE_NONE,
-        t::PATH_STATE_ADDED,
-        t::PATH_STATE_ON,
-    ]
-    .iter()
-    .any(|m| m.get() == reason)
-}
-
 impl PreferencesState {
     /// Where the machine comes from, for the jobs of the installation rows.
     pub(super) fn tools_machine_factory(&self) -> Arc<dyn Fn() -> Machine + Send + Sync> {

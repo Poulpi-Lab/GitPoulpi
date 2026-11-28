@@ -158,6 +158,8 @@ mod tests {
     use super::*;
     use std::collections::HashSet;
 
+    const PINNED_ROWS: usize = 1194;
+
     #[test]
     fn ids_are_unique() {
         let rows = parity_rows();
@@ -165,6 +167,34 @@ mod tests {
         for row in &rows {
             assert!(seen.insert(row.id.clone()), "duplicate id {}", row.id);
         }
+    }
+
+    /// The table lists the same rows as before the Settings rows came from the
+    /// shared model: its size and the Settings family rows (the generic one,
+    /// then the terminal-only settings in `TERMINAL_ONLY_SETTINGS` order).
+    #[test]
+    fn the_table_and_its_settings_rows_are_pinned() {
+        let rows = parity_rows();
+        assert_eq!(rows.len(), PINNED_ROWS);
+        let settings: Vec<(&str, bool)> = rows
+            .iter()
+            .filter(|r| r.id.starts_with("settings."))
+            .map(|r| (r.id.as_str(), r.surface.terminal_only_reason().is_some()))
+            .collect();
+        assert_eq!(
+            settings,
+            [
+                ("settings.*", false),
+                ("settings.ui.color_depth", true),
+                ("settings.ui.kitty_keyboard", true),
+                ("settings.ui.image_protocol", true),
+                ("settings.ui.image_view_text_fallback", true),
+                ("settings.ui.text_cursor", true),
+                ("settings.ui.mouse_enabled", true),
+                ("settings.ui.launch_terminal", true),
+                ("settings.ui.relaunch_in_terminal", true),
+            ]
+        );
     }
 
     #[test]

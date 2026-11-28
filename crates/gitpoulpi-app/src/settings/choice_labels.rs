@@ -9,7 +9,7 @@ use gitpoulpi_i18n::M;
 /// per-key word where the same raw value reads differently (`off` as
 /// `Off`), then the shared word, else `raw` itself (encodings, terminal
 /// presets, profile names).
-pub(super) fn label(key: &str, raw: &str) -> String {
+pub fn label(key: &str, raw: &str) -> String {
     keyed(key, raw)
         .or_else(|| shared(key, raw))
         .map_or_else(|| raw.to_string(), |m| m.get().to_string())
@@ -17,7 +17,7 @@ pub(super) fn label(key: &str, raw: &str) -> String {
 
 /// The group headings of the Add preset combobox (`detected`, `explorer`,
 /// `multiplexer`, `terminal`, `editor`).
-pub(super) fn open_in_group(group: &str) -> String {
+pub fn open_in_group(group: &str) -> String {
     use gitpoulpi_i18n::msg::settings_open_in as t;
     match group {
         "detected" => t::GROUP_DETECTED,

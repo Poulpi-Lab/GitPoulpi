@@ -31,6 +31,7 @@ pub mod refs_tree;
 pub mod registry;
 pub mod repo_facts;
 pub mod sequences;
+pub mod settings;
 pub mod status_rows;
 pub mod surface;
 pub mod tag_where;

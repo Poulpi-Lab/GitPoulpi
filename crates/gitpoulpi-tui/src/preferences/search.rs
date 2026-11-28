@@ -16,7 +16,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, BorderType, Borders, Paragraph};
 use ratatui::Frame;
 
-use super::{Control, PrefFocus, PrefSection, PreferencesState, SubTab};
+use super::{Control, PrefFocus, PrefSection, PrefSectionExt, PreferencesState, SubTab};
 use crate::display_width;
 use gitpoulpi_i18n::msg::settings_screen as screen;
 
@@ -97,7 +97,7 @@ pub(super) struct Entry {
 /// in the label, the page title or the help, each in the interface
 /// language or in English.
 pub(super) fn matches(query: &str, entries: &[Entry]) -> Vec<Hit> {
-    let words: Vec<String> = query.split_whitespace().map(str::to_lowercase).collect();
+    let words = gitpoulpi_app::settings::search::query_words(query);
     if words.is_empty() {
         return Vec::new();
     }
@@ -106,22 +106,17 @@ pub(super) fn matches(query: &str, entries: &[Entry]) -> Vec<Hit> {
         let (section, field, label, page) =
             (&entry.section, &entry.field, &entry.label, &entry.page);
         let tab = entry.tab;
-        let label_l = format!("{} {}", label, entry.label_en).to_lowercase();
-        let page_l = format!("{} {}", page, entry.page_en).to_lowercase();
-        let help_l = format!("{} {}", entry.help, entry.help_en).to_lowercase();
-        let tier = if words.iter().all(|w| label_l.contains(w)) {
-            0
-        } else if words
-            .iter()
-            .all(|w| label_l.contains(w) || page_l.contains(w))
-        {
-            1
-        } else if words
-            .iter()
-            .all(|w| label_l.contains(w) || page_l.contains(w) || help_l.contains(w))
-        {
-            2
-        } else {
+        let Some(tier) = gitpoulpi_app::settings::search::tier(
+            &words,
+            gitpoulpi_app::settings::search::Texts {
+                label,
+                label_en: &entry.label_en,
+                page,
+                page_en: &entry.page_en,
+                help: &entry.help,
+                help_en: &entry.help_en,
+            },
+        ) else {
             continue;
         };
         scored.push((

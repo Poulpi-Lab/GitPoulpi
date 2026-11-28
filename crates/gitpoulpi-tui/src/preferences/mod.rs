@@ -45,12 +45,7 @@ use std::path::{Path, PathBuf};
 use crate::wide_edge::Clear;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind};
 use gitpoulpi_config::{
-    set_list_in_file, AvatarFallback, AvatarPlacement, AvatarSources, ColorDepth, ComposerFiles,
-    Config, ConfigPaths, DefaultBackend, DialogGeometry, DiffLayout, GraphLaneBackground,
-    GraphRenderer, GraphRowTintStrength, ImageProtocol, KittyKeyboard, Profile, PullButtonMode,
-    PushBehavior, StatusbarPosition, TabDirFollow, TabsPosition, TextCursor, ToolbarAlign,
-    ToolbarPosition, UiLanguage, MAX_MOUSE_SCROLL_LINES, MIN_COMMITS_PER_LAZY_PAGE,
-    MIN_INITIAL_COMMITS_IN_GRAPH, MIN_MOUSE_SCROLL_LINES,
+    set_list_in_file, Config, ConfigPaths, DefaultBackend, Profile, PullButtonMode, PushBehavior,
 };
 use gitpoulpi_core::domain::MergeFastForward;
 use gitpoulpi_secrets::{CredentialHelperTokens, TokenStore};
@@ -66,7 +61,7 @@ use crate::{display_width, wrap_words};
 #[cfg_attr(not(feature = "ai"), path = "ai_page_stub.rs")]
 mod ai_page;
 mod buttons;
-mod choice_labels;
+pub(crate) use gitpoulpi_app::settings::choice_labels;
 mod close_guard;
 mod commit_pages;
 mod conflict_pages;
@@ -101,7 +96,6 @@ mod pages;
 pub(crate) mod palette_settings;
 mod persist;
 mod quantity;
-mod quantity_rows;
 mod render;
 mod repo_auth_page;
 mod repo_pages;
@@ -110,9 +104,11 @@ mod sequences_ai;
 mod sequences_page;
 mod sequences_picker;
 mod sequences_rows;
+mod shared_rows;
 mod sub_tabs;
 mod theme_page;
-mod updates_rows;
+use gitpoulpi_app::settings::Swatch;
+use shared_rows::{swatch_color, swatch_of};
 mod view_memory;
 mod workflow_page;
 use ai_page::AiPage;
@@ -133,11 +129,12 @@ pub(crate) fn ai_action_built(action: gitpoulpi_config::AiAction) -> bool {
 pub(crate) use sub_tabs::SubTab;
 
 use crate::live_settings::{
-    format_date, install_active_profile, install_auto_prune, install_date_patterns,
+    install_active_profile, install_auto_prune, install_date_patterns,
     install_delete_orig_after_merge, install_diff_view_prefs, install_language,
     install_log_wip_counts_in_message, install_minimap, DiffViewPrefs,
 };
 
+use model::PrefSectionExt;
 use model::{
     Btn, ChipCell, Control, CtrlCell, Field, PrefAction, PrefFocus, PrefSection, QuantityUnit,
     RepoField, Target, TextSlot,

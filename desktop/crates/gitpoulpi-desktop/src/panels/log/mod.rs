@@ -16,7 +16,12 @@ mod pills;
 mod rows;
 mod search;
 
-use gitpoulpi_core::domain::{Oid, StatusEntry};
+use std::collections::HashSet;
+
+use gitpoulpi_app::graph::{LazyLog, LogLoadSettings, TotalShown};
+use gitpoulpi_config::CommitCountMethod;
+use gitpoulpi_core::domain::{Oid, RefFilter, StatusEntry};
+use gitpoulpi_i18n::msg;
 use gpui_kit::component::{scroll::Scrollbar, v_flex};
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
@@ -68,7 +73,7 @@ pub fn init(cx: &mut App) {
 /// What the status line shows about the loaded history.
 pub struct Summary {
     pub loaded: usize,
-    pub total: Option<u64>,
+    pub total: TotalShown,
     pub branch: Option<String>,
     pub ms: u128,
     pub status: Vec<StatusEntry>,
@@ -87,10 +92,41 @@ pub struct LogPanel {
     columns: ColumnState,
     search: SearchState,
     focus: FocusHandle,
-    more: bool,
-    loading_more: bool,
+    /// Paging: page size, ceiling, lazy on/off and the detached-HEAD front (shared with the terminal UI).
+    lazy: LazyLog,
+    /// The hidden and soloed refs, as the Refs sidebar edits them.
+    hidden: HashSet<String>,
+    solo: HashSet<String>,
+    /// What the hidden set means to the daemon's walk.
+    filter: RefFilter,
+    total: load::CommitCount,
+    count_method: CommitCountMethod,
+    last_ms: u128,
+    /// Bumped by every reload so a layout computed for an older list is dropped.
+    generation: u64,
     _subs: Vec<Subscription>,
     _load: Option<Task<()>>,
+    _layout: Option<Task<()>>,
+}
+
+/// The status line's commit count: `500 commits`, `500 / 48213` or `500 / ...` while it is counted.
+pub fn commit_count_text(loaded: usize, total: TotalShown) -> String {
+    match total {
+        TotalShown::Whole => msg::footer::commit_count(loaded as u64),
+        TotalShown::Counting => msg::footer::commit_total_pending(loaded),
+        TotalShown::Of(t) => msg::footer::commit_total(t, loaded),
+    }
+}
+
+/// The log settings of the user's config (defaults when it cannot be read).
+fn load_settings() -> (LogLoadSettings, CommitCountMethod) {
+    match gitpoulpi_config::Settings::resolve_ambient() {
+        Ok(s) => (
+            LogLoadSettings::from_config(&s.config().general),
+            s.config().log.commit_count,
+        ),
+        Err(_) => (LogLoadSettings::default(), CommitCountMethod::default()),
+    }
 }
 
 impl EventEmitter<LogEvent> for LogPanel {}
@@ -99,6 +135,8 @@ impl LogPanel {
     pub fn new(backend: Shared, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let (search, subs) = SearchState::new(window, cx);
         let columns = ColumnState::for_repo(&backend.repo_root().to_string_lossy(), cx);
+        let (hidden, solo) = gitpoulpi_app::refs_tree::load_ref_visibility(&backend.repo_root());
+        let (settings, count_method) = load_settings();
         let mut this = Self {
             backend,
             data: LogData::default(),
@@ -107,10 +145,17 @@ impl LogPanel {
             columns,
             search,
             focus: cx.focus_handle(),
-            more: false,
-            loading_more: false,
+            lazy: LazyLog::new(settings),
+            filter: gitpoulpi_app::graph::walk_filter(&hidden, &solo),
+            hidden,
+            solo,
+            total: load::CommitCount::default(),
+            count_method,
+            last_ms: 0,
+            generation: 0,
             _subs: subs,
             _load: None,
+            _layout: None,
         };
         this.reload(cx);
         this
@@ -127,6 +172,22 @@ impl LogPanel {
     /// Number of commits held (stash and WIP rows excluded).
     pub fn loaded_commits(&self) -> usize {
         self.data.nodes.len()
+    }
+
+    /// What the status line says about the total (`Whole`, `Counting` or `Of(total)`).
+    pub fn commit_total(&self) -> TotalShown {
+        self.total
+            .shown(self.data.held.len(), self.lazy.is_exhausted())
+    }
+
+    /// Whether the whole history is held (the walk was read to its root).
+    pub fn is_exhausted(&self) -> bool {
+        self.lazy.is_exhausted()
+    }
+
+    /// The selected row.
+    pub fn selected_row(&self) -> usize {
+        self.selected
     }
 
     /// Number of rows shown, WIP and stash rows included.
@@ -215,7 +276,7 @@ impl Render for LogPanel {
             palette,
             matches: self.search.match_set(),
             query_active: self.search.active(),
-            more: self.more,
+            more: !self.lazy.is_exhausted() && !self.lazy.is_at_ceiling(),
             total,
         };
         let list = uniform_list("log-rows", total, move |range, _window, cx| {
@@ -260,5 +321,30 @@ impl Render for LogPanel {
                     .child(list)
                     .child(Scrollbar::vertical(&self.scroll)),
             )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_commit_count_reads_like_the_terminal_uis() {
+        assert_eq!(
+            commit_count_text(500, TotalShown::Of(48213)),
+            msg::footer::commit_total(48213, 500)
+        );
+        assert_eq!(
+            commit_count_text(500, TotalShown::Counting),
+            msg::footer::commit_total_pending(500)
+        );
+        assert_eq!(
+            commit_count_text(2500, TotalShown::Whole),
+            msg::footer::commit_count(2500)
+        );
+        assert_ne!(
+            commit_count_text(500, TotalShown::Of(48213)),
+            commit_count_text(500, TotalShown::Counting)
+        );
     }
 }

@@ -22,7 +22,7 @@ use gitpoulpi_core::domain::{OperationKind, RepoRef};
 use gitpoulpi_link::{DaemonLink, Reply, Requester};
 use serde::de::DeserializeOwned;
 
-pub use history::{HistoryPlan, HistoryStart, FIRST_PAGE, NEXT_PAGE};
+pub use history::{is_detached, merge_head_history, Refresh, Walk};
 pub use host::DesktopHost;
 pub use queries::LogSource;
 

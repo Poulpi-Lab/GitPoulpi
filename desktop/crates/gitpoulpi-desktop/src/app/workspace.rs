@@ -76,6 +76,11 @@ impl Workspace {
                     this.show_log(cx);
                     this.log.update(cx, |l, cx| l.select_oid(*oid, cx));
                 }
+                RefsEvent::VisibilityChanged { hidden, solo } => {
+                    let (hidden, solo) = (hidden.clone(), solo.clone());
+                    this.log
+                        .update(cx, |l, cx| l.set_visibility(hidden, solo, cx));
+                }
             }),
             cx.subscribe_in(
                 &right,

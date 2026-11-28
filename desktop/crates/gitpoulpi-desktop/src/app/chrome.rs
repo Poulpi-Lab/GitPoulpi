@@ -444,11 +444,7 @@ impl Workspace {
         let summary = self.summary.as_ref();
         let dirty = summary.map(|s| !s.status.is_empty()).unwrap_or(false);
         let commits = match summary {
-            Some(s) => match s.total {
-                Some(t) if t as usize != s.loaded => msg::footer::commit_total(t, s.loaded),
-                Some(t) => msg::footer::commit_count(t),
-                None => msg::footer::commit_total_pending(s.loaded),
-            },
+            Some(s) => crate::panels::log::commit_count_text(s.loaded, s.total),
             None => String::new(),
         };
         let branch = match summary {

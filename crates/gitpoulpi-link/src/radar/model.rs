@@ -14,11 +14,11 @@ use gitpoulpi_session::{ItemKey, RadarState, KIND_ISSUE, KIND_PR, KIND_WIP};
 
 use super::account::{self, AccountAnswer, AccountInput, CloneIndex};
 use super::worker::RepoAnswer;
-use crate::repo_switcher::RepoFacts;
+use gitpoulpi_app::repo_facts::RepoFacts;
 
 /// What an item is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum ItemKind {
+pub enum ItemKind {
     Pr,
     Issue,
     Wip,
@@ -29,7 +29,7 @@ pub(crate) enum ItemKind {
 /// one of the issue groups; [`Group::Mentioned`] takes both kinds, what mentions
 /// the user and is neither theirs, asked of them nor assigned to them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub(crate) enum Group {
+pub enum Group {
     NeedsReview,
     Mine,
     Assigned,
@@ -41,7 +41,7 @@ pub(crate) enum Group {
 }
 
 impl Group {
-    pub(crate) const ALL: [Group; 8] = [
+    pub const ALL: [Group; 8] = [
         Group::NeedsReview,
         Group::Mine,
         Group::Assigned,
@@ -55,18 +55,18 @@ impl Group {
 
 /// What a WIP row says about its repository.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct WipFacts {
-    pub(crate) branch: Option<String>,
-    pub(crate) modified: u32,
-    pub(crate) added: u32,
-    pub(crate) ahead: u32,
-    pub(crate) behind: u32,
+pub struct WipFacts {
+    pub branch: Option<String>,
+    pub modified: u32,
+    pub added: u32,
+    pub ahead: u32,
+    pub behind: u32,
 }
 
 impl WipFacts {
     /// A repository belongs in the WIP group when it has uncommitted changes
     /// or commits not pushed yet.
-    pub(crate) fn of(facts: &RepoFacts) -> Option<Self> {
+    pub fn of(facts: &RepoFacts) -> Option<Self> {
         (facts.dirty || facts.ahead > 0 || facts.modified > 0 || facts.added > 0).then(|| Self {
             branch: facts.branch.clone(),
             modified: facts.modified,
@@ -84,69 +84,69 @@ impl WipFacts {
 
 /// One row's worth of data.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Item {
-    pub(crate) key: ItemKey,
-    pub(crate) kind: ItemKind,
-    pub(crate) group: Group,
+pub struct Item {
+    pub key: ItemKey,
+    pub kind: ItemKind,
+    pub group: Group,
     /// The local clone the item belongs to; `None` for an account-wide row
     /// of a repository with no known clone ("not cloned").
-    pub(crate) repo: Option<PathBuf>,
-    pub(crate) repo_name: String,
+    pub repo: Option<PathBuf>,
+    pub repo_name: String,
     /// The integration an account-wide row came from; empty for the scope's.
-    pub(crate) integration: String,
+    pub integration: String,
     /// `owner/name` on the host (account-wide rows).
-    pub(crate) project: String,
+    pub project: String,
     /// Where to clone the project from (account-wide rows; may be empty).
-    pub(crate) clone_url: String,
-    pub(crate) number: u64,
+    pub clone_url: String,
+    pub number: u64,
     /// `#12`, `!53`; empty for a WIP row.
-    pub(crate) label: String,
-    pub(crate) title: String,
-    pub(crate) author: String,
-    pub(crate) url: String,
+    pub label: String,
+    pub title: String,
+    pub author: String,
+    pub url: String,
     /// A request's source branch, a WIP row's current branch.
-    pub(crate) branch: Option<String>,
-    pub(crate) updated_at: String,
-    pub(crate) labels: Vec<String>,
-    pub(crate) draft: bool,
-    pub(crate) review_requested: bool,
+    pub branch: Option<String>,
+    pub updated_at: String,
+    pub labels: Vec<String>,
+    pub draft: bool,
+    pub review_requested: bool,
     /// The request comes from a fork (its branch is not in the repository).
-    pub(crate) fork: bool,
-    pub(crate) gitlab: bool,
+    pub fork: bool,
+    pub gitlab: bool,
     /// The provider takes assignees, reviewers, labels and milestones
     /// (GitHub, GitLab).
-    pub(crate) meta: bool,
+    pub meta: bool,
     /// The in-app review exists for the provider (GitHub, GitLab, Gitea,
     /// Forgejo, Gerrit).
-    pub(crate) review: bool,
-    pub(crate) wip: Option<WipFacts>,
+    pub review: bool,
+    pub wip: Option<WipFacts>,
     /// A request's target branch (the detail line names it for a conflict).
-    pub(crate) target: String,
+    pub target: String,
     /// The head's checks, when the host said.
-    pub(crate) checks: Option<ChecksState>,
+    pub checks: Option<ChecksState>,
     /// The request conflicts with its target, when the host said.
-    pub(crate) has_conflicts: Option<bool>,
+    pub has_conflicts: Option<bool>,
     /// The item mentions the user (whatever group it is in).
-    pub(crate) mentioned: bool,
+    pub mentioned: bool,
     /// The integration the row's host calls go through (scope rows too);
     /// empty for a WIP row.
-    pub(crate) host_id: String,
+    pub host_id: String,
     /// `owner/name` on the host, for every row that has a host.
-    pub(crate) host_project: String,
+    pub host_project: String,
     /// The provider's name (`GitLab`), for "not supported by ...".
-    pub(crate) host_label: String,
+    pub host_label: String,
     /// What the host lets a request or issue do (merge, close, ready).
-    pub(crate) acts: gitpoulpi_hosting::RequestActions,
+    pub acts: gitpoulpi_hosting::RequestActions,
     /// A fork request's source owner (`alice` of `alice/app`); empty when
     /// the source branch is in the repository itself.
-    pub(crate) fork_owner: String,
+    pub fork_owner: String,
 }
 
 impl Item {
     /// `source → target` for a request, `owner:source` when the source is a
     /// fork's; empty when the host did not say. A missing target leaves the
     /// source alone, a missing source leaves nothing.
-    pub(crate) fn branches_text(&self) -> String {
+    pub fn branches_text(&self) -> String {
         match self.branches_parts() {
             Some((source, Some(target))) => format!("{source} \u{2192} {target}"),
             Some((source, None)) => source,
@@ -156,7 +156,7 @@ impl Item {
 
     /// The branches as `(source, target)` (the source is `owner:branch` for a
     /// fork's); `None` for anything but a request that names its source.
-    pub(crate) fn branches_parts(&self) -> Option<(String, Option<String>)> {
+    pub fn branches_parts(&self) -> Option<(String, Option<String>)> {
         if self.kind != ItemKind::Pr {
             return None;
         }
@@ -171,7 +171,7 @@ impl Item {
 
     /// What "until it changes" watches: the host's `updated_at`, or the WIP
     /// counters.
-    pub(crate) fn stamp(&self) -> String {
+    pub fn stamp(&self) -> String {
         match &self.wip {
             Some(w) => w.stamp(),
             None => self.updated_at.clone(),
@@ -198,7 +198,7 @@ impl Item {
 
 /// Seconds since the epoch of an ISO-8601 stamp as the hosts send it
 /// (`2026-10-14T09:30:00Z`, with or without fractions or an offset).
-pub(crate) fn iso_to_unix(text: &str) -> Option<i64> {
+pub fn iso_to_unix(text: &str) -> Option<i64> {
     let bytes = text.as_bytes();
     if bytes.len() < 19 || bytes[4] != b'-' || bytes[7] != b'-' {
         return None;
@@ -234,31 +234,31 @@ pub(crate) fn iso_to_unix(text: &str) -> Option<i64> {
 }
 
 /// Everything [`Board::build`] reads.
-pub(crate) struct BoardInput<'a> {
-    pub(crate) answers: &'a [RepoAnswer],
+pub struct BoardInput<'a> {
+    pub answers: &'a [RepoAnswer],
     /// The account-wide rows, merged into the scope's (see `account`).
-    pub(crate) accounts: &'a [AccountAnswer],
-    pub(crate) clones: &'a CloneIndex,
-    pub(crate) wips: &'a [(PathBuf, String, WipFacts)],
-    pub(crate) state: &'a RadarState,
-    pub(crate) now: i64,
+    pub accounts: &'a [AccountAnswer],
+    pub clones: &'a CloneIndex,
+    pub wips: &'a [(PathBuf, String, WipFacts)],
+    pub state: &'a RadarState,
+    pub now: i64,
 }
 
 /// The items of the scope, split into the visible ones, the pinned ones and
 /// the snoozed ones.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct Board {
-    pub(crate) items: Vec<Item>,
+pub struct Board {
+    pub items: Vec<Item>,
     /// Indices into `items`, pin order.
-    pub(crate) pinned: Vec<usize>,
+    pub pinned: Vec<usize>,
     /// Indices into `items`, per group, newest first. Pinned and snoozed
     /// items are in neither.
-    pub(crate) groups: Vec<(Group, Vec<usize>)>,
-    pub(crate) snoozed: Vec<usize>,
+    pub groups: Vec<(Group, Vec<usize>)>,
+    pub snoozed: Vec<usize>,
 }
 
 impl Board {
-    pub(crate) fn build(input: &BoardInput) -> Board {
+    pub fn build(input: &BoardInput) -> Board {
         let mut items: Vec<Item> = Vec::new();
         for answer in input.answers {
             let snap = &answer.snapshot;
@@ -314,8 +314,12 @@ impl Board {
                         review_requested: asked,
                         fork: pr.source_project.is_some(),
                         gitlab,
-                        meta: snap.kind.is_some_and(crate::meta_picker::supports),
-                        review: snap.kind.is_some_and(crate::review_view::supports),
+                        meta: snap
+                            .kind
+                            .is_some_and(gitpoulpi_app::provider_caps::supports_metadata),
+                        review: snap
+                            .kind
+                            .is_some_and(gitpoulpi_app::provider_caps::supports_review),
                         wip: None,
                         target: pr.target_branch.clone(),
                         checks: pr.checks,
@@ -386,7 +390,7 @@ impl Board {
                         review_requested: false,
                         fork: false,
                         gitlab,
-                        meta: crate::meta_picker::supports(target.profile.kind),
+                        meta: gitpoulpi_app::provider_caps::supports_metadata(target.profile.kind),
                         review: false,
                         wip: None,
                         target: String::new(),
@@ -485,7 +489,7 @@ impl Board {
 
 /// Which kinds of item the view shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) enum View {
+pub enum View {
     #[default]
     All,
     Prs,
@@ -495,7 +499,7 @@ pub(crate) enum View {
 }
 
 impl View {
-    pub(crate) const ALL: [View; 5] = [
+    pub const ALL: [View; 5] = [
         View::All,
         View::Prs,
         View::Issues,
@@ -503,7 +507,7 @@ impl View {
         View::Snoozed,
     ];
 
-    pub(crate) fn key(self) -> &'static str {
+    pub fn key(self) -> &'static str {
         match self {
             View::All => "all",
             View::Prs => "prs",
@@ -513,7 +517,7 @@ impl View {
         }
     }
 
-    pub(crate) fn from_key(key: &str) -> Option<View> {
+    pub fn from_key(key: &str) -> Option<View> {
         View::ALL.into_iter().find(|v| v.key() == key)
     }
 
@@ -529,7 +533,7 @@ impl View {
 
 /// The second filter: whose items.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) enum Who {
+pub enum Who {
     #[default]
     Everyone,
     /// The user's own: requests they wrote, issues they created.
@@ -541,7 +545,7 @@ pub(crate) enum Who {
 }
 
 impl Who {
-    pub(crate) const ALL: [Who; 5] = [
+    pub const ALL: [Who; 5] = [
         Who::Everyone,
         Who::Mine,
         Who::Assigned,
@@ -549,7 +553,7 @@ impl Who {
         Who::Mentioned,
     ];
 
-    pub(crate) fn key(self) -> &'static str {
+    pub fn key(self) -> &'static str {
         match self {
             Who::Everyone => "everyone",
             Who::Mine => "mine",
@@ -559,7 +563,7 @@ impl Who {
         }
     }
 
-    pub(crate) fn from_key(key: &str) -> Option<Who> {
+    pub fn from_key(key: &str) -> Option<Who> {
         Who::ALL.into_iter().find(|w| w.key() == key)
     }
 
@@ -576,7 +580,7 @@ impl Who {
 
 /// A section heading of the list.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Heading {
+pub enum Heading {
     Pinned,
     Group(Group),
     Snoozed,
@@ -586,7 +590,7 @@ pub(crate) enum Heading {
 
 /// One line of the list.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum Row {
+pub enum Row {
     Heading(Heading, usize),
     /// An item, as an index into the board's items.
     Item(usize),
@@ -605,15 +609,15 @@ pub(crate) enum Row {
 /// The two item filters besides the view: whose items, and which integration
 /// profile's (`""` = every profile).
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Narrow<'a> {
-    pub(crate) who: Who,
-    pub(crate) profile: &'a str,
+pub struct Narrow<'a> {
+    pub who: Who,
+    pub profile: &'a str,
 }
 
 impl Narrow<'_> {
     /// Everyone's items, whatever the profile.
     #[cfg(test)]
-    pub(crate) fn of(who: Who) -> Narrow<'static> {
+    pub fn of(who: Who) -> Narrow<'static> {
         Narrow { who, profile: "" }
     }
 }
@@ -623,7 +627,7 @@ impl Narrow<'_> {
 /// the folds and the text.
 /// `notes` says how many repository notes there are (they end the list);
 /// `hints` how many hosts offer their account-wide lists (they open it).
-pub(crate) fn rows(
+pub fn rows(
     board: &Board,
     view: View,
     narrow: Narrow,

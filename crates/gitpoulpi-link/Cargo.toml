@@ -25,6 +25,9 @@ test-support = ["dep:tempfile", "dep:async-trait", "gitpoulpi-hosting/test-suppo
 # The hosting reading model's tests (and the in-memory host fake a frontend's
 # tests share) need a request provider; the frontend forwards these.
 hosting = ["gitpoulpi-daemon/hosting", "gitpoulpi-app/hosting"]
+# The Radar model and worker (`radar`); a frontend turns it on with its own `radar` feature.
+radar = ["gitpoulpi-app/radar"]
+review = ["gitpoulpi-app/review"]
 github = ["hosting", "gitpoulpi-hosting/github", "gitpoulpi-app/github"]
 gitlab = ["hosting", "gitpoulpi-hosting/gitlab", "gitpoulpi-app/gitlab"]
 
@@ -51,5 +54,5 @@ gitpoulpi-cli-backend.workspace = true
 tempfile.workspace = true
 # The tests read the optional parts and the French catalog: a build of this
 # crate alone turns them on for its own tests (a self dev-dependency).
-gitpoulpi-link = { path = ".", features = ["lfs", "worktree", "submodule", "test-support", "github", "gitlab"] }
+gitpoulpi-link = { path = ".", features = ["lfs", "worktree", "submodule", "test-support", "github", "gitlab", "radar", "review"] }
 gitpoulpi-i18n = { workspace = true, features = ["lang-fr"] }

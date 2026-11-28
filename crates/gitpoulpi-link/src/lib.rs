@@ -89,6 +89,8 @@ pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;
 pub mod oid_text;
+#[cfg(all(feature = "radar", feature = "hosting"))]
+pub mod radar;
 pub mod redraw;
 pub mod rename_pairs;
 pub mod repo_state_path;

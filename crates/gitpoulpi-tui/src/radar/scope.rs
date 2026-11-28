@@ -132,12 +132,7 @@ pub(crate) struct ScopeChoice {
     pub(crate) name: String,
 }
 
-pub(crate) fn name_of(path: &Path) -> String {
-    path.file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .filter(|n| !n.is_empty())
-        .unwrap_or_else(|| path.to_string_lossy().into_owned())
-}
+pub(crate) use gitpoulpi_link::radar::name_of;
 
 fn session_file(config_dir: &Path, session: &str) -> PathBuf {
     crate::session_store::session_file_in(config_dir, session)

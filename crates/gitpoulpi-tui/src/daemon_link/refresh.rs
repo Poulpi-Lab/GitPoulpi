@@ -404,7 +404,8 @@ pub(super) async fn collect_refresh(
     if defer_lfs && scope.intersects(ChangeScope::LOG) {
         // The first load (the only one that defers LFS): the graph's own
         // line, then the caller adds the whole open.
-        crate::activity_log::timing_record(
+        super::host::timing(
+            super::host::TimingKind::Foreground,
             &conn.repo.root,
             gitpoulpi_i18n::msg::activity_log::OP_GRAPH
                 .get()

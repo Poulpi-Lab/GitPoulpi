@@ -128,7 +128,12 @@ fn refresh_shape_ab(repo: &RepoRef) {
 
 fn first_outcome(session: &str, repo: &RepoRef, port_file: PathBuf) -> Duration {
     let t = Instant::now();
-    let link = daemon_link::start_at(session.to_string(), repo.clone(), Some(port_file));
+    let link = daemon_link::start_at(
+        session.to_string(),
+        repo.clone(),
+        Some(port_file),
+        crate::daemon_link_host::host(),
+    );
     let outcome = link
         .outcome_rx
         .recv_timeout(Duration::from_secs(120))

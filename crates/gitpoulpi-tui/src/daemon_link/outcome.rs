@@ -1,5 +1,5 @@
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 
 /// Deletes every `*.orig` file under `root`, skipping `.git` - what
 /// `general.delete_orig_files_after_merge` asks for after a merge lands

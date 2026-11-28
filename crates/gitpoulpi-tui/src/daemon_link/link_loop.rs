@@ -1,5 +1,5 @@
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 
 pub(super) const AUTO_REFRESH_INTERVAL: Duration = Duration::from_secs(2);
 
@@ -162,14 +162,12 @@ pub(super) async fn link_loop_with_port(
     // The background jobs of the whole session: the cell every window's
     // indicator reads is seeded here, then kept current by the reader's
     // `JobChanged` / `JobRemoved`; cancels go out through this link.
-    crate::jobs_ui::set_requester(activity.raw.requester());
-    crate::push_group_ui::set_requester(activity.raw.requester());
-    crate::hosting_notify::set_requester(activity.raw.requester());
+    super::host::on_connected(activity.raw.requester());
     if let Ok(list) = conn
         .call::<Vec<gitpoulpi_ipc::JobInfo>>(OperationKind::JobList, serde_json::json!({}))
         .await
     {
-        crate::jobs_ui::seed(list);
+        super::host::jobs(super::host::JobEvent::Seed(list));
     }
 
     // The selected commit's files have a task of their own: it keeps the cache, drops superseded selections and prefetches
@@ -213,7 +211,8 @@ pub(super) async fn link_loop_with_port(
             true,
         )
         .await;
-        crate::activity_log::timing_record(
+        super::host::timing(
+            super::host::TimingKind::Foreground,
             &conn.repo.root,
             gitpoulpi_i18n::msg::activity_log::OP_OPEN.get().to_string(),
             u64::try_from(opened.elapsed().as_millis()).unwrap_or(u64::MAX),

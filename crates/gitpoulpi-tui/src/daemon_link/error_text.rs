@@ -113,9 +113,9 @@ pub(crate) fn typed_text(typed: &TypedError) -> String {
         }
         // The action that was running when its job was canceled (the label
         // comes from the jobs cell; a job the window never heard of is `#id`).
-        TypedError::Canceled { job } => msg::jobs::canceled(crate::jobs_ui::label_of_id(*job)),
+        TypedError::Canceled { job } => msg::jobs::canceled(super::host::job_label(*job)),
         TypedError::NotCancellable { reason } => {
-            msg::jobs::not_cancellable(crate::jobs_ui::reason(*reason))
+            msg::jobs::not_cancellable(super::host::not_cancellable(*reason))
         }
         TypedError::JobConflict { existing } => msg::jobs::job_conflict(existing),
         TypedError::HooksNotTrusted { hooks, .. } => {

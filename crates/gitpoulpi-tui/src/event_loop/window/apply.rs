@@ -308,7 +308,11 @@ impl WindowState {
             self.link_failure = Some(reason);
         }
         if std::mem::take(&mut self.retry_link_requested) {
-            self.link = daemon_link::start(self.session.to_string(), self.repo.clone());
+            self.link = daemon_link::start(
+                self.session.to_string(),
+                self.repo.clone(),
+                crate::daemon_link_host::host(),
+            );
             self.read_hashes = daemon_link::ReadHashes::default();
             self.changes_asked.clear();
             self.link.set_log_depth(self.lazy_log.loaded());

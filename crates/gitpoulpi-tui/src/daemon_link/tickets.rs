@@ -127,7 +127,7 @@ fn push(done: StepDone) {
     }
     queue.push_back(done);
     drop(queue);
-    crate::redraw::poke();
+    super::host::wake();
 }
 
 /// The ticket the sequence runner has armed for the next action a command

@@ -1,5 +1,5 @@
+use super::host::NotifySend as _;
 use super::*;
-use crate::redraw::NotifySend as _;
 
 /// Runs the link's refreshes off the select loop: one at a time, with
 /// whatever was asked for while it ran folded into a single follow-up.
@@ -68,7 +68,8 @@ impl Refresher {
             let outcome =
                 collect_refresh(&conn, &log_depth, &log_filter, &lfs_gate, scope, false).await;
             // The poll and the refresh after a change: background work.
-            crate::activity_log::timing_background(
+            super::host::timing(
+                super::host::TimingKind::Background,
                 &conn.repo.root,
                 gitpoulpi_i18n::msg::activity_log::OP_REFRESH
                     .get()

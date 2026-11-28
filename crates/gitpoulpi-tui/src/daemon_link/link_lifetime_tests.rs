@@ -47,6 +47,7 @@ fn the_embedded_daemon_outlives_the_window_that_started_it() {
             "lifetime".into(),
             fixture.repo_ref(),
             Some(port_file.clone()),
+            crate::daemon_link_host::host(),
         );
         let outcome = link.outcome_rx.recv_timeout(WAIT).unwrap_or_else(|e| {
             panic!(
@@ -108,7 +109,12 @@ fn a_daemon_that_hangs_up_is_reported_not_waited_on() {
     std::fs::create_dir_all(port_file.parent().unwrap()).unwrap();
     std::fs::write(&port_file, hang_up_listener().to_string()).unwrap();
 
-    let link = start_at("hangup".into(), fixture.repo_ref(), Some(port_file));
+    let link = start_at(
+        "hangup".into(),
+        fixture.repo_ref(),
+        Some(port_file),
+        crate::daemon_link_host::host(),
+    );
     let reason = link
         .failure_rx
         .recv_timeout(WAIT)

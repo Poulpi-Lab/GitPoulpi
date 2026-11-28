@@ -240,7 +240,7 @@ la pagina salva.
 
 ## Eseguire una sequenza
 
-Una sequenza è un elenco con nome di passi, ognuno un comando della palette (stage di tutto, scrivere il messaggio di commit con l'IA, commit, push...). Eseguila dalla palette (`Sequenza: <nome>`), con il tasto che le hai dato in Impostazioni > Tastiera e mouse (`[keybindings.sequence]` in `config.toml`), o da riga di comando (`gitpoulpi sequence run`).
+Una sequenza è un elenco con nome di passi, ognuno un comando della palette (stage di tutto, scrivere il messaggio di commit con l'IA, commit, push...). Eseguila dalla palette (`Sequenza: <nome>`), con il tasto che le hai dato in Impostazioni > Tastiera e mouse (`[keybindings.sequence]` in `tui.toml`), o da riga di comando (`gitpoulpi sequence run`).
 
 Mentre è in esecuzione, una striscia sopra il Log mostra `<nome> k/n`, il passo, e ciò che attende. L'esecuzione compare anche nel pannello Job come `Sequenza <nome> k/n: <passo>`. Una sola sequenza è in esecuzione per volta; avviarne una seconda dice quale è in esecuzione.
 

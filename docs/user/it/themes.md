@@ -221,7 +221,7 @@ esiste più (il file è stato eliminato o rinominato), il grafo usa i colori del
 del tema attivo, e le Impostazioni mostrano il nome segnato *non trovato* finché non
 ne scegli un altro. ![Il combo Tema colori del grafo in Aspetto: Segui il tema, poi ogni palette di corsie con alcuni dei suoi colori](../images/settings-log-graph-lanes.png)
 
-In `config.toml`:
+In `tui.toml`:
 
 ```toml
 [ui]
@@ -290,7 +290,7 @@ colore errato viene ignorato, una `base` sconosciuta ripiega su `dark`, e
 una volta nella barra di stato).
 
 I file vengono riletti quando si apre il combo Tema e quando si chiude
-Impostazioni. Una finestra in esecuzione nota anche quando `config.toml` (un
+Impostazioni. Una finestra in esecuzione nota anche quando `tui.toml` (un
 `gitpoulpi config set ui.theme ...` da una shell) o il file del tema attivo
 vengono riscritti, e applica i nuovi colori entro circa un secondo, senza
 riavvio.
@@ -363,7 +363,7 @@ come `nav_prefix.change_theme`) apre un elenco degli stessi temi senza passare d
 Impostazioni: **Sistema (segue il terminale)**, i preset, poi i tuoi file di tema,
 ciascuno con quattro piccoli chip di colore. Il tema corrente è spuntato. Scrivi
 per restringere l'elenco; spostando l'evidenziazione si vede subito l'anteprima del
-tema, **Enter** lo applica e salva `ui.theme` in `config.toml`, **Esc** (o un clic
+tema, **Enter** lo applica e salva `ui.theme` in `tui.toml`, **Esc** (o un clic
 fuori dall'elenco) rimette il tema precedente e non salva nulla.
 
 Sotto il campo del filtro un prefiltro a segmenti restringe l'elenco: **Tutti**,

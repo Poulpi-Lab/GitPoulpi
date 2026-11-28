@@ -8,7 +8,7 @@ delle Impostazioni sostituisce la finestra finché è aperta. Chiudila con la `�
 a destra, con `Esc` o con `q`. Chiede conferma solo quando chiudere farebbe perdere
 qualcosa (vedi [Chiudere le Impostazioni](#chiudere-le-impostazioni)).
 
-Le modifiche vengono salvate subito in `config.toml`. Il
+Le modifiche vengono salvate subito: le impostazioni dell'interfaccia (tema, layout, colonne, visualizzazione di diff e immagini, scorciatoie...) in `tui.toml`, tutto il resto in `config.toml`, entrambi nella tua cartella di configurazione ([perché due file](config-reference.md#due-file-configtoml-e-tuitoml)). Il
 [riferimento della configurazione](config-reference.md) descrive ogni chiave, il
 suo valore predefinito e la sua variabile d'ambiente. Questa pagina descrive la
 schermata delle Impostazioni.
@@ -151,7 +151,7 @@ La maggior parte delle impostazioni si cambia senza aprire questa schermata: dig
 
 ![La palette dei comandi filtrata su Settings: con una riga per impostazione e il valore attuale a destra](../images/palette-settings.png)
 
-Un valore viene salvato in `config.toml` e applicato esattamente come fa la pagina. Le parole inglesi della chiave dell'impostazione (`remember tabs`) trovano la riga in qualsiasi lingua.
+Un valore viene salvato nel suo file (`tui.toml` o `config.toml`) e applicato esattamente come fa la pagina. Le parole inglesi della chiave dell'impostazione (`remember tabs`) trovano la riga in qualsiasi lingua.
 
 ## Le pagine
 
@@ -463,11 +463,11 @@ build che includono il server; vedi [MCP e agenti](mcp-and-agents.md).
 | **Posizione della barra di stato** | `ui.statusbar_position`: Dove sta la barra di stato (branch, conteggi, messaggi, scorciatoie): In alto, sopra le schede dei repository, o In basso (predefinito). La scheda Home mantiene la propria barra di stato in basso. Si applica subito. |
 | **Posizione della barra delle schede** | `ui.tabs_position`: Dove stanno le schede dei repository: In alto (predefinito), In basso o A sinistra, un elenco con una scheda per riga al bordo sinistro della finestra. Una finestra sotto le 80 colonne le disegna in alto. Accanto a una barra degli strumenti in colonna, le schede restano all'esterno. Si applica subito. |
 | **Lingua di data/ora** | **sistema** (predefinito): nomi di mesi e giorni nella lingua dell'interfaccia. **english**: sempre nomi inglesi. |
-| **Formato della data**, **Formato di data/ora**, **Formato della data esteso** | I modelli di data della colonna data di Cronologia del file e Blame, della colonna Data del Log e dei dettagli del commit. Ognuno mostra un'anteprima dal vivo. Per i token vedi il [riferimento della configurazione](config-reference.md#ui). |
+| **Formato della data**, **Formato di data/ora**, **Formato della data esteso** | I modelli di data della colonna data di Cronologia del file e Blame, della colonna Data del Log e dei dettagli del commit. Ognuno mostra un'anteprima dal vivo. Per i token vedi il [riferimento della configurazione](config-reference.md#ui-in-tuitoml). |
 
 ![Il menu Tema colori del grafo: Segui il tema, poi ogni tavolozza di corsie con alcuni suoi colori](../images/settings-log-graph-lanes.png)
 
-Il tema e i colori del grafo (il Tema, il tema colori del grafo, la colorazione e lo sfondo delle corsie, l'intensità della tinta della riga) appartengono a ogni installazione: con più installazioni che condividono un solo `config.toml`, cambiarli in una non cambia mai le altre. Solo l'installazione principale scrive anche le chiavi `ui.*` condivise.
+Il tema e i colori del grafo (il Tema, il tema colori del grafo, la colorazione e lo sfondo delle corsie, l'intensità della tinta della riga) appartengono a ogni installazione: con più installazioni che condividono una sola cartella delle impostazioni, cambiarli in una non cambia mai le altre. Solo l'installazione principale scrive anche le chiavi `ui.*` condivise, in `tui.toml`; le altre tengono le proprie nella loro voce di `config.toml`.
 
 ### Tastiera e mouse
 
@@ -487,7 +487,7 @@ elenca ogni scorciatoia per contesto, con una casella di ricerca (`/`) e dei fil
 | `c` o un clic sul `!` della riga | Mostra l'azione con tutte le azioni con cui il suo tasto va in conflitto; `Esc` le mostra di nuovo tutte. Un tasto in conflitto con quello di un'altra azione è rosso, un avviso sul solo tasto (il terminale non può inviarlo) arancione. |
 
 Usala per risolvere i conflitti con tmux, AutoHotkey, herdr o il tuo terminale. Le
-stesse impostazioni stanno nella tabella `[keybindings]` di `config.toml`; vedi il
+stesse impostazioni stanno nella tabella `[keybindings]` di `tui.toml`; vedi il
 [riferimento della configurazione](config-reference.md#keybindings) e
 [Scorciatoie da tastiera](keybindings.md).
 
@@ -848,8 +848,10 @@ chiudere le Impostazioni con una bozza non salvata chiede prima conferma.
 
 ## File, variabili d'ambiente e CLI
 
-- Il file delle impostazioni è `config.toml` nella cartella di configurazione del
-  tuo sistema operativo. `gitpoulpi config path` ne stampa la posizione.
+- I file delle impostazioni sono `config.toml` (impostazioni comuni) e `tui.toml`
+  (le impostazioni dell'interfaccia del terminale) nella cartella di configurazione
+  del tuo sistema operativo. `gitpoulpi config path` ne stampa le posizioni;
+  `gitpoulpi config get <key>` dice in quale file si trova una chiave.
 - Lo stato per repository sta in `.gitpoulpi/repo-state.toml` dentro il
   repository.
 - `gitpoulpi config get <key>` e `gitpoulpi config set <key> <value>` leggono e

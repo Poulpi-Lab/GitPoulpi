@@ -1,0 +1,23 @@
+# The desktop frontend has its own workspace and lock file: its toolkit stack is large and must not
+# leak into the terminal workspace's dependency graph. The root workspace excludes this folder.
+[workspace]
+members = ["crates/gitpoulpi-desktop"]
+resolver = "2"
+
+[workspace.package]
+# Kept equal to the root workspace version.
+version = "1.3.0"
+edition = "2021"
+rust-version = "1.88"
+authors = ["Poulpi-Lab <poulpilab@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/Poulpi-Lab/GitPoulpi"
+publish = false
+
+[profile.release]
+opt-level = 3
+codegen-units = 16
+lto = false
+incremental = false
+debug = 0
+strip = "symbols"

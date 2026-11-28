@@ -25,6 +25,8 @@ members = [
     "crates/gitpoulpi-testkit",
     "xtask",
 ]
+# The desktop frontend is a separate workspace with its own lock file.
+exclude = ["desktop"]
 
 [workspace.package]
 version = "1.3.0"

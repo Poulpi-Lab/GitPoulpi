@@ -12,8 +12,8 @@ Quand vous déplacez une touche, ces endroits montrent la nouvelle. Pour la sour
 
 Ouvrez **Paramètres > Clavier et souris**. La page est décrite dans
 [Paramètres](settings.md#clavier-et-souris). Les changements s'appliquent aussitôt et sont
-enregistrés dans la table `[keybindings]` de `config.toml`. Vous pouvez aussi modifier
-cette table à la main :
+enregistrés dans la table `[keybindings]` de `tui.toml` (le fichier d'interface de l'interface
+terminal, à côté de `config.toml`). Vous pouvez aussi modifier cette table à la main :
 
 ```toml
 [keybindings.global]
@@ -473,9 +473,9 @@ groupe.
 
 Chaque ligne de la palette se termine par un bouton touche (`[k]`), et `Alt+K` fait la même chose sur la ligne en surbrillance : il ouvre **Paramètres > Clavier et souris** filtré sur le raccourci de cette commande, prêt à être réaffecté. Une commande sans raccourci propre en reçoit un ici : elle figure sous **Commandes de la palette**, sans touche par défaut, et la touche que vous lui donnez lance la commande exactement comme le fait son choix dans la palette (une commande qui ne peut pas s'exécuter maintenant dit pourquoi). La ligne affiche alors votre touche.
 
-Dans `config.toml`, c'est la table `[keybindings.palette]`, nommée d'après la commande (`toggle_minimap = "Ctrl+Alt+M"`). Une touche en conflit avec une autre action s'affiche en rouge, et `c` sur sa ligne liste toutes les actions avec lesquelles elle est en conflit.
+Dans `tui.toml`, c'est la table `[keybindings.palette]`, nommée d'après la commande (`toggle_minimap = "Ctrl+Alt+M"`). Une touche en conflit avec une autre action s'affiche en rouge, et `c` sur sa ligne liste toutes les actions avec lesquelles elle est en conflit.
 
-Une séquence que vous avez définie (une chaîne nommée de commandes de la palette) reçoit une touche de la même façon : `[keybindings.sequence]` prend l'id de la séquence (`backup = "Ctrl+Alt+B"`), une touche pour un id qui n'existe pas est signalée et ignorée, et la table suit `config.toml` pendant que l'application tourne. Chaque séquence est aussi une ligne de palette, `Séquence : <nom>`, qui montre sa touche.
+Une séquence que vous avez définie (une chaîne nommée de commandes de la palette) reçoit une touche de la même façon : `[keybindings.sequence]` prend l'id de la séquence (`backup = "Ctrl+Alt+B"`), une touche pour un id qui n'existe pas est signalée et ignorée, et la table suit `tui.toml` pendant que l'application tourne. Chaque séquence est aussi une ligne de palette, `Séquence : <nom>`, qui montre sa touche.
 
 La bande d'aide sous la liste indique cette touche (`Alt+K` par défaut). C'est l'action `palette.configure_shortcut` : elle se réaffecte comme les autres.
 

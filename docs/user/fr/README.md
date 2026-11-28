@@ -159,7 +159,7 @@ nombreux commits, avec aperçu, scripts Lua et une seule annulation.
 ## Référence et aide
 
 28. **[Référence de configuration](config-reference.md)** : chaque clé de
-    `config.toml`, sa valeur par défaut et son effet, les paramètres par dépôt,
+    `config.toml` et `tui.toml`, sa valeur par défaut et son effet, les paramètres par dépôt,
     les variables d'environnement.
 29. **[Dépannage et FAQ](troubleshooting.md)** : icônes, rendu du graphe,
     touches qui n'arrivent pas, démons bloqués, vitesse, pointeurs LFS.

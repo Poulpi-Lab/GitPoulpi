@@ -216,8 +216,25 @@ performance.
 de configuration (`gitpoulpi config path` affiche le fichier de paramètres, qui s'y trouve),
 et joignez-le à un ticket.
 
-**Où sont mes paramètres ?** `gitpoulpi config path`. L'état par dépôt est dans
-`.gitpoulpi/repo-state.toml` à l'intérieur du dépôt.
+**Où sont mes paramètres ?** `gitpoulpi config path` affiche `config.toml` (paramètres
+communs) et `tui.toml` (les paramètres d'interface de l'interface terminal : thème,
+disposition, colonnes, raccourcis...), qui sont dans le même dossier. `gitpoulpi config get <key>`
+dit dans lequel des deux se trouve une clé. L'état par dépôt est dans
+`.gitpoulpi/repo-state.toml` à l'intérieur du dépôt. Voir
+[Deux fichiers](config-reference.md#deux-fichiers--configtoml-et-tuitoml).
+
+**Je suis revenu à un GitPoulpi plus ancien et mes paramètres d'interface ont changé (ou le
+plus récent ignore ce que j'ai réglé dans l'ancien).** GitPoulpi garde les paramètres
+d'interface dans `tui.toml`, créé comme une copie de ce que contenait `config.toml` et
+jamais retiré de `config.toml`. Un GitPoulpi plus ancien installé à côté du plus récent ne
+connaît pas `tui.toml` : il continue de lire et d'écrire son propre `config.toml` complet.
+Une fois que `tui.toml` existe, le plus récent lit les paramètres d'interface dans lui seul ;
+un thème ou une disposition que vous changez ensuite dans l'ancienne version n'est donc pas
+repris, et une clé absente de `tui.toml` prend sa valeur par défaut plutôt que l'ancienne
+valeur de `config.toml`. Pour remettre la version récente à jour, changez le paramètre là
+(Paramètres, ou `gitpoulpi config set`) ; pour repartir de `config.toml` pour les paramètres
+d'interface, quittez GitPoulpi et supprimez `tui.toml` (il est recréé, comme une copie
+neuve, au prochain démarrage).
 
 **GitPoulpi envoie-t-il quelque chose quelque part ?** Seulement ce que vous demandez :
 des opérations git vers vos distants, des requêtes d'hébergeur après avoir connecté un

@@ -158,7 +158,8 @@ mod tests {
     use super::*;
     use std::collections::HashSet;
 
-    const PINNED_ROWS: usize = 1194;
+    /// The MCP palette entry exists only in builds with the `mcp` feature.
+    const PINNED_ROWS: usize = 1194 + cfg!(feature = "mcp") as usize;
 
     #[test]
     fn ids_are_unique() {

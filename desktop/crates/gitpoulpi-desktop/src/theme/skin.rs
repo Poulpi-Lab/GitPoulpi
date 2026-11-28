@@ -5,7 +5,7 @@ use std::sync::Arc;
 use gitpoulpi_config::theme::{self, ThemeColor, ThemeSpec};
 use gpui_kit::Hsla;
 
-use super::{hsla_of, Skin};
+use super::{hsla_of, DiffColors, Skin};
 
 pub(super) fn build(spec: &ThemeSpec, fallback: Hsla, lane_choice: Option<&str>) -> Skin {
     let c = |t: ThemeColor| hsla_of(t, fallback);
@@ -63,5 +63,17 @@ pub(super) fn build(spec: &ThemeSpec, fallback: Hsla, lane_choice: Option<&str>)
             c(spec.toolbar.search),
         ],
         rgb_bg: spec.effective_bg().approx_rgb().unwrap_or((34, 36, 46)),
+        diff: DiffColors {
+            text: c(spec.ui.text),
+            muted: c(spec.ui.muted),
+            add_fg: c(spec.diff.add_fg),
+            add_bg: c(spec.diff.add_bg),
+            add_emph_bg: c(spec.diff.add_emph_bg),
+            del_fg: c(spec.diff.del_fg),
+            del_bg: c(spec.diff.del_bg),
+            del_emph_bg: c(spec.diff.del_emph_bg),
+            gutter_fg: c(spec.diff.gutter_fg),
+            hunk_fg: c(spec.diff.hunk_fg),
+        },
     }
 }

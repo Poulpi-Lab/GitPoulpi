@@ -1,69 +1,91 @@
 //! Fetching the Log: the first page with refs, stashes and working changes, then further pages as the
-//! list is scrolled. The graph layout is computed on a background thread each time.
+//! list is scrolled. When to ask, how much and what to do with the answer is the shared
+//! `LazyLog`; the graph layout is computed on a background thread each time.
 
-use std::sync::Arc;
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
+use gitpoulpi_app::graph::{lookahead_rows, refs_key, CommitTotal};
 use gitpoulpi_core::domain::{CommitNode, Ref, Stash};
-use gpui_kit::{AppContext as _, Context};
+use gpui_kit::{AppContext as _, Context, Task};
 
-use super::data::{compute_layout, LogData};
-use super::{LogEvent, LogPanel, Summary};
-use crate::daemon::{HistoryPlan, LogSource, NEXT_PAGE};
+use super::data::{compute_layout, shown_nodes, LogData};
+use super::{load_settings, LogEvent, LogPanel, Summary};
 use crate::prefs::PrefsStore;
+
+/// A count in flight: the answer lands in `reply`, dropping this cancels it.
+pub struct PendingCount {
+    reply: Arc<Mutex<Option<Option<u64>>>>,
+    _task: Task<()>,
+}
+
+/// The commit total of the status line (`CommitTotal` decides when to count and what to show).
+pub type CommitCount = CommitTotal<PendingCount>;
 
 impl LogPanel {
     /// Loads (or reloads) the current repository from the top.
     pub fn reload(&mut self, cx: &mut Context<Self>) {
         let started = Instant::now();
         self.columns.widths = PrefsStore::get(cx).columns_for(&self.repo_key());
+        let (settings, method) = load_settings();
+        self.lazy.apply_settings(settings);
+        self.count_method = method;
+        self.generation += 1;
+        let generation = self.generation;
         let backend = self.backend.clone();
         let refs = backend.refs();
         let stashes = backend.stashes();
         let status = backend.status();
         let head = backend.head();
+        let filter = self.filter.clone();
+        let solo = self.solo.clone();
+        let depth = self.lazy.refresh_depth();
         let palette_len = Self::palette_len(cx);
         self._load = Some(cx.spawn(async move |this, cx| {
             let refs: Vec<Ref> = refs.await.unwrap_or_default();
             let stashes: Vec<Stash> = stashes.await.unwrap_or_default();
             let status = status.await.map(|w| w.files).unwrap_or_default();
             let head = head.await.ok();
-            let start = backend.history_start(&refs).await;
-            let (nodes, plan, more, total) = match start {
-                Ok(s) => (s.nodes, s.plan, s.more, s.total),
-                Err(_) => (
-                    Vec::new(),
-                    HistoryPlan {
-                        source: LogSource::AllRefs,
-                        head_only: 0,
-                    },
-                    false,
-                    None,
-                ),
+            let refresh = backend.history_refresh(&refs, filter, depth).await;
+            let (held, front, asked, walk) = match refresh {
+                Ok(r) => (r.nodes, r.front, r.asked, Some(r.walk)),
+                Err(_) => (Vec::new(), 0, depth, None),
             };
             let dirty = !status.is_empty();
-            let (n2, r2, s2) = (Arc::new(nodes), Arc::new(refs), Arc::new(stashes));
-            let (nodes_bg, refs_bg, stashes_bg) = (n2.clone(), r2.clone(), s2.clone());
+            let (held, refs, stashes) = (Arc::new(held), Arc::new(refs), Arc::new(stashes));
+            let shown = shown_nodes(&held, &refs, &solo);
+            let (shown_bg, refs_bg, stashes_bg) = (shown.clone(), refs.clone(), stashes.clone());
             let layout = cx
                 .background_spawn(async move {
-                    compute_layout(&nodes_bg, &refs_bg, &stashes_bg, dirty, head, palette_len)
+                    compute_layout(&shown_bg, &refs_bg, &stashes_bg, dirty, head, palette_len)
                 })
                 .await;
             let ms = started.elapsed().as_millis();
             let _ = this.update(cx, |this, cx| {
-                this.data = LogData::new(n2, r2, s2, status.clone(), plan, head, layout);
-                this.more = more;
-                this.loading_more = false;
+                if this.generation != generation {
+                    return;
+                }
+                let loaded = held.len();
+                this.data = LogData::new(
+                    held,
+                    shown,
+                    refs,
+                    stashes,
+                    status.clone(),
+                    walk,
+                    head,
+                    layout,
+                );
+                // Everything the old list had in flight (a page, the "end of history" latch) described it.
+                this.lazy.restart();
+                this.lazy.set_front(front);
+                this.lazy.on_refresh_asked(loaded, asked);
+                this.last_ms = ms;
                 this.selected = 0;
                 this.recompute_matches(cx);
-                let branch = this.data.head_branch.clone();
-                cx.emit(LogEvent::Loaded(Summary {
-                    loaded: this.data.nodes.len(),
-                    total,
-                    branch,
-                    ms,
-                    status,
-                }));
+                this.tick_total(cx);
+                this.emit_summary(cx);
                 if let Some(sel) = this.data.selection_at(0) {
                     cx.emit(LogEvent::Selected(sel));
                 }
@@ -72,41 +94,141 @@ impl LogPanel {
         }));
     }
 
-    /// Fetches the next page once the list nears its end.
-    pub(super) fn load_more(&mut self, cx: &mut Context<Self>) {
-        let Some(plan) = self.data.plan else { return };
-        if self.loading_more || !self.more {
-            return;
+    /// The Refs sidebar changed which refs are hidden or soloed. What the daemon walks changes with the
+    /// hidden set (reload from the top); solo only filters what is held.
+    pub fn set_visibility(
+        &mut self,
+        hidden: HashSet<String>,
+        solo: HashSet<String>,
+        cx: &mut Context<Self>,
+    ) {
+        let filter = gitpoulpi_app::graph::walk_filter(&hidden, &solo);
+        let walk_changed = filter != self.filter;
+        let solo_changed = solo != self.solo;
+        self.hidden = hidden;
+        self.solo = solo;
+        if walk_changed {
+            self.filter = filter;
+            self.lazy.restart();
+            self.total.forget();
+            self.reload(cx);
+        } else if solo_changed {
+            self.relayout(cx);
         }
-        self.loading_more = true;
-        let loaded = self.data.nodes.len();
-        let page = self.backend.history_next(plan, loaded);
+    }
+
+    /// Fetches the next page when the list nears its end. `rows_below_view` and `visible_rows` are in
+    /// Log rows as shown (the soloed list is shorter than the held one).
+    pub(super) fn load_more(
+        &mut self,
+        rows_below_view: usize,
+        visible_rows: usize,
+        cx: &mut Context<Self>,
+    ) {
+        let Some(request) = self.lazy.next_page(rows_below_view, visible_rows) else {
+            return;
+        };
+        let Some(walk) = self.data.walk.clone() else {
+            return;
+        };
+        self.lazy.mark_requested(request);
+        let page = self.backend.history_page(&walk, request);
+        let generation = self.generation;
+        self._load = Some(cx.spawn(async move |this, cx| {
+            // A failed page ends the walk like a short one: nothing is asked again until the next reload.
+            let page: Vec<CommitNode> = page.await.unwrap_or_default();
+            let _ = this.update(cx, |this, cx| {
+                if this.generation != generation {
+                    return;
+                }
+                let mut held = std::mem::take(&mut this.data.held);
+                let appended = this.lazy.on_page(request, page, Arc::make_mut(&mut held));
+                this.data.held = held;
+                if appended {
+                    this.relayout(cx);
+                } else {
+                    this.emit_summary(cx);
+                }
+            });
+        }));
+    }
+
+    /// Lays the held commits out again (a page arrived, or the solo set changed).
+    pub(super) fn relayout(&mut self, cx: &mut Context<Self>) {
+        let generation = self.generation;
+        let held = self.data.held.clone();
         let (refs, stashes) = (self.data.refs.clone(), self.data.stashes.clone());
+        let shown = shown_nodes(&held, &refs, &self.solo);
         let dirty = self.data.dirty();
         let head = self.data.head_target();
         let palette_len = Self::palette_len(cx);
-        self._load = Some(cx.spawn(async move |this, cx| {
-            let page: Vec<CommitNode> = page.await.unwrap_or_default();
-            let fetched = page.len();
-            let all = this
-                .update(cx, |this, _| {
-                    Arc::make_mut(&mut this.data.nodes).extend(page);
-                    this.data.nodes.clone()
-                })
-                .ok();
-            let Some(all) = all else { return };
+        let shown_bg = shown.clone();
+        self._layout = Some(cx.spawn(async move |this, cx| {
             let layout = cx
                 .background_spawn(async move {
-                    compute_layout(&all, &refs, &stashes, dirty, head, palette_len)
+                    compute_layout(&shown_bg, &refs, &stashes, dirty, head, palette_len)
                 })
                 .await;
             let _ = this.update(cx, |this, cx| {
+                if this.generation != generation {
+                    return;
+                }
+                this.data.nodes = shown;
                 this.data.layout = Arc::new(layout);
-                this.more = fetched as u32 >= NEXT_PAGE;
-                this.loading_more = false;
+                let rows = this.data.entry_count();
+                this.selected = this.selected.min(rows.saturating_sub(1));
                 this.recompute_matches(cx);
+                this.tick_total(cx);
+                this.emit_summary(cx);
                 cx.notify();
             });
         }));
+    }
+
+    /// Asks for the total when the refs moved, and takes the answer once it arrived.
+    pub(super) fn tick_total(&mut self, cx: &mut Context<Self>) {
+        let Some(walk) = self.data.walk.clone() else {
+            return;
+        };
+        let backend = self.backend.clone();
+        let front = self.lazy.front();
+        let key = refs_key(&self.data.refs);
+        self.total.tick(
+            self.count_method,
+            key,
+            self.lazy.is_exhausted(),
+            || {
+                let reply: Arc<Mutex<Option<Option<u64>>>> = Arc::default();
+                let answer = reply.clone();
+                let count = backend.history_total(&walk, front);
+                let task = cx.spawn(async move |this, cx| {
+                    let n = count.await.ok();
+                    *answer.lock().unwrap() = Some(n);
+                    let _ = this.update(cx, |this, cx| {
+                        this.tick_total(cx);
+                        this.emit_summary(cx);
+                    });
+                });
+                PendingCount { reply, _task: task }
+            },
+            |pending| pending.reply.lock().unwrap().take(),
+        );
+    }
+
+    /// Tells the window what the status line shows.
+    pub(super) fn emit_summary(&self, cx: &mut Context<Self>) {
+        let loaded = self.data.held.len();
+        cx.emit(LogEvent::Loaded(Summary {
+            loaded,
+            total: self.total.shown(loaded, self.lazy.is_exhausted()),
+            branch: self.data.head_branch.clone(),
+            ms: self.last_ms,
+            status: self.data.status.to_vec(),
+        }));
+    }
+
+    /// Rows below which the next page is due, for the row painter.
+    pub(super) fn lookahead(visible_rows: usize) -> usize {
+        lookahead_rows(visible_rows)
     }
 }

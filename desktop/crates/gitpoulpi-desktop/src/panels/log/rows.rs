@@ -22,9 +22,6 @@ use crate::strings;
 use crate::theme::Skin;
 use crate::util::dates;
 
-/// How many rows from the end of the list a visible row triggers the next page.
-const PREFETCH_ROWS: usize = 80;
-
 /// Everything the row closure of the list needs; owned, so the closure can outlive `render`.
 pub(super) struct RowsContext {
     pub me: WeakEntity<LogPanel>,
@@ -50,10 +47,12 @@ struct Cells {
 
 impl RowsContext {
     pub fn render(&self, range: Range<usize>, cx: &mut App) -> Vec<AnyElement> {
-        if self.more && range.end + PREFETCH_ROWS >= self.total {
+        let below = self.total.saturating_sub(range.end);
+        let visible = range.len();
+        if self.more && below <= LogPanel::lookahead(visible) {
             let me = self.me.clone();
             cx.defer(move |cx| {
-                let _ = me.update(cx, |this, cx| this.load_more(cx));
+                let _ = me.update(cx, |this, cx| this.load_more(below, visible, cx));
             });
         }
         let skin = cx.global::<Skin>().clone();

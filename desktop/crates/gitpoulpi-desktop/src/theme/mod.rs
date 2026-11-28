@@ -51,6 +51,24 @@ pub struct Skin {
     /// undo, pull, push, branch, tag, stash, lfs, search
     pub toolbar: [Hsla; 8],
     pub rgb_bg: (u8, u8, u8),
+    /// What the diff pane paints with (the theme's `diff` colours).
+    pub diff: DiffColors,
+}
+
+/// The theme's diff colours: added and removed lines, the stronger background of a changed word, the
+/// gutter and the hunk header, with the plain text colours the other roles use.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DiffColors {
+    pub text: Hsla,
+    pub muted: Hsla,
+    pub add_fg: Hsla,
+    pub add_bg: Hsla,
+    pub add_emph_bg: Hsla,
+    pub del_fg: Hsla,
+    pub del_bg: Hsla,
+    pub del_emph_bg: Hsla,
+    pub gutter_fg: Hsla,
+    pub hunk_fg: Hsla,
 }
 
 impl Global for Skin {}

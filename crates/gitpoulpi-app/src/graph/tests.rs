@@ -9,7 +9,7 @@ use super::layout::{build_graph_grid_themed, GraphGrid, WipAnchor};
 use super::load::LogLoadSettings;
 use super::part::{ColorRef, NodeKind, Sides, TreeCell, TreePart};
 use super::stash::{place_stashes, GraphStash, LogEntry, LogRows, StashSlot};
-use gitpoulpi_core::domain::{CommitNode, Oid, Ref};
+use gitpoulpi_core::domain::{CommitNode, Oid, Ref, RefKind, RefVisibility};
 
 /// A lane palette of the size the shipped themes use.
 const PALETTE_LEN: usize = 8;
@@ -1196,4 +1196,47 @@ fn the_log_row_order_round_trips() {
         let seen: std::collections::HashSet<_> = (0..len).map(|d| order.entry(d)).collect();
         assert_eq!(seen.len(), len, "every display index shows a different row");
     }
+}
+
+fn tag_at(target: Oid, n: usize) -> Ref {
+    Ref {
+        kind: RefKind::Tag {
+            name: format!("t{n}"),
+        },
+        target,
+        visibility: RefVisibility::Shown,
+        is_head: false,
+        upstream: None,
+        tag_sync: None,
+        multi_remote: None,
+    }
+}
+
+/// Thousands of refs, most of them on commits that are not in the window or
+/// stacked on the same tip: the one-time target set must give the same grid
+/// as a handful of refs naming the same tips.
+#[test]
+fn many_refs_give_the_same_grid_as_one_ref_per_tip() {
+    let nodes: Vec<CommitNode> = (1..=40u8)
+        .map(|i| {
+            let parent = [i + 1];
+            commit(i, if i < 40 { &parent[..] } else { &[] })
+        })
+        .collect();
+    let few: Vec<Ref> = [3u8, 17, 40].iter().map(|&i| tag_at(oid(i), 0)).collect();
+    let mut many: Vec<Ref> = (0..6000).map(|n| tag_at(oid(200), n)).collect();
+    for (n, r) in few.iter().enumerate() {
+        for k in 0..200 {
+            many.push(tag_at(r.target, n * 1000 + k));
+        }
+    }
+    let a = build_graph_grid(&nodes, &few);
+    let b = build_graph_grid(&nodes, &many);
+    assert_eq!(format!("{:?}", a.rows), format!("{:?}", b.rows));
+    let none = build_graph_grid(&nodes, &[]);
+    assert_ne!(
+        format!("{:?}", a.rows),
+        format!("{:?}", none.rows),
+        "refs must still mark their commits"
+    );
 }

@@ -156,6 +156,9 @@ pub fn build_graph_grid_themed(
     stashes: &[GraphStash],
     palette_len: usize,
 ) -> GraphGrid {
+    // One pass over the refs instead of one scan per commit: with thousands of
+    // refs the per-commit `any` dominated the fold.
+    let ref_targets: HashSet<Oid> = refs.iter().map(|r| r.target).collect();
     let mut lanes: Vec<Option<Oid>> = Vec::new();
     let mut lane_colors: Vec<ColorRef> = Vec::new();
     let mut next_color = 0usize;
@@ -311,7 +314,7 @@ pub fn build_graph_grid_themed(
             next_color += 1;
         }
         let is_merge = !new_parent_lanes.is_empty();
-        let has_ref = refs.iter().any(|r| r.target == commit.id);
+        let has_ref = ref_targets.contains(&commit.id);
         let my_color = lane_colors[my_lane];
 
         // Fan-out elbow + fill, mirrored for a new parent lane landing on either

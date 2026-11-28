@@ -214,7 +214,7 @@ Bu sürümün bilmediği anahtarlar ve adımlar, sayfa kaydettiğinde korunur.
 
 ## Bir diziyi çalıştırmak
 
-Bir dizi, her biri paletin bir komutu olan adımların adlandırılmış bir listesidir (her şeyi stage'le, commit mesajını YZ ile yaz, commit et, push et...). Onu paletten (`Dizi: <ad>`), Ayarlar > Klavye ve fare içinde ona verdiğiniz tuşla (`config.toml` içinde `[keybindings.sequence]`) ya da komut satırından (`gitpoulpi sequence run`) çalıştırın.
+Bir dizi, her biri paletin bir komutu olan adımların adlandırılmış bir listesidir (her şeyi stage'le, commit mesajını YZ ile yaz, commit et, push et...). Onu paletten (`Dizi: <ad>`), Ayarlar > Klavye ve fare içinde ona verdiğiniz tuşla (`tui.toml` içinde `[keybindings.sequence]`) ya da komut satırından (`gitpoulpi sequence run`) çalıştırın.
 
 Çalışırken Log'un üstündeki bir şerit `<ad> k/n`, adımı ve neyi beklediğini gösterir. Çalıştırma ayrıca İşler panelinde `Dizi <ad> k/n: <adım>` olarak görünür. Aynı anda bir dizi çalışır; ikincisini başlatmak hangisinin çalıştığını söyler.
 

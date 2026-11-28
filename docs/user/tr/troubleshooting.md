@@ -218,8 +218,26 @@ klasöründe `gitpoulpi-tui-exit.log` dosyasına (ve bir çökmeden sonra
 `gitpoulpi-tui-panic.txt` dosyasına) bakın (`gitpoulpi config path` ayar
 dosyasını yazdırır, o dosya oradadır) ve onu bir issue'ya ekleyin.
 
-**Ayarlarım nerede?** `gitpoulpi config path`. Depo başına durum, deponun
-içindeki `.gitpoulpi/repo-state.toml` dosyasındadır.
+**Ayarlarım nerede?** `gitpoulpi config path`, aynı klasörde duran `config.toml`
+(ortak ayarlar) ve `tui.toml` (terminal arayüzünün arayüz ayarları: tema, yerleşim,
+sütunlar, kısayollar...) dosyalarını yazdırır. `gitpoulpi config get <key>`
+bir anahtarın ikisinden hangisinde olduğunu söyler. Depo başına durum, deponun
+içindeki `.gitpoulpi/repo-state.toml` dosyasındadır. Bkz.
+[İki dosya](config-reference.md#iki-dosya-configtoml-ve-tuitoml).
+
+**Daha eski bir GitPoulpi'ye döndüm ve arayüz ayarlarım değişti (ya da yeni olan,
+eskisinde ayarladığımı yok sayıyor).** GitPoulpi arayüz ayarlarını `tui.toml`
+dosyasında tutar; bu dosya, `config.toml` dosyasının tuttuklarının bir kopyası olarak
+oluşturulur ve ayarlar `config.toml` dosyasından asla çıkarılmaz. Yenisinin yanına
+kurulmuş daha eski bir GitPoulpi `tui.toml` dosyasını bilmez: kendi tam
+`config.toml` dosyasını okumayı ve yazmayı sürdürür. `tui.toml` var olduktan sonra
+yenisi arayüz ayarlarını yalnızca ondan okur; bu yüzden eski sürümde sonradan
+değiştirdiğiniz bir tema ya da yerleşim alınmaz ve `tui.toml` içinde eksik bir anahtar,
+`config.toml` içindeki eski değeri değil, varsayılanını alır. Yeni sürümü
+uyumlu hale getirmek için ayarı orada değiştirin (Ayarlar ya da
+`gitpoulpi config set`); arayüz ayarlarını `config.toml` dosyasından yeniden
+başlatmak için GitPoulpi'den çıkın ve `tui.toml` dosyasını silin (bir sonraki
+başlatmada yeni bir kopya olarak yeniden oluşturulur).
 
 **GitPoulpi bir yere bir şey gönderiyor mu?** Yalnızca istediğiniz şeyi: uzak
 depolarınıza git işlemleri, bir hesap bağladıktan sonra barındırma istekleri, bir

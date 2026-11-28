@@ -149,7 +149,7 @@ tarihleri, iletileri ve dosya içeriklerini yeniden yazan yeniden yazma ekranı
 
 ## Başvuru ve yardım
 
-28. **[Yapılandırma başvurusu](config-reference.md)**: her `config.toml` anahtarı,
+28. **[Yapılandırma başvurusu](config-reference.md)**: her `config.toml` ve `tui.toml` anahtarı,
     varsayılanı ve etkisi, depo başına ayarlar, ortam değişkenleri.
 29. **[Sorun giderme ve SSS](troubleshooting.md)**: simgeler, grafik çizimi,
     ulaşmayan tuşlar, takılı kalmış daemon'lar, hız, LFS işaretçileri.

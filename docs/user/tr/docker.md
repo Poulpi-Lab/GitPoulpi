@@ -24,11 +24,11 @@ docker run -it --rm \
 | Yol | Ne tutar |
 |---|---|
 | `/work` | Çalışma dizini. Depolarınızı buraya bağlayın. |
-| `/config` | Ayarlar (`config.toml`), oturumlar ve alt klasörler olarak veri ve önbellek (`GITPOULPI_CONFIG_DIR=/config`). Korumak için adlandırılmış bir birim veya bir bağlama kullanın. |
+| `/config` | Ayarlar (`config.toml`, `tui.toml`), oturumlar ve alt klasörler olarak veri ve önbellek (`GITPOULPI_CONFIG_DIR=/config`). Korumak için adlandırılmış bir birim veya bir bağlama kullanın. |
 | `/data`, `/cache` | XDG değişkenlerini izleyen araçlar için bunlar da birim olarak bildirilmiştir (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Bir birim değildir: her kapsayıcı için yenidir. |
 
-`/config` için bir birim olmadan her `--rm` çalıştırması varsayılan ayarlarla başlar. Kendi `config.toml` dosyanızla başlamak için onu bağlayın: `-v "$PWD/config.toml":/config/config.toml:ro` (salt okunur, Ayarların kaydedemeyeceği anlamına gelir).
+`/config` için bir birim olmadan her `--rm` çalıştırması varsayılan ayarlarla başlar. Kendi `config.toml` dosyanızla başlamak için onu bağlayın: `-v "$PWD/config.toml":/config/config.toml:ro` (salt okunur, Ayarların kaydedemeyeceği anlamına gelir). Arayüz ayarları ikinci bir dosyadadır, `tui.toml`; aynı şekilde bağlanır (`-v "$PWD/tui.toml":/config/tui.toml:ro`); bkz. [Yapılandırma başvurusu](config-reference.md#iki-dosya-configtoml-ve-tuitoml).
 
 ## Başka bir kullanıcıya ait depolar
 

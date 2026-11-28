@@ -7,7 +7,9 @@ Ayarlar'ı `Ctrl+,`, `Ctrl+N` ardından `,`, başlık çubuğunda ×'in solundak
 `q` ile kapatın. Yalnızca kapatmak bir şeyi kaybettirecekse önce sorar (bkz.
 [Ayarlar'ı kapatma](#ayarları-kapatma)).
 
-Değişiklikler hemen `config.toml` dosyasına kaydedilir.
+Değişiklikler hemen kaydedilir: arayüz ayarları (tema, yerleşim, sütunlar, diff ve
+resim görünümü, kısayollar...) `tui.toml` dosyasına, geri kalan her şey `config.toml` dosyasına; ikisi de
+yapılandırma klasörünüzdedir ([neden iki dosya](config-reference.md#iki-dosya-configtoml-ve-tuitoml)).
 [Yapılandırma başvurusu](config-reference.md) her anahtarı, varsayılan değerini ve
 ortam değişkenini açıklar. Bu sayfa ise Ayarlar ekranını anlatır.
 
@@ -141,7 +143,7 @@ Ayarların çoğunu bu ekranı açmadan değiştirebilirsiniz: komut paletine (`
 
 ![Ayarlar: ile filtrelenmiş komut paleti: her ayar için bir satır ve sağda geçerli değeri](../images/palette-settings.png)
 
-Bir değer `config.toml` dosyasına kaydedilir ve sayfanın yaptığı gibi uygulanır. Ayar anahtarının İngilizce sözcükleri (`remember tabs`) satırı her dilde bulur.
+Bir değer kendi dosyasına (`tui.toml` ya da `config.toml`) kaydedilir ve sayfanın yaptığı gibi uygulanır. Ayar anahtarının İngilizce sözcükleri (`remember tabs`) satırı her dilde bulur.
 
 ## Sayfalar
 
@@ -448,11 +450,11 @@ görünür; bkz. [MCP ve ajanlar](mcp-and-agents.md).
 | **Durum çubuğu konumu** | `ui.statusbar_position`: Durum çubuğunun (dal, sayılar, iletiler, tuş ipuçları) yeri: Üst (depo sekmelerinin üstü) veya Alt (varsayılan). Ana sayfa sekmesi altta kendi durum çubuğunu korur. Hemen uygulanır. |
 | **Sekme çubuğu konumu** | `ui.tabs_position`: Depo sekmelerinin yeri: Üst (varsayılan), Alt veya Sol, pencerenin sol kenarında satır başına bir sekme olan bir liste. 80 sütundan dar bir pencerede üstte çizilir. Sütun biçimindeki bir araç çubuğunun yanında sekmeler en dışta kalır. Hemen uygulanır. |
 | **Tarih/Saat Yerel Ayarı** | **sistem** (varsayılan): ay ve gün adları arayüz dilinde. **english**: her zaman İngilizce adlar. |
-| **Tarih Biçimi**, **Tarih/Saat Biçimi**, **Ayrıntılı Tarih Biçimi** | Dosya Geçmişi ile Blame tarih sütununun, Log'un Tarih sütununun ve commit ayrıntılarının tarih kalıpları. Her biri canlı bir önizleme gösterir. Kalıpta kullanılabilen parçalar için bkz. [Yapılandırma başvurusu](config-reference.md#ui). |
+| **Tarih Biçimi**, **Tarih/Saat Biçimi**, **Ayrıntılı Tarih Biçimi** | Dosya Geçmişi ile Blame tarih sütununun, Log'un Tarih sütununun ve commit ayrıntılarının tarih kalıpları. Her biri canlı bir önizleme gösterir. Kalıpta kullanılabilen parçalar için bkz. [Yapılandırma başvurusu](config-reference.md#tuitoml-içinde-ui). |
 
 ![Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
 
-Tema ve grafik renkleri (Tema, grafik renk teması, şerit renklendirmesi ve arka planı, satır tonu gücü) her kuruluma aittir: tek bir `config.toml` dosyasını paylaşan birkaç kurulumda birinde değiştirmek diğerlerini asla değiştirmez. Yalnızca birincil kurulum ayrıca paylaşılan `ui.*` anahtarlarını yazar.
+Tema ve grafik renkleri (Tema, grafik renk teması, şerit renklendirmesi ve arka planı, satır tonu gücü) her kuruluma aittir: tek bir ayar klasörünü paylaşan birkaç kurulumda birinde değiştirmek diğerlerini asla değiştirmez. Yalnızca birincil kurulum ayrıca paylaşılan `ui.*` anahtarlarını `tui.toml` dosyasına yazar; diğerleri kendilerininkini `config.toml` dosyasındaki kendi girdilerinde tutar.
 
 ### Klavye ve fare
 
@@ -472,7 +474,7 @@ bağlama göre, bir arama kutusu (`/`) ve filtrelerle listeler. Bir satırda:
 | `c` ya da satırın `!` işaretine tıklama | Eylemi, tuşunun çakıştığı tüm eylemlerle birlikte gösterir; `Esc` hepsini yeniden gösterir. Başka bir eylemin tuşuyla çakışan tuş kırmızı, yalnızca tuşla ilgili bir uyarı (terminal onu gönderemiyor) turuncudur. |
 
 Bunu tmux, AutoHotkey, herdr ya da terminalinizle olan çakışmaları gidermek için kullanın.
-Aynı ayarlar `config.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz.
+Aynı ayarlar `tui.toml` dosyasının `[keybindings]` tablosunda bulunur; bkz.
 [yapılandırma başvurusu](config-reference.md#keybindings) ve
 [Klavye kısayolları](keybindings.md).
 
@@ -825,8 +827,10 @@ bir çubuk **● Kaydedilmedi** (ya da **Değişiklik yok**) ile birlikte **Payl
 
 ## Dosyalar, ortam değişkenleri ve CLI
 
-- Ayar dosyası, işletim sisteminizin yapılandırma klasöründeki `config.toml` dosyasıdır.
-  `gitpoulpi config path` konumunu yazdırır.
+- Ayar dosyaları, işletim sisteminizin yapılandırma klasöründeki `config.toml` (ortak ayarlar) ve
+  `tui.toml` (terminal arayüzünün arayüz ayarları) dosyalarıdır.
+  `gitpoulpi config path` konumlarını yazdırır; `gitpoulpi config get <key>`
+  bir anahtarın hangi dosyada olduğunu söyler.
 - Depo başına durum, deponun içindeki `.gitpoulpi/repo-state.toml` dosyasında tutulur.
 - `gitpoulpi config get <key>` ve `gitpoulpi config set <key> <value>` her ayarı okur ve
   yazar.

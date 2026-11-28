@@ -11,7 +11,8 @@ Stellen die neue. Zur Maus siehe [Maus und Gesten](mouse-and-gestures.md).
 
 Öffnen Sie **Einstellungen > Tastatur & Maus**. Die Seite ist unter
 [Einstellungen](settings.md#tastatur--maus) beschrieben. Änderungen gelten sofort und
-werden in der Tabelle `[keybindings]` der `config.toml` gespeichert. Sie können diese
+werden in der Tabelle `[keybindings]` der `tui.toml` gespeichert (der Oberflächendatei der
+Terminal-UI, neben der `config.toml`). Sie können diese
 Tabelle auch von Hand bearbeiten:
 
 ```toml
@@ -466,9 +467,9 @@ Bezeichnungen beginnen mit einer Kategorie, etwa `Navigation:`, `Refs:`, `Git:`,
 
 Jede Zeile der Palette endet mit einer Tasten-Schaltfläche (`[k]`), und `Alt+K` tut dasselbe für die markierte Zeile: Es öffnet **Einstellungen > Tastatur & Maus**, gefiltert auf das Kürzel dieses Befehls, bereit zum Neubelegen. Ein Befehl ohne eigenes Kürzel bekommt hier eines: Er steht unter **Palette-Befehle**, standardmäßig ohne Taste, und eine Taste, die Sie ihm geben, führt den Befehl genauso aus wie seine Auswahl in der Palette (ein Befehl, der jetzt nicht laufen kann, nennt den Grund). Die Zeile zeigt dann Ihre Taste.
 
-In der `config.toml` ist das die Tabelle `[keybindings.palette]`, benannt nach dem Befehl (`toggle_minimap = "Ctrl+Alt+M"`). Eine Taste, die mit einer anderen Aktion kollidiert, erscheint rot, und `c` in ihrer Zeile listet alle Aktionen auf, mit denen sie kollidiert.
+In der `tui.toml` ist das die Tabelle `[keybindings.palette]`, benannt nach dem Befehl (`toggle_minimap = "Ctrl+Alt+M"`). Eine Taste, die mit einer anderen Aktion kollidiert, erscheint rot, und `c` in ihrer Zeile listet alle Aktionen auf, mit denen sie kollidiert.
 
-Eine von Ihnen definierte Sequenz (eine benannte Kette von Palettenbefehlen) bekommt auf dieselbe Weise eine Taste: `[keybindings.sequence]` nimmt die ID der Sequenz (`backup = "Ctrl+Alt+B"`), eine Taste für eine nicht vorhandene ID wird gemeldet und ignoriert, und die Tabelle folgt `config.toml`, während die App läuft. Jede Sequenz ist außerdem eine Palettenzeile, `Sequenz: <Name>`, die ihre Taste zeigt.
+Eine von Ihnen definierte Sequenz (eine benannte Kette von Palettenbefehlen) bekommt auf dieselbe Weise eine Taste: `[keybindings.sequence]` nimmt die ID der Sequenz (`backup = "Ctrl+Alt+B"`), eine Taste für eine nicht vorhandene ID wird gemeldet und ignoriert, und die Tabelle folgt `tui.toml`, während die App läuft. Jede Sequenz ist außerdem eine Palettenzeile, `Sequenz: <Name>`, die ihre Taste zeigt.
 
 Die Hinweiszeile unter der Liste nennt diese Taste (standardmäßig `Alt+K`). Es ist die Aktion `palette.configure_shortcut` und lässt sich wie jede andere neu belegen.
 

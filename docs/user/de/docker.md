@@ -24,11 +24,11 @@ docker run -it --rm \
 | Pfad | Was er enthält |
 |---|---|
 | `/work` | Das Arbeitsverzeichnis. Binden Sie Ihre Repositorys hier ein (Bind-Mount). |
-| `/config` | Einstellungen (`config.toml`), Sitzungen und, als Unterordner, Daten und Cache (`GITPOULPI_CONFIG_DIR=/config`). Verwenden Sie ein benanntes Volume oder einen Bind-Mount, um sie zu behalten. |
+| `/config` | Einstellungen (`config.toml`, `tui.toml`), Sitzungen und, als Unterordner, Daten und Cache (`GITPOULPI_CONFIG_DIR=/config`). Verwenden Sie ein benanntes Volume oder einen Bind-Mount, um sie zu behalten. |
 | `/data`, `/cache` | Ebenfalls als Volumes deklariert, für Werkzeuge, die den XDG-Variablen folgen (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Es ist kein Volume: In jedem Container ein neues. |
 
-Ohne Volume für `/config` beginnt jeder `--rm`-Lauf mit den Standardeinstellungen. Um mit Ihrer eigenen `config.toml` zu starten, binden Sie sie ein: `-v "$PWD/config.toml":/config/config.toml:ro` (schreibgeschützt bedeutet, dass die Einstellungen nicht speichern können).
+Ohne Volume für `/config` beginnt jeder `--rm`-Lauf mit den Standardeinstellungen. Um mit Ihrer eigenen `config.toml` zu starten, binden Sie sie ein: `-v "$PWD/config.toml":/config/config.toml:ro` (schreibgeschützt bedeutet, dass die Einstellungen nicht speichern können). Die Oberflächeneinstellungen stehen in einer zweiten Datei, `tui.toml`, die auf dieselbe Weise eingebunden wird (`-v "$PWD/tui.toml":/config/tui.toml:ro`); siehe die [Konfigurationsreferenz](config-reference.md#zwei-dateien-configtoml-und-tuitoml).
 
 ## Repositorys eines anderen Benutzers
 

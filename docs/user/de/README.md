@@ -155,7 +155,7 @@ Vorschau, Lua-Skripten und einem einzigen Rückgängig.
 ## Referenz und Hilfe
 
 28. **[Konfigurationsreferenz](config-reference.md)**: jeder Schlüssel der
-    `config.toml`, sein Standardwert und seine Wirkung, die Einstellungen pro
+    `config.toml` und `tui.toml`, sein Standardwert und seine Wirkung, die Einstellungen pro
     Repository, Umgebungsvariablen.
 29. **[Fehlerbehebung und FAQ](troubleshooting.md)**: Symbole, Graph-Darstellung,
     Tasten, die nicht ankommen, hängende Daemons, Geschwindigkeit,

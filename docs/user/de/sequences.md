@@ -255,7 +255,7 @@ Eine Sequenz ist eine benannte Liste von Schritten, jeder ein Befehl der Palette
 (alles stagen, die Commit-Nachricht mit der KI schreiben, committen, pushen...).
 Führen Sie sie aus der Palette aus (`Sequenz: <Name>`), mit der Taste, die Sie ihr
 unter Einstellungen > Tastatur & Maus gegeben haben (`[keybindings.sequence]` in
-`config.toml`), oder von der Kommandozeile (`gitpoulpi sequence run`).
+`tui.toml`), oder von der Kommandozeile (`gitpoulpi sequence run`).
 
 Während sie läuft, zeigt eine Leiste über dem Log `<Name> k/n`, den Schritt und
 worauf gewartet wird. Der Lauf erscheint auch im Jobs-Panel als

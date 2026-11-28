@@ -2,6 +2,8 @@
 
 mod actions;
 mod chrome;
+mod git_actions;
+mod live;
 mod palette;
 mod workspace;
 
@@ -12,6 +14,7 @@ use gpui_kit::component::TitleBar;
 use gpui_kit::{px, size, App, AppContext as _, Bounds, WindowBounds, WindowOptions};
 
 pub use actions::{set_language, set_theme};
+pub use live::Notice;
 pub use workspace::Workspace;
 
 use crate::daemon::Shared;
@@ -49,6 +52,7 @@ pub fn init(cx: &mut App, prefs_dir: Option<PathBuf>, overrides: &Overrides) -> 
     theme::apply(&spec, cx);
 
     actions::init(cx);
+    git_actions::init(cx);
     panels::log::init(cx);
     panels::diff::init(cx);
     Ok(())

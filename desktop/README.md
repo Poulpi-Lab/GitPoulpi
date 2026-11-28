@@ -6,8 +6,11 @@ changes made from the terminal UI, the CLI or MCP show up here too.
 
 What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md).
 
-This frontend is under development on the `desktop` branch. It currently reads a repository and does not
-yet run git operations.
+This frontend is under development on the `desktop` branch. It opens the repository through the same
+per-session daemon the terminal UI and the CLI use (the shared `gitpoulpi-link` client), so a commit made
+elsewhere shows up in the Log without any action. The toolbar's Fetch, Pull, Push, Undo and Redo run git
+operations (also `Ctrl+G f`, `Ctrl+G p`, `Ctrl+G Shift+P`, `Ctrl+Z`, `Ctrl+Y`); the other toolbar
+buttons are not wired yet. `--session NAME` joins another session.
 
 ## Layout
 

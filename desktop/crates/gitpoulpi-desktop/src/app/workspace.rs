@@ -16,6 +16,7 @@ use gpui_kit::{
 };
 
 use super::actions::WorkspaceHandle;
+use super::live::{LiveState, Notice};
 use crate::daemon::Shared;
 use crate::panels::diff::{DiffPane, DiffPaneEvent};
 use crate::panels::log::{LogEvent, LogPanel, Summary};
@@ -50,6 +51,10 @@ pub struct Workspace {
     panes: Entity<ResizableState>,
     pub(super) palette: Entity<CommandState>,
     pub(super) summary: Option<Summary>,
+    /// What the last action said, for the status line.
+    pub(super) notice: Option<Notice>,
+    pub(super) live: LiveState,
+    pub(super) _pump: Option<Task<()>>,
     pub(super) logo: Arc<Image>,
     _save_window: Option<Task<()>>,
     _subs: Vec<Subscription>,
@@ -105,7 +110,7 @@ impl Workspace {
         cx.defer_in(window, |this, window, cx| {
             this.log.read(cx).focus_handle(cx).focus(window, cx)
         });
-        Self {
+        let mut this = Self {
             backend,
             refs,
             log,
@@ -117,10 +122,15 @@ impl Workspace {
             panes,
             palette,
             summary: None,
+            notice: None,
+            live: LiveState::default(),
+            _pump: None,
             logo: Arc::new(Image::from_bytes(ImageFormat::Png, LOGO_PNG.to_vec())),
             _save_window: None,
             _subs: subs,
-        }
+        };
+        this.start_pump(cx);
+        this
     }
 
     fn on_log_event(&mut self, ev: &LogEvent, cx: &mut Context<Self>) {
@@ -183,6 +193,7 @@ impl Workspace {
         if self.backend.set_repo(path) {
             let root = self.backend.repo_root().to_string_lossy().into_owned();
             PrefsStore::update(cx, |p| p.remember_recent(&root));
+            self.reset_live();
             self.refs.update(cx, |r, cx| r.reload(cx));
             self.log.update(cx, |l, cx| l.reload(cx));
             cx.notify();

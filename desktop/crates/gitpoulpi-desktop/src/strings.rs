@@ -1,8 +1,8 @@
 //! Text that is not a translatable catalog string.
 //!
 //! Most of these are literals in the terminal UI as well: git syntax (`stash@{n}`), the WIP row's
-//! placeholder, the sort glyphs. [`NOT_AVAILABLE`] is the one real gap: no catalog key says that an
-//! action is not wired up yet in this frontend.
+//! placeholder, the sort glyphs, and a few sentences no catalog key words yet (an action not wired up
+//! in this frontend, why a push has nowhere to go).
 
 /// The WIP row's message cell (the terminal UI draws the same literal).
 pub const WIP_PLACEHOLDER: &str = "// WIP";
@@ -21,9 +21,36 @@ pub fn sort_label(ascending: bool) -> &'static str {
     }
 }
 
-/// Shown when a toolbar action is clicked: those buttons are not connected to git operations yet.
-pub const NOT_AVAILABLE: &str =
-    "Read-only for now: this action is not available in the desktop frontend yet";
+/// Shown when a toolbar button is clicked whose git operation the desktop does not run yet.
+pub const NOT_AVAILABLE: &str = "This action is not available in the desktop frontend yet";
+
+/// The link asked this window to come to the front (an agent's request); the desktop does not do that yet.
+pub const NO_RAISE: &str = "this window cannot be raised on request yet";
+
+/// Push with HEAD on no branch.
+pub const PUSH_DETACHED: &str = "Nothing to push: HEAD is not on a branch";
+/// Push in a repository without remotes.
+pub const PUSH_NO_REMOTE: &str = "Nothing to push to: the repository has no remote";
+/// Push of a branch without upstream when several remotes exist and none is `origin`.
+pub const PUSH_CHOOSE_REMOTE: &str =
+    "This branch has no upstream and the repository has several remotes: push it once from the terminal UI or the CLI to choose";
+
+/// The staging guard found files that look like secrets and the desktop has no dialog for it yet.
+pub fn sensitive_stage(files: usize) -> String {
+    format!(
+        "Not staged: {files} file(s) look like secrets. Stage them from the terminal UI or the CLI to confirm"
+    )
+}
+
+/// Status line after an action finished: `title` is the button's label.
+pub fn finished(title: &str) -> String {
+    format!("{title}: done")
+}
+
+/// Status line while `n` daemon jobs run.
+pub fn jobs_running(n: usize) -> String {
+    format!("{n} job(s) running")
+}
 
 #[cfg(test)]
 mod tests {

@@ -1,72 +1,75 @@
 //! The link to GitPoulpi's daemon.
 //!
-//! The daemon is *embedded*: this process starts a `gitpoulpi_daemon::Daemon` on a dedicated tokio
-//! runtime, then talks to it through a `gitpoulpi_ipc::Client` over loopback TCP, so the data path is
-//! exactly the one the terminal UI and the CLI use. GPUI has its own executor; the two are bridged
-//! with `tokio::task::JoinHandle`s, which are plain futures and can be awaited from `cx.spawn`.
+//! The window is a client of its session's daemon exactly like the terminal UI: [`Backend`] starts a
+//! [`gitpoulpi_link::DaemonLink`] (which finds the session's running daemon through its discovery file
+//! or starts one inside this process), so a terminal UI, the CLI and this window on the same session
+//! see each other's changes live. Reads go through the link's own connection ([`Backend::call`]);
+//! refreshes the daemon pushes arrive on the link's receivers, which the window drains when
+//! [`host::DesktopHost`] wakes it (`app::live`); writes are link actions (`transfer`).
 
 mod history;
+pub mod host;
 mod queries;
+pub mod transfer;
 
+use std::future::Future;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
+use std::pin::Pin;
+use std::sync::{Arc, Mutex, MutexGuard};
+use std::task::{Context, Poll};
 
-use gitpoulpi_config::DefaultBackend;
 use gitpoulpi_core::domain::{OperationKind, RepoRef};
-use gitpoulpi_ipc::{Client, Endpoint, Request};
+use gitpoulpi_link::{DaemonLink, Reply, Requester};
 use serde::de::DeserializeOwned;
 
 pub use history::{HistoryPlan, HistoryStart, FIRST_PAGE, NEXT_PAGE};
+pub use host::DesktopHost;
 pub use queries::LogSource;
 
-/// Name of the daemon session this process hosts.
-pub const SESSION: &str = "desktop";
+struct Open {
+    link: DaemonLink,
+    repo: RepoRef,
+    requester: Requester,
+}
 
 pub struct Backend {
-    rt: tokio::runtime::Runtime,
-    endpoint: Endpoint,
     session: String,
-    repo: Mutex<RepoRef>,
-    next_id: AtomicU64,
+    host: Arc<DesktopHost>,
+    open: Mutex<Open>,
 }
 
 pub type Shared = Arc<Backend>;
 
 impl Backend {
-    /// Starts the embedded daemon and points it at the repository enclosing `repo_path`.
+    /// Opens the repository enclosing `repo_path` in the daemon of its default session (the session the
+    /// terminal UI and the CLI use for it).
     pub fn start(repo_path: &Path) -> anyhow::Result<Shared> {
-        let rt = tokio::runtime::Builder::new_multi_thread()
-            .worker_threads(2)
-            .enable_all()
-            .thread_name("gp-daemon")
-            .build()?;
-        let session = SESSION.to_string();
-        let endpoint = rt.block_on(async {
-            let handle = gitpoulpi_daemon::Daemon::new(session.clone())
-                .spawn(gitpoulpi_daemon::backend_for(DefaultBackend::Git2))
-                .await
-                .map_err(|e| anyhow::anyhow!("daemon: {e}"))?;
-            let endpoint = handle.endpoint();
-            // The accept loop must outlive this function: the process exiting stops it.
-            std::mem::forget(handle);
-            Ok::<_, anyhow::Error>(endpoint)
-        })?;
         let root = find_root(repo_path).ok_or_else(|| anyhow::anyhow!("not a git repository"))?;
+        let session = gitpoulpi_config::default_session_name_from_root(&root);
+        Self::start_in(session, &root)
+    }
+
+    /// [`Backend::start`] in a named session (`--session`).
+    pub fn start_in(session: String, repo_path: &Path) -> anyhow::Result<Shared> {
+        let root = find_root(repo_path).ok_or_else(|| anyhow::anyhow!("not a git repository"))?;
+        let host = DesktopHost::global();
+        let open = open_link(&session, &root, &host);
         Ok(Arc::new(Self {
-            rt,
-            endpoint,
             session,
-            repo: Mutex::new(RepoRef::from_root(&root)),
-            next_id: AtomicU64::new(1),
+            host,
+            open: Mutex::new(open),
         }))
     }
 
-    /// Switches to the repository enclosing `root`; `false` when there is none.
+    fn open(&self) -> MutexGuard<'_, Open> {
+        self.open.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
+    /// Switches to the repository enclosing `root`; `false` when there is none. The old link ends.
     pub fn set_repo(&self, root: &Path) -> bool {
         match find_root(root) {
             Some(r) => {
-                *self.repo.lock().unwrap() = RepoRef::from_root(&r);
+                *self.open() = open_link(&self.session, &r, &self.host);
                 true
             }
             None => false,
@@ -74,47 +77,64 @@ impl Backend {
     }
 
     pub fn repo_root(&self) -> PathBuf {
-        self.repo.lock().unwrap().root.clone()
+        self.open().repo.root.clone()
     }
 
-    /// One IPC round trip on the daemon runtime. A fresh connection per call keeps a slow diff from
-    /// queueing behind a log page (the terminal UI multiplexes one socket instead).
+    pub fn session(&self) -> &str {
+        &self.session
+    }
+
+    pub fn host(&self) -> &Arc<DesktopHost> {
+        &self.host
+    }
+
+    /// Runs `f` on the repository's link: the receivers to drain and the request methods.
+    pub fn with_link<R>(&self, f: impl FnOnce(&DaemonLink) -> R) -> R {
+        f(&self.open().link)
+    }
+
+    /// One request on the link's connection. The answer is a future any executor can poll: the link
+    /// thread fills it and wakes the host, which wakes whoever waits.
     pub fn call<T: DeserializeOwned + Send + 'static>(
         &self,
         command: OperationKind,
         args: serde_json::Value,
-    ) -> impl std::future::Future<Output = Result<T, String>> + Send + 'static {
-        let endpoint = self.endpoint.clone();
-        let session = self.session.clone();
-        let repo = self.repo.lock().unwrap().id.clone();
-        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
-        let handle = self.rt.spawn(async move {
-            let mut client = Client::connect(&endpoint)
-                .await
-                .map_err(|e| e.to_string())?;
-            let request = Request {
-                id,
-                session,
-                repo: Some(repo),
-                command,
-                args,
-            };
-            let response = client.call(&request).await.map_err(|e| e.to_string())?;
-            match response.result {
-                Ok(v) => serde_json::from_value::<T>(v).map_err(|e| e.to_string()),
-                Err(e) => Err(e.message),
-            }
-        });
-        async move { handle.await.map_err(|e| e.to_string())? }
+    ) -> impl Future<Output = Result<T, String>> + Send + 'static {
+        let reply = self.open().requester.call::<T>(command, args);
+        Answer {
+            reply,
+            host: self.host.clone(),
+        }
     }
+}
 
-    /// Runs a future on the daemon runtime and returns a handle that can be awaited anywhere.
-    pub fn run<T: Send + 'static>(
-        &self,
-        fut: impl std::future::Future<Output = T> + Send + 'static,
-    ) -> impl std::future::Future<Output = Result<T, String>> + Send + 'static {
-        let handle = self.rt.spawn(fut);
-        async move { handle.await.map_err(|e| e.to_string()) }
+/// The pending answer of one request.
+struct Answer<T> {
+    reply: Reply<T>,
+    host: Arc<DesktopHost>,
+}
+
+impl<T> Future for Answer<T> {
+    type Output = Result<T, String>;
+
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        // Registered before the look, so an answer that lands in between wakes this poll again.
+        self.host.register(cx.waker());
+        match self.reply.take() {
+            Some(result) => Poll::Ready(result.map_err(|e| host::failure_text(&e))),
+            None => Poll::Pending,
+        }
+    }
+}
+
+fn open_link(session: &str, root: &Path, host: &Arc<DesktopHost>) -> Open {
+    let repo = RepoRef::from_root(root);
+    let link = gitpoulpi_link::start(session.to_string(), repo.clone(), host.clone());
+    let requester = link.activity_handle().raw.requester();
+    Open {
+        link,
+        repo,
+        requester,
     }
 }
 

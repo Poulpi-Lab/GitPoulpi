@@ -269,11 +269,7 @@ pub(crate) fn checked_out_branch_name(refs: &[gitpoulpi_core::domain::Ref]) -> O
 /// HEAD's own commit oid (the checked-out branch's target), for actions
 /// that create a ref pointing at HEAD (branch/tag create); `None`
 /// on a detached or unborn HEAD.
-pub(crate) fn head_oid(refs: &[gitpoulpi_core::domain::Ref]) -> Option<Oid> {
-    refs.iter()
-        .find(|r| r.is_head && matches!(r.kind, RefKind::LocalBranch { .. }))
-        .map(|r| r.target)
-}
+pub(crate) use gitpoulpi_app::ref_rules::head_oid;
 
 /// Full name of the leaf ref selected in the active Refs section, or
 /// `None` when the selection sits on a folder row, the section is empty,

@@ -28,34 +28,7 @@ use gitpoulpi_i18n::{msg::remotes as msg, M};
 // The default remote
 // ---------------------------------------------------------------------
 
-/// The checked-out branch: its name and its upstream (`origin/main`).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct HeadBranch {
-    pub(crate) name: String,
-    pub(crate) upstream: Option<String>,
-}
-
-/// The checked-out *branch*, or `None` on a detached HEAD.
-pub(crate) fn head_branch(refs: &[Ref]) -> Option<HeadBranch> {
-    refs.iter().find_map(|r| match &r.kind {
-        RefKind::LocalBranch { name } if r.is_head => Some(HeadBranch {
-            name: name.clone(),
-            upstream: r.upstream.clone(),
-        }),
-        _ => None,
-    })
-}
-
-/// A local branch by name, as a [`HeadBranch`] (name + upstream).
-pub(crate) fn local_branch(refs: &[Ref], branch: &str) -> Option<HeadBranch> {
-    refs.iter().find_map(|r| match &r.kind {
-        RefKind::LocalBranch { name } if name == branch => Some(HeadBranch {
-            name: name.clone(),
-            upstream: r.upstream.clone(),
-        }),
-        _ => None,
-    })
-}
+pub(crate) use gitpoulpi_link::ref_drop::{head_branch, local_branch, HeadBranch};
 
 /// The remote part of an upstream spelling (`grp/sub/main` -> `grp/sub`),
 /// resolved against the actual remote list.
@@ -140,88 +113,9 @@ pub(crate) fn remote_web_url(url: &str) -> Option<String> {
     Some(format!("{web_scheme}://{host}/{path}"))
 }
 
-/// `(scheme, host, path)` of a remote URL git accepts over the network:
-/// `http(s)://`, `ssh://`, `git://` and the scp-like `[user@]host:path`.
-/// The host loses any user and port.
-pub(crate) fn split_remote_url(url: &str) -> Option<(&str, &str, &str)> {
-    if url.chars().any(char::is_whitespace) {
-        return None;
-    }
-    if let Some((scheme, rest)) = url.split_once("://") {
-        let scheme = match scheme.to_ascii_lowercase().as_str() {
-            "http" => "http",
-            "https" => "https",
-            "ssh" | "git+ssh" | "ssh+git" => "ssh",
-            "git" => "git",
-            _ => return None,
-        };
-        let (authority, path) = rest.split_once('/').unwrap_or((rest, ""));
-        let host = authority.rsplit('@').next()?;
-        let host = host.split(':').next()?;
-        if host.is_empty() {
-            return None;
-        }
-        return Some((scheme, host, path));
-    }
-    // scp-like: `[user@]host:path`. The colon must come before any `/`
-    // (`./a:b` is a path), and a one-letter "host" is a Windows drive
-    // (`C:\repo`, `C:/repo`), not a machine.
-    let (authority, path) = url.split_once(':')?;
-    if authority.contains('/') || authority.contains('\\') {
-        return None;
-    }
-    let host = authority.rsplit('@').next()?;
-    if host.len() <= 1 || path.is_empty() || path.starts_with('\\') {
-        return None;
-    }
-    Some(("ssh", host, path))
-}
-
-/// Accepts what a remote URL typed into the popup may be: `http(s)://`,
-/// `ssh://`, `git://`, scp-like `git@host:owner/repo.git`, or a local
-/// `file://` URL. Deliberately simple - git is the real judge, and the
-/// point here is to catch a paste of the wrong thing before it is saved.
-pub(crate) fn validate_remote_url(url: &str) -> Result<(), String> {
-    let url = url.trim();
-    if url.is_empty() {
-        return Err(msg::URL_EMPTY.get().into());
-    }
-    if url.starts_with("file://") && url.len() > "file://".len() {
-        return Ok(());
-    }
-    match split_remote_url(url) {
-        Some((_, _, path)) if !path.trim_matches('/').is_empty() => Ok(()),
-        _ => Err(msg::not_remote_url(url)),
-    }
-}
-
-/// Git's own refname rules, as they apply to a remote name, plus "not
-/// already taken" (the name being kept by an edit does not count).
-pub(crate) fn validate_remote_name(
-    name: &str,
-    taken: &[String],
-    keeping: Option<&str>,
-) -> Result<(), String> {
-    if name.is_empty() {
-        return Err(msg::NAME_EMPTY.get().into());
-    }
-    if name.chars().any(|c| c.is_whitespace() || c.is_control())
-        || name.chars().any(|c| "~^:?*[\\".contains(c))
-        || name.contains("..")
-        || name.contains("@{")
-        || name.starts_with('-')
-        || name.starts_with('/')
-        || name.ends_with('/')
-        || name.ends_with('.')
-        || name.ends_with(".lock")
-    {
-        return Err(msg::invalid_name(name));
-    }
-    if taken.iter().any(|t| t == name) && keeping != Some(name) {
-        return Err(msg::name_taken(name));
-    }
-    Ok(())
-}
+pub(crate) use gitpoulpi_app::remote_rules::{
+    split_remote_url, validate_remote_name, validate_remote_url,
+};
 
 // ---------------------------------------------------------------------
 // Actions and the menus that offer them
@@ -644,59 +538,7 @@ pub(crate) fn diverged_entries(rejection: &PushRejection) -> Vec<Entry<RemoteUiA
 // What the buttons do
 // ---------------------------------------------------------------------
 
-/// The action the Pull button (and `Ctrl+G p`) runs in `mode`, with its
-/// status line - or why it cannot run.
-///
-/// A branch with no upstream pulls its same-named branch from the
-/// default remote, rather than failing the way a bare `git pull` would.
-pub(crate) fn pull_action(
-    mode: PullButtonMode,
-    head: Option<&HeadBranch>,
-    default_remote: Option<&str>,
-) -> Result<(Action, String), String> {
-    let mode = match mode {
-        PullButtonMode::Merge => PullMode::Merge,
-        PullButtonMode::FfOnly => PullMode::FastForwardOnly,
-        PullButtonMode::Rebase => PullMode::Rebase,
-    };
-    let head = head.ok_or_else(|| msg::DETACHED_PULL.get().to_string())?;
-    let remote = if head.upstream.is_some() {
-        None
-    } else {
-        Some(
-            default_remote
-                .map(str::to_string)
-                .ok_or_else(|| msg::no_upstream_no_default(&head.name))?,
-        )
-    };
-    let from = match (&head.upstream, &remote) {
-        (Some(up), _) => up.clone(),
-        (None, Some(r)) => format!("{r}/{}", head.name),
-        (None, None) => unreachable!("handled above"),
-    };
-    Ok((
-        Action::Pull(PullOptions {
-            mode,
-            remote,
-            ..PullOptions::default()
-        }),
-        msg::pulling_from(from, &head.name),
-    ))
-}
-
-/// Pushing `branch` to `remote`, setting the upstream when the branch
-/// has none (the first push of a new branch).
-pub(crate) fn push_action(remote: &str, branch: &HeadBranch, force_with_lease: bool) -> Action {
-    Action::Push {
-        remote: remote.to_string(),
-        opts: PushOptions {
-            force_with_lease,
-            set_upstream: branch.upstream.is_none(),
-            branch: Some(branch.name.clone()),
-            ..PushOptions::default()
-        },
-    }
-}
+pub(crate) use gitpoulpi_link::ref_drop::{pull_action, push_action};
 
 /// Where a branch's own Push goes: its upstream's remote, else the
 /// default remote.

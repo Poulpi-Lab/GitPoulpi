@@ -107,17 +107,6 @@ pub(crate) fn with_posed_note(message: String) -> String {
     format!("{message} \u{b7} {}", msg::FILTERS_POSED.get())
 }
 
-/// `*.psd` for `art/hero.psd`; `None` for a file with no extension.
-pub(crate) fn extension_pattern(path: &Path) -> Option<String> {
-    let ext = path.extension()?.to_str()?;
-    (!ext.is_empty()).then(|| format!("*.{ext}"))
-}
-
-/// A path as `.gitattributes` and `git lfs` want it: forward slashes.
-pub(crate) fn pattern_for_file(path: &Path) -> String {
-    path.to_string_lossy().replace('\\', "/")
-}
-
 /// The most rows the missing-program banner may take.
 const BANNER_MAX_ROWS: usize = 3;
 
@@ -195,21 +184,6 @@ pub(crate) fn progress_text(operation: OperationKind, p: &LfsProgress) -> String
         human_size(p.bytes_total),
         p.percent(),
     )
-}
-
-/// Git LFS is set up in this repository: its own `git lfs install --local`
-/// hooks are in place. The filters alone do not count, they are usually the
-/// user's global ones (`git lfs install` at user level), and then every
-/// repository would look initialized.
-pub(crate) fn initialized(status: &LfsRepoStatus) -> bool {
-    status.hooks_installed
-}
-
-/// The toolbar's `LFS` button is worth showing: the repository is initialized,
-/// or its `.gitattributes` already routes files through LFS (the menu is how
-/// its large files get fetched, whatever the hooks say).
-pub(crate) fn shows_toolbar_button(status: &LfsRepoStatus) -> bool {
-    initialized(status) || status.uses_lfs
 }
 
 /// The render loop's copy of the LFS state.
@@ -387,22 +361,18 @@ impl LfsUi {
         &self,
         path: &Path,
     ) -> Vec<crate::status_pane::FileContextAction> {
-        use crate::status_pane::FileContextAction as A;
-        if !self.enabled || self.status.is_none() || self.unavailable_reason().is_some() {
-            return Vec::new();
-        }
-        if !self.is_lfs(path) {
-            let mut actions = vec![A::LfsTrackFile];
-            if extension_pattern(path).is_some() {
-                actions.push(A::LfsTrackExtension);
-            }
-            return actions;
-        }
-        match self.lock_on(path) {
-            None => vec![A::LfsLock],
-            Some(lock) if lock.ours => vec![A::LfsUnlock],
-            Some(_) => vec![A::LfsForceUnlock],
-        }
+        let usable = self.enabled && self.status.is_some() && self.unavailable_reason().is_none();
+        let lock = match self.lock_on(path) {
+            None => FileLock::Free,
+            Some(lock) if lock.ours => FileLock::Ours,
+            Some(_) => FileLock::Theirs,
+        };
+        file_menu_actions(
+            usable,
+            self.is_lfs(path),
+            extension_pattern(path).is_some(),
+            lock,
+        )
     }
 
     /// `path` is locked by somebody, for the row's text.

@@ -991,13 +991,18 @@ async fn dispatch(
             )
             .await
         }
-        Action::CherryPick(commit) => {
+        Action::CherryPick(_) | Action::CherryPickMany(_) => {
+            let commits = match &action {
+                Action::CherryPickMany(commits) => commits.clone(),
+                Action::CherryPick(commit) => vec![*commit],
+                _ => unreachable!("matched above"),
+            };
             reported::<CherryPickOutcome>(
                 conn,
                 action_message_tx,
                 OperationKind::CherryPick,
                 serde_json::json!({
-                    "commits": [commit],
+                    "commits": commits,
                     "opts": CherryPickOptions::default(),
                 }),
                 |outcome| match outcome {

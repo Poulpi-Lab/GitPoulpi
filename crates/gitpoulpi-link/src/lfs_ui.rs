@@ -7,6 +7,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
+use gitpoulpi_app::palette::vocab::status_pane::FileContextAction;
 use gitpoulpi_core::domain::{
     LfsFile, LfsLock, LfsProgress, LfsRepoStatus, OperationKind, WorkingTree,
 };
@@ -192,5 +193,112 @@ impl LfsGate {
             self.dirty.store(true, Ordering::Relaxed);
         }
         state.attributes_stamp = stamp;
+    }
+}
+
+/// `*.psd` for `art/hero.psd`; `None` for a file with no extension.
+pub fn extension_pattern(path: &Path) -> Option<String> {
+    let ext = path.extension()?.to_str()?;
+    (!ext.is_empty()).then(|| format!("*.{ext}"))
+}
+
+/// A path as `.gitattributes` and `git lfs` want it: forward slashes.
+pub fn pattern_for_file(path: &Path) -> String {
+    path.to_string_lossy().replace('\\', "/")
+}
+
+/// Git LFS is set up in this repository: its own `git lfs install --local`
+/// hooks are in place. The filters alone do not count, they are usually the
+/// user's global ones (`git lfs install` at user level), and then every
+/// repository would look initialized.
+pub fn initialized(status: &LfsRepoStatus) -> bool {
+    status.hooks_installed
+}
+
+/// The toolbar's `LFS` button is worth showing: the repository is initialized,
+/// or its `.gitattributes` already routes files through LFS (the menu is how
+/// its large files get fetched, whatever the hooks say).
+pub fn shows_toolbar_button(status: &LfsRepoStatus) -> bool {
+    initialized(status) || status.uses_lfs
+}
+
+/// Who holds the LFS lock on a file, for [`file_menu_actions`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileLock {
+    /// Nobody (or the lock state is not known).
+    Free,
+    /// The current user.
+    Ours,
+    /// Somebody else.
+    Theirs,
+}
+
+/// The LFS rows a file's context menu adds. `usable` is "LFS is on, its state
+/// is read and the program works" (no rows otherwise); a file not stored with
+/// LFS offers tracking it (and its extension when it has one); one that is
+/// offers the lock row that fits its lock: take it, release ours, or break
+/// somebody else's.
+pub fn file_menu_actions(
+    usable: bool,
+    is_lfs: bool,
+    has_extension: bool,
+    lock: FileLock,
+) -> Vec<FileContextAction> {
+    use FileContextAction as A;
+    if !usable {
+        return Vec::new();
+    }
+    if !is_lfs {
+        let mut actions = vec![A::LfsTrackFile];
+        if has_extension {
+            actions.push(A::LfsTrackExtension);
+        }
+        return actions;
+    }
+    match lock {
+        FileLock::Free => vec![A::LfsLock],
+        FileLock::Ours => vec![A::LfsUnlock],
+        FileLock::Theirs => vec![A::LfsForceUnlock],
+    }
+}
+
+#[cfg(test)]
+mod menu_tests {
+    use super::*;
+    use FileContextAction as A;
+
+    #[test]
+    fn a_file_offers_tracking_or_the_lock_that_fits() {
+        assert!(file_menu_actions(false, false, true, FileLock::Free).is_empty());
+        assert_eq!(
+            file_menu_actions(true, false, true, FileLock::Free),
+            vec![A::LfsTrackFile, A::LfsTrackExtension]
+        );
+        assert_eq!(
+            file_menu_actions(true, false, false, FileLock::Free),
+            vec![A::LfsTrackFile]
+        );
+        assert_eq!(
+            file_menu_actions(true, true, true, FileLock::Free),
+            vec![A::LfsLock]
+        );
+        assert_eq!(
+            file_menu_actions(true, true, true, FileLock::Ours),
+            vec![A::LfsUnlock]
+        );
+        assert_eq!(
+            file_menu_actions(true, true, true, FileLock::Theirs),
+            vec![A::LfsForceUnlock]
+        );
+    }
+
+    #[test]
+    fn patterns_are_built_the_way_gitattributes_wants_them() {
+        assert_eq!(
+            extension_pattern(Path::new("a/b.PSD")).as_deref(),
+            Some("*.PSD")
+        );
+        assert_eq!(extension_pattern(Path::new("Makefile")), None);
+        assert_eq!(pattern_for_file(Path::new("a\\b\\c.bin")), "a/b/c.bin");
     }
 }

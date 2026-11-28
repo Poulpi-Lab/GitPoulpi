@@ -424,6 +424,11 @@ pub enum Action {
     /// One commit per action; the wire shape is still the list the daemon
     /// expects.
     CherryPick(Oid),
+    /// Several commits as one request and one journal entry ("Cherry-pick
+    /// n commits"), applied onto HEAD in the order given; the daemon stops
+    /// at the first conflict. For a frontend that picks a multi-selection
+    /// without the interactive form.
+    CherryPickMany(Vec<Oid>),
     /// `mainline`: the parent (1-based) that stays, required for a merge
     /// commit (`git revert -m`).
     Revert {
@@ -998,7 +1003,7 @@ impl Action {
             Action::SparseSet { .. } => plain(gitpoulpi_i18n::msg::sparse::APPLYING),
             Action::SparseDisable => plain(gitpoulpi_i18n::msg::sparse::DISABLING),
             Action::OperationSkip => plain(l::ACT_SKIPPING_OPERATION),
-            Action::CherryPick(_) => plain(l::ACT_CHERRY_PICKING),
+            Action::CherryPick(_) | Action::CherryPickMany(_) => plain(l::ACT_CHERRY_PICKING),
             Action::Revert { .. } => plain(l::ACT_REVERTING),
             Action::Reset { .. } => plain(l::ACT_RESETTING),
             Action::AutoStashStartOver { .. } => plain(l::ACT_STARTING_OVER),

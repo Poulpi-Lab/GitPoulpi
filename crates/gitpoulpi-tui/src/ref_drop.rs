@@ -25,7 +25,7 @@
 //! refused), the same as a click on the menu entry.
 
 use gitpoulpi_config::PullButtonMode;
-use gitpoulpi_core::domain::{CommitGraph, PullOptions, Ref};
+use gitpoulpi_core::domain::{CommitGraph, Ref};
 
 use super::*;
 use crate::log_menu::FfVerdict;
@@ -37,32 +37,7 @@ use gitpoulpi_i18n::msg::{menu_drop as msg, menu_log, menu_ref};
 /// font measured for this project, so it never flips under a bold style.
 pub(crate) const MARK_GLYPH: char = '\u{25C6}';
 
-/// One choice of the drop menu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum DropOp {
-    /// Merge the dragged ref into the target branch.
-    Merge,
-    /// Local X onto Y: replay X on Y. Remote R onto Y: replay Y on R.
-    Rebase,
-    /// Open the interactive rebase popup for X's commits onto Y.
-    InteractiveRebase,
-    /// Move the target branch forward to the dragged ref.
-    FastForward,
-    /// Push the dragged local branch to the target's remote.
-    Push,
-    /// Pull the dragged remote branch into the (local) target.
-    Pull,
-    /// Move the dragged tag to the target's commit (a fast-forward of the
-    /// tag: the target descends from the tag's commit).
-    MoveTag,
-    /// The same move when it is not a fast-forward, offered with a warning.
-    MoveTagForced,
-    /// `git merge <tag>` on the target branch.
-    MergeTagIntoBranch,
-    /// Merge the target branch into the tag's commit, detached, then move
-    /// the tag onto the merge commit.
-    MergeBranchIntoTag,
-}
+pub(crate) use gitpoulpi_link::ref_drop::DropOp;
 
 /// What a chosen `DropOp` turns into.
 #[derive(Debug, Clone, PartialEq)]
@@ -73,42 +48,9 @@ pub(crate) enum DropPlan {
     Rebase(Box<RebaseForm>),
 }
 
-fn find_ref<'a>(refs: &'a [Ref], kind: RefRowKind, name: &str) -> Option<&'a Ref> {
-    refs.iter().find(|r| match (&r.kind, kind) {
-        (RefKind::LocalBranch { name: n }, RefRowKind::Local) => n == name,
-        (RefKind::RemoteBranch { remote, name: n }, RefRowKind::Remote) => {
-            format!("{remote}/{n}") == name
-        }
-        (RefKind::Tag { name: n }, RefRowKind::Tag) => n == name,
-        _ => false,
-    })
-}
+use gitpoulpi_app::ref_rules::find_ref;
 
-/// `then`, preceded by checking `branch` out unless it already is.
-fn after_checkout(branch: &str, head: Option<&HeadBranch>, then: Action) -> Action {
-    if head.is_some_and(|h| h.name == branch) {
-        then
-    } else {
-        Action::CheckoutThen {
-            branch: branch.to_string(),
-            then: Box::new(then),
-        }
-    }
-}
-
-/// The remotes that have `tag`: moving it leaves them at the old position.
-pub(crate) fn tag_remotes(tag: &Ref) -> Vec<String> {
-    tag.tag_sync
-        .as_ref()
-        .map(|s| {
-            s.pushed_to
-                .iter()
-                .chain(s.differs_on.iter())
-                .cloned()
-                .collect()
-        })
-        .unwrap_or_default()
-}
+pub(crate) use gitpoulpi_app::ref_rules::tag_remotes;
 
 /// The rows a drop of `source` on `target` offers. Empty when the pair
 /// is not a valid drop (`ref_drop_is_valid` is the gate the gesture
@@ -241,6 +183,8 @@ pub(crate) fn drop_menu_title(source: &str, target: &str) -> String {
 }
 
 /// What `op` does for this drop. `Err` is a status line saying why not.
+/// The decision lives in `gitpoulpi_link::ref_drop::plan_drop`; the
+/// interactive rebase's form is built here, from the loaded graph.
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn plan_drop(
     op: DropOp,
@@ -253,97 +197,28 @@ pub(crate) fn plan_drop(
     remotes: &[String],
     pull_mode: PullButtonMode,
 ) -> Result<DropPlan, String> {
-    let gone = |name: &str| crate::git_actions::gone(name);
-    let src = find_ref(refs, source_kind, source).ok_or_else(|| gone(source))?;
-    let tgt = find_ref(refs, target_kind, target).ok_or_else(|| gone(target))?;
-    let head = head_branch(refs);
-    match (op, source_kind, target_kind) {
-        // Both directions merge `src` into the local branch `target`.
-        (DropOp::Merge, _, RefRowKind::Local) => Ok(DropPlan::Submit(
-            after_checkout(target, head.as_ref(), Action::Merge(src.clone())),
-            msg::merging(source, target),
-        )),
-        (DropOp::Rebase, RefRowKind::Local, RefRowKind::Local) => Ok(DropPlan::Submit(
-            after_checkout(source, head.as_ref(), Action::Rebase(tgt.clone())),
-            msg::rebasing_source(source, target),
-        )),
-        (DropOp::Rebase, RefRowKind::Remote, RefRowKind::Local) => Ok(DropPlan::Submit(
-            after_checkout(target, head.as_ref(), Action::Rebase(src.clone())),
-            msg::rebasing_target(target, source),
-        )),
-        (DropOp::InteractiveRebase, RefRowKind::Local, RefRowKind::Local) => {
+    use gitpoulpi_link::ref_drop::{plan_drop as plan, DropPlan as Plan};
+    match plan(
+        op,
+        source,
+        source_kind,
+        target,
+        target_kind,
+        refs,
+        graph,
+        remotes,
+        pull_mode,
+    )? {
+        Plan::Submit(action, said) => Ok(DropPlan::Submit(action, said)),
+        Plan::Rebase(r) => {
             let graph = graph.ok_or(msg::NO_HISTORY.get())?;
-            let checkout = (head.as_ref().map(|h| h.name.as_str()) != Some(source))
-                .then(|| source.to_string());
-            rebase_form_onto(graph, source, src.target, tgt.target, checkout).map(|mut form| {
-                form.onto_label = Some(target.to_string());
-                DropPlan::Rebase(Box::new(form))
-            })
-        }
-        (DropOp::MoveTag | DropOp::MoveTagForced, RefRowKind::Tag, _) => {
-            // Where the tag lives besides here: the remote keeps its old
-            // position until the owner pushes (the tag turns `differs`).
-            let remotes = tag_remotes(src);
-            let said = if remotes.is_empty() {
-                msg::moving_tag(source, target)
-            } else {
-                msg::moving_tag_remote(source, target, remotes.join(", "))
-            };
-            Ok(DropPlan::Submit(
-                Action::TagMove {
-                    name: source.to_string(),
-                    target: tgt.target,
-                    force: op == DropOp::MoveTagForced,
-                    target_label: target.to_string(),
-                    remotes,
+            rebase_form_onto(graph, &r.source, r.source_tip, r.target_tip, r.checkout).map(
+                |mut form| {
+                    form.onto_label = Some(r.target);
+                    DropPlan::Rebase(Box::new(form))
                 },
-                said,
-            ))
+            )
         }
-        (DropOp::MergeTagIntoBranch, RefRowKind::Tag, RefRowKind::Local) => Ok(DropPlan::Submit(
-            after_checkout(target, head.as_ref(), Action::Merge(src.clone())),
-            msg::merging(source, target),
-        )),
-        (DropOp::MergeBranchIntoTag, RefRowKind::Tag, RefRowKind::Local) => Ok(DropPlan::Submit(
-            Action::TagMergeBranch {
-                name: source.to_string(),
-                branch: target.to_string(),
-            },
-            msg::merging_into_tag(target, source),
-        )),
-        (DropOp::FastForward, _, RefRowKind::Local) => Ok(DropPlan::Submit(
-            Action::FastForward {
-                branch: target.to_string(),
-                target: src.target,
-                target_label: source.to_string(),
-            },
-            menu_ref::fast_forwarding(target, source),
-        )),
-        (DropOp::Push, RefRowKind::Local, RefRowKind::Remote) => {
-            let (remote, _) = gitpoulpi_core::domain::split_remote_ref(target, remotes)
-                .ok_or_else(|| msg::not_on_remote(target))?;
-            let branch = HeadBranch {
-                name: source.to_string(),
-                upstream: src.upstream.clone(),
-            };
-            Ok(DropPlan::Submit(
-                push_action(&remote, &branch, false),
-                menu_ref::pushing(source, &remote),
-            ))
-        }
-        (DropOp::Pull, RefRowKind::Remote, RefRowKind::Local) => {
-            let branch = HeadBranch {
-                name: target.to_string(),
-                upstream: tgt.upstream.clone(),
-            };
-            let (pull, said) = pull_action(pull_mode, Some(&branch), None)?;
-            debug_assert!(matches!(&pull, Action::Pull(PullOptions { .. })));
-            Ok(DropPlan::Submit(
-                after_checkout(target, head.as_ref(), pull),
-                said,
-            ))
-        }
-        _ => Err(msg::cannot_drop(source, target)),
     }
 }
 

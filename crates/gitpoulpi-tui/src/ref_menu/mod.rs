@@ -273,108 +273,7 @@ pub(crate) fn ref_by_display_name<'a>(
     })
 }
 
-/// `(remote, branch)` of the remote-tracking ref shown as `display`
-/// (`origin/feature/x`), or `None` when no such ref is loaded.
-pub(crate) fn remote_branch_parts(
-    refs: &[gitpoulpi_core::domain::Ref],
-    display: &str,
-) -> Option<(String, String)> {
-    refs.iter().find_map(|r| match &r.kind {
-        RefKind::RemoteBranch { remote, name } if format!("{remote}/{name}") == display => {
-            Some((remote.clone(), name.clone()))
-        }
-        _ => None,
-    })
-}
-
-/// A branch's counterpart on the other side, as sidebar names:
-/// `(local_twin, remote_twin)`. For a local branch the remote twin is its
-/// upstream when that ref is loaded, else a remote branch of the same
-/// name; for a remote branch the local twin is the local branch tracking
-/// it, else one of the same name. Tags have neither.
-pub(crate) fn branch_twins(
-    refs: &[gitpoulpi_core::domain::Ref],
-    kind: RefRowKind,
-    full_name: &str,
-) -> (Option<String>, Option<String>) {
-    match kind {
-        RefRowKind::Local => {
-            let upstream = refs.iter().find_map(|r| match &r.kind {
-                RefKind::LocalBranch { name } if name == full_name => r.upstream.clone(),
-                _ => None,
-            });
-            let remote = upstream
-                .filter(|u| remote_branch_parts(refs, u).is_some())
-                .or_else(|| {
-                    refs.iter().find_map(|r| match &r.kind {
-                        RefKind::RemoteBranch { remote, name }
-                            if name == full_name && name != "HEAD" =>
-                        {
-                            Some(format!("{remote}/{name}"))
-                        }
-                        _ => None,
-                    })
-                });
-            (None, remote)
-        }
-        RefRowKind::Remote => {
-            let Some((_, branch)) = remote_branch_parts(refs, full_name) else {
-                return (None, None);
-            };
-            let tracking = refs.iter().find_map(|r| match &r.kind {
-                RefKind::LocalBranch { name } if r.upstream.as_deref() == Some(full_name) => {
-                    Some(name.clone())
-                }
-                _ => None,
-            });
-            let local = tracking.or_else(|| {
-                refs.iter().find_map(|r| match &r.kind {
-                    RefKind::LocalBranch { name } if *name == branch => Some(name.clone()),
-                    _ => None,
-                })
-            });
-            (local, None)
-        }
-        RefRowKind::Tag => (None, None),
-    }
-}
-
-/// What a Delete row acts on: the local branch and/or the remote one.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub(crate) struct DeleteTargets {
-    pub(crate) local: Option<String>,
-    /// `(remote, branch)`.
-    pub(crate) remote: Option<(String, String)>,
-}
-
-pub(crate) fn delete_targets(
-    refs: &[gitpoulpi_core::domain::Ref],
-    kind: RefRowKind,
-    full_name: &str,
-) -> DeleteTargets {
-    let (local_twin, remote_twin) = branch_twins(refs, kind, full_name);
-    match kind {
-        RefRowKind::Local => DeleteTargets {
-            local: Some(full_name.to_string()),
-            remote: remote_twin.and_then(|t| remote_branch_parts(refs, &t)),
-        },
-        RefRowKind::Remote => DeleteTargets {
-            local: local_twin,
-            remote: remote_branch_parts(refs, full_name),
-        },
-        RefRowKind::Tag => DeleteTargets::default(),
-    }
-}
-
-/// The refusal for deleting the checked-out branch, or `None`.
-pub(crate) fn checked_out_refusal(
-    refs: &[gitpoulpi_core::domain::Ref],
-    branch: &str,
-) -> Option<String> {
-    refs.iter()
-        .any(|r| r.is_head && matches!(&r.kind, RefKind::LocalBranch { name } if name == branch))
-        .then(|| msg::cannot_delete_checked_out(branch))
-}
+pub(crate) use gitpoulpi_app::ref_rules::{branch_twins, checked_out_refusal, delete_targets};
 
 /// A folder or remote-root row's own context menu: the bulk twin of a
 /// leaf's hide/solo entries, and nothing else - a folder can't be
@@ -951,20 +850,13 @@ pub(crate) fn target_stash(
     stash_state: &ListState,
 ) -> Option<gitpoulpi_core::domain::Stash> {
     let stashes = stashes.as_ref().ok()?;
-    if focus == Focus::Refs && active == SidebarSection::Stashes {
-        if let Some(selected) = stash_state.selected().and_then(|i| stashes.get(i)) {
-            return Some(selected.clone());
-        }
-    }
-    stashes.first().cloned()
+    let selected = (focus == Focus::Refs && active == SidebarSection::Stashes)
+        .then(|| stash_state.selected())
+        .flatten();
+    gitpoulpi_app::ref_rules::default_stash(stashes, selected).cloned()
 }
 
-/// The STASHES sidebar rows carry their stash id as the context menu's
-/// row identity (refs carry their name there instead), so acting on one
-/// means parsing it back.
-pub(crate) fn parse_stash_id(raw: &str) -> Option<gitpoulpi_core::domain::StashId> {
-    raw.parse().ok().map(gitpoulpi_core::domain::StashId)
-}
+pub(crate) use gitpoulpi_app::ref_rules::parse_stash_id;
 
 #[cfg(test)]
 mod tests;

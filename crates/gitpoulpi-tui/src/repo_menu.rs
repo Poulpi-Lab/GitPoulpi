@@ -419,58 +419,7 @@ fn path_exts() -> Vec<String> {
     }
 }
 
-/// Where `program` really is, for a spawn by full path. On Windows this is
-/// the PATH + PATHEXT search `CreateProcess` does not do for `.cmd`/`.bat`
-/// shims (`code`, `cursor`): `code` finds `code.cmd`. A name with a path
-/// separator is taken relative to `cwd`. `windows` is a parameter so the
-/// rules are testable on any OS; callers pass `cfg!(windows)`.
-pub(crate) fn resolve_program(
-    program: &str,
-    path_var: Option<&std::ffi::OsStr>,
-    pathext: Option<&str>,
-    windows: bool,
-    cwd: &Path,
-) -> Option<PathBuf> {
-    let mut names: Vec<String> = Vec::new();
-    if windows {
-        let exts: Vec<String> = pathext
-            .unwrap_or(".COM;.EXE;.BAT;.CMD")
-            .split(';')
-            .map(str::trim)
-            .filter(|e| !e.is_empty())
-            .map(str::to_string)
-            .collect();
-        let lower = program.to_ascii_lowercase();
-        if exts
-            .iter()
-            .any(|e| lower.ends_with(&e.to_ascii_lowercase()))
-        {
-            names.push(program.to_string());
-        }
-        names.extend(exts.iter().map(|e| format!("{program}{e}")));
-    } else {
-        names.push(program.to_string());
-    }
-    let has_separator = program.contains('/') || (windows && program.contains('\\'));
-    if has_separator {
-        return names.iter().find_map(|n| {
-            let candidate = Path::new(n);
-            let full = if candidate.is_absolute() {
-                candidate.to_path_buf()
-            } else {
-                cwd.join(candidate)
-            };
-            full.is_file().then_some(full)
-        });
-    }
-    let paths = path_var?;
-    std::env::split_paths(paths).find_map(|dir| {
-        names.iter().find_map(|n| {
-            let full = dir.join(n);
-            full.is_file().then_some(full)
-        })
-    })
-}
+pub(crate) use gitpoulpi_link::open_in::resolve_program;
 
 /// Starts `program` detached: no stdin/stdout/stderr tied to this
 /// terminal (which is in raw mode and belongs to the TUI), and never

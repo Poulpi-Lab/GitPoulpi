@@ -87,25 +87,31 @@ pub mod conversation_cache;
 #[cfg(all(feature = "conversation", feature = "hosting"))]
 pub mod conversation_write;
 pub mod diff_recode;
+pub mod external_tools;
+pub mod friendly;
 #[cfg(feature = "hosting")]
 pub mod hosting_rows;
 #[cfg(feature = "hosting")]
 pub mod hosting_task;
 #[cfg(all(feature = "conversation", feature = "hosting"))]
 pub mod item_target;
+pub mod jobs_wording;
 pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;
 pub mod oid_text;
+pub mod open_in;
 #[cfg(all(feature = "radar", feature = "hosting"))]
 pub mod radar;
 pub mod rebase_plan;
 pub mod redraw;
+pub mod ref_drop;
 pub mod rename_pairs;
 pub mod repo_state_path;
 #[cfg(all(feature = "review", feature = "hosting"))]
 pub mod review_model;
 pub mod rewrite_rules;
+pub mod sequence_machine;
 pub mod ui_viewer;
 pub mod undo_label;
 pub mod undo_ui;

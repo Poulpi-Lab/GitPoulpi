@@ -61,6 +61,24 @@ pub struct RefreshSummary {
 }
 
 impl RefreshSummary {
+    /// Folds `other` into `self` (each flag is the OR of the two): for a
+    /// frontend that coalesces several delivered refreshes into one redraw and
+    /// must still replace every part any of them changed.
+    pub fn merge(&mut self, other: RefreshSummary) {
+        self.first |= other.first;
+        self.log |= other.log;
+        self.head |= other.head;
+        self.refs |= other.refs;
+        self.working_tree |= other.working_tree;
+        self.stashes |= other.stashes;
+        self.worktrees |= other.worktrees;
+        self.submodules |= other.submodules;
+        self.conflicts |= other.conflicts;
+        self.remotes |= other.remotes;
+        self.config |= other.config;
+        self.lfs |= other.lfs;
+    }
+
     /// Whether any part changed.
     pub fn any(&self) -> bool {
         self.log
@@ -139,4 +157,28 @@ pub(super) fn combine(parts: &[u64]) -> u64 {
     let mut hasher = std::collections::hash_map::DefaultHasher::new();
     parts.hash(&mut hasher);
     hasher.finish()
+}
+
+#[cfg(test)]
+mod merge_tests {
+    use super::*;
+
+    #[test]
+    fn merging_ors_every_flag() {
+        let mut a = RefreshSummary {
+            log: true,
+            first: true,
+            ..RefreshSummary::default()
+        };
+        a.merge(RefreshSummary {
+            refs: true,
+            lfs: true,
+            ..RefreshSummary::default()
+        });
+        assert!(a.first && a.log && a.refs && a.lfs);
+        assert!(!a.working_tree && !a.stashes && !a.config);
+        let mut quiet = RefreshSummary::default();
+        quiet.merge(RefreshSummary::default());
+        assert!(!quiet.any());
+    }
 }

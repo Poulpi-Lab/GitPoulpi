@@ -1,5 +1,5 @@
 use super::*;
-use crate::ai_ui::AiEnd;
+use gitpoulpi_app::ai_state::AiEnd;
 use gitpoulpi_config::sequences::StepSpec;
 
 fn def(steps: Vec<StepSpec>) -> SequenceDef {

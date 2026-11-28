@@ -266,6 +266,10 @@
   CherryPick {"commits":["0707070707070707070707070707070707070707"],"opts":{"no_commit":false}}
   message: cherry-picked as 0707070
   ok: true
+== CherryPickMany([Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]), Oid([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8])])
+  CherryPick {"commits":["0707070707070707070707070707070707070707","0808080808080808080808080808080808080808"],"opts":{"no_commit":false}}
+  message: cherry-picked as 0707070
+  ok: true
 == Revert { commit: Oid([7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]), mainline: None }
   Revert {"commit":"0707070707070707070707070707070707070707","mainline":null}
   message: revert conflicted - resolve the files, then commit

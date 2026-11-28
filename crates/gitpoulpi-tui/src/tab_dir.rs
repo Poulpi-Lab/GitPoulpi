@@ -20,8 +20,7 @@ pub(crate) use gitpoulpi_app::palette::vocab::tab_dir::TabDirButton;
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
-use std::time::{Duration, Instant};
+use std::sync::{Mutex, OnceLock};
 
 use gitpoulpi_config::launch::{self, LaunchVars};
 use gitpoulpi_config::open_in::{self, OpenInEntry};
@@ -424,102 +423,15 @@ pub(crate) fn default_index() -> usize {
 // the active one and [`head_changed`] when its HEAD moves; a run that finds the
 // cache empty reads the two tiny files itself (microseconds) and stores them.
 
-/// What `${repo}` and `${branch}` stand for on one tab.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct RepoInfo {
-    /// The repository root (differs from the tab folder for a worktree).
-    pub(crate) repo: String,
-    /// The checked-out branch, empty when detached or unknown.
-    pub(crate) branch: String,
-    /// The origin's web page when it is a GitHub / GitLab project, else empty.
-    pub(crate) web_url: String,
-}
+pub(crate) use gitpoulpi_link::open_in::RepoInfo;
 
 static REPO_INFO: Mutex<BTreeMap<PathBuf, RepoInfo>> = Mutex::new(BTreeMap::new());
 
-/// Removes `.`/`..` components without touching the disk.
-fn lexical_normalize(path: &Path) -> PathBuf {
-    let mut out = PathBuf::new();
-    for c in path.components() {
-        match c {
-            std::path::Component::ParentDir => {
-                out.pop();
-            }
-            std::path::Component::CurDir => {}
-            other => out.push(other.as_os_str()),
-        }
-    }
-    out
-}
-
-/// Reads the facts from the files under `.git`: a plain repository, or a
-/// linked worktree whose `.git` is a `gitdir: ...` file.
+/// Reads the facts from the files under `.git` (the reading itself is
+/// `gitpoulpi_link::open_in::read_repo_info`; the web page of the origin
+/// depends on the integrations configured here).
 pub(crate) fn read_repo_info(path: &Path) -> RepoInfo {
-    let folder = path.to_string_lossy().to_string();
-    let dot_git = path.join(".git");
-    let (git_dir, repo) = if dot_git.is_dir() {
-        (dot_git, folder.clone())
-    } else if let Ok(text) = std::fs::read_to_string(&dot_git) {
-        let Some(dir) = text.trim().strip_prefix("gitdir:").map(str::trim) else {
-            return RepoInfo {
-                repo: folder,
-                ..RepoInfo::default()
-            };
-        };
-        let git_dir = lexical_normalize(&path.join(dir));
-        // `commondir` points from `.git/worktrees/<n>` back to the shared
-        // `.git`; the repository root is its parent.
-        let repo = std::fs::read_to_string(git_dir.join("commondir"))
-            .ok()
-            .map(|c| lexical_normalize(&git_dir.join(c.trim())))
-            .and_then(|common| common.parent().map(|p| p.to_string_lossy().to_string()))
-            .unwrap_or_else(|| folder.clone());
-        (git_dir, repo)
-    } else {
-        return RepoInfo {
-            repo: folder,
-            ..RepoInfo::default()
-        };
-    };
-    let branch = std::fs::read_to_string(git_dir.join("HEAD"))
-        .ok()
-        .and_then(|head| {
-            head.trim()
-                .strip_prefix("ref:")
-                .map(|r| r.trim().trim_start_matches("refs/heads/").to_string())
-        })
-        .unwrap_or_default();
-    let common = std::fs::read_to_string(git_dir.join("commondir"))
-        .ok()
-        .map(|c| lexical_normalize(&git_dir.join(c.trim())))
-        .unwrap_or_else(|| git_dir.clone());
-    let web_url = origin_url(&common.join("config"))
-        .and_then(|url| web_url_of(&url))
-        .unwrap_or_default();
-    RepoInfo {
-        repo,
-        branch,
-        web_url,
-    }
-}
-
-/// The `url` of `[remote "origin"]` in a git config file.
-fn origin_url(config: &Path) -> Option<String> {
-    let text = std::fs::read_to_string(config).ok()?;
-    let mut in_origin = false;
-    for line in text.lines() {
-        let line = line.trim();
-        if line.starts_with('[') {
-            in_origin = line.replace(' ', "") == "[remote\"origin\"]"; // i18n-english
-        } else if in_origin {
-            if let Some(v) = line.strip_prefix("url") {
-                if let Some(v) = v.trim_start().strip_prefix('=') {
-                    return Some(v.trim().to_string());
-                }
-            }
-        }
-    }
-    None
+    gitpoulpi_link::open_in::read_repo_info(path, &web_url_of)
 }
 
 /// `https://host/owner/repo` for a GitHub or GitLab (well-known or configured
@@ -599,240 +511,22 @@ pub(crate) fn head_changed(path: &Path) {
 
 // ------------------------------------------------------------------ the runner
 
-/// How long the watcher thread waits for an early failure.
-const WATCH: Duration = Duration::from_millis(1500);
-/// How much of the launcher's stderr is kept.
-const STDERR_KEEP: usize = 300;
-
-/// One launch: what to run, in which folder, with which facts.
-pub(crate) struct Launch<'a> {
-    pub(crate) label: &'a str,
-    pub(crate) program: &'a str,
-    pub(crate) args: &'a [String],
-    /// The command line after the program, passed verbatim on Windows when a
-    /// program parses it itself (`--single-argument`); `args` otherwise.
-    pub(crate) raw_args: Option<&'a str>,
-    pub(crate) cwd: &'a Path,
-    pub(crate) info: &'a RepoInfo,
-}
-
-fn program_stem(program: &str) -> String {
-    let name = program.rsplit(['/', '\\']).next().unwrap_or(program);
-    let lower = name.to_ascii_lowercase();
-    lower.strip_suffix(".exe").unwrap_or(&lower).to_string()
-}
-
-/// `cmd /C start ...` opens its own window: it must not get
-/// `CREATE_NO_WINDOW`.
-#[cfg_attr(not(windows), allow(dead_code))] // only Windows spawns with it
-fn is_cmd_start(program: &str, args: &[String]) -> bool {
-    program_stem(program) == "cmd"
-        && args
-            .iter()
-            .skip(1)
-            .find(|a| !a.starts_with('/') || a.len() > 2)
-            .is_some_and(|a| a.eq_ignore_ascii_case("start"))
-}
-
-/// Whether `program args` is a bare console shell (`cmd`, `pwsh`,
-/// `powershell`, `wsl [--cd <dir>]`, `cmd /K <command>`): on Windows it is
-/// started with `CREATE_NEW_CONSOLE` so it opens a window of its own in the
-/// launch directory. Anything with other arguments (`cmd /C dir`) is a
-/// command to run, not a terminal to show.
-pub(crate) fn wants_new_console(program: &str, args: &[String]) -> bool {
-    match program_stem(program).as_str() {
-        "cmd" => args.is_empty() || args[0].eq_ignore_ascii_case("/K"),
-        "pwsh" | "powershell" => args.is_empty(),
-        "wsl" => args.is_empty() || (args.len() == 2 && args[0].eq_ignore_ascii_case("--cd")),
-        _ => false,
-    }
-}
-
-/// The late-error message for a launcher that ended with `code`, or `None`
-/// when that is a success. `explorer.exe` always exits 1 even when it worked.
-pub(crate) fn exit_failure(
-    label: &str,
-    program: &str,
-    code: Option<i32>,
-    stderr: &[u8],
-) -> Option<String> {
-    let Some(code) = code else {
-        return Some(msg::open_in_run::stopped(label));
-    };
-    if code == 0 || (code == 1 && program_stem(program) == "explorer") {
-        return None;
-    }
-    let text = String::from_utf8_lossy(stderr);
-    let detail = text
-        .lines()
-        .map(str::trim)
-        .find(|l| !l.is_empty())
-        .unwrap_or_default();
-    Some(if detail.is_empty() {
-        msg::open_in_run::failed_silent(label, code)
-    } else {
-        msg::open_in_run::failed(label, code, detail)
-    })
-}
-
-/// Spawns the launcher and returns at once. Immediate errors: the program is
-/// not found, or the system refuses to start it. Later ones (a non-zero exit
-/// within [`WATCH`]) go to `report`; the child is reaped either way.
-pub(crate) fn start(launch: &Launch, report: fn(String)) -> Result<(), String> {
-    use std::process::{Command, Stdio};
-    let resolved = crate::repo_menu::resolve_program(
-        launch.program,
-        std::env::var_os("PATH").as_deref(),
-        std::env::var("PATHEXT").ok().as_deref(),
-        cfg!(windows),
-        launch.cwd,
-    )
-    .ok_or_else(|| msg::open_in_run::program_not_found(launch.label, launch.program))?;
-    let mut command = Command::new(&resolved);
-    command.current_dir(launch.cwd);
-    match launch.raw_args {
-        #[cfg(windows)]
-        Some(raw) => {
-            use std::os::windows::process::CommandExt;
-            command.raw_arg(raw);
-        }
-        _ => {
-            command.args(launch.args);
-        }
-    }
-    command
-        .env("GITPOULPI_CWD", launch.cwd)
-        .env("GITPOULPI_REPO", &launch.info.repo)
-        .env("GITPOULPI_BRANCH", &launch.info.branch);
-    // A console shell opened "here" gets its own console window, with the
-    // folder as its working directory: no `cmd /C start` in between, which
-    // would parse the folder name as a command line.
-    let own_console = cfg!(windows) && wants_new_console(launch.program, launch.args);
-    if own_console {
-        // Null handles would be kept by the new console and end the shell at
-        // once; inherited console handles are replaced by the new console's.
-        command
-            .stdin(Stdio::inherit())
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit());
-    } else {
-        command
-            .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::piped());
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        if own_console {
-            command.creation_flags(0x0000_0010); // CREATE_NEW_CONSOLE
-        } else if !is_cmd_start(launch.program, launch.args) {
-            command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
-        }
-    }
-    let mut child = command
-        .spawn()
-        .map_err(|err| msg::open_in_run::could_not_start(launch.label, launch.program, err))?;
-
-    // Keep the first bytes of stderr, drain the rest so the child never blocks
-    // on a full pipe (a GUI program holds it open for as long as it lives).
-    let captured = Arc::new(Mutex::new(Vec::<u8>::new()));
-    let drained = Arc::new(AtomicBool::new(false));
-    if let Some(mut stderr) = child.stderr.take() {
-        let (captured, drained) = (captured.clone(), drained.clone());
-        std::thread::spawn(move || {
-            use std::io::Read;
-            let mut buf = [0u8; 4096];
-            while let Ok(n) = stderr.read(&mut buf) {
-                if n == 0 {
-                    break;
-                }
-                if let Ok(mut kept) = captured.lock() {
-                    let room = STDERR_KEEP.saturating_sub(kept.len());
-                    kept.extend_from_slice(&buf[..n.min(room)]);
-                }
-            }
-            drained.store(true, Ordering::Relaxed);
-        });
-    } else {
-        drained.store(true, Ordering::Relaxed);
-    }
-
-    let (label, program) = (launch.label.to_string(), launch.program.to_string());
-    std::thread::spawn(move || {
-        let deadline = Instant::now() + WATCH;
-        loop {
-            match child.try_wait() {
-                Ok(Some(status)) => {
-                    // Give the stderr reader a moment to see the end.
-                    let until = Instant::now() + Duration::from_millis(150);
-                    while !drained.load(Ordering::Relaxed) && Instant::now() < until {
-                        std::thread::sleep(Duration::from_millis(10));
-                    }
-                    let kept = captured.lock().map(|k| k.clone()).unwrap_or_default();
-                    if let Some(message) = exit_failure(&label, &program, status.code(), &kept) {
-                        report(message);
-                    }
-                    return;
-                }
-                Ok(None) if Instant::now() < deadline => {
-                    std::thread::sleep(Duration::from_millis(20));
-                }
-                Ok(None) => break,
-                Err(_) => return,
-            }
-        }
-        // Still running: a terminal or editor that stays up. Reap it
-        // whenever it ends.
-        let _ = child.wait();
-    });
-    Ok(())
-}
-
-/// How `gitpoulpi_config::open_in::expand` words an unknown variable.
-const UNKNOWN_VARIABLE_PREFIX: &str = "unknown variable "; // i18n-english
+#[cfg(test)]
+pub(crate) use gitpoulpi_link::open_in::{exit_failure, is_cmd_start, wants_new_console};
+pub(crate) use gitpoulpi_link::open_in::{start, Launch};
 
 /// A run, prepared: the entry, its expanded argv and the facts.
-struct Prepared {
-    label: String,
-    argv: Vec<String>,
-    info: RepoInfo,
-}
+#[cfg(test)]
+use gitpoulpi_link::open_in::OpenInCommand as Prepared;
 
+#[cfg(test)]
 fn prepare(index: usize, path: &Path) -> Result<Prepared, String> {
     let state = open_in_state();
     let entry = state
         .entries
         .get(index)
         .ok_or_else(|| msg::open_in_run::no_entry(index + 1))?;
-    let label = entry.label.clone();
-    let info = launch_repo_info(path);
-    let cwd = path.to_string_lossy().to_string();
-    let name = path
-        .file_name()
-        .map(|n| n.to_string_lossy().to_string())
-        .unwrap_or_default();
-    // A saved config may still hold an old `cmd /C start` preset text.
-    let command = open_in::modernized_command(&entry.command).unwrap_or(&entry.command);
-    let argv = open_in::expand(
-        command,
-        &open_in::OpenInVars {
-            cwd: &cwd,
-            repo: &info.repo,
-            name: &name,
-            branch: &info.branch,
-            web_url: &info.web_url,
-        },
-        &|k| std::env::var(k).ok(),
-    )
-    .map_err(|e| match e.strip_prefix(UNKNOWN_VARIABLE_PREFIX) {
-        Some(var) => msg::open_in_run::unknown_variable(&label, var),
-        None => msg::open_in_run::bad_command(&label, e),
-    })?;
-    if info.web_url.is_empty() && entry.command.contains("${web_url}") {
-        return Err(msg::open_in_run::no_web_url(&label));
-    }
-    Ok(Prepared { label, argv, info })
+    gitpoulpi_link::open_in::prepare(entry, path, launch_repo_info(path))
 }
 
 /// The argv entry `index` runs for `path`, without spawning.
@@ -851,27 +545,12 @@ pub(crate) fn run_open_in(index: usize, path: &Path) -> Result<String, String> {
 }
 
 fn run_open_in_with(index: usize, path: &Path, report: fn(String)) -> Result<String, String> {
-    let label = open_in_state()
+    let state = open_in_state();
+    let entry = state
         .entries
         .get(index)
-        .map(|e| e.label.clone())
         .ok_or_else(|| msg::open_in_run::no_entry(index + 1))?;
-    if !path.is_dir() {
-        return Err(msg::open_in_run::folder_gone(&label, path.display()));
-    }
-    let run = prepare(index, path)?;
-    start(
-        &Launch {
-            label: &run.label,
-            program: &run.argv[0],
-            args: &run.argv[1..],
-            raw_args: None,
-            cwd: path,
-            info: &run.info,
-        },
-        report,
-    )?;
-    Ok(msg::open_in_run::opening(&run.label))
+    gitpoulpi_link::open_in::run_entry(entry, path, launch_repo_info(path), report)
 }
 
 /// The position of the entry labelled `label` (trimmed, exact, first match):
@@ -927,6 +606,7 @@ pub(crate) fn reset_for_tests() {
 mod tests {
     use super::TEST_SERIAL as SERIAL;
     use super::*;
+    use std::time::{Duration, Instant};
 
     static SLOW: Warmable<u32> = Warmable::new();
     static RUNS: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);

@@ -227,7 +227,7 @@ GitPoulpi sparar också följande:
 
 | Vad | Var |
 |---|---|
-| Inställningar (`config.toml`) och sessioner | Operativsystemets konfigurationsmapp. `GITPOULPI_CONFIG_DIR` ändrar den. |
+| Inställningar (`config.toml` och `tui.toml`) och sessioner | Operativsystemets konfigurationsmapp. `GITPOULPI_CONFIG_DIR` ändrar den. |
 | Tillstånd per repository | Som standard `gitpoulpi/` i repositoryts `.git`-mapp (`session.per_repo_state_dir` kan flytta det till `.gitpoulpi/` i arbetsträdet eller till användarens datamapp). |
 | Cacher (avatarer) | Operativsystemets cachemapp. |
 | Tokens och API-nycklar | Din credential helper. **Inställningar > SSH & inloggning > Glöm alla användarnamn och lösenord** tar bort dem. |

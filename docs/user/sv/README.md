@@ -142,7 +142,7 @@ förhandsgranskning, Lua-skript och en enda ångra.
 
 ## Referens och hjälp
 
-28. **[Konfigurationsreferens](config-reference.md)**: varje `config.toml`-nyckel,
+28. **[Konfigurationsreferens](config-reference.md)**: varje nyckel i `config.toml` och `tui.toml`,
     dess standardvärde och effekt, inställningarna per repository,
     miljövariabler.
 29. **[Felsökning och vanliga frågor](troubleshooting.md)**: ikoner, grafritning,

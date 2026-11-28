@@ -536,7 +536,7 @@ mod tests {
 
     // -- edit_lines / offset_at --------------------------------------
 
-    use crate::text_edit::Caret;
+    use crate::text_edit::{Caret, CaretKeys as _};
     use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
     fn look() -> EditLook {

@@ -22,6 +22,7 @@ mod review_rows;
 pub(in crate::preferences) use privacy_rows::PrivacyRow;
 pub(in crate::preferences) use review_rows::ReviewRow;
 
+use crate::text_edit::CaretKeys as _;
 use crate::th;
 use std::collections::HashMap;
 use std::sync::mpsc;

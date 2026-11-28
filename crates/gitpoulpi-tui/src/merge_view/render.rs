@@ -189,7 +189,9 @@ pub(super) fn text_spans(
         }
         let mut style = runs
             .and_then(|r| r.get(run_idx))
-            .map_or(Style::default().fg(text_fg), |r| r.style);
+            .map_or(Style::default().fg(text_fg), |r| {
+                crate::editor_highlight::style_of(r.style)
+            });
         if style.fg.is_none() {
             style = style.fg(text_fg);
         }

@@ -25,6 +25,7 @@
 //! a typed description or an open proposal asks before it is dropped, and
 //! the Settings close guard knows about it too.
 
+use crate::text_edit::CaretKeys as _;
 use ratatui::buffer::Buffer;
 use ratatui::style::Style;
 

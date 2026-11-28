@@ -135,11 +135,11 @@ impl MergeView {
         let path = merge.entry.path.clone();
         let first = |lines: Option<&[String]>| lines.and_then(|l| l.first().cloned());
         let hl = [
-            Highlight::for_file(&path, first(sides[0]).as_deref().unwrap_or("")),
-            Highlight::for_file(&path, first(sides[1]).as_deref().unwrap_or("")),
-            Highlight::for_file(&path, first(sides[2]).as_deref().unwrap_or("")),
+            crate::editor_highlight::for_file(&path, first(sides[0]).as_deref().unwrap_or("")),
+            crate::editor_highlight::for_file(&path, first(sides[1]).as_deref().unwrap_or("")),
+            crate::editor_highlight::for_file(&path, first(sides[2]).as_deref().unwrap_or("")),
         ];
-        let hl_out = Highlight::for_file(&path, model.output().line(0));
+        let hl_out = crate::editor_highlight::for_file(&path, model.output().line(0));
         MergeView {
             model,
             file_pos: (1, 1),

@@ -12,10 +12,13 @@
 //! `tests/dependency_guard.rs` fails if a UI crate ever becomes a dependency.
 
 pub mod diff;
+pub mod editor_prefs;
 pub mod features;
 pub mod flow;
 pub mod graph;
+pub mod highlight;
 pub mod keymap;
+pub mod merge_view;
 pub mod palette;
 pub mod refs_sections;
 pub mod refs_tree;
@@ -23,3 +26,4 @@ pub mod registry;
 pub mod sequences;
 pub mod surface;
 pub mod tag_where;
+pub mod text;

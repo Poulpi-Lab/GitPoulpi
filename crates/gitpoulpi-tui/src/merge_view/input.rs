@@ -19,6 +19,7 @@ use gitpoulpi_i18n::msg::merge as tr;
 
 use crate::clipboard::Clipboard;
 use crate::editor::{find_on_key, find_step_in, find_typed_in, text_press, Find, FindKey};
+use crate::editor_buffer::DocKeys as _;
 use crate::keymap::{self, Action, Ctx};
 use crate::text_edit::KeyEdit;
 

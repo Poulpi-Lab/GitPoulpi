@@ -50,6 +50,7 @@ gitpoulpi-core.workspace = true
 gitpoulpi-i18n.workspace = true
 gitpoulpi-session.workspace = true
 gitpoulpi-log.workspace = true
+syntect.workspace = true
 unicode-width = "0.2"
 
 [dev-dependencies]

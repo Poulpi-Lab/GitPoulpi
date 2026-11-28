@@ -4,8 +4,6 @@ use std::time::Duration;
 
 use ratatui::style::Style;
 
-use crate::editor_highlight::Highlight;
-
 /// Longest time spent colouring one block; the rest is drawn plain.
 const BUDGET: Duration = Duration::from_millis(40);
 
@@ -25,7 +23,7 @@ pub(super) fn language(info: &str) -> &str {
 /// Each of `lines` (tabs already expanded) as coloured runs.
 pub(super) fn highlight(lang: &str, lines: &[String]) -> Vec<Runs> {
     let plain = |l: &String| vec![(l.clone(), None)];
-    let mut hl = Highlight::for_token(lang);
+    let mut hl = crate::editor_highlight::for_token(lang);
     let done = hl.advance(|i| lines[i].as_str(), lines.len(), lines.len(), BUDGET);
     let _ = done;
     lines
@@ -43,7 +41,10 @@ pub(super) fn highlight(lang: &str, lines: &[String]) -> Vec<Runs> {
                     return plain(text);
                 };
                 if !piece.is_empty() {
-                    out.push((piece.to_string(), Some(run.style)));
+                    out.push((
+                        piece.to_string(),
+                        Some(crate::editor_highlight::style_of(run.style)),
+                    ));
                 }
                 at = end;
             }

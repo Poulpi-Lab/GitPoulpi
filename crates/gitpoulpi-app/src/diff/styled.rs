@@ -53,6 +53,7 @@ pub struct SyntaxStyle {
     pub fg: Rgb,
     pub bold: bool,
     pub italic: bool,
+    pub underline: bool,
 }
 
 /// A run of text with one look.

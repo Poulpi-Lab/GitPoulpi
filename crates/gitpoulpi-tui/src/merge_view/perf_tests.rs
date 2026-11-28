@@ -278,7 +278,7 @@ fn run(lines: usize, conflicts: usize) {
         .take(3000)
         .cloned()
         .collect();
-    let mut hl = crate::editor_highlight::Highlight::for_file(std::path::Path::new("a.rs"), "");
+    let mut hl = crate::editor_highlight::for_file(std::path::Path::new("a.rs"), "");
     let t = Instant::now();
     hl.advance(
         |i| lines[i].as_str(),

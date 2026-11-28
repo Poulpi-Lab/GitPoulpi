@@ -364,7 +364,7 @@ impl Editor {
         }
         let bytes = std::fs::read(&abs).map_err(|e| msg::cannot_read(&shown, e))?;
         let doc = Doc::decode(&bytes).map_err(|why| why.message(&shown))?;
-        let hl = Highlight::for_file(rel, doc.line(0));
+        let hl = crate::editor_highlight::for_file(rel, doc.line(0));
         Ok(Editor {
             path: rel.to_path_buf(),
             stamp: stamp(&abs),

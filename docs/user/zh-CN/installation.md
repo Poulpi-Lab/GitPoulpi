@@ -187,7 +187,7 @@ GitPoulpi 还会保留以下文件：
 
 | 内容 | 位置 |
 |---|---|
-| 设置（`config.toml`）和会话 | 你操作系统的配置文件夹。可用 `GITPOULPI_CONFIG_DIR` 更改。 |
+| 设置（`config.toml` 和 `tui.toml`）和会话 | 你操作系统的配置文件夹。可用 `GITPOULPI_CONFIG_DIR` 更改。 |
 | 各仓库的状态 | 默认位于仓库 `.git` 文件夹内的 `gitpoulpi/`（`session.per_repo_state_dir` 可把它改到工作区的 `.gitpoulpi/` 或用户数据文件夹）。 |
 | 缓存（头像） | 你操作系统的缓存文件夹。 |
 | 令牌和 API 密钥 | 你的 credential helper。**设置 > SSH 与凭据 > 忘记所有用户名和密码**可将其删除。 |

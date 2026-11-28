@@ -82,7 +82,7 @@ GitPoulpi 是一个终端 Git 客户端，拥有可点击的 commit 图、命令
 
 ## 参考与帮助
 
-28. **[配置参考](config-reference.md)**：每个 `config.toml` 键、其默认值和作用、各仓库设置、环境变量。
+28. **[配置参考](config-reference.md)**：每个 `config.toml` 和 `tui.toml` 键、其默认值和作用、各仓库设置、环境变量。
 29. **[故障排除与常见问题](troubleshooting.md)**：图标、图的渲染、收不到的按键、卡住的守护进程、速度、LFS 指针。
 
 ## 截图

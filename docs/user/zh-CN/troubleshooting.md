@@ -141,7 +141,9 @@ GitPoulpi 的网络操作使用你的 `git` 自己的凭据助手和 ssh-agent�
 
 **GitPoulpi 自己关闭了。** 每次退出都有记录：请在配置目录中查找 `gitpoulpi-tui-exit.log`（崩溃之后还有 `gitpoulpi-tui-panic.txt`）（`gitpoulpi config path` 会打印设置文件的路径，它就在那里），并把它附到议题中。
 
-**我的设置在哪里？** `gitpoulpi config path`。按仓库的状态位于仓库内的 `.gitpoulpi/repo-state.toml`。
+**我的设置在哪里？** `gitpoulpi config path` 会打印 `config.toml`（通用设置）和 `tui.toml`（终端界面的界面设置：主题、布局、列、快捷键等），它们位于同一个文件夹。`gitpoulpi config get <key>` 会告诉你某个键在两者中的哪一个。按仓库的状态位于仓库内的 `.gitpoulpi/repo-state.toml`。见[两个文件](config-reference.md#两个文件configtoml-和-tuitoml)。
+
+**我回到了较旧的 GitPoulpi，我的界面设置变了（或者较新的版本忽略了我在较旧版本中的设置）。** GitPoulpi 把界面设置保存在 `tui.toml` 中，它是按 `config.toml` 当时的内容复制创建的，内容从不会从 `config.toml` 中移走。与较新版本并存的较旧 GitPoulpi 不认识 `tui.toml`：它继续读写自己完整的 `config.toml`。`tui.toml` 一旦存在，较新的版本就只从它读取界面设置，所以之后你在较旧版本中更改的主题或布局不会被采用，`tui.toml` 中缺少的键取默认值，而不是 `config.toml` 中的旧值。要让较新的版本保持一致，请在那里更改设置（设置界面，或 `gitpoulpi config set`）；要让界面设置从 `config.toml` 重新开始，请退出 GitPoulpi 并删除 `tui.toml`（下次启动时会重新创建，作为一份新的副本）。
 
 **GitPoulpi 会把任何东西发送到别处吗？** 只发送你要求的内容：发往你远程仓库的 git 操作、连接账号之后的托管请求、按下 AI 按钮之后的 AI 请求，以及（如果你开启了头像）发往 Gravatar 的作者邮箱哈希。没有任何遥测。参见 [AI 辅助](ai.md#隐私)。
 

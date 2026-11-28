@@ -165,7 +165,7 @@ backup = "Alt+B"
 
 ## 运行序列
 
-序列是一个具名的步骤列表，每一步都是命令面板中的一个命令（stage 全部更改、用 AI 写 commit 消息、commit、push 等）。可以从命令面板运行（`序列：<名称>`），用你在 设置 > 键盘与鼠标 中给它的按键（`config.toml` 中的 `[keybindings.sequence]`），或从命令行运行（`gitpoulpi sequence run`）。
+序列是一个具名的步骤列表，每一步都是命令面板中的一个命令（stage 全部更改、用 AI 写 commit 消息、commit、push 等）。可以从命令面板运行（`序列：<名称>`），用你在 设置 > 键盘与鼠标 中给它的按键（`tui.toml` 中的 `[keybindings.sequence]`），或从命令行运行（`gitpoulpi sequence run`）。
 
 运行时，Log 顶部会出现一条条带，显示 `<名称> k/n`、当前步骤以及它在等待什么。该运行也会在任务面板中显示为 `序列 <名称> k/n：<步骤>`。同一时间只运行一个序列；启动第二个时会告诉你哪一个正在运行。
 

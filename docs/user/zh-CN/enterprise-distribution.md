@@ -222,4 +222,4 @@ download_base = "https://mirror.example/gitpoulpi/"
 
 ## 部署默认 config.toml
 
-GitPoulpi 没有整台机器范围的 `config.toml`：设置保存在每个用户的文件夹中（`%APPDATA%\GitPoulpi\config.toml`、`~/.config/gitpoulpi/config.toml`、`~/Library/Application Support/GitPoulpi/config.toml`）。要给新用户你的默认值，请在用户还没有配置时，把一份精简的 `config.toml`（只含你想要的键，见[配置参考](config-reference.md)）复制到该文件夹中：Windows 上用登录脚本或 Intune 脚本，Linux 上用 `/etc/skel/.config/gitpoulpi/`，macOS 上用首次登录脚本。GitPoulpi 的软件包绝不会覆盖配置，所以它由你来管理。必须始终生效的更新规则不要放在那里：请使用用户无法覆盖的策略。便携的或按任务区分的配置也可以用 `GITPOULPI_CONFIG_DIR` 来选择。
+GitPoulpi 没有整台机器范围的 `config.toml`：设置保存在每个用户的文件夹中（`%APPDATA%\GitPoulpi\config.toml`、`~/.config/gitpoulpi/config.toml`、`~/Library/Application Support/GitPoulpi/config.toml`）。要给新用户你的默认值，请在用户还没有配置时，把一份精简的 `config.toml`（只含你想要的键，见[配置参考](config-reference.md)）复制到该文件夹中（界面默认值，例如 `ui.theme` 或 `ui.language`，放进它旁边一份精简的 `tui.toml`，终端界面会单独读取它；见[两个文件](config-reference.md#两个文件configtoml-和-tuitoml)）：Windows 上用登录脚本或 Intune 脚本，Linux 上用 `/etc/skel/.config/gitpoulpi/`，macOS 上用首次登录脚本。GitPoulpi 的软件包绝不会覆盖配置，所以它由你来管理。必须始终生效的更新规则不要放在那里：请使用用户无法覆盖的策略。便携的或按任务区分的配置也可以用 `GITPOULPI_CONFIG_DIR` 来选择。

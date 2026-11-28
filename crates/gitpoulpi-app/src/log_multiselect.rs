@@ -10,19 +10,21 @@
 
 use std::collections::HashSet;
 
-use super::*;
+use gitpoulpi_core::domain::Oid;
+
+use crate::graph;
 
 /// What a Log row stands for in the multi-select: the WIP row, or a commit
 /// (a stash row is its stash commit, an `Oid` of its own that no history
 /// node shares).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum RowKey {
+pub enum RowKey {
     Wip,
     Id(Oid),
 }
 
 #[derive(Debug, Default, Clone)]
-pub(crate) struct LogSelection {
+pub struct LogSelection {
     set: HashSet<Oid>,
     wip: bool,
     /// Where a Shift range starts: the last row toggled or clicked.
@@ -30,15 +32,15 @@ pub(crate) struct LogSelection {
 }
 
 impl LogSelection {
-    pub(crate) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.set.len() + usize::from(self.wip)
     }
 
-    pub(crate) fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
-    pub(crate) fn contains(&self, key: &RowKey) -> bool {
+    pub fn contains(&self, key: &RowKey) -> bool {
         match key {
             RowKey::Wip => self.wip,
             RowKey::Id(id) => self.set.contains(id),
@@ -46,11 +48,11 @@ impl LogSelection {
     }
 
     /// Whether the commit (or stash commit) `id` is selected.
-    pub(crate) fn contains_id(&self, id: &Oid) -> bool {
+    pub fn contains_id(&self, id: &Oid) -> bool {
         self.set.contains(id)
     }
 
-    pub(crate) fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.set.clear();
         self.wip = false;
         self.anchor = None;
@@ -74,7 +76,7 @@ impl LogSelection {
 
     /// A plain click: forget the selection, remember where a following
     /// Shift+click should start from.
-    pub(crate) fn reset_to(&mut self, anchor: Option<RowKey>) {
+    pub fn reset_to(&mut self, anchor: Option<RowKey>) {
         self.set.clear();
         self.wip = false;
         self.anchor = anchor;
@@ -83,7 +85,7 @@ impl LogSelection {
     /// Ctrl+click / Space: flips `key`. The row the cursor was on is part
     /// of the selection the moment a second one is added, the way
     /// Ctrl+click extends what is already highlighted.
-    pub(crate) fn toggle(&mut self, key: RowKey, cursor: Option<RowKey>) {
+    pub fn toggle(&mut self, key: RowKey, cursor: Option<RowKey>) {
         if self.is_empty() {
             if let Some(cursor) = cursor.filter(|c| *c != key) {
                 self.insert(cursor);
@@ -98,7 +100,7 @@ impl LogSelection {
     /// Shift+click / Shift+Up/Down: selects every row between the anchor
     /// (or `cursor_index` when there is none yet) and `target`, both
     /// display indexes into `display`.
-    pub(crate) fn extend_to(
+    pub fn extend_to(
         &mut self,
         display: &[Option<RowKey>],
         target: usize,
@@ -129,7 +131,7 @@ impl LogSelection {
     /// The selection in the Log's own order, newest (top row) first: what
     /// the comparison reads its two ends from. Rows that scrolled out of
     /// `display` are left out.
-    pub(crate) fn in_display_order(&self, display: &[Option<RowKey>]) -> Vec<RowKey> {
+    pub fn in_display_order(&self, display: &[Option<RowKey>]) -> Vec<RowKey> {
         display
             .iter()
             .flatten()
@@ -143,7 +145,7 @@ impl LogSelection {
     /// stashes are not commits to cherry-pick and are left out; so are
     /// commits that scrolled out of the loaded page (the caller compares
     /// the length).
-    pub(crate) fn newest_first(
+    pub fn newest_first(
         &self,
         log_result: &gitpoulpi_core::Result<gitpoulpi_core::domain::CommitGraph>,
     ) -> Vec<Oid> {
@@ -159,9 +161,26 @@ impl LogSelection {
     }
 }
 
+/// The stash drawn at Log display index `index`, if a stash row is there.
+pub fn log_stash_at(
+    stashes_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
+    rows: &graph::LogRows,
+    index: usize,
+) -> Option<gitpoulpi_core::domain::Stash> {
+    let graph::LogEntry::Stash(k) = rows.entry(index) else {
+        return None;
+    };
+    let stashes = stashes_result.as_ref().ok()?;
+    // `slots[k].stash` indexes the drawable stashes (those with a commit
+    // and a base), which is not necessarily the full list: find it by id.
+    let drawable = graph::GraphStash::from_stashes(stashes);
+    let id = drawable.get(rows.slots().get(k)?.stash)?.id;
+    stashes.iter().find(|s| s.id.0 == id).cloned()
+}
+
 /// What every display row of the Log stands for: `None` only for a row
 /// that is nothing selectable (a stash whose commit is unknown).
-pub(crate) fn display_commits(
+pub fn display_commits(
     log_result: &gitpoulpi_core::Result<gitpoulpi_core::domain::CommitGraph>,
     stashes_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
     rows: &graph::LogRows,
@@ -184,7 +203,23 @@ pub(crate) fn display_commits(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_support::*;
+
+    fn oid(n: u8) -> Oid {
+        Oid([n; 20])
+    }
+
+    fn commit(id: u8, parents: &[u8]) -> gitpoulpi_core::domain::CommitNode {
+        gitpoulpi_core::domain::CommitNode {
+            id: oid(id),
+            parents: parents.iter().map(|&p| oid(p)).collect(),
+            summary: format!("commit {id}"),
+            message: format!("commit {id}"),
+            author_name: "a".into(),
+            author_email: "a@example.com".into(),
+            timestamp: 0,
+            refs: Vec::new(),
+        }
+    }
 
     fn id(n: u8) -> RowKey {
         RowKey::Id(oid(n))

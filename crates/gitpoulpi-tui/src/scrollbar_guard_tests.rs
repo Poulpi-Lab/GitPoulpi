@@ -14,8 +14,6 @@ const PENDING: &[&str] = &[
     // Not a list the user scrolls: pixel / text-cell windows.
     "commit_column/picture.rs",
     "text_select.rs",
-    "file_selection.rs",
-    "log_multiselect.rs",
 ];
 
 const BAR_MARKERS: &[&str] = &[

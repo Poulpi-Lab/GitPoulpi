@@ -109,22 +109,7 @@ pub(crate) fn log_commit_at(
     }
 }
 
-/// The stash drawn at Log display index `index`, if a stash row is there.
-pub(crate) fn log_stash_at(
-    stashes_result: &gitpoulpi_core::Result<Vec<gitpoulpi_core::domain::Stash>>,
-    rows: &graph::LogRows,
-    index: usize,
-) -> Option<gitpoulpi_core::domain::Stash> {
-    let graph::LogEntry::Stash(k) = rows.entry(index) else {
-        return None;
-    };
-    let stashes = stashes_result.as_ref().ok()?;
-    // `slots[k].stash` indexes the drawable stashes (those with a commit
-    // and a base), which is not necessarily the full list: find it by id.
-    let drawable = graph::GraphStash::from_stashes(stashes);
-    let id = drawable.get(rows.slots().get(k)?.stash)?.id;
-    stashes.iter().find(|s| s.id.0 == id).cloned()
-}
+pub(crate) use gitpoulpi_app::log_multiselect::log_stash_at;
 
 /// Whether the Log's selection is on the pinned WIP row - the keyboard
 /// twin of hovering it, and what tells the menu key

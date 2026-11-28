@@ -218,8 +218,26 @@ IA](ai.md#risoluzione-dei-problemi).
 di configurazione (`gitpoulpi config path` stampa il file delle impostazioni, che
 sta lì), e allegalo a una issue.
 
-**Dove sono le mie impostazioni?** `gitpoulpi config path`. Lo stato per repository
-è in `.gitpoulpi/repo-state.toml` dentro il repository.
+**Dove sono le mie impostazioni?** `gitpoulpi config path` stampa `config.toml`
+(impostazioni comuni) e `tui.toml` (le impostazioni dell'interfaccia del terminale:
+tema, layout, colonne, scorciatoie...), che stanno nella stessa cartella.
+`gitpoulpi config get <key>` dice in quale dei due si trova una chiave. Lo stato per
+repository è in `.gitpoulpi/repo-state.toml` dentro il repository. Vedi
+[Due file](config-reference.md#due-file-configtoml-e-tuitoml).
+
+**Sono tornato a un GitPoulpi più vecchio e le mie impostazioni dell'interfaccia
+sono cambiate (o quello più nuovo ignora ciò che ho impostato nel più vecchio).**
+GitPoulpi tiene le impostazioni dell'interfaccia in `tui.toml`, creato come copia di
+ciò che conteneva `config.toml` e mai tolto da `config.toml`. Un GitPoulpi più
+vecchio installato accanto a quello più nuovo non conosce `tui.toml`: continua a
+leggere e scrivere il proprio `config.toml` completo. Una volta che `tui.toml`
+esiste, quello più nuovo legge le impostazioni dell'interfaccia solo da lì, quindi un
+tema o un layout che cambi dopo nella versione più vecchia non viene recepito, e una
+chiave assente da `tui.toml` prende il suo valore predefinito invece del vecchio
+valore in `config.toml`. Per riallineare la versione più nuova, cambia
+l'impostazione lì (Impostazioni, oppure `gitpoulpi config set`); per ricominciare le
+impostazioni dell'interfaccia da `config.toml`, chiudi GitPoulpi ed elimina
+`tui.toml` (viene creato di nuovo, come copia nuova, al prossimo avvio).
 
 **GitPoulpi invia qualcosa da qualche parte?** Solo ciò che chiedi: operazioni git ai
 tuoi remoti, richieste di hosting dopo che colleghi un account, richieste all'IA

@@ -154,7 +154,7 @@ commit, con anteprima, script Lua e un solo annulla.
 ## Riferimento e aiuto
 
 28. **[Riferimento della configurazione](config-reference.md)**: ogni chiave di
-    `config.toml`, il suo valore predefinito e il suo effetto, le impostazioni
+    `config.toml` e `tui.toml`, il suo valore predefinito e il suo effetto, le impostazioni
     per repository, le variabili d'ambiente.
 29. **[Risoluzione dei problemi e FAQ](troubleshooting.md)**: icone, resa del
     grafo, tasti che non arrivano, demoni bloccati, velocità, puntatori LFS.

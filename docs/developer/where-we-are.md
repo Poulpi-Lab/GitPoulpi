@@ -81,7 +81,22 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   (drawing a field), `text_select.rs` (selectable text in read-only views).
 - `theme/` (roles, presets, `th()` runtime, insta snapshots), `color_depth.rs`,
   `terminal_bg.rs`, `theme_picker.rs`, `language_picker.rs`, `terminology.rs`.
-- `keymap/` (one registry of key -> action per context), `kitty_keyboard.rs`.
+- `keymap/`: the registry, chords and conflict analysis live in
+  **`crates/gitpoulpi-app/src/keymap/`** (neutral `KeyChord`, `KeyTransport`);
+  the TUI's `keymap/mod.rs` re-exports them at the old paths and `keymap/term.rs`
+  is the terminal adapter (crossterm events, AltGr, `\n` as Ctrl+Enter).
+  `kitty_keyboard.rs`. The docs generators and drift tests stay here.
+- `app_hooks.rs`: what the TUI installs into the shared registries (key
+  transport, the sequence rebuild hook, the palette `Families`). `ensure()` is
+  idempotent; entry points that read a hook call it, so unit tests and the real
+  window see the same wiring.
+- Shared with the desktop in `gitpoulpi-app`: `features` (`Feature`, build flags),
+  `palette/` (`PALETTE_COMMANDS`, `PaletteCommand`, `PaletteContext`,
+  `unavailable_reason`, `palette_matches`, `palette_action_defs`), the payload
+  enums in `palette/vocab/*` (each TUI vocabulary file is now a re-export),
+  `sequences` (slots registry) and `registry::parity_rows`. The TUI-only methods
+  of a moved type are extension traits (`PartExt`, `LogColumnExt`,
+  `SidebarSectionExt`, ...) kept in scope by `lib.rs`.
 
 **Log and graph**
 - `graph/`: the terminal's reading of the graph: glyphs and colours
@@ -178,7 +193,9 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
 - `palette/settings.rs` + `preferences/palette_settings.rs`: the `Settings: ...`
   palette rows, generated from the Preferences field model (`row_pool`), applied by
   the page's own commit functions on a *detached* state. Never list one by hand.
-  `palette/bindings.rs`: a palette command with no key action gets
+  The TUI feeds them (and the flow / jobs rows and the process-state probes) to
+  the shared palette through `palette::install_families` (`palette::tui_families`).
+  `gitpoulpi-app` `palette/bindings.rs`: a palette command with no key action gets
   `Action::Palette(i)`, config `[keybindings.palette] <command id>`; the id is
   derived from the variant and payload, so renaming a command id breaks users'
   bindings.

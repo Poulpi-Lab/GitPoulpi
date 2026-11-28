@@ -103,15 +103,10 @@ pub(crate) enum HostingEffect {
     Focus(HostingList),
 }
 
-pub(crate) use crate::hosting_command::{HostingAvailability, HostingCommand};
-
-/// Always "unavailable": there is no provider in this build.
-pub(crate) fn command_unavailable_from(
-    _cmd: HostingCommand,
-    _a: HostingAvailability,
-) -> Option<&'static str> {
-    Some(gitpoulpi_i18n::msg::hosting_ui::WHY_NOT_BUILT.get())
-}
+#[allow(unused_imports)]
+pub(crate) use crate::hosting_command::{
+    command_unavailable_from, HostingAvailability, HostingCommand,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct ToolbarChip {

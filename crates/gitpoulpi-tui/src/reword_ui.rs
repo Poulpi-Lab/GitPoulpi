@@ -158,52 +158,6 @@ impl RewordPart {
 mod vocab;
 pub(crate) use vocab::AmendScope;
 
-impl AmendScope {
-    /// The fields shown, in Tab order.
-    fn fields(self) -> &'static [RewordPart] {
-        use RewordPart as P;
-        match self {
-            AmendScope::Message => &[P::Summary, P::Description],
-            _ => &[
-                P::Summary,
-                P::Description,
-                P::AuthorName,
-                P::AuthorEmail,
-                P::AuthorDate,
-            ],
-        }
-    }
-
-    /// The field the caret starts in.
-    fn focus(self) -> RewordPart {
-        match self {
-            AmendScope::Description => RewordPart::Description,
-            AmendScope::Author => RewordPart::AuthorName,
-            AmendScope::Date => RewordPart::AuthorDate,
-            _ => RewordPart::Summary,
-        }
-    }
-
-    fn shows(self, part: RewordPart) -> bool {
-        self.fields().contains(&part)
-    }
-
-    fn has_message(self) -> bool {
-        self.shows(RewordPart::Summary) || self.shows(RewordPart::Description)
-    }
-
-    fn has_author(self) -> bool {
-        self.shows(RewordPart::AuthorName)
-    }
-
-    fn title(self) -> &'static str {
-        match self {
-            AmendScope::Message => msg::TITLE.get(),
-            _ => msg::TITLE_AMEND.get(),
-        }
-    }
-}
-
 /// The author's date as the Amend popup shows and parses it: UTC, because
 /// the Log only knows the instant (a date left as shown is never sent, so
 /// the commit keeps its own zone).
@@ -1196,3 +1150,55 @@ mod tests;
 
 /// The commit message form moves (its size follows its scope).
 const WIN: crate::dialog_kit::Win = crate::dialog_kit::Win::resizable("reword", 50, 12);
+
+pub(crate) trait AmendScopeExt: Sized {
+    /// The fields shown, in Tab order.
+    fn fields(self) -> &'static [RewordPart];
+    /// The field the caret starts in.
+    fn focus(self) -> RewordPart;
+    fn shows(self, part: RewordPart) -> bool;
+    fn has_message(self) -> bool;
+    fn has_author(self) -> bool;
+    fn title(self) -> &'static str;
+}
+
+impl AmendScopeExt for AmendScope {
+    /// The fields shown, in Tab order.
+    fn fields(self) -> &'static [RewordPart] {
+        use RewordPart as P;
+        match self {
+            AmendScope::Message => &[P::Summary, P::Description],
+            _ => &[
+                P::Summary,
+                P::Description,
+                P::AuthorName,
+                P::AuthorEmail,
+                P::AuthorDate,
+            ],
+        }
+    }
+    /// The field the caret starts in.
+    fn focus(self) -> RewordPart {
+        match self {
+            AmendScope::Description => RewordPart::Description,
+            AmendScope::Author => RewordPart::AuthorName,
+            AmendScope::Date => RewordPart::AuthorDate,
+            _ => RewordPart::Summary,
+        }
+    }
+    fn shows(self, part: RewordPart) -> bool {
+        self.fields().contains(&part)
+    }
+    fn has_message(self) -> bool {
+        self.shows(RewordPart::Summary) || self.shows(RewordPart::Description)
+    }
+    fn has_author(self) -> bool {
+        self.shows(RewordPart::AuthorName)
+    }
+    fn title(self) -> &'static str {
+        match self {
+            AmendScope::Message => msg::TITLE.get(),
+            _ => msg::TITLE_AMEND.get(),
+        }
+    }
+}

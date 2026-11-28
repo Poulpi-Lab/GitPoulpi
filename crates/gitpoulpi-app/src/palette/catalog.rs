@@ -2,16 +2,20 @@ use super::{
     entry, hint_entry, ManagementCommand, PaletteCommand, PaletteEntry, StashTarget,
     WorkspaceCommand,
 };
-use crate::diff_view::DiffViewMode;
-use crate::merge_view::MergeCmd as M;
-use crate::merge_view::MergePane;
-use crate::radar::{Act as RadarAct, RadarCommand};
-use crate::repo_menu::RepoMenuAction;
-use crate::safety_panel::SafetyCmd;
-use crate::status_pane::FileContextAction;
-use crate::{
-    AmendScope, CommitField, HostingCommand, LogColumn, RefField, SidebarSection, StatusSection,
-};
+use crate::palette::vocab::diff_view::DiffViewMode;
+use crate::palette::vocab::hosting_command::HostingCommand;
+use crate::palette::vocab::log_menu::CommitField;
+use crate::palette::vocab::log_table::LogColumn;
+use crate::palette::vocab::merge_view::MergeCmd as M;
+use crate::palette::vocab::merge_view::MergePane;
+use crate::palette::vocab::radar::{Act as RadarAct, RadarCommand};
+use crate::palette::vocab::ref_menu::RefField;
+use crate::palette::vocab::refs_sidebar::SidebarSection;
+use crate::palette::vocab::repo_menu::RepoMenuAction;
+use crate::palette::vocab::reword_ui::AmendScope;
+use crate::palette::vocab::safety_cmd::SafetyCmd;
+use crate::palette::vocab::status_pane::FileContextAction;
+use crate::palette::vocab::status_pane::StatusSection;
 use gitpoulpi_config::PullButtonMode;
 use gitpoulpi_core::domain::{ConflictSide, ResetMode};
 use gitpoulpi_i18n::msg;
@@ -22,11 +26,11 @@ use gitpoulpi_i18n::msg;
 /// than the rest of the label, so typing `stash` still surfaces all five
 /// stash commands ahead of anything merely containing those letters, while
 /// typing `git` still gathers the whole git group.
-const fn blame_entry(op: crate::blame_view::BlameOp) -> PaletteEntry {
+const fn blame_entry(op: crate::palette::vocab::blame::BlameOp) -> PaletteEntry {
     entry(op.palette_label(), "", PaletteCommand::BlameOp(op))
 }
 
-pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
+pub const PALETTE_COMMANDS: &[PaletteEntry] = &[
     // -- Navigation ------------------------------------------------
     entry(
         msg::palette::NAVIGATION_FOCUS_REFS_PANE,
@@ -181,22 +185,22 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::NAVIGATION_REFS_PANE_WIDER,
         "Ctrl+N Right",
-        PaletteCommand::ResizePane(crate::pane_layout::PaneResize::RefsWider),
+        PaletteCommand::ResizePane(crate::palette::vocab::pane_layout::PaneResize::RefsWider),
     ),
     entry(
         msg::palette::NAVIGATION_REFS_PANE_NARROWER,
         "Ctrl+N Left",
-        PaletteCommand::ResizePane(crate::pane_layout::PaneResize::RefsNarrower),
+        PaletteCommand::ResizePane(crate::palette::vocab::pane_layout::PaneResize::RefsNarrower),
     ),
     entry(
         msg::palette::NAVIGATION_STATUS_PANE_WIDER,
         "Ctrl+N Shift+Left",
-        PaletteCommand::ResizePane(crate::pane_layout::PaneResize::StatusWider),
+        PaletteCommand::ResizePane(crate::palette::vocab::pane_layout::PaneResize::StatusWider),
     ),
     entry(
         msg::palette::NAVIGATION_STATUS_PANE_NARROWER,
         "Ctrl+N Shift+Right",
-        PaletteCommand::ResizePane(crate::pane_layout::PaneResize::StatusNarrower),
+        PaletteCommand::ResizePane(crate::palette::vocab::pane_layout::PaneResize::StatusNarrower),
     ),
     entry(
         msg::palette::NAVIGATION_TOGGLE_STATUS_PANE_COLLAPSED,
@@ -412,7 +416,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::REWRITE_PURGE_OLD_HISTORY,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Purge),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Purge),
     ),
     entry(
         msg::palette::GIT_APPLY_PATCH,
@@ -423,186 +427,188 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::REWRITE_HISTORY_WORKBENCH,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Workbench),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Workbench),
     ),
     entry(
         msg::palette::REWRITE_REPLACE_AUTHOR,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Identity,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Identity,
         )),
     ),
     entry(
         msg::palette::REWRITE_ANONYMISE_AUTHORS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Anonymise,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Anonymise,
         )),
     ),
     entry(
         msg::palette::REWRITE_APPLY_MAILMAP,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Mailmap,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Mailmap,
         )),
     ),
     entry(
         msg::palette::REWRITE_MERGE_IDENTITIES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Identities),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Identities),
     ),
     entry(
         msg::palette::REWRITE_SHIFT_DATES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::DateShift,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::DateShift,
         )),
     ),
     entry(
         msg::palette::REWRITE_CHANGE_TIMEZONE,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::DateTimezone,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::DateTimezone,
         )),
     ),
     entry(
         msg::palette::REWRITE_KEEP_WITHIN_HOURS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::DateWindow,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::DateWindow,
         )),
     ),
     entry(
         msg::palette::REWRITE_COMMITTER_DATE_FROM_AUTHOR,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::CommitterFromAuthor,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::CommitterFromAuthor,
         )),
     ),
     entry(
         msg::palette::REWRITE_REPLACE_IN_MESSAGES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::MessageReplace,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::MessageReplace,
         )),
     ),
     entry(
         msg::palette::REWRITE_DELETE_MESSAGE_LINES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::MessageDeleteLines,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::MessageDeleteLines,
         )),
     ),
     entry(
         msg::palette::REWRITE_TRAILERS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Trailer,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Trailer,
         )),
     ),
     entry(
         msg::palette::REWRITE_REMOVE_SIGNATURES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::RemoveSignatures,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::RemoveSignatures,
         )),
     ),
     entry(
         msg::palette::REWRITE_FIX_MESSAGE_ENCODING,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::MessageEncoding,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::MessageEncoding,
         )),
     ),
     entry(
         msg::palette::REWRITE_REPLACE_IN_FILES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::ContentReplace,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::ContentReplace,
         )),
     ),
     entry(
         msg::palette::REWRITE_REMOVE_FILES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::RemovePaths,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::RemovePaths,
         )),
     ),
     entry(
         msg::palette::REWRITE_REMOVE_LARGE_FILES,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::RemoveBlobsOver,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::RemoveBlobsOver,
         )),
     ),
     entry(
         msg::palette::REWRITE_MOVE_PATHS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::MovePaths,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::MovePaths,
         )),
     ),
     entry(
         msg::palette::REWRITE_MIGRATE_TO_LFS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::LfsImport,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::LfsImport,
         )),
     ),
     entry(
         msg::palette::REWRITE_EXPORT_FROM_LFS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::LfsExport,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::LfsExport,
         )),
     ),
     entry(
         msg::palette::REWRITE_LINE_ENDINGS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::LineEndings,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::LineEndings,
         )),
     ),
     entry(
         msg::palette::REWRITE_STRIP_EXEC,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::StripExec,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::StripExec,
         )),
     ),
     entry(
         msg::palette::REWRITE_FILE_ENCODING,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Reencode,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Reencode,
         )),
     ),
     entry(
         msg::palette::REWRITE_SCRIPT,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::Rule(
-            crate::rewrite_view::RuleTemplate::Script,
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::Rule(
+            crate::palette::vocab::rewrite_view::RuleTemplate::Script,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::rewrite_ai::PALETTE_WRITE_SCRIPT,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::ScriptAi),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::ScriptAi),
     ),
     entry(
         gitpoulpi_i18n::msg::rewrite_rules_ai::PALETTE_CREATE,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::RulesAi),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::RulesAi),
     ),
     entry(
         msg::palette::REWRITE_FROM_SELECTED_COMMIT,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::FromSelectedCommit),
+        PaletteCommand::Rewrite(
+            crate::palette::vocab::rewrite_view::RewriteEntry::FromSelectedCommit,
+        ),
     ),
     entry(
         msg::palette::REWRITE_SELECTED_COMMITS,
         "",
-        PaletteCommand::Rewrite(crate::rewrite_view::RewriteEntry::SelectedCommits),
+        PaletteCommand::Rewrite(crate::palette::vocab::rewrite_view::RewriteEntry::SelectedCommits),
     ),
     // -- Git LFS ---------------------------------------------------
     entry(
@@ -610,67 +616,67 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::LfsInitialize,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_TRACK_PATTERN,
         "",
         PaletteCommand::LfsTrackPattern,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_UNTRACK_PATTERN,
         "",
         PaletteCommand::LfsUntrackPattern,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_FETCH_OBJECTS,
         "",
         PaletteCommand::LfsFetch,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(msg::palette::LFS_OPEN_MENU, "", PaletteCommand::LfsMenu)
-        .requires(crate::build_features::Feature::Lfs),
+        .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_FETCH_ALL_OBJECTS,
         "",
         PaletteCommand::LfsFetchAll,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_CHECKOUT_ALL_FILES,
         "",
         PaletteCommand::LfsCheckout,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_PUSH_ALL_OBJECTS,
         "",
         PaletteCommand::LfsPushAll,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(msg::palette::LFS_PULL_OBJECTS, "", PaletteCommand::LfsPull)
-        .requires(crate::build_features::Feature::Lfs),
+        .requires(crate::features::Feature::Lfs),
     entry(msg::palette::LFS_PUSH_OBJECTS, "", PaletteCommand::LfsPush)
-        .requires(crate::build_features::Feature::Lfs),
+        .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_PRUNE_LOCAL_OBJECTS,
         "",
         PaletteCommand::LfsPrune,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_SHOW_LOCKS,
         "",
         PaletteCommand::LfsShowLocks,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_OPEN_INSTALL_PAGE,
         "",
         PaletteCommand::LfsOpenInstallPage,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_TOGGLE_RAW_POINTER_IN_DIFF,
         "r",
@@ -681,115 +687,115 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::LfsTrackSelectedFile,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_TRACK_SELECTED_FILE_S_EXTENSION,
         "",
         PaletteCommand::LfsTrackSelectedExtension,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_LOCK_SELECTED_FILE,
         "",
         PaletteCommand::LfsLockSelectedFile,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_UNLOCK_SELECTED_FILE,
         "",
         PaletteCommand::LfsUnlockSelectedFile,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::LFS_FORCE_UNLOCK_SELECTED_FILE,
         "",
         PaletteCommand::LfsForceUnlockSelectedFile,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_DELETE_SELECTED_BRANCH_OR_TAG,
         "Ctrl+G d",
         PaletteCommand::DeleteSelectedRef,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_DELETE_SELECTED_BRANCH_FROM_ITS_REMOTE,
         "",
         PaletteCommand::DeleteSelectedRemoteBranch,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_DELETE_SELECTED_BRANCH_LOCALLY_AND_ON_ITS_REMOTE,
         "",
         PaletteCommand::DeleteSelectedBranchAndRemote,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_COPY_LINK_TO_SELECTED_BRANCH_ON_REMOTE,
         "",
         PaletteCommand::CopySelectedBranchLink,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::GIT_COPY_LINK_TO_SELECTED_COMMIT_ON_REMOTE,
         "",
         PaletteCommand::CopySelectedCommitLink,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::GIT_ANNOTATED_TAG_AT_SELECTED_COMMIT,
         "",
         PaletteCommand::CreateAnnotatedTagAtSelectedCommit,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_PUSH_SELECTED_TAG_TO_DEFAULT_REMOTE,
         "",
         PaletteCommand::PushSelectedTag,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_DELETE_SELECTED_TAG_FROM_ITS_REMOTE,
         "",
         PaletteCommand::DeleteSelectedTagFromRemote,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::GIT_FETCH_SELECTED_TAG,
         "",
         PaletteCommand::FetchSelectedTag,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::GIT_USE_REMOTE_VERSION_OF_SELECTED_TAG,
         "",
         PaletteCommand::TakeRemoteSelectedTag,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::GIT_FORCE_PUSH_SELECTED_TAG,
         "",
         PaletteCommand::ForcePushSelectedTag,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_ANNOTATE_SELECTED_TAG,
         "",
         PaletteCommand::AnnotateSelectedTag,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_MOVE_SELECTED_TAG_TO_SELECTED_COMMIT,
         "",
         PaletteCommand::MoveSelectedTagToSelectedCommit,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_TOGGLE_HIDE_IN_GRAPH,
         "",
         PaletteCommand::ToggleHideInGraph,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_REVEAL_IN_GRAPH,
         "g",
@@ -800,97 +806,97 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "o",
         PaletteCommand::ToggleSolo,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_STOP_SOLOING_CLEAR_EVERY_SOLOED_REF,
         "Shift+O",
         PaletteCommand::StopSoloing,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_SHOW_ALL_HIDDEN_REFS,
         "Shift+H",
         PaletteCommand::ShowAllHiddenRefs,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_TOGGLE_HIDE_ON_SELECTED_FOLDER_REMOTE,
         "",
         PaletteCommand::ToggleHideSelectedFolder,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_TOGGLE_SOLO_ON_SELECTED_FOLDER_REMOTE,
         "o",
         PaletteCommand::ToggleSoloSelectedFolder,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_FILTER_BY_NAME,
         "/",
         PaletteCommand::FilterRefs,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_CLEAR_NAME_FILTER,
         "Esc",
         PaletteCommand::ClearRefsFilter,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::tree_fold::PAL_REFS_EXPAND_ALL,
         "",
-        PaletteCommand::RefsFold(crate::tree_fold::TreeFold::ExpandAll),
+        PaletteCommand::RefsFold(crate::palette::vocab::tree_fold::TreeFold::ExpandAll),
     ),
     entry(
         msg::tree_fold::PAL_REFS_COLLAPSE_ALL,
         "",
-        PaletteCommand::RefsFold(crate::tree_fold::TreeFold::CollapseAll),
+        PaletteCommand::RefsFold(crate::palette::vocab::tree_fold::TreeFold::CollapseAll),
     ),
     entry(
         msg::tree_fold::PAL_REFS_EXPAND_BELOW,
         "",
-        PaletteCommand::RefsFold(crate::tree_fold::TreeFold::ExpandBelow),
+        PaletteCommand::RefsFold(crate::palette::vocab::tree_fold::TreeFold::ExpandBelow),
     ),
     entry(
         msg::tree_fold::PAL_REFS_COLLAPSE_BELOW,
         "",
-        PaletteCommand::RefsFold(crate::tree_fold::TreeFold::CollapseBelow),
+        PaletteCommand::RefsFold(crate::palette::vocab::tree_fold::TreeFold::CollapseBelow),
     ),
     entry(
         msg::pane_hscroll::PAL_LEFT,
         "",
-        PaletteCommand::PaneScroll(crate::hscroll::Dir::Left),
+        PaletteCommand::PaneScroll(crate::palette::vocab::hscroll::Dir::Left),
     ),
     entry(
         msg::pane_hscroll::PAL_RIGHT,
         "",
-        PaletteCommand::PaneScroll(crate::hscroll::Dir::Right),
+        PaletteCommand::PaneScroll(crate::palette::vocab::hscroll::Dir::Right),
     ),
     entry(
         msg::palette::REFS_NEXT_SECTION,
         "l",
         PaletteCommand::NextRefSection,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_PREVIOUS_SECTION,
         "h",
         PaletteCommand::PrevRefSection,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_EXPAND_OR_COLLAPSE_ACTIVE_SECTION,
         "Enter",
         PaletteCommand::ToggleSectionCollapse,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::REFS_TOGGLE_BRANCH_HIERARCHY_VIEW,
         "y",
         PaletteCommand::ToggleHierarchy,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     // -- Git -------------------------------------------------------
     entry(
         msg::palette::GIT_STAGE_SELECTED_FILE,
@@ -1186,57 +1192,57 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_MENU,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Menu),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Menu),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_START,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::StartAny),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::StartAny),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::ISSUE_PALETTE_NEW,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::NewIssueAny),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::NewIssueAny),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::ISSUE_PALETTE_PICK_UP,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::PickUp),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::PickUp),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_FINISH,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Finish),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Finish),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_SYNC,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Sync),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Sync),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_PROMOTE,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Promote),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Promote),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_SET_PARENT,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::SetParent),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::SetParent),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_RESUME,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Resume),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Resume),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_TOGGLE_GROUPING,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::ToggleGrouping),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::ToggleGrouping),
     ),
     entry(
         gitpoulpi_i18n::msg::flow::PALETTE_SETTINGS,
         "",
-        PaletteCommand::Flow(crate::flow::FlowCmd::Settings),
+        PaletteCommand::Flow(crate::palette::vocab::flow::FlowCmd::Settings),
     ),
     entry(
         msg::palette::REMOTE_HIDE_REMOTE_IN_GRAPH,
@@ -1709,7 +1715,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::Merge(M::AiSuggest),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::MERGE_CLOSE_MERGE_EDITOR,
         "",
@@ -1883,235 +1889,247 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "",
         PaletteCommand::Radar(RadarCommand::Open),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_REFRESH,
         "r",
         PaletteCommand::Radar(RadarCommand::Refresh),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_SEARCH,
         "/",
         PaletteCommand::Radar(RadarCommand::Search),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_OPEN_BROWSER,
         "o",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::OpenBrowser)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_OPEN_REPOSITORY,
         "Enter",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::OpenRepo)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_CHECKOUT,
         "c",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Checkout)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_WORKTREE,
         "t",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Worktree)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_SHOW,
         "s",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Show)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_START_WORK,
         "n",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::StartWork)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_PIN,
         "p",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Pin)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_SNOOZE,
         "z",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Snooze)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_REVIEW,
         "e",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Review)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_RADAR_CONVERSATION,
         "i",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Conversation)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_MERGE,
         "m",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Merge)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_CLOSE,
         "x",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::CloseItem)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_READY,
         "y",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::Ready)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_CLONE,
         "g",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::CloneRepo)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_REVIEW_API,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::ReviewApi)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_CLONE_REVIEW,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::CloneReview)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_EDIT_ASSIGNEES,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::EditAssignees)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_EDIT_REVIEWERS,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::EditReviewers)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_EDIT_LABELS,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::EditLabels)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_SET_MILESTONE,
         "",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::SetMilestone)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_SCOPE,
         "w",
         PaletteCommand::Radar(RadarCommand::Scope),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_VIEW,
         "v",
         PaletteCommand::Radar(RadarCommand::View),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_FILTER,
         "f",
         PaletteCommand::Radar(RadarCommand::Filter),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_PROFILE,
         "P",
         PaletteCommand::Radar(RadarCommand::Profile),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_NOT_CLONED,
         "a",
         PaletteCommand::Radar(RadarCommand::NotCloned),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_DRAFTS,
         "d",
         PaletteCommand::Radar(RadarCommand::Drafts),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_TURN_ON,
         "T",
         PaletteCommand::Radar(RadarCommand::Act(RadarAct::TurnOn)),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_MENU,
         ".",
         PaletteCommand::Radar(RadarCommand::Menu),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_PICK,
         "C",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Pick)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::Pick,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_WIDER,
         "]",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Wider)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::Wider,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_NARROWER,
         "[",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Narrower)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::Narrower,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_RESET,
         "0",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Reset)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::Reset,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_FIT,
         "=",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::Fit)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::Fit,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_COLUMN_FIT_ALL,
         "+",
-        PaletteCommand::Radar(RadarCommand::Column(crate::radar::ColumnCmd::FitAll)),
+        PaletteCommand::Radar(RadarCommand::Column(
+            crate::palette::vocab::radar::ColumnCmd::FitAll,
+        )),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_BACK,
         "Esc",
         PaletteCommand::Radar(RadarCommand::Back),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     entry(
         msg::palette::RADAR_CLOSE_TAB,
         "",
         PaletteCommand::Radar(RadarCommand::CloseTab),
     )
-    .requires(crate::build_features::Feature::Radar),
+    .requires(crate::features::Feature::Radar),
     // The tab menu (right-click a tab), row by row.
     entry(msg::palette::TAB_NEW_TAB, "", PaletteCommand::NewTab),
     entry(msg::palette::TAB_NEW_MENU, "", PaletteCommand::OpenNewMenu),
@@ -2155,7 +2173,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::TAB_TERMINAL_HERE,
         "",
-        PaletteCommand::TabDir(crate::tab_dir::TabDirButton::Terminal),
+        PaletteCommand::TabDir(crate::palette::vocab::tab_dir::TabDirButton::Terminal),
     ),
     entry(
         msg::palette::TAB_OPEN_AI_AGENT_HERE,
@@ -2195,72 +2213,72 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_RELEASE_NOTES,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::ReleaseNotes),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::ReleaseNotes),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_SHOW,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::ShowPanel),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::ShowPanel),
     ),
     entry(
         gitpoulpi_i18n::msg::security_notice::PALETTE_OPEN,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::SecurityNotice),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::SecurityNotice),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_COPY,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::CopyCommand),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::CopyCommand),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_TERMINAL,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::RunInTerminal),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::RunInTerminal),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_CHECK,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::CheckNow),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::CheckNow),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_DOWNLOAD,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::Download),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::Download),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_UPDATE_NOW,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::UpdateNow),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::UpdateNow),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_RESTART,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::Restart),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::Restart),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_REVERT,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::Revert),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::Revert),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_SKIP,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::Skip),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::Skip),
     ),
     entry(
         gitpoulpi_i18n::msg::updates::PALETTE_CLOSE,
         "",
-        PaletteCommand::Updates(crate::updates::UpdatesCommand::CloseTab),
+        PaletteCommand::Updates(crate::palette::vocab::updates::UpdatesCommand::CloseTab),
     ),
     entry(
         gitpoulpi_i18n::msg::jobs::PALETTE_SHOW,
         "",
-        PaletteCommand::Jobs(crate::jobs_ui::JobsCmd::Show),
+        PaletteCommand::Jobs(crate::palette::vocab::jobs_ui::JobsCmd::Show),
     ),
     entry(
         gitpoulpi_i18n::msg::jobs::PALETTE_CANCEL_ALL,
         "",
-        PaletteCommand::Jobs(crate::jobs_ui::JobsCmd::CancelAll),
+        PaletteCommand::Jobs(crate::palette::vocab::jobs_ui::JobsCmd::CancelAll),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_COPY_DIAGNOSTICS,
@@ -2270,92 +2288,92 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_ERROR,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Toggle(
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Toggle(
             gitpoulpi_log::Level::Error,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_WARN,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Toggle(
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Toggle(
             gitpoulpi_log::Level::Warn,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_INFO,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Toggle(
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Toggle(
             gitpoulpi_log::Level::Info,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_DEBUG,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Toggle(
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Toggle(
             gitpoulpi_log::Level::Debug,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_TRACE,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Toggle(
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Toggle(
             gitpoulpi_log::Level::Trace,
         )),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_ALL,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::All),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::All),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_NONE,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Clear),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Clear),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_CLEAR_LOG,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ClearLog),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::ClearLog),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SCOPE,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::Scope),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::Scope),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_GIT_TAB,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::GitTab),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::GitTab),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_APP_TAB,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::AppTab),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::AppTab),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SHOW_OPERATION,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ShowOperation),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::ShowOperation),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_NEXT_PROBLEM,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::NextProblem),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::NextProblem),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_PREV_PROBLEM,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::PrevProblem),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::PrevProblem),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SCROLL_LEFT,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollLeft),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::ScrollLeft),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_SCROLL_RIGHT,
         "",
-        PaletteCommand::ActivityLevel(crate::activity_log::LevelCmd::ScrollRight),
+        PaletteCommand::ActivityLevel(crate::palette::vocab::activity_log::LevelCmd::ScrollRight),
     ),
     entry(
         gitpoulpi_i18n::msg::activity_log::PALETTE_COPY_LAST_ERROR,
@@ -2375,7 +2393,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::TAB_QUIT_AND_CD_HERE,
         "",
-        PaletteCommand::TabDir(crate::tab_dir::TabDirButton::QuitCd),
+        PaletteCommand::TabDir(crate::palette::vocab::tab_dir::TabDirButton::QuitCd),
     ),
     entry(
         msg::palette::REPOSITORY_CLONE,
@@ -2449,549 +2467,549 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::REVIEW_TAB_OVERVIEW,
         "",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::TabOverview),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::TabOverview),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TAB_FILES,
         "",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::TabFiles),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::TabFiles),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TAB_COMMITS,
         "",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::TabCommits),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::TabCommits),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_COMMENT_LINE,
         "c",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::AddComment),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::AddComment),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_COMMENT_CONVERSATION,
         "C",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ConversationComment),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ConversationComment),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_REPLY,
         "r",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::Reply),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::Reply),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_RESOLVE,
         "x",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleResolve),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleResolve),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_BACK_TO_COMMENT,
         "Esc",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::BackToComment),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::BackToComment),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_FOLD_THREAD,
         "z",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleThread),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleThread),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_EDIT_PENDING,
         "e",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditPending),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditPending),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_DELETE_PENDING,
         "d",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::DeletePending),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::DeletePending),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_VIEWED,
         "v",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleViewed),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleViewed),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_NEXT_FILE,
         "]",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::NextFile),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::NextFile),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_PREV_FILE,
         "[",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::PrevFile),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::PrevFile),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_FINISH,
         "f",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::FinishReview),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::FinishReview),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_DISCARD,
         "",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::DiscardReview),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::DiscardReview),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_REFRESH,
         "F5",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::Refresh),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::Refresh),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_OPEN_BROWSER,
         "o",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::OpenBrowser),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::OpenBrowser),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_CHECK_OUT,
         "b",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::Checkout),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::Checkout),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_CLOSE,
         "Esc",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::Close),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::Close),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_EDIT_ASSIGNEES,
         "a",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditAssignees),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditAssignees),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_EDIT_REVIEWERS,
         "p",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditReviewers),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditReviewers),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_EDIT_LABELS,
         "l",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditLabels),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditLabels),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_SET_MILESTONE,
         "m",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::SetMilestone),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::SetMilestone),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_PICK_PATCH_SET,
         "P",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::PickPatchSet),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::PickPatchSet),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_COMPARE_PATCH_SET,
         "D",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ComparePatchSet),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ComparePatchSet),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_SUBMIT_CHANGE,
         "U",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::SubmitChange),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::SubmitChange),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_ABANDON_CHANGE,
         "Q",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::AbandonChange),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::AbandonChange),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TOGGLE_LAYOUT,
         "V",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleLayout),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleLayout),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TOGGLE_HUNKS_ONLY,
         "H",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleHunksOnly),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleHunksOnly),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TOGGLE_WHITESPACE,
         "S",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleWhitespace),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleWhitespace),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TOGGLE_WRAP,
         "W",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleWrap),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleWrap),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_NEXT_HUNK,
         "J",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::NextHunk),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::NextHunk),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_PREV_HUNK,
         "K",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::PrevHunk),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::PrevHunk),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_CHOOSE_ENCODING,
         "E",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ChooseEncoding),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ChooseEncoding),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_TOGGLE_MINIMAP,
         "M",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ToggleMinimap),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ToggleMinimap),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_SCROLL_LEFT,
         "Left",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ScrollLeft),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ScrollLeft),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_SCROLL_RIGHT,
         "Right",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::ScrollRight),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::ScrollRight),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     entry(
         msg::palette::REVIEW_COPY_TEXT,
         "Ctrl+C",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::CopyText),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::CopyText),
     )
-    .requires(crate::build_features::Feature::Review),
+    .requires(crate::features::Feature::Review),
     // -- Kanban board (open) ------------------------------------------
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_MOVE_TO,
         "m",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::MoveTo),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::MoveTo),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_MOVE_LEFT,
         "",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::MoveLeft),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::MoveLeft),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_MOVE_RIGHT,
         "",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::MoveRight),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::MoveRight),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_OPEN_CARD,
         "Enter",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::OpenCard),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::OpenCard),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_EDIT_ASSIGNEES,
         "",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::EditAssignees),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::EditAssignees),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_EDIT_LABELS,
         "",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::EditLabels),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::EditLabels),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_SET_MILESTONE,
         "",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::SetMilestone),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::SetMilestone),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_NEW_CARD,
         "n",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::NewCard),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::NewCard),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_FILTER_ASSIGNEE,
         "a",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::FilterAssignee),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::FilterAssignee),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_FILTER_LABEL,
         "l",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::FilterLabel),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::FilterLabel),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_FILTER_MILESTONE,
         "M",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::FilterMilestone),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::FilterMilestone),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_FILTER_TEXT,
         "/",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::FilterText),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::FilterText),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_CLEAR_FILTERS,
         "x",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::ClearFilters),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::ClearFilters),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_COLUMN_LABELS,
         "c",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::SetColumnLabels),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::SetColumnLabels),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_REFRESH,
         "r",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::Refresh),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::Refresh),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     entry(
         gitpoulpi_i18n::msg::board::PALETTE_CLOSE,
         "Esc",
-        PaletteCommand::Board(crate::board_cmd::BoardCmd::Close),
+        PaletteCommand::Board(crate::palette::vocab::board::BoardCmd::Close),
     )
-    .requires(crate::build_features::Feature::Board),
+    .requires(crate::features::Feature::Board),
     // -- conversation (open) -------------------------------------------
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_BACK,
         "",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Back),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Back),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_REFRESH,
         "F5",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Refresh),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Refresh),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_LOAD_OLDER,
         "m",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::LoadOlder),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::LoadOlder),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_PREV_ENTRY,
         "Up",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::PrevEntry),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::PrevEntry),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_NEXT_ENTRY,
         "Down",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::NextEntry),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::NextEntry),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_NEXT_UNREAD,
         "n",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::NextUnread),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::NextUnread),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_REPLY,
         "r",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Reply),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Reply),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_QUOTE,
         "Q",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Quote),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Quote),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_NEW_COMMENT,
         "c",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::NewComment),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::NewComment),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_LINKS,
         "l",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Links),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Links),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_DIAGRAM,
         "g",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenDiagram),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::OpenDiagram),
     )
-    .requires(crate::build_features::Feature::Mermaid),
+    .requires(crate::features::Feature::Mermaid),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_CODE,
         "G",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenCode),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::OpenCode),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_COPY_LINK,
         "y",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::CopyLink),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::CopyLink),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_COPY_TEXT,
         "Ctrl+C",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::CopyText),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::CopyText),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_BROWSER,
         "o",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::OpenBrowser),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::OpenBrowser),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_EDIT,
         "e",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Edit),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Edit),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_DELETE,
         "d",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Delete),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Delete),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_EVENTS,
         "v",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleEvents),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::ToggleEvents),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_PREVIEW,
         "",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::TogglePreview),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::TogglePreview),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_SPLIT,
         "",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleSplit),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::ToggleSplit),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_SEND,
         "",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Send),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Send),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_TOGGLE_INTERNAL,
         "",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::ToggleInternal),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::ToggleInternal),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_CLOSE,
         "Esc",
-        PaletteCommand::Item(crate::item_cmd::ItemCmd::Close),
+        PaletteCommand::Item(crate::palette::vocab::item::ItemCmd::Close),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         gitpoulpi_i18n::msg::keymap_action::MD_EDITOR_AI,
         "",
-        PaletteCommand::Composer(crate::composer_cmd::ComposerCmd::WriteWithAi),
+        PaletteCommand::Composer(crate::palette::vocab::composer::ComposerCmd::WriteWithAi),
     ),
     entry(
         gitpoulpi_i18n::msg::md_editor::PALETTE_REFRESH_CONTEXT,
         "",
-        PaletteCommand::Composer(crate::composer_cmd::ComposerCmd::RefreshContext),
+        PaletteCommand::Composer(crate::palette::vocab::composer::ComposerCmd::RefreshContext),
     ),
     entry(
         gitpoulpi_i18n::msg::item_view::PALETTE_OPEN_CONVERSATION,
         "",
         PaletteCommand::Hosting(HostingCommand::OpenIssueConversation),
     )
-    .requires(crate::build_features::Feature::Conversation),
+    .requires(crate::features::Feature::Conversation),
     entry(
         msg::review_ai::PALETTE_SUGGEST,
         "s",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::SuggestReview),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::SuggestReview),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_ACCEPT,
         "y",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::AcceptSuggestion),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::AcceptSuggestion),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_EDIT_ACCEPT,
         "w",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditSuggestion),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditSuggestion),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_DISMISS,
         "n",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::DismissSuggestion),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::DismissSuggestion),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_ACCEPT_ALL,
         "A",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::AcceptAllSuggestions),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::AcceptAllSuggestions),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_DISMISS_ALL,
         "N",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::DismissAllSuggestions),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::DismissAllSuggestions),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_USE_SUMMARY,
         "i",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::UseSummary),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::UseSummary),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_USE_DRAFT,
         "u",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::UseDraft),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::UseDraft),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_EDIT_DRAFT,
         "t",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::EditDraftText),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::EditDraftText),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::review_ai::PALETTE_DISCARD_DRAFT,
         "N",
-        PaletteCommand::Review(crate::review_cmd::ReviewCmd::DiscardDraft),
+        PaletteCommand::Review(crate::palette::vocab::review::ReviewCmd::DiscardDraft),
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     // -- Undo History panel (open) ----------------------------------
     entry(
         msg::palette::UNDO_HISTORY_UNDO_TO,
@@ -3174,76 +3192,76 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::VIEW_LOG_COLUMN_PICK,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Pick),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Pick),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_NEXT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::NextColumn),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::NextColumn),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_PREV,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::PrevColumn),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::PrevColumn),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_MOVE_LEFT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Move(
-            crate::commit_column::Side::Left,
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Move(
+            crate::palette::vocab::commit_column::Side::Left,
         )),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_MOVE_RIGHT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Move(
-            crate::commit_column::Side::Right,
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Move(
+            crate::palette::vocab::commit_column::Side::Right,
         )),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_WIDER,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Wider),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Wider),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_NARROWER,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Narrower),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Narrower),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_RESET_WIDTH,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ResetWidth),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::ResetWidth),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_FIT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::FitToContent),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::FitToContent),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_FIT_ALL,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::FitAllToContent),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::FitAllToContent),
     ),
     entry(
         msg::palette::VIEW_LOG_SCROLL_LEFT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ScrollLeft),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::ScrollLeft),
     ),
     entry(
         msg::palette::VIEW_LOG_SCROLL_RIGHT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ScrollRight),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::ScrollRight),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMNS_LAYOUT,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::ToggleLayout),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::ToggleLayout),
     ),
     entry(
         msg::palette::VIEW_LOG_COLUMN_CHOOSER,
         "",
-        PaletteCommand::LogColumn(crate::log_table::LogColumnCmd::Chooser),
+        PaletteCommand::LogColumn(crate::palette::vocab::log_table::LogColumnCmd::Chooser),
     ),
     // -- Diff ------------------------------------------------------
     entry(
@@ -3342,7 +3360,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "o",
         PaletteCommand::FilesToggleLfsOnly,
     )
-    .requires(crate::build_features::Feature::Lfs),
+    .requires(crate::features::Feature::Lfs),
     entry(
         msg::palette::COMMIT_TOGGLE_SKIP_HOOKS,
         "",
@@ -3356,22 +3374,22 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::tree_fold::PAL_FILES_EXPAND_ALL,
         "",
-        PaletteCommand::FilesFold(crate::tree_fold::TreeFold::ExpandAll),
+        PaletteCommand::FilesFold(crate::palette::vocab::tree_fold::TreeFold::ExpandAll),
     ),
     entry(
         msg::tree_fold::PAL_FILES_COLLAPSE_ALL,
         "",
-        PaletteCommand::FilesFold(crate::tree_fold::TreeFold::CollapseAll),
+        PaletteCommand::FilesFold(crate::palette::vocab::tree_fold::TreeFold::CollapseAll),
     ),
     entry(
         msg::tree_fold::PAL_FILES_EXPAND_BELOW,
         "",
-        PaletteCommand::FilesFold(crate::tree_fold::TreeFold::ExpandBelow),
+        PaletteCommand::FilesFold(crate::palette::vocab::tree_fold::TreeFold::ExpandBelow),
     ),
     entry(
         msg::tree_fold::PAL_FILES_COLLAPSE_BELOW,
         "",
-        PaletteCommand::FilesFold(crate::tree_fold::TreeFold::CollapseBelow),
+        PaletteCommand::FilesFold(crate::palette::vocab::tree_fold::TreeFold::CollapseBelow),
     ),
     entry(
         msg::palette::FILES_SELECT_ALL,
@@ -3393,7 +3411,7 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "Shift+Y",
         PaletteCommand::CopySelectedAsMermaid,
     )
-    .requires(crate::build_features::Feature::Mermaid),
+    .requires(crate::features::Feature::Mermaid),
     entry(
         msg::compare::PALETTE_COMPARE_SELECTION,
         "v",
@@ -3428,176 +3446,188 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::VIEW_TOGGLE_COMMIT_COLUMN,
         "Alt+C",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Toggle),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Toggle),
     ),
     entry(
         msg::palette::VIEW_COLUMN_OFF,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Set(
-            crate::commit_column::ColumnState::Off,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Set(
+            crate::palette::vocab::commit_column::ColumnState::Off,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_FILE,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Set(
-            crate::commit_column::ColumnState::File,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Set(
+            crate::palette::vocab::commit_column::ColumnState::File,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_GRAPH,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Set(
-            crate::commit_column::ColumnState::Graph,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Set(
+            crate::palette::vocab::commit_column::ColumnState::Graph,
         )),
     ),
     entry(
         msg::palette::VIEW_FOCUS_COMMIT_COLUMN,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Focus),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Focus),
     ),
     entry(
         msg::palette::VIEW_WIDEN_COMMIT_COLUMN,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Widen),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Widen),
     ),
     entry(
         msg::palette::VIEW_NARROW_COMMIT_COLUMN,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Narrow),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Narrow),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SCROLL_LEFT,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ScrollLeft),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::ScrollLeft),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SCROLL_RIGHT,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ScrollRight),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::ScrollRight),
     ),
     entry(
         msg::palette::VIEW_COLUMN_NEXT_PART,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::NextPart),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::NextPart),
     ),
     entry(
         msg::palette::VIEW_COLUMN_MOVE_LEFT,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::MovePart(
-            crate::commit_column::Side::Left,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::MovePart(
+            crate::palette::vocab::commit_column::Side::Left,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_MOVE_RIGHT,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::MovePart(
-            crate::commit_column::Side::Right,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::MovePart(
+            crate::palette::vocab::commit_column::Side::Right,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_WIDER_PART,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::PartWider),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::PartWider),
     ),
     entry(
         msg::palette::VIEW_COLUMN_NARROWER_PART,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::PartNarrower),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::PartNarrower),
     ),
     entry(
         msg::palette::VIEW_COLUMN_RESET_WIDTHS,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ResetWidths),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::ResetWidths),
     ),
     entry(
         msg::palette::VIEW_COLUMN_FIT_PART,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Fit),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Fit),
     ),
     entry(
         msg::palette::VIEW_COLUMN_FIT_ALL,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::FitAll),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::FitAll),
     ),
     entry(
         msg::palette::VIEW_COLUMN_MENU,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Menu),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Menu),
     ),
     entry(
         msg::palette::VIEW_COLUMN_COLUMNS_MENU,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ColumnsMenu),
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::ColumnsMenu),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_REFS,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Refs,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Refs,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_GRAPH,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Graph,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Graph,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_AUTHOR,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Author,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Author,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_DATE,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Date,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Date,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_CHANGES,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Changes,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Changes,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_TOGGLE_SHA,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::ToggleShown(
-            crate::commit_column::Part::Sha,
-        )),
+        PaletteCommand::CommitColumn(
+            crate::palette::vocab::commit_column::ColumnCmd::ToggleShown(
+                crate::palette::vocab::commit_column::Part::Sha,
+            ),
+        ),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SHOW_IN_LOG,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Show(
-            crate::log_menu::ColumnOp::ShowInLog,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Show(
+            crate::palette::vocab::log_menu::ColumnOp::ShowInLog,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SHOW_DIFF,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Show(
-            crate::log_menu::ColumnOp::Diff,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Show(
+            crate::palette::vocab::log_menu::ColumnOp::Diff,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SHOW_FILE,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Show(
-            crate::log_menu::ColumnOp::File,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Show(
+            crate::palette::vocab::log_menu::ColumnOp::File,
         )),
     ),
     entry(
         msg::palette::VIEW_COLUMN_SHOW_BLAME,
         "",
-        PaletteCommand::CommitColumn(crate::commit_column::ColumnCmd::Show(
-            crate::log_menu::ColumnOp::Blame,
+        PaletteCommand::CommitColumn(crate::palette::vocab::commit_column::ColumnCmd::Show(
+            crate::palette::vocab::log_menu::ColumnOp::Blame,
         )),
     ),
     entry(
@@ -3654,72 +3684,74 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::HISTORY_SHOW_IN_LOG,
         "Enter",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::ShowInLog),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::ShowInLog),
     ),
     entry(
         msg::palette::HISTORY_COPY_SHA,
         "y",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::CopySha),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::CopySha),
     ),
     entry(
         msg::palette::HISTORY_COPY_SUMMARY,
         "Shift+Y",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::CopySummary),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::CopySummary),
     ),
     entry(
         msg::palette::HISTORY_SHOW_DIFF,
         "d",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::ShowDiff),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::ShowDiff),
     ),
     entry(
         msg::palette::HISTORY_OPEN_FILE,
         "o",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::OpenFile),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::OpenFile),
     ),
     entry(
         msg::palette::HISTORY_BLAME,
         "b",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::Blame),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::Blame),
     ),
     entry(
         msg::palette::HISTORY_COMPARE_WORKING_TREE,
         "c",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::CompareWorkingTree),
+        PaletteCommand::HistoryView(
+            crate::palette::vocab::history::HistoryAction::CompareWorkingTree,
+        ),
     ),
     entry(
         msg::palette::HISTORY_RESTORE,
         "Shift+R",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::Restore),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::Restore),
     ),
     entry(
         msg::palette::HISTORY_RANGE_UP,
         "Shift+Up",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::RangeUp),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::RangeUp),
     ),
     entry(
         msg::palette::HISTORY_RANGE_DOWN,
         "Shift+Down",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::RangeDown),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::RangeDown),
     ),
     entry(
         msg::palette::HISTORY_SWITCH_FOCUS,
         "Tab",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::SwitchFocus),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::SwitchFocus),
     ),
     entry(
         msg::palette::HISTORY_WIDEN_LIST,
         "Alt+Right",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::WidenList),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::WidenList),
     ),
     entry(
         msg::palette::HISTORY_NARROW_LIST,
         "Alt+Left",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::NarrowList),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::NarrowList),
     ),
     entry(
         msg::palette::HISTORY_RESET_SPLIT,
         "Alt+0",
-        PaletteCommand::HistoryView(crate::history_view::HistoryAction::ResetSplit),
+        PaletteCommand::HistoryView(crate::palette::vocab::history::HistoryAction::ResetSplit),
     ),
     entry(msg::palette::OPEN_WITH, "O", PaletteCommand::OpenWith),
     entry(
@@ -3737,51 +3769,51 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         "Ctrl+G i",
         PaletteCommand::AiGenerateCommitMessage,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_GENERATE_STASH_MESSAGE,
         "",
         PaletteCommand::AiGenerateStashMessage,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_INSERT_PROMPT_VARIABLE,
         "",
         PaletteCommand::AiInsertPromptVariable,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_EDIT_PROFILE,
         "",
         PaletteCommand::AiEditProfile,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(msg::palette::AI_OPEN_AGENT, "", PaletteCommand::AiOpenAgent)
-        .requires(crate::build_features::Feature::Ai),
+        .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_EXPLAIN_SELECTED_COMMIT,
         "Ctrl+G w",
         PaletteCommand::AiExplainSelectedCommit,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_SPLIT_SELECTED_COMMIT,
         "",
         PaletteCommand::AiSplitSelectedCommit,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_EXPLAIN_WORKING_CHANGES,
         "Ctrl+G w",
         PaletteCommand::AiExplainWip,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::AI_COMPOSE_COMMITS_FROM_WORKING_CHANGES,
         "Ctrl+G C",
         PaletteCommand::AiComposeCommits,
     )
-    .requires(crate::build_features::Feature::Ai),
+    .requires(crate::features::Feature::Ai),
     entry(
         msg::palette::STAGE_GUARD_SHOW_IN_FILE,
         "S",
@@ -3793,19 +3825,19 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
         PaletteCommand::ComposerMoveFile,
     ),
     entry(msg::palette::DIFF_BLAME, "", PaletteCommand::Blame),
-    blame_entry(crate::blame_view::BlameOp::ShowInLog),
-    blame_entry(crate::blame_view::BlameOp::CopySha),
-    blame_entry(crate::blame_view::BlameOp::ShowDiff),
-    blame_entry(crate::blame_view::BlameOp::BlameParent),
-    blame_entry(crate::blame_view::BlameOp::OpenHistory),
-    blame_entry(crate::blame_view::BlameOp::ToggleCard),
-    blame_entry(crate::blame_view::BlameOp::NextHunk),
-    blame_entry(crate::blame_view::BlameOp::PrevHunk),
-    blame_entry(crate::blame_view::BlameOp::NextSame),
-    blame_entry(crate::blame_view::BlameOp::PrevSame),
-    blame_entry(crate::blame_view::BlameOp::Goto),
-    blame_entry(crate::blame_view::BlameOp::Wider),
-    blame_entry(crate::blame_view::BlameOp::Narrower),
+    blame_entry(crate::palette::vocab::blame::BlameOp::ShowInLog),
+    blame_entry(crate::palette::vocab::blame::BlameOp::CopySha),
+    blame_entry(crate::palette::vocab::blame::BlameOp::ShowDiff),
+    blame_entry(crate::palette::vocab::blame::BlameOp::BlameParent),
+    blame_entry(crate::palette::vocab::blame::BlameOp::OpenHistory),
+    blame_entry(crate::palette::vocab::blame::BlameOp::ToggleCard),
+    blame_entry(crate::palette::vocab::blame::BlameOp::NextHunk),
+    blame_entry(crate::palette::vocab::blame::BlameOp::PrevHunk),
+    blame_entry(crate::palette::vocab::blame::BlameOp::NextSame),
+    blame_entry(crate::palette::vocab::blame::BlameOp::PrevSame),
+    blame_entry(crate::palette::vocab::blame::BlameOp::Goto),
+    blame_entry(crate::palette::vocab::blame::BlameOp::Wider),
+    blame_entry(crate::palette::vocab::blame::BlameOp::Narrower),
     entry(msg::palette::DIFF_HISTORY, "", PaletteCommand::History),
     entry(msg::palette::DIFF_FILE_VIEW, "", PaletteCommand::FileView),
     entry(
@@ -3817,27 +3849,27 @@ pub(crate) const PALETTE_COMMANDS: &[PaletteEntry] = &[
     entry(
         msg::palette::EDITOR_CHANGE_ENCODING,
         "",
-        PaletteCommand::EditorMenu(crate::editor::StatusMenu::Encoding),
+        PaletteCommand::EditorMenu(crate::palette::vocab::editor::StatusMenu::Encoding),
     ),
     entry(
         msg::palette::EDITOR_REOPEN_ENCODING,
         "",
-        PaletteCommand::EditorMenu(crate::editor::StatusMenu::Reopen),
+        PaletteCommand::EditorMenu(crate::palette::vocab::editor::StatusMenu::Reopen),
     ),
     entry(
         msg::palette::EDITOR_CONVERT_ENCODING,
         "",
-        PaletteCommand::EditorMenu(crate::editor::StatusMenu::Convert),
+        PaletteCommand::EditorMenu(crate::palette::vocab::editor::StatusMenu::Convert),
     ),
     entry(
         msg::palette::EDITOR_LINE_ENDINGS,
         "",
-        PaletteCommand::EditorMenu(crate::editor::StatusMenu::LineEndings),
+        PaletteCommand::EditorMenu(crate::palette::vocab::editor::StatusMenu::LineEndings),
     ),
     entry(
         msg::palette::EDITOR_INDENTATION,
         "",
-        PaletteCommand::EditorMenu(crate::editor::StatusMenu::Indentation),
+        PaletteCommand::EditorMenu(crate::palette::vocab::editor::StatusMenu::Indentation),
     ),
     // -- App -------------------------------------------------------
     entry(

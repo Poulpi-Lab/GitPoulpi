@@ -13,37 +13,13 @@
 //! `&'static PaletteEntry` like the catalogue's), the values shown beside
 //! them are read again whenever `config.toml` changes.
 
-use super::*;
 use crate::preferences::palette_settings::{self as ps, Current, Edit, SettingKind, SettingRow};
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::palette::SettingOp;
+use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry};
 use gitpoulpi_i18n::msg;
 use std::collections::HashMap;
 use std::sync::Mutex;
-
-/// What a `Settings: ...` row does. The numbers index [`rows`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SettingOp {
-    Toggle(u16),
-    /// Edits a number or text on the Settings page.
-    Edit(u16),
-    /// Narrows the palette to the setting's choices.
-    Sub(u16),
-    /// Picks one choice (`.1` indexes the setting's options).
-    Choose(u16, u16),
-    /// Opens Settings on the setting.
-    Page(u16),
-}
-
-impl SettingOp {
-    fn row(self) -> u16 {
-        match self {
-            SettingOp::Toggle(r)
-            | SettingOp::Edit(r)
-            | SettingOp::Sub(r)
-            | SettingOp::Choose(r, _)
-            | SettingOp::Page(r) => r,
-        }
-    }
-}
 
 struct Model {
     rows: Vec<SettingRow>,
@@ -77,6 +53,7 @@ fn build() -> Model {
                 requires: None,
                 text: Some(leak(now)),
                 text_en: Some(leak(english)),
+                surface: gitpoulpi_app::surface::settings_surface(row.key),
             });
         };
         let (op, now) = match &row.kind {
@@ -147,17 +124,6 @@ pub(crate) fn listed_count() -> usize {
 /// Every `Settings: ...` entry, in the current language.
 pub(crate) fn entries() -> &'static [PaletteEntry] {
     &model().entries
-}
-
-/// Whether the entry is listed for `query` (trimmed, lower case): a choice
-/// row only once the query names its setting (`Settings: <label>:`).
-pub(crate) fn listed(entry: &PaletteEntry, query: &str, prefixes: &[String]) -> bool {
-    match entry.command {
-        PaletteCommand::Setting(SettingOp::Choose(r, _)) => prefixes
-            .get(r as usize)
-            .is_some_and(|p| !p.is_empty() && query.starts_with(p.as_str())),
-        _ => true,
-    }
 }
 
 /// Each setting's `Settings: <label>:` (lower case), for [`listed`].

@@ -36,36 +36,6 @@ impl FileListMode {
 mod vocab;
 pub(crate) use vocab::{FileContextAction, StatusSection};
 
-impl StatusSection {
-    /// Display order, top to bottom. Unstaged first: it's the half the
-    /// user is usually acting on.
-    pub(crate) const ORDER: [StatusSection; 2] = [StatusSection::Unstaged, StatusSection::Staged];
-
-    pub(crate) fn title(self) -> &'static str {
-        match self {
-            StatusSection::Unstaged => msg::UNSTAGED_TITLE.get(),
-            StatusSection::Staged => msg::STAGED_TITLE.get(),
-        }
-    }
-
-    /// Label of the button in this section's header: the bulk action that
-    /// empties it.
-    pub(crate) fn bulk_label(self) -> &'static str {
-        match self {
-            StatusSection::Unstaged => msg::STAGE_ALL.get(),
-            StatusSection::Staged => msg::UNSTAGE_ALL.get(),
-        }
-    }
-
-    /// Label of the per-row button revealed on hover.
-    pub(crate) fn row_label(self) -> &'static str {
-        match self {
-            StatusSection::Unstaged => msg::STAGE_FILE.get(),
-            StatusSection::Staged => msg::UNSTAGE_FILE.get(),
-        }
-    }
-}
-
 /// One row produced by the tree walk. `File` carries an index back into
 /// the slice it was built from rather than a borrowed entry, so the same
 /// walk serves the working tree (`StatusEntry`) and a commit's changed
@@ -433,58 +403,6 @@ pub(crate) fn status_marker(status: FileStatus) -> &'static str {
         FileStatus::Deleted => "-",
         FileStatus::Renamed => ">",
         FileStatus::Conflicted => "!",
-    }
-}
-
-impl FileContextAction {
-    /// The row's label for actions whose text does not depend on the
-    /// file. `file_context_entries` words the name-bearing ones itself.
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            FileContextAction::Stage => msg::FA_STAGE.get(),
-            FileContextAction::Unstage => msg::FA_UNSTAGE.get(),
-            FileContextAction::OpenMergeEditor => msg::FA_OPEN_MERGE_EDITOR.get(),
-            FileContextAction::ResolveUsing(ConflictSide::Ours) => msg::FA_RESOLVE_OURS.get(),
-            FileContextAction::ResolveUsing(ConflictSide::Theirs) => msg::FA_RESOLVE_THEIRS.get(),
-            FileContextAction::ResolveUsing(ConflictSide::Base) => msg::FA_RESOLVE_BASE.get(),
-            FileContextAction::Discard => msg::FA_DISCARD.get(),
-            FileContextAction::IgnoreFile => msg::FA_IGNORE_FILE.get(),
-            FileContextAction::IgnoreExtension => msg::FA_IGNORE_EXTENSION.get(),
-            FileContextAction::TreatFileBinary => msg::FA_TREAT_FILE_BINARY.get(),
-            FileContextAction::TreatFileText => msg::FA_TREAT_FILE_TEXT.get(),
-            FileContextAction::TreatExtensionBinary => msg::FA_TREAT_EXTENSION_BINARY.get(),
-            FileContextAction::TreatExtensionText => msg::FA_TREAT_EXTENSION_TEXT.get(),
-            FileContextAction::StashFile => msg::FA_STASH_FILE.get(),
-            FileContextAction::FileHistory => msg::FA_FILE_HISTORY.get(),
-            FileContextAction::FileBlame => msg::FA_FILE_BLAME.get(),
-            FileContextAction::ExternalDiff => msg::FA_EXTERNAL_DIFF.get(),
-            FileContextAction::OpenInEditor => msg::FA_OPEN_IN_EDITOR.get(),
-            FileContextAction::OpenInDefault => msg::FA_OPEN_IN_DEFAULT.get(),
-            FileContextAction::EditImageIn => gitpoulpi_i18n::msg::image_edit_in::MENU.get(),
-            FileContextAction::OpenWith => gitpoulpi_i18n::msg::open_with::MENU.get(),
-            FileContextAction::ShowInFolder => msg::FA_SHOW_IN_FOLDER.get(),
-            FileContextAction::CopyPath => msg::FA_COPY_PATH.get(),
-            FileContextAction::CreatePatch => msg::FA_CREATE_PATCH.get(),
-            FileContextAction::EditFile => msg::FA_EDIT_FILE.get(),
-            FileContextAction::DeleteFile => msg::FA_DELETE_FILE.get(),
-            FileContextAction::LfsTrackFile => msg::FA_LFS_TRACK_FILE.get(),
-            FileContextAction::LfsTrackExtension => msg::FA_LFS_TRACK_EXTENSION.get(),
-            FileContextAction::LfsLock => msg::FA_LFS_LOCK.get(),
-            FileContextAction::LfsUnlock => msg::FA_LFS_UNLOCK.get(),
-            FileContextAction::LfsForceUnlock => msg::FA_LFS_FORCE_UNLOCK.get(),
-            FileContextAction::Convert(_) => gitpoulpi_i18n::msg::pane_menu::CONVERT.get(),
-        }
-    }
-
-    /// Whether running this needs the confirm modal first: discarding
-    /// throws away uncommitted work and deleting removes the file, both
-    /// with no undo, so both go through the same `PendingDestructive`
-    /// path as branch delete and stash drop.
-    pub(crate) fn is_destructive(self) -> bool {
-        matches!(
-            self,
-            FileContextAction::Discard | FileContextAction::DeleteFile
-        )
     }
 }
 

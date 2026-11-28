@@ -14,7 +14,7 @@
 //! looks at two file stamps and re-reads only when one moved, so a file that
 //! changed under a running window asks again within a frame.
 
-use super::registry::{self, with, Registry};
+use super::registry;
 use gitpoulpi_config::sequences::SequenceDef;
 use gitpoulpi_session::{inspect_repo_sequences, RepoSequences, RepoState, SequencesTrust};
 use std::path::{Path, PathBuf};
@@ -22,8 +22,33 @@ use std::time::SystemTime;
 
 type Stamp = [Option<(SystemTime, u64)>; 2];
 
+/// The active repository's file, as this window last read it. One slot per
+/// process; unit tests get one per thread, like the registry beside it.
+struct Registry {
+    repo: Option<Entry>,
+}
+
+#[cfg(not(test))]
+static REPO: std::sync::Mutex<Registry> = std::sync::Mutex::new(Registry { repo: None });
+
+#[cfg(test)]
+thread_local! {
+    static REPO: std::cell::RefCell<Registry> = const { std::cell::RefCell::new(Registry { repo: None }) };
+}
+
+fn with<R>(f: impl FnOnce(&mut Registry) -> R) -> R {
+    #[cfg(not(test))]
+    {
+        f(&mut REPO.lock().unwrap_or_else(|e| e.into_inner()))
+    }
+    #[cfg(test)]
+    {
+        REPO.with(|r| f(&mut r.borrow_mut()))
+    }
+}
+
 /// What the registry knows about the active repository's file.
-pub(super) struct Entry {
+struct Entry {
     root: PathBuf,
     stamp: Stamp,
     seen: RepoSequences,

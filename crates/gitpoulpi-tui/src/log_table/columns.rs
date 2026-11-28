@@ -8,136 +8,6 @@ pub(crate) use super::vocab::LogColumn;
 /// commit summary must not make a column a thousand cells wide).
 pub(crate) const MAX_COLUMN_CELLS: u16 = 300;
 
-impl LogColumn {
-    pub(crate) const ALL: [LogColumn; 7] = [
-        LogColumn::Ref,
-        LogColumn::Graph,
-        LogColumn::Message,
-        LogColumn::Author,
-        LogColumn::Date,
-        LogColumn::Changes,
-        LogColumn::Sha,
-    ];
-
-    /// The stable name written to `config.toml` (`ui.log_columns_*`).
-    pub(crate) fn config_name(self) -> &'static str {
-        match self {
-            LogColumn::Ref => "ref",
-            LogColumn::Graph => "graph",
-            LogColumn::Message => "message",
-            LogColumn::Author => "author",
-            LogColumn::Date => "date",
-            LogColumn::Changes => "changes",
-            LogColumn::Sha => "sha",
-        }
-    }
-
-    /// Inverse of [`LogColumn::config_name`]; `None` for an unknown name.
-    pub(crate) fn from_config_name(name: &str) -> Option<LogColumn> {
-        LogColumn::ALL
-            .iter()
-            .copied()
-            .find(|c| c.config_name() == name)
-    }
-
-    /// The header text in the current language (display only; the stable
-    /// name is [`LogColumn::config_name`]).
-    pub(crate) fn title(self) -> &'static str {
-        use gitpoulpi_i18n::msg::log_table as m;
-        match self {
-            LogColumn::Ref => m::COL_REF,
-            LogColumn::Graph => m::COL_GRAPH,
-            LogColumn::Message => m::COL_MESSAGE,
-            LogColumn::Author => m::COL_AUTHOR,
-            LogColumn::Date => m::COL_DATE,
-            LogColumn::Changes => m::COL_CHANGES,
-            LogColumn::Sha => m::COL_SHA,
-        }
-        .get()
-    }
-
-    /// `Message` is the one column the show/hide menu must never offer: a
-    /// Log pane without commit summaries shows nothing meaningful.
-    ///
-    /// Hiding is the only thing special-cased for `Message`: every column,
-    /// `Message` included, resizes from its own right-hand boundary
-    /// (`for_area_width` honours a `Message` override and
-    /// `boundary_drag_widths` pins both sides of a drag).
-    pub(crate) fn hideable(self) -> bool {
-        !matches!(self, LogColumn::Message)
-    }
-
-    pub(crate) fn min_width(self) -> u16 {
-        match self {
-            LogColumn::Ref => 10,
-            LogColumn::Graph => 4,
-            LogColumn::Message => 8,
-            LogColumn::Author => 4,
-            LogColumn::Date => 10,
-            LogColumn::Changes => 6,
-            LogColumn::Sha => 4,
-        }
-    }
-
-    /// The least a column can be **dragged** to. The Graph column goes down
-    /// to one commit dot (`graph::min_width`: a lane of two cells, one more with
-    /// avatars in the circles), where the graph is compact;
-    /// the automatic layout still keeps [`LogColumn::min_width`] for it.
-    pub(crate) fn drag_min_width(self) -> u16 {
-        match self {
-            LogColumn::Graph => crate::graph::min_width() as u16,
-            other => other.min_width(),
-        }
-    }
-
-    /// The order columns are given up in when the pane is too narrow for
-    /// every visible column's `min_width` - first entry sacrificed first.
-    /// `Message` is absent on purpose: it is the one column that has to
-    /// survive any width, and everything here is spent buying it room.
-    ///
-    /// This list is a product decision, not an artefact of the allocation
-    /// loop. The reasoning, cheapest sacrifice first:
-    ///
-    /// - **Changes** is an optional, off-by-default extra: the first to go.
-    /// - **Ref** costs ten cells for pills the sidebar already lists in
-    ///   full, and a pill is the first thing that stops being readable
-    ///   when it is truncated.
-    /// - **Date** costs ten more, and the log is already in date order:
-    ///   a row's *position* carries most of what its timestamp says.
-    /// - **Graph** is what this client is for, but with two or three live
-    ///   lanes its column is mostly whitespace, and the topology is still
-    ///   legible in the ordering.
-    /// - **Author** costs four cells and is the cheapest way to tell two
-    ///   similar commits apart.
-    /// - **Sha** costs four cells and is the handle you need to *act* on a
-    ///   commit from the CLI, so it is the last thing to go.
-    ///
-    /// A sacrificed column is not *hidden* - the show/hide menu still
-    /// lists it as visible and it comes back the moment the pane is wide
-    /// enough. It simply renders at zero width for this frame.
-    pub(crate) const SACRIFICE_ORDER: [LogColumn; 6] = [
-        LogColumn::Changes,
-        LogColumn::Ref,
-        LogColumn::Date,
-        LogColumn::Graph,
-        LogColumn::Author,
-        LogColumn::Sha,
-    ];
-
-    /// How much of a narrow pane is reserved for `Message` before any
-    /// other column grows past its own floor.
-    ///
-    /// Capped at 16 cells deliberately: `Message` naturally gets more than
-    /// that from the leftover budget at every pane width the app is
-    /// normally used at, so the reservation only ever binds when the pane
-    /// is genuinely cramped. That is what keeps this fix from quietly
-    /// re-proportioning the columns at widths where they were already
-    /// right.
-    fn message_reservation(inner: u16) -> u16 {
-        ((inner as u32 * 45 / 100) as u16).clamp(LogColumn::Message.min_width(), 16)
-    }
-}
-
 /// The Log table's six column widths, derived from the pane's *actual*
 /// available width every frame rather than fixed constants - the ref-pill
 /// column in particular needs real room (icon + optional checkmark +
@@ -694,6 +564,189 @@ pub(crate) fn boundary_drag_widths(
             .filter(|(c, _)| *c != LogColumn::Message)
             .collect(),
     )
+}
+
+pub(crate) trait LogColumnExt: Sized {
+    const ALL: [LogColumn; 7];
+    /// The stable name written to `config.toml` (`ui.log_columns_*`).
+    fn config_name(self) -> &'static str;
+    /// Inverse of [`LogColumn::config_name`]; `None` for an unknown name.
+    fn from_config_name(name: &str) -> Option<LogColumn>;
+    /// The header text in the current language (display only; the stable
+    /// name is [`LogColumn::config_name`]).
+    fn title(self) -> &'static str;
+    /// `Message` is the one column the show/hide menu must never offer: a
+    /// Log pane without commit summaries shows nothing meaningful.
+    ///
+    /// Hiding is the only thing special-cased for `Message`: every column,
+    /// `Message` included, resizes from its own right-hand boundary
+    /// (`for_area_width` honours a `Message` override and
+    /// `boundary_drag_widths` pins both sides of a drag).
+    fn hideable(self) -> bool;
+    fn min_width(self) -> u16;
+    /// The least a column can be **dragged** to. The Graph column goes down
+    /// to one commit dot (`graph::min_width`: a lane of two cells, one more with
+    /// avatars in the circles), where the graph is compact;
+    /// the automatic layout still keeps [`LogColumn::min_width`] for it.
+    fn drag_min_width(self) -> u16;
+    /// The order columns are given up in when the pane is too narrow for
+    /// every visible column's `min_width` - first entry sacrificed first.
+    /// `Message` is absent on purpose: it is the one column that has to
+    /// survive any width, and everything here is spent buying it room.
+    ///
+    /// This list is a product decision, not an artefact of the allocation
+    /// loop. The reasoning, cheapest sacrifice first:
+    ///
+    /// - **Changes** is an optional, off-by-default extra: the first to go.
+    /// - **Ref** costs ten cells for pills the sidebar already lists in
+    ///   full, and a pill is the first thing that stops being readable
+    ///   when it is truncated.
+    /// - **Date** costs ten more, and the log is already in date order:
+    ///   a row's *position* carries most of what its timestamp says.
+    /// - **Graph** is what this client is for, but with two or three live
+    ///   lanes its column is mostly whitespace, and the topology is still
+    ///   legible in the ordering.
+    /// - **Author** costs four cells and is the cheapest way to tell two
+    ///   similar commits apart.
+    /// - **Sha** costs four cells and is the handle you need to *act* on a
+    ///   commit from the CLI, so it is the last thing to go.
+    ///
+    /// A sacrificed column is not *hidden* - the show/hide menu still
+    /// lists it as visible and it comes back the moment the pane is wide
+    /// enough. It simply renders at zero width for this frame.
+    const SACRIFICE_ORDER: [LogColumn; 6];
+    /// How much of a narrow pane is reserved for `Message` before any
+    /// other column grows past its own floor.
+    ///
+    /// Capped at 16 cells deliberately: `Message` naturally gets more than
+    /// that from the leftover budget at every pane width the app is
+    /// normally used at, so the reservation only ever binds when the pane
+    /// is genuinely cramped. That is what keeps this fix from quietly
+    /// re-proportioning the columns at widths where they were already
+    /// right.
+    fn message_reservation(inner: u16) -> u16;
+}
+
+impl LogColumnExt for LogColumn {
+    const ALL: [LogColumn; 7] = [
+        LogColumn::Ref,
+        LogColumn::Graph,
+        LogColumn::Message,
+        LogColumn::Author,
+        LogColumn::Date,
+        LogColumn::Changes,
+        LogColumn::Sha,
+    ];
+    /// The stable name written to `config.toml` (`ui.log_columns_*`).
+    fn config_name(self) -> &'static str {
+        match self {
+            LogColumn::Ref => "ref",
+            LogColumn::Graph => "graph",
+            LogColumn::Message => "message",
+            LogColumn::Author => "author",
+            LogColumn::Date => "date",
+            LogColumn::Changes => "changes",
+            LogColumn::Sha => "sha",
+        }
+    }
+    /// Inverse of [`LogColumn::config_name`]; `None` for an unknown name.
+    fn from_config_name(name: &str) -> Option<LogColumn> {
+        LogColumn::ALL
+            .iter()
+            .copied()
+            .find(|c| c.config_name() == name)
+    }
+    /// The header text in the current language (display only; the stable
+    /// name is [`LogColumn::config_name`]).
+    fn title(self) -> &'static str {
+        use gitpoulpi_i18n::msg::log_table as m;
+        match self {
+            LogColumn::Ref => m::COL_REF,
+            LogColumn::Graph => m::COL_GRAPH,
+            LogColumn::Message => m::COL_MESSAGE,
+            LogColumn::Author => m::COL_AUTHOR,
+            LogColumn::Date => m::COL_DATE,
+            LogColumn::Changes => m::COL_CHANGES,
+            LogColumn::Sha => m::COL_SHA,
+        }
+        .get()
+    }
+    /// `Message` is the one column the show/hide menu must never offer: a
+    /// Log pane without commit summaries shows nothing meaningful.
+    ///
+    /// Hiding is the only thing special-cased for `Message`: every column,
+    /// `Message` included, resizes from its own right-hand boundary
+    /// (`for_area_width` honours a `Message` override and
+    /// `boundary_drag_widths` pins both sides of a drag).
+    fn hideable(self) -> bool {
+        !matches!(self, LogColumn::Message)
+    }
+    fn min_width(self) -> u16 {
+        match self {
+            LogColumn::Ref => 10,
+            LogColumn::Graph => 4,
+            LogColumn::Message => 8,
+            LogColumn::Author => 4,
+            LogColumn::Date => 10,
+            LogColumn::Changes => 6,
+            LogColumn::Sha => 4,
+        }
+    }
+    /// The least a column can be **dragged** to. The Graph column goes down
+    /// to one commit dot (`graph::min_width`: a lane of two cells, one more with
+    /// avatars in the circles), where the graph is compact;
+    /// the automatic layout still keeps [`LogColumn::min_width`] for it.
+    fn drag_min_width(self) -> u16 {
+        match self {
+            LogColumn::Graph => crate::graph::min_width() as u16,
+            other => other.min_width(),
+        }
+    }
+    /// The order columns are given up in when the pane is too narrow for
+    /// every visible column's `min_width` - first entry sacrificed first.
+    /// `Message` is absent on purpose: it is the one column that has to
+    /// survive any width, and everything here is spent buying it room.
+    ///
+    /// This list is a product decision, not an artefact of the allocation
+    /// loop. The reasoning, cheapest sacrifice first:
+    ///
+    /// - **Changes** is an optional, off-by-default extra: the first to go.
+    /// - **Ref** costs ten cells for pills the sidebar already lists in
+    ///   full, and a pill is the first thing that stops being readable
+    ///   when it is truncated.
+    /// - **Date** costs ten more, and the log is already in date order:
+    ///   a row's *position* carries most of what its timestamp says.
+    /// - **Graph** is what this client is for, but with two or three live
+    ///   lanes its column is mostly whitespace, and the topology is still
+    ///   legible in the ordering.
+    /// - **Author** costs four cells and is the cheapest way to tell two
+    ///   similar commits apart.
+    /// - **Sha** costs four cells and is the handle you need to *act* on a
+    ///   commit from the CLI, so it is the last thing to go.
+    ///
+    /// A sacrificed column is not *hidden* - the show/hide menu still
+    /// lists it as visible and it comes back the moment the pane is wide
+    /// enough. It simply renders at zero width for this frame.
+    const SACRIFICE_ORDER: [LogColumn; 6] = [
+        LogColumn::Changes,
+        LogColumn::Ref,
+        LogColumn::Date,
+        LogColumn::Graph,
+        LogColumn::Author,
+        LogColumn::Sha,
+    ];
+    /// How much of a narrow pane is reserved for `Message` before any
+    /// other column grows past its own floor.
+    ///
+    /// Capped at 16 cells deliberately: `Message` naturally gets more than
+    /// that from the leftover budget at every pane width the app is
+    /// normally used at, so the reservation only ever binds when the pane
+    /// is genuinely cramped. That is what keeps this fix from quietly
+    /// re-proportioning the columns at widths where they were already
+    /// right.
+    fn message_reservation(inner: u16) -> u16 {
+        ((inner as u32 * 45 / 100) as u16).clamp(LogColumn::Message.min_width(), 16)
+    }
 }
 
 #[cfg(test)]

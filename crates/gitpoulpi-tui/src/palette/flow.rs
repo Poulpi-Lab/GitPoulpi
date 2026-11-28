@@ -6,8 +6,8 @@
 //! is leaked: once per (language epoch, set of type labels), which is bounded
 //! by language switches and edits of the workflow.
 
-use super::*;
 use crate::flow::FlowCmd;
+use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry, Surface};
 use gitpoulpi_i18n::msg::flow as flow_msg;
 use std::sync::Mutex;
 
@@ -77,6 +77,7 @@ pub(crate) fn entries() -> &'static [PaletteEntry] {
                     requires: None,
                     text: Some(leak(flow_msg::palette_start_type(label))),
                     text_en: Some(leak(english(|l| flow_msg::palette_start_type(l)))),
+                    surface: Surface::Any,
                 },
                 PaletteEntry {
                     label: flow_msg::ISSUE_PALETTE_NEW,
@@ -86,6 +87,7 @@ pub(crate) fn entries() -> &'static [PaletteEntry] {
                     requires: None,
                     text: Some(leak(flow_msg::issue_palette_new_type(label))),
                     text_en: Some(leak(english(|l| flow_msg::issue_palette_new_type(l)))),
+                    surface: Surface::Any,
                 },
             ]
         })

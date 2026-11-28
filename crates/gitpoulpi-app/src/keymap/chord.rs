@@ -7,19 +7,19 @@ use std::fmt;
 
 /// Modifier set. Only the three that terminals report reliably.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub(crate) struct Mods {
-    pub(crate) ctrl: bool,
-    pub(crate) alt: bool,
-    pub(crate) shift: bool,
+pub struct Mods {
+    pub ctrl: bool,
+    pub alt: bool,
+    pub shift: bool,
 }
 
 impl Mods {
-    pub(crate) const NONE: Mods = Mods {
+    pub const NONE: Mods = Mods {
         ctrl: false,
         alt: false,
         shift: false,
     };
-    pub(crate) const CTRL: Mods = Mods {
+    pub const CTRL: Mods = Mods {
         ctrl: true,
         alt: false,
         shift: false,
@@ -34,7 +34,7 @@ impl Mods {
 /// The key of a chord. Letters are stored lowercase; an uppercase
 /// letter is `Char(lower)` with `mods.shift` set.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Key {
+pub enum Key {
     Char(char),
     Enter,
     Esc,
@@ -57,13 +57,13 @@ pub(crate) enum Key {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct KeyChord {
-    pub(crate) mods: Mods,
-    pub(crate) key: Key,
+pub struct KeyChord {
+    pub mods: Mods,
+    pub key: Key,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum ChordError {
+pub enum ChordError {
     Empty,
     UnknownKey(String),
     /// `Ctrl+Alt+<non-letter>` is how Windows delivers AltGr characters.
@@ -112,12 +112,12 @@ fn named_key(name: &str) -> Option<Key> {
 }
 
 impl KeyChord {
-    pub(crate) const fn new(mods: Mods, key: Key) -> Self {
+    pub const fn new(mods: Mods, key: Key) -> Self {
         KeyChord { mods, key }
     }
 
     /// `Ctrl+Shift+N`, `F2`, `+`, `Ctrl+,`, `x`, `X` (= `Shift+x`).
-    pub(crate) fn parse(text: &str) -> Result<KeyChord, ChordError> {
+    pub fn parse(text: &str) -> Result<KeyChord, ChordError> {
         let text = text.trim();
         if text.is_empty() {
             return Err(ChordError::Empty);
@@ -167,7 +167,7 @@ impl KeyChord {
     }
 
     /// The same key with no modifier: what a prefix table looks up.
-    pub(crate) fn bare(self) -> KeyChord {
+    pub fn bare(self) -> KeyChord {
         KeyChord::new(Mods::NONE, self.key)
     }
 
@@ -175,7 +175,7 @@ impl KeyChord {
     /// member of the set of chords one terminal byte sequence can mean.
     /// `Ctrl+J` and `Ctrl+Enter` are one class; so are `Ctrl+@` and
     /// `Ctrl+Space`, and `Ctrl+_`, `Ctrl+7` and `Ctrl+/`.
-    pub(crate) fn class(self) -> KeyChord {
+    pub fn class(self) -> KeyChord {
         let plain_ctrl = self.mods.ctrl && !self.mods.alt && !self.mods.shift;
         match self.key {
             Key::Char('j') if plain_ctrl => KeyChord::new(Mods::CTRL, Key::Enter),
@@ -191,7 +191,7 @@ impl KeyChord {
     /// `Ctrl+Shift+O`), and a letter under Ctrl/Alt ignores case. Callers
     /// with a Shift twin (`Ctrl+Shift+N` over `Ctrl+N`) keep the twin's arm
     /// first.
-    pub(crate) fn matches_chord(&self, actual: KeyChord) -> bool {
+    pub fn matches_chord(&self, actual: KeyChord) -> bool {
         let want = self.class();
         // `Shift+Tab` spells itself two ways: `BackTab` (legacy, and most
         // kitty-protocol decodings) or `Tab` with Shift. A `Tab` binding
@@ -218,7 +218,7 @@ impl KeyChord {
     /// The compact spelling used on screen: a shifted bare letter is its
     /// capital (`P`); every other chord prints as [`fmt::Display`] does
     /// (`Ctrl+Shift+N`).
-    pub(crate) fn short(&self) -> String {
+    pub fn short(&self) -> String {
         match self.key {
             Key::Char(c) if self.mods.shift && !self.mods.ctrl && !self.mods.alt => {
                 c.to_uppercase().collect()
@@ -271,7 +271,7 @@ impl fmt::Display for KeyChord {
 
 /// Whether a chord can reach the application on a terminal.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Reach {
+pub enum Reach {
     Ok,
     /// Arrives as the same bytes as this other chord.
     NotDistinct(KeyChord),
@@ -283,7 +283,7 @@ pub(crate) enum Reach {
 impl KeyChord {
     /// Pure table: can this chord arrive? `windows` = the console API
     /// (modifiers intact); `enhanced` = the kitty keyboard protocol is on.
-    pub(crate) fn reach(self, windows: bool, enhanced: bool) -> Reach {
+    pub fn reach(self, windows: bool, enhanced: bool) -> Reach {
         if windows || enhanced {
             return Reach::Ok;
         }
@@ -321,7 +321,7 @@ impl KeyChord {
 
 /// Tools that commonly take a chord before the application sees it, as
 /// an informational hint (never blocking).
-pub(crate) fn commonly_taken_by(chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
+pub fn commonly_taken_by(chord: KeyChord) -> Option<gitpoulpi_i18n::M> {
     use gitpoulpi_i18n::msg::keymap_conflict as msg;
     let c = chord.class();
     let text = c.to_string();

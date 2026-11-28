@@ -6,7 +6,7 @@
 
 /// Where a binding is looked up (the config table name).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Ctx {
+pub enum Ctx {
     Global,
     GitPrefix,
     NavPrefix,
@@ -54,7 +54,7 @@ pub(crate) enum Ctx {
 }
 
 impl Ctx {
-    pub(crate) const ALL: &'static [Ctx] = &[
+    pub const ALL: &'static [Ctx] = &[
         Ctx::Global,
         Ctx::GitPrefix,
         Ctx::NavPrefix,
@@ -93,7 +93,7 @@ impl Ctx {
     ];
 
     /// A focused pane or the Home tab: a child of `global`.
-    pub(crate) const fn is_pane(self) -> bool {
+    pub const fn is_pane(self) -> bool {
         matches!(
             self,
             Ctx::Refs | Ctx::Log | Ctx::LogFiles | Ctx::Status | Ctx::Home
@@ -101,7 +101,7 @@ impl Ctx {
     }
 
     /// A central view (diff, File View): a child of `global`, like a pane.
-    pub(crate) const fn is_view(self) -> bool {
+    pub const fn is_view(self) -> bool {
         matches!(
             self,
             Ctx::Diff
@@ -115,7 +115,7 @@ impl Ctx {
 
     /// A popup or form that owns the keyboard: its table is its own, and
     /// Enter, Tab and the arrows stay fixed in it.
-    pub(crate) const fn is_popup(self) -> bool {
+    pub const fn is_popup(self) -> bool {
         matches!(
             self,
             Ctx::Rebase
@@ -135,7 +135,7 @@ impl Ctx {
 
     /// A context where text is being typed: a bare printable key cannot
     /// be bound there.
-    pub(crate) const fn is_typing(self) -> bool {
+    pub const fn is_typing(self) -> bool {
         matches!(
             self,
             Ctx::Editor
@@ -151,7 +151,7 @@ impl Ctx {
     }
 
     /// The name the Settings page shows for the context.
-    pub(crate) const fn title(self) -> gitpoulpi_i18n::M {
+    pub const fn title(self) -> gitpoulpi_i18n::M {
         use gitpoulpi_i18n::msg::keymap_ctx as t;
         match self {
             Ctx::Global => t::GLOBAL,
@@ -192,7 +192,7 @@ impl Ctx {
         }
     }
 
-    pub(crate) const fn name(self) -> &'static str {
+    pub const fn name(self) -> &'static str {
         match self {
             Ctx::Global => "global",
             Ctx::GitPrefix => "git_prefix",
@@ -233,20 +233,20 @@ impl Ctx {
     }
 
     /// Whether dispatch for this context goes through the keymap.
-    pub(crate) const fn is_live(self) -> bool {
+    pub const fn is_live(self) -> bool {
         true
     }
 
     /// Prefix tables look at the second key's `code` alone, exactly as
     /// the `match key.code` they replace did: modifiers are ignored and
     /// an uppercase letter is `Shift+<lower>`.
-    pub(crate) const fn ignores_modifiers(self) -> bool {
+    pub const fn ignores_modifiers(self) -> bool {
         matches!(self, Ctx::GitPrefix | Ctx::NavPrefix)
     }
 
     /// The context the key is looked up in: palette commands are global
     /// keys, so they clash with `global` and are hidden by a pane's.
-    pub(crate) const fn scope(self) -> Ctx {
+    pub const fn scope(self) -> Ctx {
         match self {
             Ctx::Palette | Ctx::Sequence => Ctx::Global,
             other => other,
@@ -258,7 +258,7 @@ impl Ctx {
 /// two (their strings live in the `[compare]` section with the rest of that
 /// feature).
 mod labels {
-    pub(super) use gitpoulpi_i18n::msg::blame_view::{
+    pub use gitpoulpi_i18n::msg::blame_view::{
         OP_CARD as FILE_INSIGHT_BLAME_CARD, OP_COPY_SHA as FILE_INSIGHT_BLAME_COPY_SHA,
         OP_GOTO as FILE_INSIGHT_BLAME_GOTO, OP_HISTORY as FILE_INSIGHT_BLAME_HISTORY,
         OP_NARROWER as FILE_INSIGHT_BLAME_NARROWER, OP_NEXT as FILE_INSIGHT_BLAME_NEXT,
@@ -266,15 +266,15 @@ mod labels {
         OP_PREV as FILE_INSIGHT_BLAME_PREV, OP_PREV_SAME as FILE_INSIGHT_BLAME_PREV_SAME,
         OP_SHOW_DIFF as FILE_INSIGHT_BLAME_DIFF, OP_WIDER as FILE_INSIGHT_BLAME_WIDER,
     };
-    pub(super) use gitpoulpi_i18n::msg::compare::{
+    pub use gitpoulpi_i18n::msg::compare::{
         KEYMAP_COMPARE_SELECTION, KEYMAP_NEXT_CARD, KEYMAP_SWAP,
     };
-    pub(super) use gitpoulpi_i18n::msg::keymap_action::*;
-    pub(super) use gitpoulpi_i18n::msg::mermaid::KEYMAP_COPY as KEYMAP_COPY_MERMAID;
-    pub(super) use gitpoulpi_i18n::msg::pane_hscroll::{
+    pub use gitpoulpi_i18n::msg::keymap_action::*;
+    pub use gitpoulpi_i18n::msg::mermaid::KEYMAP_COPY as KEYMAP_COPY_MERMAID;
+    pub use gitpoulpi_i18n::msg::pane_hscroll::{
         KEY_LEFT as PANE_HSCROLL_LEFT, KEY_RIGHT as PANE_HSCROLL_RIGHT,
     };
-    pub(super) use gitpoulpi_i18n::msg::tree_fold::{
+    pub use gitpoulpi_i18n::msg::tree_fold::{
         KEY_COLLAPSE_ALL as TREE_COLLAPSE_ALL, KEY_COLLAPSE_BELOW as TREE_COLLAPSE_BELOW,
         KEY_EXPAND_ALL as TREE_EXPAND_ALL, KEY_EXPAND_BELOW as TREE_EXPAND_BELOW,
     };
@@ -286,7 +286,7 @@ macro_rules! actions {
     // palette, help, conflict detection) when the build lacks it.
     ($( $variant:ident => ($ctx:ident, $id:literal, $label:ident, [$($chord:literal),*] $(, @$req:ident)?) ),* $(,)?) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        pub(crate) enum Action {
+        pub enum Action {
             $($variant),*,
             /// A palette command without a key of its own: an index into
             /// `PALETTE_COMMANDS` (see [`palette_defs`]).
@@ -296,7 +296,7 @@ macro_rules! actions {
             Sequence(u16),
         }
 
-        pub(crate) const STATIC_ACTIONS: &[ActionDef] = &[
+        pub const STATIC_ACTIONS: &[ActionDef] = &[
             $(ActionDef {
                 action: Action::$variant,
                 static_id: $id,
@@ -307,19 +307,20 @@ macro_rules! actions {
                 shadows_parent: false,
                 hint: None,
                 requires: actions!(@req $($req)?),
+                surface: $crate::surface::Surface::Any,
             }),*
         ];
     };
     (@req) => { None };
-    (@req $feature:ident) => { Some(crate::build_features::Feature::$feature) };
+    (@req $feature:ident) => { Some(crate::features::Feature::$feature) };
 }
 
 /// Every bindable action: the registered ones, then one per palette command
 /// that has no key action of its own. Built once; behaves as a slice.
 #[derive(Clone, Copy)]
-pub(crate) struct ActionList;
+pub struct ActionList;
 
-pub(crate) const ACTIONS: ActionList = ActionList;
+pub const ACTIONS: ActionList = ActionList;
 
 impl std::ops::Deref for ActionList {
     type Target = [ActionDef];
@@ -351,7 +352,7 @@ fn all_actions() -> &'static [ActionDef] {
 /// The pool of sequence slots, appended to the action list once. Each slot
 /// carries a placeholder id and no label until a slug takes it.
 fn sequence_pool_defs() -> Vec<ActionDef> {
-    (0..crate::sequence_run::registry::MAX_SEQUENCE_SLOTS as u16)
+    (0..crate::sequences::MAX_SEQUENCE_SLOTS as u16)
         .map(|slot| ActionDef {
             action: Action::Sequence(slot),
             static_id: Box::leak(format!("sequence.#{slot}").into_boxed_str()),
@@ -362,52 +363,54 @@ fn sequence_pool_defs() -> Vec<ActionDef> {
             shadows_parent: false,
             hint: None,
             requires: None,
+            surface: crate::surface::Surface::Any,
         })
         .collect()
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct ActionDef {
-    pub(crate) action: Action,
+pub struct ActionDef {
+    pub action: Action,
     /// Stable config key `"<ctx>.<name>"`. Never renamed. Read through
     /// [`ActionDef::config_id`]: a sequence slot's id is its slug's.
-    pub(crate) static_id: &'static str,
-    pub(crate) ctx: Ctx,
+    pub static_id: &'static str,
+    pub ctx: Ctx,
     /// Settings list and conflict messages (display text only: the stable
     /// `id` and the config keys stay English).
     /// Read through [`ActionDef::display_label`].
-    pub(crate) static_label: gitpoulpi_i18n::M,
+    pub static_label: gitpoulpi_i18n::M,
     /// Default chords, parsed by `KeyChord::parse`.
-    pub(crate) defaults: &'static [&'static str],
+    pub defaults: &'static [&'static str],
     /// `false` = listed read-only, still part of conflict detection.
-    pub(crate) rebindable: bool,
+    pub rebindable: bool,
     /// A default that deliberately overrides a parent binding.
-    pub(crate) shadows_parent: bool,
-    pub(crate) hint: Option<&'static str>,
+    pub shadows_parent: bool,
+    pub hint: Option<&'static str>,
     /// The cargo feature this action belongs to (`@Ai` in `actions!`);
     /// `None` = always built.
-    pub(crate) requires: Option<crate::build_features::Feature>,
+    pub requires: Option<crate::features::Feature>,
+    /// Which frontends offer the action (`Any` unless it exists only
+    /// because of what a terminal is).
+    pub surface: crate::surface::Surface,
 }
 
 impl ActionDef {
     /// The stable config key: `<ctx>.<name>`, or `sequence.<slug>` for a
     /// pool slot that a sequence holds. Everything outside `keymap/` reads
     /// the id through this (a source-scan test keeps it so).
-    pub(crate) fn config_id(&self) -> &'static str {
+    pub fn config_id(&self) -> &'static str {
         match self.action {
-            Action::Sequence(slot) => {
-                crate::sequence_run::registry::config_id(slot).unwrap_or(self.static_id)
-            }
+            Action::Sequence(slot) => crate::sequences::config_id(slot).unwrap_or(self.static_id),
             _ => self.static_id,
         }
     }
 
     /// The name shown in Settings, help and conflict messages. A sequence
     /// is `Sequence: <its name>`, in the UI language.
-    pub(crate) fn display_label(&self) -> std::borrow::Cow<'static, str> {
+    pub fn display_label(&self) -> std::borrow::Cow<'static, str> {
         match self.action {
             Action::Sequence(slot) => std::borrow::Cow::Owned(
-                crate::sequence_run::registry::info(slot)
+                crate::sequences::info(slot)
                     .map(|i| gitpoulpi_i18n::msg::palette::sequence_run(&i.name))
                     .unwrap_or_default(),
             ),
@@ -416,10 +419,10 @@ impl ActionDef {
     }
 
     /// [`ActionDef::display_label`] in English, for a search typed in English.
-    pub(crate) fn english_label(&self) -> std::borrow::Cow<'static, str> {
+    pub fn english_label(&self) -> std::borrow::Cow<'static, str> {
         match self.action {
             Action::Sequence(slot) => std::borrow::Cow::Owned(
-                crate::sequence_run::registry::info(slot)
+                crate::sequences::info(slot)
                     .map(|i| {
                         gitpoulpi_i18n::with_lang(gitpoulpi_i18n::Lang::En, || {
                             gitpoulpi_i18n::msg::palette::sequence_run(&i.name)
@@ -433,9 +436,9 @@ impl ActionDef {
 
     /// Whether the action exists right now: always, except a pool slot no
     /// sequence holds, which Settings, help, conflicts and the docs skip.
-    pub(crate) fn present(&self) -> bool {
+    pub fn present(&self) -> bool {
         match self.action {
-            Action::Sequence(slot) => crate::sequence_run::registry::info(slot).is_some(),
+            Action::Sequence(slot) => crate::sequences::info(slot).is_some(),
             _ => true,
         }
     }
@@ -443,20 +446,20 @@ impl ActionDef {
     /// Whether this build offers the action (its feature, if any, is built,
     /// and a sequence slot is held): the one gate every list (Settings,
     /// help, conflicts) goes through.
-    pub(crate) fn built(&self) -> bool {
+    pub fn built(&self) -> bool {
         self.present()
-            && crate::build_features::offered(self.requires)
+            && crate::features::offered(self.requires)
             // Every action of the rewrite workbench's own keys belongs to the
             // History workbench, whatever else (`@Ai`) it also needs.
             && (!matches!(self.ctx, Ctx::Rewrite)
-                || crate::build_features::offered(Some(
-                    crate::build_features::Feature::HistoryRewrite,
+                || crate::features::offered(Some(
+                    crate::features::Feature::HistoryRewrite,
                 )))
     }
 
     /// Whether dispatch for this action reads the keymap: every registered
     /// action is.
-    pub(crate) const fn live(&self) -> bool {
+    pub const fn live(&self) -> bool {
         self.ctx.is_live()
     }
 }

@@ -11,6 +11,7 @@ mod vocab;
 use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::layout::Rect;
 
+#[allow(unused_imports)]
 pub(crate) use vocab::{
     Act, ColumnCmd, ConversationRequest, Outcome, RadarCommand, ReviewRequest, Spot,
 };

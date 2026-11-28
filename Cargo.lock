@@ -1309,6 +1309,7 @@ dependencies = [
  "gitpoulpi-config",
  "gitpoulpi-core",
  "gitpoulpi-i18n",
+ "gitpoulpi-log",
  "gitpoulpi-session",
  "tempfile",
 ]

@@ -3,6 +3,8 @@
 //! widths the maintainer uses (100 and 160 columns), and nothing is left as an
 //! unresolved placeholder.
 
+#[allow(unused_imports)]
+use crate::refs_sidebar::SidebarSectionExt;
 use gitpoulpi_i18n::{override_git_terms, override_lang, Lang};
 
 use crate::display_width;

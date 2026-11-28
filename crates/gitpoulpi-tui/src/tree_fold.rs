@@ -15,70 +15,24 @@
 
 use crate::context_menu::Entry;
 use crate::keymap::term::TermKeymap;
-use crate::keymap::Action;
-use gitpoulpi_i18n::msg::tree_fold as msg;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 
 mod vocab;
-pub(crate) use vocab::TreeFold;
+pub(crate) use vocab::{FoldCtx, TreeFold};
 
-/// Which pane's key table a fold operation is looked up in.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum FoldCtx {
-    Refs,
-    Status,
-    LogFiles,
+/// The `from_key` lookup reads a terminal key event, so it lives here.
+pub(crate) trait TreeFoldExt: Sized {
+    fn from_key(
+        km: &crate::keymap::Keymap,
+        ctx: FoldCtx,
+        key: &crossterm::event::KeyEvent,
+    ) -> Option<Self>;
 }
 
-impl TreeFold {
-    pub(crate) const ALL: [TreeFold; 4] = [
-        TreeFold::ExpandAll,
-        TreeFold::CollapseAll,
-        TreeFold::ExpandBelow,
-        TreeFold::CollapseBelow,
-    ];
-
-    pub(crate) fn collapses(self) -> bool {
-        matches!(self, TreeFold::CollapseAll | TreeFold::CollapseBelow)
-    }
-
-    pub(crate) fn below(self) -> bool {
-        matches!(self, TreeFold::ExpandBelow | TreeFold::CollapseBelow)
-    }
-
-    pub(crate) fn label(self) -> &'static str {
-        match self {
-            TreeFold::ExpandAll => msg::EXPAND_ALL.get(),
-            TreeFold::CollapseAll => msg::COLLAPSE_ALL.get(),
-            TreeFold::ExpandBelow => msg::EXPAND_BELOW.get(),
-            TreeFold::CollapseBelow => msg::COLLAPSE_BELOW.get(),
-        }
-    }
-
-    /// The registry action of this operation in `ctx`'s pane.
-    pub(crate) fn key(self, ctx: FoldCtx) -> Action {
-        use FoldCtx as C;
-        use TreeFold as T;
-        match (ctx, self) {
-            (C::Refs, T::ExpandAll) => Action::RefsExpandAll,
-            (C::Refs, T::CollapseAll) => Action::RefsCollapseAll,
-            (C::Refs, T::ExpandBelow) => Action::RefsExpandBelow,
-            (C::Refs, T::CollapseBelow) => Action::RefsCollapseBelow,
-            (C::Status, T::ExpandAll) => Action::StatusExpandAll,
-            (C::Status, T::CollapseAll) => Action::StatusCollapseAllFolders,
-            (C::Status, T::ExpandBelow) => Action::StatusExpandBelow,
-            (C::Status, T::CollapseBelow) => Action::StatusCollapseBelow,
-            (C::LogFiles, T::ExpandAll) => Action::LogFilesExpandAll,
-            (C::LogFiles, T::CollapseAll) => Action::LogFilesCollapseAllFolders,
-            (C::LogFiles, T::ExpandBelow) => Action::LogFilesExpandBelow,
-            (C::LogFiles, T::CollapseBelow) => Action::LogFilesCollapseBelow,
-        }
-    }
-
-    /// The operation a bound key stands for in `ctx`, if any.
-    pub(crate) fn from_key(
+impl TreeFoldExt for TreeFold {
+    fn from_key(
         km: &crate::keymap::Keymap,
         ctx: FoldCtx,
         key: &crossterm::event::KeyEvent,

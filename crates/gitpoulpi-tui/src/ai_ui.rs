@@ -239,13 +239,7 @@ pub(crate) enum AiOutcome {
     Canceled(AiRequest),
 }
 
-/// How a finished request ended, for whoever waits on it (a sequence step).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum AiEnd {
-    Ok,
-    Failed(String),
-    Canceled,
-}
+pub(crate) use gitpoulpi_app::ai_end::AiEnd;
 
 /// The ends nobody has taken yet, by kind of request. Process-wide: the
 /// window that polled the answer may not be the one that asked, and a tab

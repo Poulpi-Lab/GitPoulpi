@@ -283,13 +283,8 @@ impl AiPopup {
 
 /// How a request ended, for a waiter (a sequence step). Without the `ai`
 /// feature no request ever runs, so nothing is ever recorded.
-#[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum AiEnd {
-    Ok,
-    Failed(String),
-    Canceled,
-}
+#[allow(unused_imports)]
+pub(crate) use gitpoulpi_app::ai_end::AiEnd;
 
 /// Mirrors `ai_ui::finished_of`: the stub never sees an answer, so the end
 /// carries nothing a waiter could act on.

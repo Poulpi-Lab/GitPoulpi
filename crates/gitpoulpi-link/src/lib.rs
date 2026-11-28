@@ -93,6 +93,7 @@ pub mod redraw;
 pub mod ref_drop;
 pub mod rename_pairs;
 pub mod repo_state_path;
+pub mod sequence_machine;
 pub mod ui_viewer;
 pub mod undo_label;
 pub mod undo_ui;

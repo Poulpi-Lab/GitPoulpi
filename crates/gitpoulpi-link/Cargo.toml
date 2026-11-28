@@ -34,6 +34,7 @@ gitpoulpi-session.workspace = true
 imara-diff.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+toml.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tempfile = { workspace = true, optional = true }

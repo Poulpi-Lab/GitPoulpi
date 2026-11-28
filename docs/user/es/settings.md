@@ -8,7 +8,8 @@ Ajustes sustituye a la ventana mientras está abierta. Ciérrala con la `✕` de
 esquina superior derecha, con `Esc` o con `q`. Solo pregunta antes cuando cerrar
 hiciera perder algo (véase [Cerrar Ajustes](#cerrar-ajustes)).
 
-Los cambios se guardan en `config.toml` al instante. La
+Los cambios se guardan al instante: los ajustes de interfaz (tema, disposición, columnas, visualización de diffs e imágenes, atajos...) en `tui.toml`, todo lo demás en `config.toml`, ambos
+en tu carpeta de configuración ([por qué dos archivos](config-reference.md#dos-archivos-configtoml-y-tuitoml)). La
 [referencia de configuración](config-reference.md) describe cada clave, su valor
 por defecto y su variable de entorno. Esta página describe la pantalla de Ajustes.
 
@@ -146,7 +147,7 @@ La mayoría de los ajustes se cambian sin abrir esta pantalla: escribe `Ajustes:
 
 ![La paleta de comandos filtrada por Settings: con una fila por ajuste y su valor actual a la derecha](../images/palette-settings.png)
 
-Un valor se guarda en `config.toml` y se aplica exactamente como lo hace la página. Las palabras en inglés de la clave del ajuste (`remember tabs`) encuentran la fila en cualquier idioma.
+Un valor se guarda en su archivo (`tui.toml` o `config.toml`) y se aplica exactamente como lo hace la página. Las palabras en inglés de la clave del ajuste (`remember tabs`) encuentran la fila en cualquier idioma.
 
 ## Las páginas
 
@@ -456,11 +457,11 @@ las compilaciones que incluyen el servidor; consulta [MCP y agentes](mcp-and-age
 | **Posición de la barra de estado** | `ui.statusbar_position`: Dónde va la barra de estado (rama, contadores, mensajes, atajos): Arriba, sobre las pestañas de repositorio, o Abajo (por defecto). La pestaña Inicio conserva su propia barra de estado abajo. Se aplica al instante. |
 | **Posición de la barra de pestañas** | `ui.tabs_position`: Dónde van las pestañas de repositorio: Arriba (por defecto), Abajo o Izquierda, una lista con una pestaña por fila en el borde izquierdo de la ventana. Una ventana de menos de 80 columnas las dibuja arriba. Junto a una barra de herramientas en columna, las pestañas quedan en el exterior. Se aplica al instante. |
 | **Configuración regional de fecha/hora** | **sistema** (por defecto): nombres de meses y de días de la semana en el idioma de la interfaz. **english**: siempre nombres en inglés. |
-| **Formato de fecha**, **Formato de fecha/hora**, **Formato de fecha detallado** | Los patrones de fecha de la columna de fecha del Historial de archivo y del Blame, de la columna Fecha del Log y de los detalles del commit. Cada uno muestra una vista previa en directo. Consulta la [referencia de configuración](config-reference.md#ui) para ver los tokens. |
+| **Formato de fecha**, **Formato de fecha/hora**, **Formato de fecha detallado** | Los patrones de fecha de la columna de fecha del Historial de archivo y del Blame, de la columna Fecha del Log y de los detalles del commit. Cada uno muestra una vista previa en directo. Consulta la [referencia de configuración](config-reference.md#ui-en-tuitoml) para ver los tokens. |
 
 ![El combo Tema de color del grafo: Seguir el tema y luego todas las paletas de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
 
-El tema y los colores del grafo (el Tema, el tema de color del grafo, la colorización y el fondo de los carriles, la intensidad del tinte de fila) pertenecen a cada instalación: con varias instalaciones que comparten un mismo `config.toml`, cambiarlos en una nunca cambia las demás. Solo la instalación primaria escribe además las claves `ui.*` compartidas.
+El tema y los colores del grafo (el Tema, el tema de color del grafo, la colorización y el fondo de los carriles, la intensidad del tinte de fila) pertenecen a cada instalación: con varias instalaciones que comparten una misma carpeta de ajustes, cambiarlos en una nunca cambia las demás. Solo la instalación primaria escribe además las claves `ui.*` compartidas, en `tui.toml`; las demás guardan las suyas en su propia entrada de `config.toml`.
 
 ### Teclado y ratón
 
@@ -480,7 +481,7 @@ lista todos los atajos por contexto, con un cuadro de búsqueda (`/`) y filtros.
 | `c` o un clic en el `!` de la fila | Muestra la acción con todas las acciones con las que choca su tecla; `Esc` vuelve a mostrarlas todas. Una tecla que choca con la de otra acción sale en rojo, un aviso solo sobre la tecla (el terminal no puede enviarla) en naranja. |
 
 Úsala para resolver choques con tmux, AutoHotkey, herdr o tu terminal. Los mismos
-ajustes están en la tabla `[keybindings]` de `config.toml`; consulta la
+ajustes están en la tabla `[keybindings]` de `tui.toml`; consulta la
 [referencia de configuración](config-reference.md#keybindings) y
 [Atajos de teclado](keybindings.md).
 
@@ -850,8 +851,9 @@ para mí** y **Descartar cambios**, y cerrar Ajustes con un borrador sin guardar
 
 ## Archivos, variables de entorno y la CLI
 
-- El archivo de ajustes es `config.toml` en la carpeta de configuración de tu SO.
-  `gitpoulpi config path` imprime su ubicación.
+- Los archivos de ajustes son `config.toml` (ajustes comunes) y `tui.toml` (los ajustes de interfaz de la interfaz de terminal) en la carpeta de configuración de tu SO.
+  `gitpoulpi config path` imprime sus ubicaciones; `gitpoulpi config get <key>`
+  indica en qué archivo está una clave.
 - El estado por repositorio vive en `.gitpoulpi/repo-state.toml` dentro del
   repositorio.
 - `gitpoulpi config get <key>` y `gitpoulpi config set <key> <value>` leen y

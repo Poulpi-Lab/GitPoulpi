@@ -155,7 +155,7 @@ muchos commits, con vista previa, scripts Lua y un único deshacer.
 ## Referencia y ayuda
 
 28. **[Referencia de configuración](config-reference.md)**: cada clave de
-    `config.toml`, su valor por defecto y su efecto, los ajustes por
+    `config.toml` y `tui.toml`, su valor por defecto y su efecto, los ajustes por
     repositorio, las variables de entorno.
 29. **[Solución de problemas y preguntas frecuentes](troubleshooting.md)**:
     iconos, dibujo del grafo, teclas que no llegan, daemons bloqueados,

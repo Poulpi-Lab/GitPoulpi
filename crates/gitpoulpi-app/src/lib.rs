@@ -24,6 +24,7 @@ pub mod highlight;
 pub mod keymap;
 pub mod log_multiselect;
 pub mod merge_view;
+pub mod operation_banner;
 pub mod palette;
 pub mod ref_rules;
 pub mod refs_sections;

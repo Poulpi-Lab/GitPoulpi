@@ -12,7 +12,8 @@ locais mostram a nova tecla. Para o rato, consulte
 
 Abra **Definições > Teclado e rato**. A página está descrita em
 [Definições](settings.md#teclado-e-rato). As alterações aplicam-se de imediato e são guardadas
-na tabela `[keybindings]` do `config.toml`. Pode também editar essa tabela à
+na tabela `[keybindings]` do `tui.toml` (o ficheiro de interface da UI de terminal, ao lado
+do `config.toml`). Pode também editar essa tabela à
 mão:
 
 ```toml
@@ -469,7 +470,9 @@ seu grupo.
 
 Cada linha da paleta termina com um botão de tecla (`[k]`), e `Alt+K` faz o mesmo na linha realçada: abre **Definições > Teclado e rato** filtrado pelo atalho desse comando, pronto a reatribuir. Um comando sem atalho próprio recebe um aqui: aparece em **Comandos da paleta**, sem tecla por predefinição, e a tecla que lhe der executa o comando exatamente como escolhê-lo na paleta (um comando que não pode correr agora diz porquê). A linha passa a mostrar a sua tecla.
 
-No `config.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`toggle_minimap = "Ctrl+Alt+M"`). Uma tecla que colide com outra ação aparece a vermelho, e `c` na linha lista todas as ações com que colide.
+No `tui.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`toggle_minimap = "Ctrl+Alt+M"`). Uma tecla que colide com outra ação aparece a vermelho, e `c` na linha lista todas as ações com que colide.
+
+Uma sequência que definiu (uma cadeia nomeada de comandos da paleta) recebe uma tecla da mesma forma: `[keybindings.sequence]` aceita o id da sequência (`backup = "Ctrl+Alt+B"`), uma tecla para um id que não existe é reportada e ignorada, e a tabela acompanha o `tui.toml` enquanto a aplicação corre. Cada sequência é também uma linha da paleta, `Sequência: <nome>`, que mostra a sua tecla.
 
 A faixa de ajuda abaixo da lista indica esta tecla (`Alt+K` por predefinição). É a ação `palette.configure_shortcut`, por isso pode ser reatribuída como qualquer outra.
 

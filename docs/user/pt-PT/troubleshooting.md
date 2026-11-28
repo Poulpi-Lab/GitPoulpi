@@ -216,8 +216,26 @@ predefinição; veja [Assistência de IA](ai.md#resolução-de-problemas).
 diretório de configuração (`gitpoulpi config path` imprime o ficheiro de
 definições, que fica aí), e anexe-o a uma issue.
 
-**Onde estão as minhas definições?** `gitpoulpi config path`. O estado por
-repositório está em `.gitpoulpi/repo-state.toml` dentro do repositório.
+**Onde estão as minhas definições?** `gitpoulpi config path` imprime o
+`config.toml` (definições comuns) e o `tui.toml` (as definições de interface da UI
+de terminal: tema, disposição, colunas, atalhos...), que ficam na mesma pasta.
+`gitpoulpi config get <chave>` diz em qual dos dois está uma chave. O estado por
+repositório está em `.gitpoulpi/repo-state.toml` dentro do repositório. Veja
+[Dois ficheiros](config-reference.md#dois-ficheiros-configtoml-e-tuitoml).
+
+**Voltei a um GitPoulpi mais antigo e as minhas definições de interface mudaram
+(ou o mais recente ignora o que defini no mais antigo).** O GitPoulpi guarda as
+definições de interface no `tui.toml`, criado como uma cópia do que o `config.toml`
+tinha e nunca retirado do `config.toml`. Um GitPoulpi mais antigo instalado ao
+lado do mais recente não conhece o `tui.toml`: continua a ler e a escrever o seu
+`config.toml` completo. Depois de o `tui.toml` existir, o mais recente lê as
+definições de interface apenas dele, por isso um tema ou uma disposição que altere
+depois na versão mais antiga não é aproveitado, e uma chave em falta no `tui.toml`
+assume a sua predefinição em vez do valor antigo do `config.toml`. Para pôr a
+versão mais recente em linha, altere a definição nela (Definições, ou `gitpoulpi
+config set`); para recomeçar as definições de interface a partir do `config.toml`,
+feche o GitPoulpi e apague o `tui.toml` (é criado de novo, como uma cópia nova, no
+arranque seguinte).
 
 **O GitPoulpi envia alguma coisa para algum lado?** Apenas o que pedir:
 operações git para os seus remotos, pedidos de alojamento depois de ligar uma

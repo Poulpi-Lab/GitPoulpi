@@ -227,7 +227,7 @@ O GitPoulpi também guarda estes ficheiros:
 
 | O quê | Onde |
 |---|---|
-| Definições (`config.toml`) e sessões | A pasta de configuração do seu SO. `GITPOULPI_CONFIG_DIR` altera-a. |
+| Definições (`config.toml` e `tui.toml`) e sessões | A pasta de configuração do seu SO. `GITPOULPI_CONFIG_DIR` altera-a. |
 | Estado por repositório | Por predefinição, `gitpoulpi/` dentro da pasta `.git` do repositório (`session.per_repo_state_dir` pode movê-lo para `.gitpoulpi/` na árvore de trabalho ou para a pasta de dados do utilizador). |
 | Caches (avatares) | A pasta de cache do seu SO. |
 | Tokens e chaves de API | O seu credential helper. **Definições > SSH e credenciais > Esquecer todos os utilizadores e palavras-passe** remove-os. |

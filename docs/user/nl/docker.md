@@ -24,11 +24,11 @@ docker run -it --rm \
 | Pad | Wat het bevat |
 |---|---|
 | `/work` | De werkmap. Koppel hier je repositories met een bind mount. |
-| `/config` | Instellingen (`config.toml`), sessies en, als submappen, gegevens en cache (`GITPOULPI_CONFIG_DIR=/config`). Gebruik een benoemd volume of een bind mount om ze te bewaren. |
+| `/config` | Instellingen (`config.toml`, `tui.toml`), sessies en, als submappen, gegevens en cache (`GITPOULPI_CONFIG_DIR=/config`). Gebruik een benoemd volume of een bind mount om ze te bewaren. |
 | `/data`, `/cache` | Ook als volumes gedeclareerd, voor tools die de XDG-variabelen volgen (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. Het is geen volume: elke container krijgt een verse. |
 
-Zonder volume voor `/config` begint elke `--rm`-run met standaardinstellingen. Om met je eigen `config.toml` te beginnen, koppel je die: `-v "$PWD/config.toml":/config/config.toml:ro` (alleen-lezen betekent dat de Instellingen niets kunnen opslaan).
+Zonder volume voor `/config` begint elke `--rm`-run met standaardinstellingen. Om met je eigen `config.toml` te beginnen, koppel je die: `-v "$PWD/config.toml":/config/config.toml:ro` (alleen-lezen betekent dat de Instellingen niets kunnen opslaan). Interface-instellingen staan in een tweede bestand, `tui.toml`, dat op dezelfde manier wordt gekoppeld (`-v "$PWD/tui.toml":/config/tui.toml:ro`); zie de [Configuratienaslag](config-reference.md#twee-bestanden-configtoml-en-tuitoml).
 
 ## Repositories van een andere gebruiker
 

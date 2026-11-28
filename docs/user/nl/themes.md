@@ -222,7 +222,7 @@ niet meer (het bestand is verwijderd of hernoemd), dan gebruikt de grafiek de ba
 actieve thema, en toont Instellingen de naam gemarkeerd als *niet gevonden* tot je
 een ander kiest. ![Het keuzelijst Kleurthema van de grafiek bij Weergave: Thema volgen, daarna elk baanpalet met een paar van zijn kleuren](../images/settings-log-graph-lanes.png)
 
-In `config.toml`:
+In `tui.toml`:
 
 ```toml
 [ui]
@@ -292,7 +292,7 @@ ongeldige kleur wordt genegeerd, een onbekende `base` valt terug op `dark`, en
 één keer in de statusbalk).
 
 Bestanden worden opnieuw gelezen wanneer het keuzelijst Thema opent en wanneer
-de Instellingen sluiten. Een draaiend venster merkt ook dat `config.toml` (een
+de Instellingen sluiten. Een draaiend venster merkt ook dat `tui.toml` (een
 `gitpoulpi config set ui.theme ...` vanuit een shell) of het bestand van het
 actieve thema is herschreven, en past de nieuwe kleuren binnen ongeveer een
 seconde toe, zonder herstart.
@@ -364,7 +364,7 @@ klik elders herstelt het vorige en bewaart niets. De opdracht
 Instellingen te gaan: **Systeem (volgt de terminal)**, de presets en daarna je
 eigen themabestanden, elk met vier kleine kleurchips. Het huidige thema is
 aangevinkt. Typ om de lijst te versmallen; de markering verplaatsen toont het
-thema meteen, **Enter** past toe en bewaart `ui.theme` in `config.toml`,
+thema meteen, **Enter** past toe en bewaart `ui.theme` in `tui.toml`,
 **Esc** (of een klik buiten de lijst) zet het vorige thema terug en bewaart niets.
 
 Onder het filterveld versmalt een gesegmenteerd voorfilter de lijst: **Alle**,

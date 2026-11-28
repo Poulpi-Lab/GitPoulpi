@@ -2,17 +2,50 @@
 
 # Configuratienaslag
 
-Elke sleutel van `config.toml`, zijn standaardwaarde en wat hij doet. Je hoeft het
-bestand zelden met de hand te bewerken: het scherm [Instellingen](settings.md) (`Ctrl+,`)
-schrijft het terwijl je dingen wijzigt, en `gitpoulpi config set` doet dat ook.
+Elke sleutel van de configuratiebestanden, zijn standaardwaarde en wat hij doet. Je hoeft
+een bestand zelden met de hand te bewerken: het scherm [Instellingen](settings.md) (`Ctrl+,`)
+schrijft ze terwijl je dingen wijzigt, en `gitpoulpi config set` doet dat ook.
+
+## Twee bestanden: `config.toml` en `tui.toml`
+
+De instellingen staan in twee bestanden van dezelfde map.
+
+| Bestand | Bevat |
+|---|---|
+| `config.toml` | Alles wat voor elke manier van GitPoulpi gebruiken gelijk is: repositories, accounts en integraties, git-gedrag, AI, MCP, updates, installaties, externe hulpmiddelen en de paar `[ui]`-sleutels die staan onder [`[ui]` in `config.toml`](#ui-in-configtoml). |
+| `tui.toml` | De interface-instellingen van de terminal-UI: het grootste deel van `[ui]` (thema, indeling, kolommen, weergave van diffs en afbeeldingen, taal, muis- en terminalopties, ...), de hele tabel `[keybindings]` en `merge.side_by_side_min_width`. Ze staan onder [`[ui]` in `tui.toml`](#ui-in-tuitoml), [`[keybindings]`](#keybindings) en [`[merge]`](#merge). |
+
+- **Hoe `tui.toml` ontstaat.** GitPoulpi maakt het zelf aan, als kopie van de
+  interface-instellingen in `config.toml`: wanneer de terminal-UI start en
+  `config.toml` bestaat, of bij de eerste wijziging van een interface-instelling.
+  `config.toml` wordt daardoor nooit gewijzigd.
+- **Zodra het bestaat, is het de enige bron** voor de sleutels die het bezit. Een
+  sleutel die het niet noemt, krijgt zijn standaardwaarde, niet de waarde die een oud
+  `config.toml` er nog voor kan bevatten. Om zo'n sleutel te herstellen, verwijder je
+  hem uit `tui.toml`.
+- **Een oudere GitPoulpi** die naast deze is geïnstalleerd, blijft zijn eigen volledige
+  `config.toml` lezen. Een instelling die daarna in de oudere versie wordt gewijzigd,
+  wordt niet door de nieuwere overgenomen, en omgekeerd.
+- **In welk bestand een sleutel staat.** `gitpoulpi config get <key>` toont het bestand
+  in het JSON-veld `file` (met `--json`), `gitpoulpi config set <key> <value>` schrijft
+  ernaar, en `gitpoulpi config path` toont `path` (`config.toml`) en `tui_file`
+  (`tui.toml`). `gitpoulpi config get`, `set` en de `GITPOULPI_UI_*`-variabelen
+  behouden dezelfde sleutelnamen (`ui.theme`), welk bestand de sleutel ook bevat; een
+  variabele wint nog steeds van beide bestanden.
+- **Installaties.** Het uiterlijk van een andere installatie dan de primaire blijft in
+  zijn item `[installation.settings.<id>]` van `config.toml` (zie
+  [`[installation]`](#installation-één-item-per-gitpoulpi-op-deze-machine)).
+
+De secties hieronder zeggen in welk bestand elke sectie staat. Voorbeelden die een tabel
+tonen (`[ui]`, `[[ui.open_in]]`) worden geschreven naar het bestand dat in de sectietitel staat.
 
 ## Waar het staat en hoe een waarde wordt gekozen
 
 | | |
 |---|---|
-| Bestand | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` toont het. |
-| Andere map | `GITPOULPI_CONFIG_DIR=<dir>` verplaatst de hele configuratiemap (het bestand, `sessions/`, de poortbestanden van de daemon): een draagbare installatie, een test, of een agent die van je eigen instellingen wordt gescheiden. |
-| Voorrang | ingebouwde standaard, dan `config.toml`, dan de `GITPOULPI_*`-variabele, dan een opdrachtregelvlag. De hoogste wint. Een verkeerde waarde (een verkeerd gespelde keuze in het bestand, een ongeldige variabele) is een fout en wordt nooit stilzwijgend genegeerd. |
+| Bestand | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS), en `tui.toml` ernaast. `gitpoulpi config path` toont beide. |
+| Andere map | `GITPOULPI_CONFIG_DIR=<dir>` verplaatst de hele configuratiemap (de bestanden, `sessions/`, de poortbestanden van de daemon): een draagbare installatie, een test, of een agent die van je eigen instellingen wordt gescheiden. |
+| Voorrang | ingebouwde standaard, dan `config.toml` (`tui.toml` voor de sleutels die het bezit), dan de `GITPOULPI_*`-variabele, dan een opdrachtregelvlag. De hoogste wint. Een verkeerde waarde (een verkeerd gespelde keuze in het bestand, een ongeldige variabele) is een fout en wordt nooit stilzwijgend genegeerd. |
 | Variabelen | Zet de sleutel in hoofdletters en maak van de punten underscores: `general.auto_prune` is `GITPOULPI_GENERAL_AUTO_PRUNE`. Alleen voor sleutels die GitPoulpi echt leest (niet die hieronder als *niet gebruikt* zijn gemarkeerd, en ook geen lijsten zoals `ui.log_columns_hidden`). |
 | Vlaggen | `--backend git2\|system` overschrijft `general.default_backend` voor een daemon die die opdracht start. |
 | Tokens en sleutels | Nooit in dit bestand. Hosting-tokens en AI-API-sleutels gaan naar de credential helper van je systeem (Git Credential Manager, libsecret / `pass`, Keychain); het bestand bevat alleen een verwijzing (`token_ref`). Zonder helper mislukt het opslaan van een token met een melding en geldt het token alleen voor de sessie. |
@@ -84,7 +117,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `[ui]` in `tui.toml`
 
 **Log en grafiek**
 
@@ -122,7 +155,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` laat de muis (en tekstselectie) aan de terminal. **Herstart.** |
 | `ui.mouse_scroll_lines` | `3` | Log-rijen per tik van het wiel, 1 tot 20. **Herstart.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` vraagt de terminal om het kitty-toetsenbordprotocol (zodat `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` aankomen; alleen Unix, tmux antwoordt nooit: zie [Multiplexers](multiplexers.md#tmux)); `off` vraagt nooit. **Herstart.** |
-| `ui.logo_color` | `""` | Kleurstelling van het logo in het venster Over, een slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); leeg of onbekend betekent de standaard van de build (`lavender`). Geschreven als je op het logo klikt of in Over een kleur kiest. |
 
 **Avatars** (standaard uit; als je ze aanzet, wordt een SHA-256-hash van de e-mailadressen
 van auteurs naar Gravatar gestuurd en wordt je verbonden GitHub/GitLab-account gevraagd)
@@ -130,7 +162,6 @@ van auteurs naar Gravatar gestuurd en wordt je verbonden GitHub/GitLab-account g
 | Sleutel | Standaard | Waarden en effect |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph` (in de commit-cirkel van de afbeeldingsgrafiek), `author` (in de kolom Auteur), `off`. De oude `ui.show_avatars` (`true`) wordt nog als `author` gelezen zolang `ui.avatars` ontbreekt. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | Zoekvolgorde: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Een GitLab-host wordt alleen via een verbonden profiel gevraagd. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon` (lokaal gegenereerd) of `initials`. Op een terminal zonder afbeeldingsprotocol wordt altijd de initialenbadge gebruikt. |
 
 **Weergave van diff en editor**
@@ -143,10 +174,6 @@ van auteurs naar Gravatar gestuurd en wordt je verbonden GitHub/GitLab-account g
 | `ui.diff_word_wrap` | `false` | Breek lange diff-regels af (`w`; Instellingen > Diff & editor). |
 | `ui.diff_intraline` | `true` | Kleur de gewijzigde woorden van een gewijzigde regel met een sterkere achtergrond (palet `Diff: Markering van gewijzigde woorden omschakelen`; Instellingen > Diff & editor). |
 | `ui.minimap` | `false` | Een minimap naast de schuifbalk van de diff en de editor (`M`). |
-| `ui.mermaid_detail` | `refs` | Detail van Kopiëren als Mermaid gitGraph van de Log: `structure`, `refs`, `subjects`, `full` (onthouden uit de popup; de standaard van `log --format mermaid`). |
-| `ui.mermaid_orientation` | `lr` | Richting van die grafiek: `lr` (van links naar rechts) of `tb` (van boven naar beneden). |
-| `ui.mermaid_fence` | `false` | Verpakt het gekopieerde Mermaid-script in een codeblok `mermaid`. |
-| `ui.mermaid_subject_width` | `40` | Commit-onderwerpen worden in de Mermaid-id's op zoveel tekens afgekapt (`subjects`, `full`). |
 | `ui.text_cursor` | `"terminal"` | Waar de invoegpositie van een actief tekstveld wordt getoond: `terminal` zet de eigen cursor van de terminal daar (een knipperend streepje, zodat de cursorinstellingen van de terminal en het kandidatenvenster van een invoermethode meebewegen; verborgen als geen veld het toetsenbord heeft en bij het afsluiten hersteld naar je eigen cursorstijl), `drawn` tekent de eigen invoegpositie van GitPoulpi en houdt de terminalcursor verborgen. Live. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` of `16`: met hoeveel kleuren wordt getekend. `auto` is truecolor behalve op Apple Terminal (256), de Linux-console (16) en `*-256color`-terminals zonder `COLORTERM` (256). Live. Zie [Thema's](themes.md). |
 | `ui.input_color` | `"theme"` | Achtergrond van tekstvelden: `theme` (die van het thema zelf), `gray`, `blue`, `slate`, `dark`, `custom`. |
@@ -179,16 +206,39 @@ de standaard, of `"english"`) houdt de namen Engels, welke taal ook.
 | `ui.launch` | `"off"` | Of een agent een GitPoulpi-venster mag openen als er geen open is: `off`, een preset (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) of `custom`. |
 | `ui.launch_command` | `""` | Het `custom`-sjabloon: `{repo}`, `{session}`, `{gitpoulpi}`. In argumenten gesplitst, geen shell. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons` (de tabbalk biedt *Afsluiten & cd hier*) of `auto` (elke afsluiting wijzigt de map van de shell, en een nieuw tabblad voert de standaard *Openen in*-regel uit). Zie [De map van het actieve tabblad volgen](following-the-tab-folder.md). |
-| `ui.terminal_launch` | `"auto"` | Verouderd, zie hieronder en [Openen in](open-in.md). Hoe het oude *Terminal hier* een terminal opende: `auto` (de `ui.launch`-preset, anders `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), een preset of `custom`. |
-| `ui.terminal_launch_command` | `""` | Het `custom`-sjabloon; `{repo}` is de map. |
-| `ui.open_in` | *(afwezig)* | De lijst [Openen in](open-in.md), een array van tabellen `[[ui.open_in]]` met `label` en `command`. Afwezig betekent "nog niet geconfigureerd": de lijst wordt berekend uit de verouderde `ui.terminal_launch*`-sleutels (een niet-`auto`-waarde wordt de eerste regel), de bestandsverkenner van het OS, de multiplexers en terminals die uit de omgeving worden gedetecteerd (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) en de editors op `PATH`. De eerste keer opslaan vanuit Instellingen schrijft de lijst. `open_in = []` is een lege lijst. Niet in te stellen met `config set` (bewerk het bestand). |
-| `ui.open_in_default` | `""` | Label van de regel die "Openen in standaard" uitvoert; leeg of onbekend betekent de eerste regel. |
 | `ui.launch_terminal` | `"auto"` | De terminal waarin de bureaubladsnelkoppelingen (Instellingen > Starter) en de herstart op Windows GitPoulpi starten. `auto` kiest uit wat is geïnstalleerd (Windows: Windows Terminal, anders WezTerm, Alacritty, de gewone console; Linux: `xdg-terminal-exec`, anders de eerste gevonden terminal; macOS: iTerm2, Ghostty, WezTerm of kitty als die geïnstalleerd is, anders Terminal), `default` is die van het besturingssysteem, of een terminal-id zoals `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
-| `ui.launcher_build` | `"current"` | Alleen in ontwikkelmodus (zie `general.dev_mode`; alleen dan getoond in Instellingen > Starter, anders genegeerd). `"current"`: snelkoppelingen en de opdrachtalias starten de build die ze heeft gemaakt. `"newest"`: ze starten de meest recente build van `target/dist` en `target/release` van de checkout, bij elke klik bepaald, en het starten van een van beide builds herschrijft ze nooit. |
-| `ui.command_alias` | `""` | De naam van de opdracht die GitPoulpi vanuit een terminal start, bijvoorbeeld `gp` (Instellingen > Starter, `gitpoulpi alias create`). Leeg: geen. Alleen letters, cijfers, `-`, `_` en `.`. Het is alleen de naam die de knop **Maken: opdrachtalias** gebruikt; er bestaat niets tot je het maakt. |
-| `ui.command_alias_add` | `""` | De naam van de tweede opdracht, bijvoorbeeld `gpa`, die `gitpoulpi --add` uitvoert: ze opent de huidige map als nieuw tabblad in het al draaiende GitPoulpi (Instellingen > Starter, `gitpoulpi alias create gpa --add`). Leeg: geen. Dezelfde naamregels; samen met `ui.command_alias` gemaakt door de knop **Maken**. |
 | `ui.relaunch_in_terminal` | `true` | Alleen Windows: als de exe met een dubbelklik in een eigen console start, opent GitPoulpi zich opnieuw in `ui.launch_terminal` en sluit af. Een terminal die de exe rechtstreeks draait (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) is ook een console van zichzelf, maar geen klassiek consolevenster: hij wordt nooit heropend. Uit: hij blijft in die console. |
 | `ui.reuse_window` | `true` | Een klik op een GitPoulpi-snelkoppeling (`gitpoulpi launch`) toont het venster van een GitPoulpi dat al open staat, in plaats van een nieuw te starten. Uit: elke klik start een nieuw venster. |
+
+### Afbeeldingen
+
+| Sleutel | Standaard | Betekenis |
+|---|---|---|
+| `ui.image_view` | `true` | Toon een binair bestand dat een afbeelding is (PNG, JPEG, GIF, WebP, BMP, ...) als afbeelding in de Diff-weergave en de Bestandsweergave. Uit: de gewone binaire melding. |
+| `ui.image_view_max_mib` | `32` | Afbeeldingen groter dan dit (MiB) worden niet gedecodeerd; in plaats daarvan verschijnt een infokaart. |
+| `ui.image_view_max_unit` | `"auto"` | De eenheid waarin Instellingen de limiet toont: `mib`, `gib` (1024 MiB) of `auto`. Alleen weergave: de limiet is altijd `image_view_max_mib` MiB, 1 tot 1024. |
+| `ui.image_view_text_fallback` | `"halfblock"` | Op een terminal zonder afbeeldingsprotocol: `halfblock` (gekleurde halve-blok-tekens) of `card` (alleen infokaart). |
+| `ui.image_view_pixelated_from` | `"2x"` | Zoom vanaf waar vergroten vierkante pixels toont in plaats van te egaliseren: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | De panelen voor en na delen één zoom en scrollpositie. |
+
+**Nog niet gebruikt** (geaccepteerd, opgeslagen, maar niets leest ze):
+`ui.graph_colorization` (uit Instellingen verwijderd;
+bij het laden nog geaccepteerd), `ui.date_word_format` (uit Instellingen verwijderd; bij
+het laden nog geaccepteerd). De oude `ui.diff_view_mode`
+wordt eenmalig gelezen als `diff_layout` / `diff_hunks_only`.
+
+## `[ui]` in `config.toml`
+
+De paar `[ui]`-sleutels die hetzelfde zijn welke interface je ook gebruikt: externe hulpmiddelen van deze machine, de identiteit van deze installatie, welke netwerkdiensten voor avatars worden gevraagd en de standaardwaarden van `log --format mermaid`. Ze worden alleen uit `config.toml` gelezen; de andere `[ui]`-sleutels staan in [`tui.toml`](#ui-in-tuitoml).
+
+**Een map elders openen**
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `ui.open_in` | *(afwezig)* | De lijst [Openen in](open-in.md), een array van tabellen `[[ui.open_in]]` met `label` en `command`. Afwezig betekent "nog niet geconfigureerd": de lijst wordt berekend uit de verouderde `ui.terminal_launch*`-sleutels (een niet-`auto`-waarde wordt de eerste regel), de bestandsverkenner van het OS, de multiplexers en terminals die uit de omgeving worden gedetecteerd (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) en de editors op `PATH`. De eerste keer opslaan vanuit Instellingen schrijft de lijst. `open_in = []` is een lege lijst. Niet in te stellen met `config set` (bewerk het bestand). |
+| `ui.open_in_default` | `""` | Label van de regel die "Openen in standaard" uitvoert; leeg of onbekend betekent de eerste regel. |
+| `ui.terminal_launch` | `"auto"` | Verouderd, zie hieronder en [Openen in](open-in.md). Hoe het oude *Terminal hier* een terminal opende: `auto` (de `ui.launch`-preset, anders `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), een preset of `custom`. |
+| `ui.terminal_launch_command` | `""` | Het `custom`-sjabloon; `{repo}` is de map. |
 
 **`ui.open_in`-opdrachten** worden eerst in argumenten gesplitst (witruimte, `'...'`, `"..."`), daarna worden de variabelen binnen elk argument vervangen, zodat een map met spaties één argument blijft; er komt geen shell aan te pas, tenzij de opdracht er een start (`sh -c '... "$GITPOULPI_CWD"'`). Variabelen: `${cwd}` (de map van het tabblad), `${repo}` (repositoryroot), `${name}` (basisnaam van de map), `${branch}` (leeg bij een losgekoppelde HEAD), `${web_url}` (de webpagina van de remote `origin` als dat een GitHub- of GitLab-project is, anders leeg; een regel die hem gebruikt weigert te draaien als hij leeg is), `${env:NAME}` (leeg als niet ingesteld). De oude `{repo}` betekent nog steeds `${cwd}`. Elke andere `${...}` is een fout die hem noemt. Voorbeeld:
 
@@ -207,16 +257,10 @@ command = "code ${cwd}"
 
 Verouderd: `ui.terminal_launch` en `ui.terminal_launch_command` worden nog gelezen (ze vullen de lijst zolang `ui.open_in` ontbreekt: `custom` wordt "Terminal (custom)" met `{repo}` herschreven naar `${cwd}`, een preset-id wordt die preset), maar zijn vervangen door `ui.open_in`.
 
-### Afbeeldingen
+**Afbeeldingseditors**
 
-| Sleutel | Standaard | Betekenis |
+| Sleutel | Standaard | Waarden en effect |
 |---|---|---|
-| `ui.image_view` | `true` | Toon een binair bestand dat een afbeelding is (PNG, JPEG, GIF, WebP, BMP, ...) als afbeelding in de Diff-weergave en de Bestandsweergave. Uit: de gewone binaire melding. |
-| `ui.image_view_max_mib` | `32` | Afbeeldingen groter dan dit (MiB) worden niet gedecodeerd; in plaats daarvan verschijnt een infokaart. |
-| `ui.image_view_max_unit` | `"auto"` | De eenheid waarin Instellingen de limiet toont: `mib`, `gib` (1024 MiB) of `auto`. Alleen weergave: de limiet is altijd `image_view_max_mib` MiB, 1 tot 1024. |
-| `ui.image_view_text_fallback` | `"halfblock"` | Op een terminal zonder afbeeldingsprotocol: `halfblock` (gekleurde halve-blok-tekens) of `card` (alleen infokaart). |
-| `ui.image_view_pixelated_from` | `"2x"` | Zoom vanaf waar vergroten vierkante pixels toont in plaats van te egaliseren: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | De panelen voor en na delen één zoom en scrollpositie. |
 | `ui.image_editors` | *(afwezig)* | De afbeeldingseditors van "Bewerken in", een array van tabellen `[[ui.image_editors]]` met `label` en `command`. Afwezig betekent "nog niet geconfigureerd": de lijst bestaat uit de editors die op deze machine zijn gedetecteerd (programma's op `PATH`, Flatpak-installaties, bekende installatiemappen op Windows, `/Applications` op macOS), daarna de standaardapp van het OS. De eerste keer opslaan vanuit Instellingen schrijft de lijst. `image_editors = []` is een lege lijst. Niet in te stellen met `config set` (bewerk het bestand). |
 | `ui.image_editor_default` | `""` | Label van de editor die "Bewerken in standaard" uitvoert; leeg of onbekend betekent de eerste regel. |
 
@@ -235,11 +279,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**Nog niet gebruikt** (geaccepteerd, opgeslagen, maar niets leest ze):
-`ui.graph_colorization` (uit Instellingen verwijderd;
-bij het laden nog geaccepteerd), `ui.date_word_format` (uit Instellingen verwijderd; bij
-het laden nog geaccepteerd). De oude `ui.diff_view_mode`
-wordt eenmalig gelezen als `diff_layout` / `diff_hunks_only`.
+**Starter en identiteit**
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `ui.logo_color` | `""` | Kleurstelling van het logo in het venster Over, een slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); leeg of onbekend betekent de standaard van de build (`lavender`). Geschreven als je op het logo klikt of in Over een kleur kiest. |
+| `ui.command_alias` | `""` | De naam van de opdracht die GitPoulpi vanuit een terminal start, bijvoorbeeld `gp` (Instellingen > Starter, `gitpoulpi alias create`). Leeg: geen. Alleen letters, cijfers, `-`, `_` en `.`. Het is alleen de naam die de knop **Maken: opdrachtalias** gebruikt; er bestaat niets tot je het maakt. |
+| `ui.command_alias_add` | `""` | De naam van de tweede opdracht, bijvoorbeeld `gpa`, die `gitpoulpi --add` uitvoert: ze opent de huidige map als nieuw tabblad in het al draaiende GitPoulpi (Instellingen > Starter, `gitpoulpi alias create gpa --add`). Leeg: geen. Dezelfde naamregels; samen met `ui.command_alias` gemaakt door de knop **Maken**. |
+| `ui.launcher_build` | `"current"` | Alleen in ontwikkelmodus (zie `general.dev_mode`; alleen dan getoond in Instellingen > Starter, anders genegeerd). `"current"`: snelkoppelingen en de opdrachtalias starten de build die ze heeft gemaakt. `"newest"`: ze starten de meest recente build van `target/dist` en `target/release` van de checkout, bij elke klik bepaald, en het starten van een van beide builds herschrijft ze nooit. |
+
+**Avatar opzoeken**
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | Zoekvolgorde: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Een GitLab-host wordt alleen via een verbonden profiel gevraagd. |
+
+**Mermaid-standaardwaarden** (`log --format mermaid`; Kopiëren als Mermaid gitGraph van de Log onthoudt zijn keuzes uit het venster)
+
+| Sleutel | Standaard | Waarden en effect |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Detail van Kopiëren als Mermaid gitGraph van de Log: `structure`, `refs`, `subjects`, `full` (onthouden uit de popup; de standaard van `log --format mermaid`). |
+| `ui.mermaid_orientation` | `lr` | Richting van die grafiek: `lr` (van links naar rechts) of `tb` (van boven naar beneden). |
+| `ui.mermaid_fence` | `false` | Verpakt het gekopieerde Mermaid-script in een codeblok `mermaid`. |
+| `ui.mermaid_subject_width` | `40` | Commit-onderwerpen worden in de Mermaid-id's op zoveel tekens afgekapt (`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -252,6 +314,8 @@ wordt eenmalig gelezen als `diff_layout` / `diff_hunks_only`.
 | `editor.follow_selection` | `true` | Zolang de editor open is, opent het selecteren van een ander bestand in het rechterpaneel dat ook in de editor, nadat is gevraagd of niet-opgeslagen wijzigingen moeten worden opgeslagen. Een bestand dat niet bewerkt kan worden, opent in de gebruikelijke weergave. Een bestand van een commit verlaat de editor voor de diff ervan. |
 
 ## `[merge]`
+
+Bestand: `tui.toml`.
 
 De merge-conflicteditor ([Merge-conflicten oplossen](merge-conflicts.md)). Instellingen > Diff & editor toont hem.
 
@@ -592,6 +656,8 @@ Bind er een met `[keybindings.sequence] <id> = "<chord>"`, bijvoorbeeld
 `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+Bestand: `tui.toml`.
 
 Herbindt de sneltoetsen van de TUI; Instellingen > Toetsenbord & muis bewerkt het.
 

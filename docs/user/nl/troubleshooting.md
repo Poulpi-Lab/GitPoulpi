@@ -216,8 +216,25 @@ om bij een prestatiemelding te voegen.
 configuratiemap (`gitpoulpi config path` toont het instellingenbestand, dat daar
 staat) en voeg het bij een issue.
 
-**Waar staan mijn instellingen?** `gitpoulpi config path`. De status per repository
-staat in `.gitpoulpi/repo-state.toml` in de repository.
+**Waar staan mijn instellingen?** `gitpoulpi config path` toont `config.toml`
+(gemeenschappelijke instellingen) en `tui.toml` (de interface-instellingen van de
+terminal-UI: thema, indeling, kolommen, sneltoetsen...), die in dezelfde map staan.
+`gitpoulpi config get <key>` zegt in welke van de twee een sleutel staat. De status per
+repository staat in `.gitpoulpi/repo-state.toml` in de repository. Zie
+[Twee bestanden](config-reference.md#twee-bestanden-configtoml-en-tuitoml).
+
+**Ik ben teruggegaan naar een oudere GitPoulpi en mijn interface-instellingen zijn veranderd
+(of de nieuwere negeert wat ik in de oudere heb ingesteld).** GitPoulpi bewaart de
+interface-instellingen in `tui.toml`, aangemaakt als kopie van wat `config.toml` bevatte en
+nooit uit `config.toml` gehaald. Een oudere GitPoulpi die naast de nieuwere is geïnstalleerd,
+kent `tui.toml` niet: hij blijft zijn eigen volledige `config.toml` lezen en schrijven. Zodra
+`tui.toml` bestaat, leest de nieuwere de interface-instellingen alleen daaruit, dus een thema
+of indeling die je daarna in de oudere versie wijzigt, wordt niet overgenomen, en een sleutel
+die in `tui.toml` ontbreekt, krijgt zijn standaardwaarde in plaats van de oude waarde in
+`config.toml`. Om de nieuwere versie weer gelijk te trekken, wijzig je de instelling daar
+(Instellingen, of `gitpoulpi config set`); om de interface-instellingen opnieuw vanuit
+`config.toml` te laten beginnen, sluit je GitPoulpi af en verwijder je `tui.toml` (het wordt
+bij de volgende start opnieuw aangemaakt, als verse kopie).
 
 **Stuurt GitPoulpi iets ergens naartoe?** Alleen wat je zelf vraagt: git-bewerkingen
 naar je remotes, hostingverzoeken nadat je een account verbindt, AI-verzoeken nadat

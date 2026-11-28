@@ -229,7 +229,7 @@ na lista. Se o nome configurado já não existe (o ficheiro foi apagado ou renom
 usa as cores de faixa do tema ativo, e as Definições mostram o nome marcado *não encontrado*
 até escolher outro. ![A lista Tema de cores do grafo em Aspeto: Seguir o tema, depois todas as paletas de faixas com algumas das suas cores](../images/settings-log-graph-lanes.png)
 
-No `config.toml`:
+No `tui.toml`:
 
 ```toml
 [ui]
@@ -299,7 +299,7 @@ inválida é ignorada, uma `base` desconhecida recua para `dark`, e
 uma vez na barra de estado).
 
 Os ficheiros são relidos quando a lista Tema abre e quando as Definições se
-fecham. Uma janela em execução também repara quando o `config.toml` (um
+fecham. Uma janela em execução também repara quando o `tui.toml` (um
 `gitpoulpi config set ui.theme ...` feito a partir de uma shell) ou o ficheiro do
 tema ativo são reescritos, e aplica as novas cores em cerca de um segundo, sem
 reiniciar.
@@ -373,7 +373,7 @@ passar pelas Definições: **Sistema (segue o terminal)**, as predefinições,
 depois os seus próprios ficheiros de tema, cada um com quatro pequenos chips de
 cor. O tema atual está assinalado. Escreva para restringir a lista; mover o
 realce pré-visualiza o tema de imediato, **Enter** aplica-o e guarda `ui.theme`
-no `config.toml`, **Esc** (ou um clique fora da lista) repõe o tema anterior e
+no `tui.toml`, **Esc** (ou um clique fora da lista) repõe o tema anterior e
 não guarda nada.
 
 Por baixo do campo de filtro, um pré-filtro segmentado restringe a lista:

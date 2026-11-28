@@ -2,18 +2,52 @@
 
 # Referência de configuração
 
-Todas as chaves de `config.toml`, a sua predefinição e o que fazem. Raramente
-precisa de editar o ficheiro à mão: o [ecrã de Definições](settings.md)
-(`Ctrl+,`) escreve-o à medida que altera as coisas, e `gitpoulpi config set`
+Todas as chaves dos ficheiros de configuração, a sua predefinição e o que fazem.
+Raramente precisa de editar um ficheiro à mão: o [ecrã de Definições](settings.md)
+(`Ctrl+,`) escreve-os à medida que altera as coisas, e `gitpoulpi config set`
 também.
+
+## Dois ficheiros: `config.toml` e `tui.toml`
+
+As definições estão em dois ficheiros da mesma pasta.
+
+| Ficheiro | Contém |
+|---|---|
+| `config.toml` | Tudo o que é comum a todas as formas de usar o GitPoulpi: repositórios, contas e integrações, comportamento do git, IA, MCP, atualizações, instalações, ferramentas externas, e as poucas chaves de `[ui]` listadas em [`[ui]` em `config.toml`](#ui-em-configtoml). |
+| `tui.toml` | As definições de interface da UI de terminal: a maior parte de `[ui]` (tema, disposição, colunas, apresentação de diffs e imagens, idioma, opções do rato e do terminal, ...), toda a tabela `[keybindings]` e `merge.side_by_side_min_width`. Estão listadas em [`[ui]` em `tui.toml`](#ui-em-tuitoml), [`[keybindings]`](#keybindings) e [`[merge]`](#merge). |
+
+- **Como aparece o `tui.toml`.** O GitPoulpi cria-o por si, como uma cópia das
+  definições de interface encontradas em `config.toml`: quando a UI de terminal
+  arranca e `config.toml` existe, ou na primeira alteração de uma definição de
+  interface. O `config.toml` nunca é modificado por isso.
+- **Depois de existir, é a única fonte** das chaves que lhe pertencem. Uma chave
+  que ele não menciona assume a sua predefinição, não o valor que um
+  `config.toml` antigo ainda possa ter para ela. Para repor uma dessas chaves,
+  remova-a de `tui.toml`.
+- **Um GitPoulpi mais antigo** instalado ao lado deste continua a ler o seu
+  `config.toml` completo. Uma definição alterada depois na versão mais antiga não
+  é aproveitada pela mais recente, e vice-versa.
+- **Em que ficheiro está uma chave.** `gitpoulpi config get <chave>` imprime o
+  ficheiro no campo JSON `file` (com `--json`), `gitpoulpi config set <chave>
+  <valor>` escreve nele, e `gitpoulpi config path` imprime `path` (`config.toml`)
+  e `tui_file` (`tui.toml`). `gitpoulpi config get`, `set` e as variáveis
+  `GITPOULPI_UI_*` mantêm os mesmos nomes de chave (`ui.theme`) seja qual for o
+  ficheiro que a contém; uma variável continua a ganhar a ambos os ficheiros.
+- **Instalações.** O aspeto de uma instalação que não seja a principal fica na
+  sua entrada `[installation.settings.<id>]` de `config.toml` (veja
+  [`[installation]`](#installation-uma-entrada-por-gitpoulpi-neste-computador)).
+
+As secções abaixo dizem em que ficheiro está cada uma. Os exemplos que mostram
+uma tabela (`[ui]`, `[[ui.open_in]]`) escrevem-se no ficheiro indicado no título
+da secção.
 
 ## Onde está, e como se escolhe um valor
 
 | | |
 |---|---|
-| Ficheiro | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path` imprime-o. |
-| Outra pasta | `GITPOULPI_CONFIG_DIR=<dir>` move toda a pasta de configuração (o ficheiro, `sessions/`, os ficheiros de porta do daemon): uma instalação portátil, um teste, ou um agente mantido longe das suas próprias definições. |
-| Precedência | predefinição integrada, depois `config.toml`, depois a variável `GITPOULPI_*`, depois uma opção da linha de comandos. Ganha a mais alta. Um valor errado (uma escolha mal escrita no ficheiro, uma variável incorreta) é um erro, nunca é ignorado em silêncio. |
+| Ficheiro | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS), e `tui.toml` ao lado dele. `gitpoulpi config path` imprime ambos. |
+| Outra pasta | `GITPOULPI_CONFIG_DIR=<dir>` move toda a pasta de configuração (os ficheiros, `sessions/`, os ficheiros de porta do daemon): uma instalação portátil, um teste, ou um agente mantido longe das suas próprias definições. |
+| Precedência | predefinição integrada, depois `config.toml` (`tui.toml` para as chaves que lhe pertencem), depois a variável `GITPOULPI_*`, depois uma opção da linha de comandos. Ganha a mais alta. Um valor errado (uma escolha mal escrita no ficheiro, uma variável incorreta) é um erro, nunca é ignorado em silêncio. |
 | Variáveis | Ponha a chave em maiúsculas e transforme os pontos em sublinhados: `general.auto_prune` é `GITPOULPI_GENERAL_AUTO_PRUNE`. Só para chaves que o GitPoulpi realmente lê (não as marcadas *não usada* abaixo, nem listas como `ui.log_columns_hidden`). |
 | Opções | `--backend git2\|system` sobrepõe-se a `general.default_backend` num daemon que esse comando inicia. |
 | Tokens e chaves | Nunca neste ficheiro. Os tokens de alojamento e as chaves de API de IA vão para o credential helper do seu sistema (Git Credential Manager, libsecret / `pass`, Keychain); o ficheiro só guarda uma referência (`token_ref`). Sem um helper, guardar um token falha com uma mensagem e o token dura apenas a sessão. |
@@ -86,7 +120,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `[ui]` em `tui.toml`
 
 **Log e grafo**
 
@@ -124,7 +158,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false` deixa o rato (e a seleção de texto) ao terminal. **Reiniciar.** |
 | `ui.mouse_scroll_lines` | `3` | Linhas do Log por passo da roda, de 1 a 20. **Reiniciar.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` pede ao terminal o protocolo de teclado kitty (para que `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N` cheguem; só em Unix, o tmux nunca responde: veja [Multiplexadores](multiplexers.md#tmux)); `off` nunca pede. **Reiniciar.** |
-| `ui.logo_color` | `""` | Combinação de cores do logótipo na janela Acerca do GitPoulpi, um slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); vazio ou desconhecido significa a predefinição da compilação (`lavender`). Escrita quando clica no logótipo ou escolhe uma cor no Acerca. |
 
 **Avatares** (desativados por predefinição; ativá-los envia um hash SHA-256 dos
 e-mails dos autores ao Gravatar, e consulta a sua conta GitHub/GitLab ligada)
@@ -132,7 +165,6 @@ e-mails dos autores ao Gravatar, e consulta a sua conta GitHub/GitLab ligada)
 | Chave | Predefinição | Valores e efeito |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph` (no círculo do commit do grafo em imagem), `author` (na coluna Autor), `off`. O antigo `ui.show_avatars` (`true`) continua a ser lido como `author` enquanto `ui.avatars` estiver em falta. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | Ordem de pesquisa: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Um anfitrião GitLab só é consultado através de um perfil ligado. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon` (gerado localmente) ou `initials`. Num terminal sem protocolo de imagens usa-se sempre o emblema com as iniciais. |
 
 **Apresentação do diff e do editor**
@@ -145,10 +177,6 @@ e-mails dos autores ao Gravatar, e consulta a sua conta GitHub/GitLab ligada)
 | `ui.diff_word_wrap` | `false` | Quebrar as linhas longas do diff (`w`; Definições > Diff e editor). |
 | `ui.diff_intraline` | `true` | Pinta as palavras alteradas de uma linha alterada com um fundo mais forte (paleta `Diff: alternar o destaque das palavras alteradas`; Definições > Diff e editor). |
 | `ui.minimap` | `false` | Um minimapa ao lado da barra de deslocação do diff e do editor (`M`). |
-| `ui.mermaid_detail` | `refs` | Detalhe do Copiar como Mermaid gitGraph do Log: `structure`, `refs`, `subjects`, `full` (memorizado a partir do popup; o valor por omissão de `log --format mermaid`). |
-| `ui.mermaid_orientation` | `lr` | Direção desse grafo: `lr` (da esquerda para a direita) ou `tb` (de cima para baixo). |
-| `ui.mermaid_fence` | `false` | Envolve o script Mermaid copiado num bloco de código `mermaid`. |
-| `ui.mermaid_subject_width` | `40` | Os assuntos dos commits são cortados neste número de carateres nos ids do Mermaid (`subjects`, `full`). |
 | `ui.text_cursor` | `"terminal"` | Onde se mostra o cursor de texto de um campo em foco: `terminal` põe aí o cursor do próprio terminal (uma barra intermitente, pelo que as definições de cursor do terminal e a janela de candidatos de um método de entrada o acompanham; oculto quando nenhum campo tem o teclado e reposto no seu próprio estilo de cursor ao sair), `drawn` desenha o glifo de cursor próprio do GitPoulpi e mantém o cursor do terminal oculto. Em direto. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256` ou `16`: com quantas cores desenhar. `auto` é truecolor exceto no Terminal da Apple (256), na consola Linux (16) e em terminais `*-256color` sem `COLORTERM` (256). Em direto. Veja [Temas](themes.md). |
 | `ui.input_color` | `"theme"` | Fundo dos campos de texto: `theme` (o do próprio tema), `gray`, `blue`, `slate`, `dark`, `custom`. |
@@ -182,16 +210,39 @@ mantém os nomes em inglês seja qual for o idioma.
 | `ui.launch` | `"off"` | Se um agente pode abrir uma janela do GitPoulpi quando não há nenhuma aberta: `off`, uma predefinição (`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) ou `custom`. |
 | `ui.launch_command` | `""` | O modelo `custom`: `{repo}`, `{session}`, `{gitpoulpi}`. Dividido em argumentos, sem shell. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons` (a linha de separadores oferece *Sair e cd aqui*) ou `auto` (cada saída muda a pasta da shell, e um novo separador executa a entrada predefinida de *Abrir em*). Veja [Seguir a pasta do separador ativo](following-the-tab-folder.md). |
+| `ui.launch_terminal` | `"auto"` | O terminal em que os atalhos do ambiente de trabalho (Definições > Lançador) e o relançamento no Windows iniciam o GitPoulpi. `auto` escolhe entre os instalados (Windows: Windows Terminal, senão WezTerm, Alacritty, a consola simples; Linux: `xdg-terminal-exec`, senão o primeiro terminal encontrado; macOS: iTerm2, Ghostty, WezTerm ou kitty se instalados, senão Terminal), `default` é o do sistema operativo, ou um id de terminal como `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
+| `ui.relaunch_in_terminal` | `true` | Apenas Windows: quando o exe é iniciado com clique duplo numa consola própria, o GitPoulpi reabre-se em `ui.launch_terminal` e termina. Um terminal que executa o exe diretamente (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) também é uma consola própria, mas não uma janela de consola clássica: nunca é relançado. Desativado: fica nessa consola. |
+| `ui.reuse_window` | `true` | Um clique num atalho do GitPoulpi (`gitpoulpi launch`) mostra a janela de um GitPoulpi que já está aberto, em vez de iniciar outro. Desativado: cada clique inicia uma nova janela. |
+
+### Imagens
+
+| Chave | Predefinição | Significado |
+|---|---|---|
+| `ui.image_view` | `true` | Mostrar um ficheiro binário que é uma imagem (PNG, JPEG, GIF, WebP, BMP, ...) como imagem na vista Diff e na vista de ficheiro. Desativado: o aviso binário habitual. |
+| `ui.image_view_max_mib` | `32` | As imagens maiores que isto (MiB) não são descodificadas; aparece uma ficha de informações. |
+| `ui.image_view_max_unit` | `"auto"` | A unidade em que as Definições mostram o limite: `mib`, `gib` (1024 MiB) ou `auto`. Só de apresentação: o limite é sempre `image_view_max_mib` MiB, de 1 a 1024. |
+| `ui.image_view_text_fallback` | `"halfblock"` | Num terminal sem protocolo de imagem: `halfblock` (caracteres de meio bloco coloridos) ou `card` (só a ficha de informações). |
+| `ui.image_view_pixelated_from` | `"2x"` | Zoom a partir do qual ampliar mostra píxeis quadrados em vez de suavizar: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | Os painéis antes e depois partilham o mesmo zoom e posição de deslocação. |
+
+**Ainda não usadas** (aceites, guardadas, mas nada as lê):
+`ui.graph_colorization` (removidas das Definições;
+ainda aceites ao carregar), `ui.date_word_format` (removida das Definições; ainda
+aceite ao carregar). O antigo
+`ui.diff_view_mode` é lido uma vez como `diff_layout` / `diff_hunks_only`.
+
+## `[ui]` em `config.toml`
+
+As poucas chaves de `[ui]` que são iguais seja qual for a interface que usa: as ferramentas externas desta máquina, a identidade desta instalação, os serviços de rede consultados para os avatares e as predefinições de `log --format mermaid`. São lidas apenas de `config.toml`; as outras chaves de `[ui]` estão em [`tui.toml`](#ui-em-tuitoml).
+
+**Abrir uma pasta noutro sítio**
+
+| Chave | Predefinição | Valores e efeito |
+|---|---|---|
 | `ui.terminal_launch` | `"auto"` | Antigo, veja abaixo e [Abrir em](open-in.md). Como o antigo *Terminal aqui* abria um terminal: `auto` (a predefinição `ui.launch`, senão `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), uma predefinição, ou `custom`. |
 | `ui.terminal_launch_command` | `""` | O modelo `custom`; `{repo}` é a pasta. |
 | `ui.open_in` | *(em falta)* | A lista [Abrir em](open-in.md), um array de tabelas `[[ui.open_in]]` com `label` e `command`. Em falta significa "ainda não configurada": a lista é calculada a partir das chaves antigas `ui.terminal_launch*` (um valor diferente de `auto` passa a ser a primeira entrada), do explorador de ficheiros do SO, dos multiplexadores e terminais detetados no ambiente (herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...) e dos editores encontrados no `PATH`. A primeira gravação a partir das Definições escreve a lista. `open_in = []` é uma lista vazia. Não se define com `config set` (edite o ficheiro). |
 | `ui.open_in_default` | `""` | Etiqueta da entrada que "Abrir no predefinido" executa; vazio ou desconhecido significa a primeira entrada. |
-| `ui.launch_terminal` | `"auto"` | O terminal em que os atalhos do ambiente de trabalho (Definições > Lançador) e o relançamento no Windows iniciam o GitPoulpi. `auto` escolhe entre os instalados (Windows: Windows Terminal, senão WezTerm, Alacritty, a consola simples; Linux: `xdg-terminal-exec`, senão o primeiro terminal encontrado; macOS: iTerm2, Ghostty, WezTerm ou kitty se instalados, senão Terminal), `default` é o do sistema operativo, ou um id de terminal como `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal`. |
-| `ui.launcher_build` | `"current"` | Só no modo de programador (veja `general.dev_mode`; só então aparece em Definições > Lançador, ignorado nos outros casos). `"current"`: os atalhos e o alias de comando iniciam a compilação que os criou. `"newest"`: iniciam a compilação mais recente entre `target/dist` e `target/release` do clone, decidida a cada clique, e iniciar uma ou outra nunca os reescreve. |
-| `ui.command_alias` | `""` | O nome do comando que inicia o GitPoulpi a partir de um terminal, por exemplo `gp` (Definições > Lançador, `gitpoulpi alias create`). Vazio: nenhum. Apenas letras, dígitos, `-`, `_` e `.`. É só o nome que o botão **Criar: alias de comando** usa; nada existe até o criar. |
-| `ui.command_alias_add` | `""` | O nome do segundo comando, por exemplo `gpa`, que executa `gitpoulpi --add`: abre a pasta atual num novo separador do GitPoulpi que já está aberto (Definições > Lançador, `gitpoulpi alias create gpa --add`). Vazio: nenhum. Mesmas regras de nome; criado em conjunto com `ui.command_alias` pelo botão **Criar**. |
-| `ui.relaunch_in_terminal` | `true` | Apenas Windows: quando o exe é iniciado com clique duplo numa consola própria, o GitPoulpi reabre-se em `ui.launch_terminal` e termina. Um terminal que executa o exe diretamente (`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`) também é uma consola própria, mas não uma janela de consola clássica: nunca é relançado. Desativado: fica nessa consola. |
-| `ui.reuse_window` | `true` | Um clique num atalho do GitPoulpi (`gitpoulpi launch`) mostra a janela de um GitPoulpi que já está aberto, em vez de iniciar outro. Desativado: cada clique inicia uma nova janela. |
 
 Os comandos de **`ui.open_in`** são primeiro divididos em argumentos (espaços em branco, `'...'`, `"..."`), depois as variáveis são substituídas dentro de cada argumento, de modo que uma pasta com espaços continua a ser um só argumento; nenhuma shell está envolvida a menos que o comando inicie uma (`sh -c '... "$GITPOULPI_CWD"'`). Variáveis: `${cwd}` (a pasta do separador), `${repo}` (raiz do repositório), `${name}` (nome base da pasta), `${branch}` (vazio em detached), `${web_url}` (a página web do remoto `origin` quando é um projeto GitHub ou GitLab, senão vazio; uma entrada que o use recusa-se a executar quando está vazio), `${env:NAME}` (vazio quando não definida). O antigo `{repo}` continua a significar `${cwd}`. Qualquer outro `${...}` é um erro que o nomeia. Exemplo:
 
@@ -210,16 +261,10 @@ command = "code ${cwd}"
 
 Antigo: `ui.terminal_launch` e `ui.terminal_launch_command` continuam a ser lidos (semeiam a lista enquanto `ui.open_in` estiver em falta: `custom` passa a "Terminal (custom)" com `{repo}` reescrito para `${cwd}`, o id de uma predefinição passa a essa predefinição) mas foram substituídos por `ui.open_in`.
 
-### Imagens
+**Editores de imagem**
 
-| Chave | Predefinição | Significado |
+| Chave | Predefinição | Valores e efeito |
 |---|---|---|
-| `ui.image_view` | `true` | Mostrar um ficheiro binário que é uma imagem (PNG, JPEG, GIF, WebP, BMP, ...) como imagem na vista Diff e na vista de ficheiro. Desativado: o aviso binário habitual. |
-| `ui.image_view_max_mib` | `32` | As imagens maiores que isto (MiB) não são descodificadas; aparece uma ficha de informações. |
-| `ui.image_view_max_unit` | `"auto"` | A unidade em que as Definições mostram o limite: `mib`, `gib` (1024 MiB) ou `auto`. Só de apresentação: o limite é sempre `image_view_max_mib` MiB, de 1 a 1024. |
-| `ui.image_view_text_fallback` | `"halfblock"` | Num terminal sem protocolo de imagem: `halfblock` (caracteres de meio bloco coloridos) ou `card` (só a ficha de informações). |
-| `ui.image_view_pixelated_from` | `"2x"` | Zoom a partir do qual ampliar mostra píxeis quadrados em vez de suavizar: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | Os painéis antes e depois partilham o mesmo zoom e posição de deslocação. |
 | `ui.image_editors` | *(em falta)* | Os editores de imagem de "Editar em", um array de tabelas `[[ui.image_editors]]` com `label` e `command`. Em falta significa "ainda não configurada": a lista são os editores detetados nesta máquina (programas no `PATH`, instalações Flatpak, pastas de instalação conhecidas no Windows, `/Applications` no macOS), depois a aplicação predefinida do SO. A primeira gravação a partir das Definições escreve a lista. `image_editors = []` é uma lista vazia. Não se define com `config set` (edite o ficheiro). |
 | `ui.image_editor_default` | `""` | Etiqueta do editor que "Editar em predefinido" executa; vazio ou desconhecido significa a primeira entrada. |
 
@@ -238,11 +283,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**Ainda não usadas** (aceites, guardadas, mas nada as lê):
-`ui.graph_colorization` (removidas das Definições;
-ainda aceites ao carregar), `ui.date_word_format` (removida das Definições; ainda
-aceite ao carregar). O antigo
-`ui.diff_view_mode` é lido uma vez como `diff_layout` / `diff_hunks_only`.
+**Lançador e identidade**
+
+| Chave | Predefinição | Valores e efeito |
+|---|---|---|
+| `ui.logo_color` | `""` | Combinação de cores do logótipo na janela Acerca do GitPoulpi, um slug (`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`); vazio ou desconhecido significa a predefinição da compilação (`lavender`). Escrita quando clica no logótipo ou escolhe uma cor no Acerca. |
+| `ui.command_alias` | `""` | O nome do comando que inicia o GitPoulpi a partir de um terminal, por exemplo `gp` (Definições > Lançador, `gitpoulpi alias create`). Vazio: nenhum. Apenas letras, dígitos, `-`, `_` e `.`. É só o nome que o botão **Criar: alias de comando** usa; nada existe até o criar. |
+| `ui.command_alias_add` | `""` | O nome do segundo comando, por exemplo `gpa`, que executa `gitpoulpi --add`: abre a pasta atual num novo separador do GitPoulpi que já está aberto (Definições > Lançador, `gitpoulpi alias create gpa --add`). Vazio: nenhum. Mesmas regras de nome; criado em conjunto com `ui.command_alias` pelo botão **Criar**. |
+| `ui.launcher_build` | `"current"` | Só no modo de programador (veja `general.dev_mode`; só então aparece em Definições > Lançador, ignorado nos outros casos). `"current"`: os atalhos e o alias de comando iniciam a compilação que os criou. `"newest"`: iniciam a compilação mais recente entre `target/dist` e `target/release` do clone, decidida a cada clique, e iniciar uma ou outra nunca os reescreve. |
+
+**Pesquisa de avatares**
+
+| Chave | Predefinição | Valores e efeito |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | Ordem de pesquisa: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. Um anfitrião GitLab só é consultado através de um perfil ligado. |
+
+**Predefinições do Mermaid** (`log --format mermaid`; o Copiar como Mermaid gitGraph do Log lembra as suas escolhas a partir da janela)
+
+| Chave | Predefinição | Valores e efeito |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Detalhe do Copiar como Mermaid gitGraph do Log: `structure`, `refs`, `subjects`, `full` (memorizado a partir do popup; o valor por omissão de `log --format mermaid`). |
+| `ui.mermaid_orientation` | `lr` | Direção desse grafo: `lr` (da esquerda para a direita) ou `tb` (de cima para baixo). |
+| `ui.mermaid_fence` | `false` | Envolve o script Mermaid copiado num bloco de código `mermaid`. |
+| `ui.mermaid_subject_width` | `40` | Os assuntos dos commits são cortados neste número de carateres nos ids do Mermaid (`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -255,6 +318,8 @@ aceite ao carregar). O antigo
 | `editor.follow_selection` | `true` | Com o editor aberto, selecionar outro ficheiro no painel direito também o abre no editor, depois de perguntar se as alterações por guardar devem ser guardadas. Um ficheiro que não pode ser editado abre na vista habitual; um ficheiro de um commit sai do editor para o seu diff. |
 
 ## `[merge]`
+
+Ficheiro: `tui.toml`.
 
 O editor de conflitos de merge ([Resolver conflitos de merge](merge-conflicts.md)). As Definições > Diff e editor mostram-no.
 
@@ -603,6 +668,8 @@ ficheiro. Os ids duplicados entre as sequências que pode ver são assinalados. 
 `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+Ficheiro: `tui.toml`.
 
 Reatribui os atalhos da TUI; as Definições > Teclado e rato editam-no.
 

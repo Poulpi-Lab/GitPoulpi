@@ -23,6 +23,7 @@
 //! remarks, the dialog turns into a short result list; the rules are already
 //! in the workbench behind it.
 
+use crate::text_edit::CaretKeys as _;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

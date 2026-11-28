@@ -1311,6 +1311,7 @@ dependencies = [
  "gitpoulpi-i18n",
  "gitpoulpi-log",
  "gitpoulpi-session",
+ "syntect",
  "tempfile",
  "unicode-width 0.2.0",
 ]

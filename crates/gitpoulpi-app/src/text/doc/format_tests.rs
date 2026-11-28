@@ -1,7 +1,7 @@
 //! The status bar's formats: encodings, line breaks, indentation.
 
+use super::test_keys::{KeyCode, KeyEvent, KeyModifiers, OnKey};
 use super::*;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 fn key(code: KeyCode) -> KeyEvent {
     KeyEvent::new(code, KeyModifiers::NONE)

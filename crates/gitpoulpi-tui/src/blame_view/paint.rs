@@ -281,7 +281,7 @@ fn paint_code(
         }
         if let Some(runs) = runs {
             while byte >= run_end && run_idx < runs.len() {
-                style = runs[run_idx].style;
+                style = crate::editor_highlight::style_of(runs[run_idx].style);
                 run_end += runs[run_idx].len;
                 run_idx += 1;
             }

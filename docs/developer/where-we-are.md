@@ -77,7 +77,7 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   `dialog_kit.rs`, `picker_view.rs`, `tooltip.rs` (the only tooltip owner),
   `scrollbar.rs`, `scrollbar_repeat.rs`, `scroll_marks.rs`, `minimap.rs`,
   `cursor.rs` (OSC 22 pointer shape), `clipboard.rs` (OSC 52).
-- `text_edit.rs` (one caret/selection core for every field), `text_field.rs`
+- `text_edit.rs` (one caret/selection core for every field; the caret itself is `gitpoulpi_app::text::Caret`, the terminal key decoding is `CaretKeys`), `text_field.rs`
   (drawing a field), `text_select.rs` (selectable text in read-only views).
 - `theme/` (roles, presets, `th()` runtime, insta snapshots), `color_depth.rs`,
   `terminal_bg.rs`, `theme_picker.rs`, `language_picker.rs`, `terminology.rs`.
@@ -156,7 +156,7 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   `Flow: Start <Type>...` rows.
 
 **Editor text format, file-list menus, Open with, palette (2026-10-09/10)**
-- `editor_buffer.rs` (`Doc`) holds a *format model* next to the text: encoding
+- `editor_buffer.rs` (a re-export of `gitpoulpi_app::text::doc`, with the terminal key decoding as `DocKeys`; `Doc`) holds a *format model* next to the text: encoding
   (`Charset`, with BOM), line-break kind and indentation, so a save writes the
   bytes back exactly (the buffer's own text is always Unicode with `\n`). Decode
   never substitutes U+FFFD and encode never writes `?`: both report instead.
@@ -774,7 +774,7 @@ without the fix; keep it that way.
 
 ### Ctrl+Z / Ctrl+Y belong to a focused text field
 
-- Every field that types through `text_edit::Caret` has an edit history (`text_history.rs`: grouped typing, one entry per paste / cut / kill / snippet, bounded, dropped when the text was replaced from outside). Filter boxes without a caret use `text_history::QueryHistory`. A focused field claims the chords (`Caret::claims`), so the global git undo never fires while a field has the keyboard (`keys_normal.rs`); elsewhere `Ctrl+Z` / `Ctrl+Y` keep their global meaning. The code editor and merge editor keep their own undo.
+- Every field that types through `text_edit::Caret` has an edit history (`text_history.rs`: grouped typing, one entry per paste / cut / kill / snippet, bounded, dropped when the text was replaced from outside). Filter boxes without a caret use `text_history::QueryHistory`. A focused field claims the chords (`Caret::claims`), so the global git undo never fires while a field has the keyboard (`keys_normal.rs`); elsewhere `Ctrl+Z` / `Ctrl+Y` keep their global meaning. The code editor and merge editor keep their own undo. Trap: `Caret::on_key` / `claims` and `Doc::on_key` are extension-trait methods (the models live in `gitpoulpi-app`, which has no key type); `lib.rs` brings `CaretKeys` and `DocKeys` into scope for every `use super::*` module, any other module needs `use crate::text_edit::CaretKeys as _;`.
 - Text changed behind the caret's back (`text.replace_range`, a field assigned from outside) clears the history on the next use; an edit that should stay undoable goes through `Caret::insert` / `replace_range`.
 
 ### Log row arithmetic (the repeat offender)

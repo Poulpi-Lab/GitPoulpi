@@ -20,6 +20,7 @@
 //! **Files** are repository-relative and read or written on the spot: a
 //! script is a few kilobytes, and the path may not leave the repository.
 
+use crate::text_edit::CaretKeys as _;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};

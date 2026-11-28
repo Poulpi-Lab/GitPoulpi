@@ -106,7 +106,7 @@ impl BlameView {
         Self {
             hunks,
             hunk_of,
-            hl: Highlight::for_file(path, first),
+            hl: crate::editor_highlight::for_file(path, first),
             hl_pending: false,
             pinned: false,
             hover: None,

@@ -9,6 +9,7 @@
 //! install request) and sends as an ordinary tracked action; the state the
 //! pages show is pushed in by the event loop from its last refresh.
 
+use crate::text_edit::CaretKeys as _;
 use gitpoulpi_core::domain::{LfsRepoStatus, SparseState};
 use gitpoulpi_i18n::msg::settings_repo as t;
 use gitpoulpi_i18n::msg::settings_workflow as wf;

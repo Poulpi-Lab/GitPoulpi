@@ -18,6 +18,7 @@
 //! While the request runs the dialog stays open and modal (Esc cancels it),
 //! so the rule the answer belongs to cannot change under it.
 
+use crate::text_edit::CaretKeys as _;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;

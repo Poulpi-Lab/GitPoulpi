@@ -53,6 +53,7 @@ mod tools;
 mod tests;
 
 use crate::keymap::term::TermKeymap;
+use crate::text_edit::CaretKeys as _;
 use std::path::PathBuf;
 use std::time::Instant;
 

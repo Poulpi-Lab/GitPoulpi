@@ -250,7 +250,9 @@ impl Editor {
             }
             let mut style = runs
                 .and_then(|r| r.get(run_idx))
-                .map_or(Style::default().fg(th().editor.text), |r| r.style);
+                .map_or(Style::default().fg(th().editor.text), |r| {
+                    crate::editor_highlight::style_of(r.style)
+                });
             if style.fg.is_none() {
                 style = style.fg(th().editor.text);
             }

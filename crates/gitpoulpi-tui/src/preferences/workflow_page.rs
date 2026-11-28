@@ -11,6 +11,7 @@
 //! the rows of the selected one) so every control is the same one the other
 //! pages use: comboboxes, text rows, toggles, buttons.
 
+use crate::text_edit::CaretKeys as _;
 use std::cell::OnceCell;
 use std::sync::Arc;
 

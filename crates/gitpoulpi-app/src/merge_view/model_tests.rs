@@ -1,8 +1,10 @@
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use gitpoulpi_core::domain::{
     compose_resolution, ConflictEntry, ConflictPicks, ConflictSide, Eol, MergeDocument,
     MergeRegion, Oid, StageEntry, WorktreeFileState,
 };
+
+use crate::text::doc::{DocKey, Group};
+use crate::text::Op;
 
 use super::*;
 
@@ -63,21 +65,25 @@ fn model() -> MergeModel {
     MergeModel::new(two_conflicts())
 }
 
-fn key(c: char) -> KeyEvent {
-    KeyEvent::new(KeyCode::Char(c), KeyModifiers::NONE)
+fn key(c: char) -> DocKey {
+    DocKey::Caret {
+        op: Some(Op::Insert(c)),
+        group: Group::Typing,
+    }
 }
+
+const BACKSPACE: DocKey = DocKey::Caret {
+    op: Some(Op::Backspace),
+    group: Group::Deleting,
+};
 
 /// Types `s` at byte `at` of the Output through the model.
 fn type_at(m: &mut MergeModel, at: usize, s: &str) {
     m.edit(|d| {
         d.set_cursor(at, false);
         for c in s.chars() {
-            let k = if c == '\n' {
-                KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE)
-            } else {
-                key(c)
-            };
-            d.on_key(&k, 10);
+            let k = if c == '\n' { DocKey::Enter } else { key(c) };
+            d.apply_key(k, false);
         }
     });
 }
@@ -327,8 +333,8 @@ fn adding_a_line_inside_a_region_grows_it() {
     let e = m.states[0].end - 1;
     m.edit(|d| {
         d.set_cursor(e, false);
-        d.on_key(&KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE), 10);
-        d.on_key(&key('n'), 10);
+        d.apply_key(DocKey::Enter, false);
+        d.apply_key(key('n'), false);
     });
     assert_eq!(m.region_text(0), "a1\na2\nn\n");
     assert!(m.is_edited(0));
@@ -345,7 +351,7 @@ fn deleting_across_a_boundary_extends_the_region_over_whole_lines() {
     let e = m.states[0].end;
     m.edit(|d| {
         d.set_cursor(e, false);
-        d.on_key(&KeyEvent::new(KeyCode::Backspace, KeyModifiers::NONE), 10);
+        d.apply_key(BACKSPACE, false);
     });
     assert_eq!(m.region_text(0), "a1\na2mid\n");
     assert!(m.is_edited(0));
@@ -361,7 +367,7 @@ fn typing_the_original_text_back_un_edits_the_region() {
     assert!(m.is_edited(0));
     m.edit(|d| {
         d.set_cursor(s + 1, false);
-        d.on_key(&KeyEvent::new(KeyCode::Backspace, KeyModifiers::NONE), 10);
+        d.apply_key(BACKSPACE, false);
     });
     assert_eq!(m.region_text(0), "a1\na2\n");
     assert_eq!(m.status(0), Some(ConflictStatus::Picked));
@@ -493,7 +499,7 @@ fn consecutive_typing_is_one_undo_step_with_one_snapshot() {
     m.edit(|d| d.set_cursor(s, false));
     for c in "xyz".chars() {
         m.edit(|d| {
-            d.on_key(&key(c), 10);
+            d.apply_key(key(c), false);
         });
     }
     assert_eq!(m.region_text(0), "xyza1\na2\n");

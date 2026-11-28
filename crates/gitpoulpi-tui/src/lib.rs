@@ -391,6 +391,7 @@ mod ui_kit;
 #[cfg_attr(not(feature = "global-search"), path = "workspace_search_stub.rs")]
 mod workspace_search;
 
+// The terminal key half of `Caret::on_key`, in scope for every `use super::*` module.
 use ai_ui::{AiAnswer, AiOutcome, AiRequest, AiUi, ExplainTarget, PopupKey};
 use autostash_banner::AutoStashBannerButton;
 use button_bar::*;
@@ -399,6 +400,7 @@ use commit_detail::*;
 use compose_ui::{compose_hit_at, ComposeForm, ComposeOutcome};
 use composer::*;
 use diff_actions::*;
+use editor_buffer::DocKeys as _;
 use event_loop::*;
 use file_panel::*;
 use file_selection::*;
@@ -428,6 +430,7 @@ use split_ui::{SplitForm, SplitFormOutcome};
 use status_list::*;
 use submodules_ui::*;
 use tabs::*;
+use text_edit::CaretKeys as _;
 use theme::*;
 use ui_kit::*;
 

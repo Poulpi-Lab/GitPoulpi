@@ -270,6 +270,7 @@ fn every_action() -> Vec<Action> {
         Action::IndexLockRemove,
         Action::OperationSkip,
         Action::CherryPick(oid(7)),
+        Action::CherryPickMany(vec![oid(7), oid(8)]),
         Action::Revert {
             commit: oid(7),
             mainline: None,

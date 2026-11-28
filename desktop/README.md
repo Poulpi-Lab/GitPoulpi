@@ -4,13 +4,15 @@ A native desktop frontend for GitPoulpi. It shows the same repository views as t
 sidebar, commit log with graph, commit and working-tree details, diff) and talks to the same daemon, so
 changes made from the terminal UI, the CLI or MCP show up here too.
 
+What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md).
+
 This frontend is under development on the `desktop` branch. It currently reads a repository and does not
 yet run git operations.
 
 ## Layout
 
 `desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The
-crate is `crates/gitpoulpi-desktop` (binary `gitpoulpi-desktop`) and depends on the shared crates by path.
+crate is `crates/gitpoulpi-desktop` (binary `gitpoulpi-desktop`) and depends on the shared crates by path, among them `gitpoulpi-app` (commit-graph lanes, stash rows, row model).
 
 ## Build and run
 

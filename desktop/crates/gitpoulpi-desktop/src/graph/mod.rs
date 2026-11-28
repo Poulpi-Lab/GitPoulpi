@@ -1,16 +1,19 @@
-//! The commit graph: lane layout and its vector painter, behind a deliberately small interface.
+//! The commit graph: lane layout (from the shared `gitpoulpi-app` crate) and its vector painter,
+//! behind a deliberately small interface.
 //!
-//! The lane algorithm (`lanes.rs`) is a copy of the terminal UI's and will be replaced by the shared
-//! `gitpoulpi-app` crate. Everything outside this folder talks to [`GraphLayout`], [`Entry`],
-//! [`RowGraphic`] and [`Palette`] only; no lane, cell or colour-index type leaks out, so swapping the
-//! implementation means rewriting `mod.rs` and `paint.rs`.
+//! Everything outside this folder talks to [`GraphLayout`], [`Entry`], [`RowGraphic`] and
+//! [`Palette`] only; no lane, cell or colour-index type leaks out.
 
-mod lanes;
+#[cfg(test)]
+mod fixtures;
+#[cfg(test)]
+mod golden_tests;
 mod paint;
 
 use std::collections::HashSet;
 
-use gitpoulpi_core::domain::{CommitNode, Oid, Stash};
+use gitpoulpi_app::graph as app;
+use gitpoulpi_core::domain::{CommitNode, Oid, Ref, Stash};
 use gpui_kit::{Bounds, Hsla, Pixels, Window};
 
 pub use paint::{Palette, CH, CW};
@@ -29,8 +32,8 @@ pub enum Entry {
 /// Everything the layout is computed from.
 pub struct GraphInput<'a> {
     pub nodes: &'a [CommitNode],
-    /// Commits some ref points at (they get a filled node).
-    pub ref_targets: &'a HashSet<Oid>,
+    /// Every ref; the commits they point at get a filled node.
+    pub refs: &'a [Ref],
     pub stashes: &'a [Stash],
     /// A dirty working tree gets the WIP row.
     pub dirty: bool,
@@ -43,7 +46,7 @@ pub struct GraphInput<'a> {
 /// The computed graph: display order plus one drawable row per entry.
 #[derive(Clone, Default)]
 pub struct GraphLayout {
-    grid: lanes::GraphGrid,
+    grid: app::GraphGrid,
     entries: Vec<Entry>,
     /// For each input stash, its slot in the lane layout (stashes without a commit or base have none).
     slot_of_stash: Vec<Option<usize>>,
@@ -52,11 +55,11 @@ pub struct GraphLayout {
 
 impl GraphLayout {
     pub fn build(input: &GraphInput<'_>) -> Self {
-        let mut graph_stashes = Vec::new();
+        let mut stashes = Vec::new();
         let mut original = Vec::new();
         for (ix, s) in input.stashes.iter().enumerate() {
             if let (Some(commit), Some(base)) = (s.commit, s.base) {
-                graph_stashes.push(lanes::GraphStash {
+                stashes.push(app::GraphStash {
                     id: s.id.0,
                     commit,
                     base,
@@ -65,32 +68,35 @@ impl GraphLayout {
                 original.push(ix);
             }
         }
-        let wip = input.dirty.then_some(lanes::WipAnchor { head: input.head });
-        let grid = lanes::build_graph_grid(
-            input.nodes,
-            input.ref_targets,
-            wip,
-            &graph_stashes,
-            input.palette_len,
-        );
+        let wip = input.dirty.then_some(app::WipAnchor { head: input.head });
+        // The shared layout scans the refs once per commit; one ref per target keeps that scan short
+        // on repositories with thousands of refs.
+        let mut seen = HashSet::new();
+        let refs: Vec<Ref> = input
+            .refs
+            .iter()
+            .filter(|r| seen.insert(r.target))
+            .cloned()
+            .collect();
+        let grid =
+            app::build_graph_grid_themed(input.nodes, &refs, wip, &stashes, input.palette_len);
         let mut slot_of_stash = vec![None; input.stashes.len()];
         for (slot, placed) in grid.stash_slots.iter().enumerate() {
             if let Some(&orig) = original.get(placed.stash) {
                 slot_of_stash[orig] = Some(slot);
             }
         }
-        let entries =
-            lanes::display_order(grid.wip.is_some(), &grid.stash_slots, input.nodes.len())
-                .into_iter()
-                .filter_map(|e| match e {
-                    lanes::LogEntry::Wip => Some(Entry::Wip),
-                    lanes::LogEntry::Commit(i) => Some(Entry::Commit(i)),
-                    lanes::LogEntry::Stash(slot) => {
-                        let placed = grid.stash_slots.get(slot)?;
-                        original.get(placed.stash).map(|&orig| Entry::Stash(orig))
-                    }
-                })
-                .collect();
+        let order = grid.log_rows();
+        let entries = (0..order.len(input.nodes.len()))
+            .filter_map(|display| match order.entry(display) {
+                app::LogEntry::Wip => Some(Entry::Wip),
+                app::LogEntry::Commit(i) => Some(Entry::Commit(i)),
+                app::LogEntry::Stash(slot) => {
+                    let placed = grid.stash_slots.get(slot)?;
+                    original.get(placed.stash).map(|&orig| Entry::Stash(orig))
+                }
+            })
+            .collect();
         let max_cells = grid.rows.iter().map(|r| r.cells.len()).max().unwrap_or(0);
         Self {
             grid,
@@ -126,7 +132,7 @@ impl GraphLayout {
 
 /// One row's graph cells, ready to paint.
 #[derive(Clone)]
-pub struct RowGraphic(lanes::GraphRow);
+pub struct RowGraphic(app::GraphRow);
 
 impl RowGraphic {
     /// The colour of this row's own lane (what its ref pills are tinted with).
@@ -155,7 +161,7 @@ mod tests {
     fn empty_input_has_no_rows() {
         let layout = GraphLayout::build(&GraphInput {
             nodes: &[],
-            ref_targets: &HashSet::new(),
+            refs: &[],
             stashes: &[],
             dirty: false,
             head: None,
@@ -169,7 +175,7 @@ mod tests {
     fn dirty_tree_adds_a_wip_row() {
         let layout = GraphLayout::build(&GraphInput {
             nodes: &[],
-            ref_targets: &HashSet::new(),
+            refs: &[],
             stashes: &[],
             dirty: true,
             head: None,

@@ -19,7 +19,7 @@ pub enum Selection {
 }
 
 /// What a selected row is, independent of where it sits: a reload keeps the selection on it.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RowKey {
     Wip,
     Commit(Oid),
@@ -115,7 +115,15 @@ impl LogData {
     pub fn selection_at(&self, ix: usize) -> Option<Selection> {
         match *self.layout.entries().get(ix)? {
             Entry::Wip => Some(Selection::Wip),
-            Entry::Commit(i) => self.nodes.get(i).cloned().map(Selection::Commit),
+            Entry::Commit(i) => self.nodes.get(i).cloned().map(|mut n| {
+                // The refs on the commit, for the details pane.
+                n.refs = self
+                    .refs_by_commit
+                    .get(&n.id)
+                    .map(|ix| ix.iter().map(|i| self.refs[*i].kind.clone()).collect())
+                    .unwrap_or_default();
+                Selection::Commit(n)
+            }),
             Entry::Stash(i) => self.stashes.get(i).cloned().map(Selection::Stash),
         }
     }
@@ -123,6 +131,22 @@ impl LogData {
     /// The identity of the row at `ix`.
     pub fn key_at(&self, ix: usize) -> Option<RowKey> {
         self.selection_at(ix).map(|s| RowKey::of(&s))
+    }
+
+    /// The identity of every row, in display order.
+    pub fn display_keys(&self) -> Vec<RowKey> {
+        self.layout
+            .entries()
+            .iter()
+            .map(|e| match *e {
+                Entry::Wip => RowKey::Wip,
+                Entry::Commit(i) => RowKey::Commit(self.nodes[i].id),
+                Entry::Stash(i) => {
+                    let s = &self.stashes[i];
+                    RowKey::Stash(s.commit, s.message.clone())
+                }
+            })
+            .collect()
     }
 
     /// Display index of the row `key` names, if it is still there.

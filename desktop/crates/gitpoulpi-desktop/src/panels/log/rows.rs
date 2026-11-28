@@ -10,7 +10,8 @@ use gpui_kit::component::{h_flex, Icon};
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
     div, px, AnyElement, App, ClickEvent, FontWeight, InteractiveElement as _, IntoElement,
-    ParentElement as _, StatefulInteractiveElement as _, Styled as _, WeakEntity,
+    MouseButton, MouseDownEvent, ParentElement as _, StatefulInteractiveElement as _, Styled as _,
+    WeakEntity,
 };
 
 use super::data::LogData;
@@ -29,6 +30,7 @@ pub(super) struct RowsContext {
     pub selected: usize,
     pub layout: ColumnLayout,
     pub palette: Palette,
+    pub marked: Arc<HashSet<usize>>,
     pub matches: Arc<HashSet<usize>>,
     pub query_active: bool,
     pub more: bool,
@@ -60,11 +62,13 @@ impl RowsContext {
     }
 
     fn row(&self, ix: usize, skin: &Skin) -> AnyElement {
-        let selected = ix == self.selected;
+        let cursor = ix == self.selected;
+        let selected = cursor || self.marked.contains(&ix);
         let dim = self.query_active && !self.matches.contains(&ix);
         let entries = self.data.layout.entries();
         let entry = entries[ix];
         let me = self.me.clone();
+        let me_menu = self.me.clone();
         let l = self.layout;
         let cells = match entry {
             Entry::Commit(ci) => self.commit_cells(entry, ci, dim, skin),
@@ -112,12 +116,25 @@ impl RowsContext {
             .items_center()
             .when(selected, |d| d.bg(selection))
             .hover(move |d| if selected { d } else { d.bg(hover) })
-            .on_click(move |_: &ClickEvent, window, cx| {
-                let _ = me.update(cx, |this, cx| {
-                    this.select(ix, cx);
-                    this.focus.focus(window, cx);
-                });
+            .on_click({
+                let me = me.clone();
+                move |ev: &ClickEvent, window, cx| {
+                    let mods = ev.modifiers();
+                    let _ = me.update(cx, |this, cx| this.click_row(ix, mods, window, cx));
+                }
             })
+            .on_mouse_down(
+                MouseButton::Right,
+                move |ev: &MouseDownEvent, window, cx| {
+                    let at = ev.position;
+                    // Asked before the Log is updated: the window state reads the Log too.
+                    let palette =
+                        crate::commands::context::window_state(window, cx).palette_context();
+                    let _ = me_menu.update(cx, |this, cx| {
+                        this.open_menu_on(ix, at, palette, window, cx)
+                    });
+                },
+            )
             .child(cells.ref_cell.w(px(l.ref_w)).flex_none().h_full())
             .child(graph_cell)
             .child(cells.message)

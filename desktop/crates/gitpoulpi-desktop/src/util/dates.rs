@@ -28,6 +28,19 @@ pub fn iso_date(ts: i64) -> String {
     format!("{y:04}-{m:02}-{d:02} {hh:02}:{mm:02}")
 }
 
+/// The date the details pane and "Copy date" write: `5 March 2024 14:05` in the interface language, UTC.
+pub fn verbose(ts: i64) -> String {
+    let (y, m, d, hh, mm) = civil(ts);
+    format!(
+        "{} {hh:02}:{mm:02}",
+        msg::date::day_month_year(
+            d.to_string(),
+            gitpoulpi_i18n::month_name_of(m).get(),
+            format_args!("{y:04}")
+        )
+    )
+}
+
 /// "3 days ago" in the current UI language for recent commits, the ISO date after a year.
 pub fn relative_date(ts: i64, now: i64) -> String {
     let d = (now - ts).max(0) as u64;

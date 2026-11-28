@@ -5,12 +5,12 @@ Generated from the shared registry (`gitpoulpi_app::registry::parity_rows`, ever
 `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` from `desktop/` to rewrite it.
 The branch merges when `parity_is_complete` passes (see `desktop/parity/README.md`).
 
-**976 rows: 86 done, 8 terminal only, 882 to do.**
+**976 rows: 104 done, 8 terminal only, 864 to do.**
 
 | Kind | Rows | Done | Terminal only | To do |
 |---|---:|---:|---:|---:|
-| action | 375 | 54 | 0 | 321 |
-| palette command | 588 | 32 | 0 | 556 |
+| action | 375 | 61 | 0 | 314 |
+| palette command | 588 | 43 | 0 | 545 |
 | family | 13 | 0 | 8 | 5 |
 
 A palette command that is the only twin of a key action shares that action's row.
@@ -45,7 +45,7 @@ A palette command that is the only twin of a key action shares that action's row
 | `global.undo_history` | global | Open the Undo History | Alt+Z | to do |
 | `global.commit_column` | global | Show or Hide the Commit Column | Alt+C | to do |
 | `global.undo_offer` | global | Restore the Branch to Where the Blocked Action Left It | Alt+Shift+Z | to do |
-| `global.context_menu` | global | Context Menu | . / Menu / Shift+F10 | to do |
+| `global.context_menu` | global | Context Menu | . / Menu / Shift+F10 | done |
 | `git_prefix.compose_commit` | git_prefix | Compose Commit Message | c / Ctrl+G c | done |
 | `git_prefix.commit_now` | git_prefix | Commit Staged Changes Now | Enter / Ctrl+G Enter | done |
 | `git_prefix.ai_compose` | git_prefix | AI: Split Changes into Commits | Shift+C | to do |
@@ -65,12 +65,12 @@ A palette command that is the only twin of a key action shares that action's row
 | `git_prefix.new_tag` | git_prefix | New Tag | t / Ctrl+G t | to do |
 | `git_prefix.new_branch` | git_prefix | New Branch | b / Ctrl+G b | to do |
 | `git_prefix.stash_push` | git_prefix | Stash Changes | Shift+T / Ctrl+G T | to do |
-| `git_prefix.cherry_pick` | git_prefix | Cherry-Pick Selected Commit | y / Ctrl+G y | to do |
-| `git_prefix.revert` | git_prefix | Revert Selected Commit | v / Ctrl+G v | to do |
+| `git_prefix.cherry_pick` | git_prefix | Cherry-Pick Selected Commit | y / Ctrl+G y | done |
+| `git_prefix.revert` | git_prefix | Revert Selected Commit | v / Ctrl+G v | done |
 | `git_prefix.edit_message` | git_prefix | Edit Commit Message | e / Ctrl+G e | to do |
 | `git_prefix.amend` | git_prefix | Amend Selected Commit | Shift+E / Ctrl+G E | to do |
 | `git_prefix.edit_author` | git_prefix | Amend Selected Commit Author | Shift+A / Ctrl+G A | to do |
-| `git_prefix.reset_mixed` | git_prefix | Reset (Mixed) to Selected Commit | Shift+R / Ctrl+G R | to do |
+| `git_prefix.reset_mixed` | git_prefix | Reset (Mixed) to Selected Commit | Shift+R / Ctrl+G R | done |
 | `git_prefix.rebase_onto` | git_prefix | Rebase onto Selected Branch | r / Ctrl+G r | to do |
 | `git_prefix.stash_pop` | git_prefix | Pop Stash | o / Ctrl+G o | to do |
 | `git_prefix.delete_ref` | git_prefix | Delete Selected Ref or Drop Stash | d / Ctrl+G d | to do |
@@ -126,9 +126,9 @@ A palette command that is the only twin of a key action shares that action's row
 | `log.toggle_file_mode` | log | Files: Path or Tree | m | to do |
 | `log.lfs_only` | log | Files: LFS Only | o | to do |
 | `log.view_all_files` | log | Files: View All Files | a | to do |
-| `log.compare_selection` | log | Compare the Selected Rows | v | to do |
-| `log.compare_swap` | log | Swap the Comparison Ends | x | to do |
-| `log.compare_next` | log | Go to the Next Compared Row | n | to do |
+| `log.compare_selection` | log | Compare the Selected Rows | v | done |
+| `log.compare_swap` | log | Swap the Comparison Ends | x | done |
+| `log.compare_next` | log | Go to the Next Compared Row | n | done |
 | `log.filter_author` | log | Filter the Log by Author | Shift+A | to do |
 | `log.pick_column` | log | Pick a Column to Move or Size | Shift+C | to do |
 | `log.scroll_left` | log | Scroll the Columns Left | Shift+Left | to do |
@@ -581,15 +581,15 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.show_remote_in_graph` | palette | Remote: Show Remote in Graph... |  | to do |
 | `palette.stash_apply` | palette | Git: Stash Apply |  | to do |
 | `palette.stash_drop` | palette | Git: Stash Drop... |  | to do |
-| `palette.checkout_selected_commit` | palette | Git: Check Out Selected Commit (detached HEAD) |  | to do |
+| `palette.checkout_selected_commit` | palette | Git: Check Out Selected Commit (detached HEAD) |  | done |
 | `palette.create_branch_at_selected_commit` | palette | Git: Create Branch at Selected Commit... |  | to do |
 | `palette.create_tag_at_selected_commit` | palette | Git: Create Tag at Selected Commit... |  | to do |
-| `palette.copy_commit_field_message` | palette | Commit: Copy Message |  | to do |
-| `palette.copy_commit_field_author_name` | palette | Commit: Copy Author Name |  | to do |
-| `palette.copy_commit_field_author_email` | palette | Commit: Copy Author Email |  | to do |
-| `palette.copy_commit_field_date` | palette | Commit: Copy Date |  | to do |
-| `palette.copy_commit_field_short_sha` | palette | Commit: Copy Short SHA |  | to do |
-| `palette.copy_commit_field_long_sha` | palette | Commit: Copy Full SHA |  | to do |
+| `palette.copy_commit_field_message` | palette | Commit: Copy Message |  | done |
+| `palette.copy_commit_field_author_name` | palette | Commit: Copy Author Name |  | done |
+| `palette.copy_commit_field_author_email` | palette | Commit: Copy Author Email |  | done |
+| `palette.copy_commit_field_date` | palette | Commit: Copy Date |  | done |
+| `palette.copy_commit_field_short_sha` | palette | Commit: Copy Short SHA |  | done |
+| `palette.copy_commit_field_long_sha` | palette | Commit: Copy Full SHA |  | done |
 | `palette.amend_selected_commit_summary` | palette | Commit: Amend Summary... |  | to do |
 | `palette.amend_selected_commit_description` | palette | Commit: Amend Description... |  | to do |
 | `palette.split_selected_commit` | palette | Git: Split Selected Commit... |  | to do |
@@ -607,8 +607,8 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.conflicts_show` | palette | Conflicts: Show Predicted Conflicts |  | to do |
 | `palette.auto_stash_drop` | palette | Banner: Drop Pending Auto-Stash... |  | to do |
 | `palette.auto_stash_start_over` | palette | Banner: Start Over... |  | to do |
-| `palette.reset_to_selected_commit_soft` | palette | Git: Reset Branch to Selected Commit (soft - keep index and working tree) |  | to do |
-| `palette.reset_to_selected_commit_hard` | palette | Git: Reset Branch to Selected Commit (hard - discard everything)... |  | to do |
+| `palette.reset_to_selected_commit_soft` | palette | Git: Reset Branch to Selected Commit (soft - keep index and working tree) |  | done |
+| `palette.reset_to_selected_commit_hard` | palette | Git: Reset Branch to Selected Commit (hard - discard everything)... |  | done |
 | `palette.resolve_conflict_with_ours` | palette | Git: Resolve Conflict Using Ours (this branch) |  | to do |
 | `palette.resolve_conflict_with_theirs` | palette | Git: Resolve Conflict Using Theirs (incoming) |  | to do |
 | `palette.resolve_conflict_with_base` | palette | Git: Resolve Conflict Using Base (common ancestor) |  | to do |
@@ -624,8 +624,8 @@ A palette command that is the only twin of a key action shares that action's row
 | `palette.merge_unresolve` | palette | Merge: Unresolve and Reopen |  | to do |
 | `palette.merge_reload` | palette | Merge: Reload the File |  | to do |
 | `palette.merge_close` | palette | Merge: Close Merge Editor |  | to do |
-| `palette.abort_operation` | palette | Git: Abort Merge, Cherry-Pick or Revert |  | to do |
-| `palette.skip_operation` | palette | Git: Skip Cherry-Pick or Revert |  | to do |
+| `palette.abort_operation` | palette | Git: Abort Merge, Cherry-Pick or Revert |  | done |
+| `palette.skip_operation` | palette | Git: Skip Cherry-Pick or Revert |  | done |
 | `palette.browse_repository` | palette | Repository: Browse for a Repository... |  | done |
 | `palette.create_repository` | palette | Repository: Create New (Init)... |  | to do |
 | `palette.management_open_selected` | palette | Repositories: Open Selected | Enter | to do |

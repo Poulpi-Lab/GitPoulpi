@@ -10,13 +10,20 @@
 //! `columns` (widths, header, resize), `rows` (one row's cells), `pills` (ref pills).
 
 mod columns;
+pub mod compare;
 mod data;
 mod load;
+mod marks;
+pub mod menu;
+pub mod menu_items;
+mod ops;
+mod pick;
 mod pills;
 mod rows;
 mod search;
 
 use std::collections::HashSet;
+use std::sync::Arc;
 
 use gitpoulpi_app::graph::{LazyLog, LogLoadSettings, TotalShown};
 use gitpoulpi_config::CommitCountMethod;
@@ -38,6 +45,8 @@ use crate::theme::Skin;
 use columns::ColumnState;
 use data::LogData;
 pub use data::Selection;
+use gpui_kit::Entity;
+use marks::Marks;
 use search::SearchState;
 
 actions!(
@@ -49,7 +58,10 @@ actions!(
         PageDown,
         RowHome,
         RowEnd,
-        CloseSearch
+        CloseSearch,
+        ToggleMark,
+        ExtendUp,
+        ExtendDown
     ]
 );
 
@@ -57,6 +69,7 @@ actions!(
 const CONTEXT: &str = "GpLog";
 
 pub fn init(cx: &mut App) {
+    menu::init(cx);
     cx.bind_keys([
         KeyBinding::new("up", RowUp, Some(CONTEXT)),
         KeyBinding::new("down", RowDown, Some(CONTEXT)),
@@ -67,6 +80,9 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("home", RowHome, Some(CONTEXT)),
         KeyBinding::new("end", RowEnd, Some(CONTEXT)),
         KeyBinding::new("escape", CloseSearch, Some(CONTEXT)),
+        KeyBinding::new("space", ToggleMark, Some(CONTEXT)),
+        KeyBinding::new("shift-up", ExtendUp, Some(CONTEXT)),
+        KeyBinding::new("shift-down", ExtendDown, Some(CONTEXT)),
     ]);
 }
 
@@ -81,13 +97,25 @@ pub struct Summary {
 
 pub enum LogEvent {
     Selected(Selection),
+    /// Two or more rows are selected: the right pane compares them.
+    Compare(compare::CompareSpec),
     Loaded(Summary),
+    /// A line for the status line (what an operation started, why it did nothing).
+    Say(String),
 }
 
 pub struct LogPanel {
     backend: Shared,
     data: LogData,
     selected: usize,
+    /// Several rows selected next to the cursor (Ctrl/Shift+click, Space), and the display rows they are.
+    marks: Marks,
+    marked_rows: Arc<HashSet<usize>>,
+    /// The two ends of a two-row comparison were traded.
+    swapped: bool,
+    /// The open commit menu.
+    menu: Option<Entity<menu::CommitMenu>>,
+    _menu_sub: Option<Subscription>,
     scroll: UniformListScrollHandle,
     columns: ColumnState,
     search: SearchState,
@@ -145,6 +173,11 @@ impl LogPanel {
             backend,
             data: LogData::default(),
             selected: 0,
+            marks: Marks::default(),
+            marked_rows: Arc::default(),
+            swapped: false,
+            menu: None,
+            _menu_sub: None,
             scroll: UniformListScrollHandle::new(),
             columns,
             search,
@@ -221,11 +254,27 @@ impl LogPanel {
         }
         let ix = ix.min(total - 1);
         self.selected = ix;
+        self.drop_marks();
         self.scroll.scroll_to_item(ix, ScrollStrategy::Nearest);
         if let Some(sel) = self.data.selection_at(ix) {
             cx.emit(LogEvent::Selected(sel));
         }
         cx.notify();
+    }
+
+    /// The display row of a commit, if it is loaded.
+    pub fn row_of(&self, oid: Oid) -> Option<usize> {
+        self.data.position_of(oid)
+    }
+
+    /// How many rows are selected next to the cursor.
+    pub fn marked_count(&self) -> usize {
+        self.marks.len()
+    }
+
+    /// The open commit menu, if any.
+    pub fn menu(&self) -> Option<&Entity<menu::CommitMenu>> {
+        self.menu.as_ref()
     }
 
     fn move_by(&mut self, delta: isize, cx: &mut Context<Self>) {
@@ -234,8 +283,12 @@ impl LogPanel {
     }
 
     pub fn select_oid(&mut self, oid: Oid, cx: &mut Context<Self>) {
-        if let Some(ix) = self.data.position_of(oid) {
-            self.select(ix, cx);
+        match self.data.position_of(oid) {
+            Some(ix) => self.select(ix, cx),
+            None => self.say(
+                msg::menu_log::not_loaded(crate::daemon::commit_ops::short(oid)),
+                cx,
+            ),
         }
     }
 }
@@ -288,6 +341,7 @@ impl Render for LogPanel {
             selected: self.selected,
             layout,
             palette,
+            marked: self.marked_rows.clone(),
             matches: self.search.match_set(),
             query_active: self.search.active(),
             more: !self.lazy.is_exhausted() && !self.lazy.is_at_ceiling(),
@@ -316,8 +370,13 @@ impl Render for LogPanel {
             .on_action(cx.listener(|this, _: &CloseSearch, window, cx| {
                 if this.search.open {
                     this.toggle_search(window, cx);
+                } else if !this.marks.is_empty() {
+                    this.clear_marks(cx);
                 }
             }))
+            .on_action(cx.listener(|this, _: &ToggleMark, _, cx| this.toggle_mark(cx)))
+            .on_action(cx.listener(|this, _: &ExtendUp, _, cx| this.extend_by(-1, cx)))
+            .on_action(cx.listener(|this, _: &ExtendDown, _, cx| this.extend_by(1, cx)))
             .border_1()
             .border_color(if focus_ring {
                 skin.border_focused
@@ -335,6 +394,7 @@ impl Render for LogPanel {
                     .child(list)
                     .child(Scrollbar::vertical(&self.scroll)),
             )
+            .children(self.menu.clone())
     }
 }
 

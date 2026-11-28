@@ -12,10 +12,12 @@
 //! | `context`  | the palette's availability context and the key context of the focused pane |
 //! | `picker`   | the searchable list dialog (command palette, theme / language pickers) |
 //! | `palette`  | the command palette: shared entries, shortcuts, fuzzy matching, reasons |
+//! | `commit_ops` | the Log's commit operations: cherry-pick, revert, reset, checkout, copy, the menu key, comparing rows |
 //! | `staging`  | running the staging and commit ops on the working-changes pane and the diff |
 //! | `status`   | the one-line message shown in the status line |
 
 pub mod catalog;
+pub mod commit_ops;
 pub mod context;
 pub mod exec;
 pub mod keys;

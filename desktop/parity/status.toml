@@ -56,6 +56,10 @@ id = "diff.toggle_wrap"
 status = "done"
 
 [[action]]
+id = "git_prefix.cherry_pick"
+status = "done"
+
+[[action]]
 id = "git_prefix.commit_now"
 status = "done"
 
@@ -80,6 +84,14 @@ id = "git_prefix.push"
 status = "done"
 
 [[action]]
+id = "git_prefix.reset_mixed"
+status = "done"
+
+[[action]]
+id = "git_prefix.revert"
+status = "done"
+
+[[action]]
 id = "git_prefix.stage_all"
 status = "done"
 
@@ -89,6 +101,10 @@ status = "done"
 
 [[action]]
 id = "git_prefix.unstage_file"
+status = "done"
+
+[[action]]
+id = "global.context_menu"
 status = "done"
 
 [[action]]
@@ -135,6 +151,18 @@ id = "global.undo"
 status = "done"
 
 [[action]]
+id = "log.compare_next"
+status = "done"
+
+[[action]]
+id = "log.compare_selection"
+status = "done"
+
+[[action]]
+id = "log.compare_swap"
+status = "done"
+
+[[action]]
 id = "log_columns.fit_all"
 status = "done"
 
@@ -173,12 +201,44 @@ status = "done"
 note = "Opens the keybindings view."
 
 [[action]]
+id = "palette.abort_operation"
+status = "done"
+
+[[action]]
 id = "palette.browse_repository"
 status = "done"
 note = "Folder chooser of the operating system, then opens that repository (File menu)."
 
 [[action]]
+id = "palette.checkout_selected_commit"
+status = "done"
+
+[[action]]
 id = "palette.close_diff"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_author_email"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_author_name"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_date"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_long_sha"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_message"
+status = "done"
+
+[[action]]
+id = "palette.copy_commit_field_short_sha"
 status = "done"
 
 [[action]]
@@ -251,7 +311,19 @@ id = "palette.prev_hunk"
 status = "done"
 
 [[action]]
+id = "palette.reset_to_selected_commit_hard"
+status = "done"
+
+[[action]]
+id = "palette.reset_to_selected_commit_soft"
+status = "done"
+
+[[action]]
 id = "palette.select_lines"
+status = "done"
+
+[[action]]
+id = "palette.skip_operation"
 status = "done"
 
 [[action]]

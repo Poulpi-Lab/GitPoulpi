@@ -94,10 +94,8 @@ impl LogPanel {
                 this.recompute_matches(cx);
                 this.tick_total(cx);
                 this.emit_summary(cx);
-                if let Some(sel) = this.data.selection_at(this.selected) {
-                    cx.emit(LogEvent::Selected(sel));
-                }
-                cx.notify();
+                this.recompute_marks();
+                this.sync_right(cx);
             });
         }));
     }

@@ -7,6 +7,7 @@
 //! refreshes the daemon pushes arrive on the link's receivers, which the window drains when
 //! [`host::DesktopHost`] wakes it (`app::live`); writes are link actions (`transfer`).
 
+pub mod commit_ops;
 mod history;
 pub mod host;
 mod queries;

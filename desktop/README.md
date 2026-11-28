@@ -45,6 +45,26 @@ commit yet. `Ctrl+Enter` in a field, `Ctrl+G Enter` and the button commit; the f
 commit succeeded, and a refusal (a hook, nothing staged) keeps the text and shows the daemon's message.
 A stage that would add files that look like secrets asks first (Stage anyway or Cancel).
 
+## Commits in the Log
+
+Right-click a commit, or press the menu key (Shift+F10, `.`) on the selected row, for the commit menu: the
+terminal UI's rows in its order (cherry-pick, revert, reset to here with Soft / Mixed / Hard, edit and amend,
+create branch or tag here, check out, patches, copy). A row the desktop does not run yet stays listed with
+its reason. Up / Down move, Enter or Right opens a submenu, Left or Esc goes back, the close control and a click
+away close it. Every row is a registry command, so the keys (`Ctrl+G y` cherry-pick, `Ctrl+G v` revert,
+`Ctrl+G R` mixed reset) and the palette do the same.
+
+Ctrl+click or Space toggles a row, Shift+click or Shift+Up / Down takes a range, Esc clears. Two or more rows
+turn the right pane into a comparison (cards, Swap with `x`, next row with `n`, the changed files); cherry-pick
+on several commits applies them oldest first as one undo entry. Revert and `reset --hard` ask first; every
+operation is one undo entry. The right pane's commit details show the author, the date, every parent (a click
+jumps to it), the refs, the change counts and the whole message as selectable text, with copy chips; the changed
+files open their diff on a click or Enter.
+
+A merge, cherry-pick or revert stopped on conflicts shows a banner above the panes and its state in the status
+line: Resolve conflicts (the merge editor is not available yet), Continue (takes you to the commit form), Skip and
+Abort, which ask first.
+
 ## Layout
 
 `desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The

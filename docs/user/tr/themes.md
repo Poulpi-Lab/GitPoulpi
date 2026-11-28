@@ -215,7 +215,7 @@ aynı adlı bir özel tema (örneğin `gruvbox`) o paleti listede değiştirir. 
 yoksa (dosya silindi veya yeniden adlandırıldı), grafik etkin temanın şerit renklerini kullanır
 ve Ayarlar, siz başka birini seçene kadar adı *bulunamadı* olarak işaretli gösterir. ![Görünüm sayfasındaki Grafik renk teması açılır listesi: Temayı izle, ardından her şerit paleti ve renklerinden birkaçı](../images/settings-log-graph-lanes.png)
 
-`config.toml` içinde:
+`tui.toml` içinde:
 
 ```toml
 [ui]
@@ -281,7 +281,7 @@ renk yok sayılır, bilinmeyen bir `base` değeri `dark`'a döner ve `gitpoulpi 
 her sorunu `warnings` altında bildirir (uygulama bunları durum çubuğunda bir kez gösterir).
 
 Dosyalar Tema açılır listesi açıldığında ve Ayarlar kapandığında yeniden okunur. Çalışan
-bir pencere ayrıca `config.toml` dosyasının (kabuktan yapılan bir
+bir pencere ayrıca `tui.toml` dosyasının (kabuktan yapılan bir
 `gitpoulpi config set ui.theme ...`) ve etkin temanın dosyasının yeniden yazıldığını fark
 eder ve yeni renkleri yeniden başlatmadan yaklaşık bir saniye içinde uygular.
 
@@ -349,7 +349,7 @@ o satırda açar.
 bir listesini açar: **Sistem (terminali izler)**, hazır ayarlar, ardından kendi tema
 dosyalarınız; her biri dört küçük renk çipiyle gösterilir. Geçerli tema işaretlidir.
 Listeyi daraltmak için yazın; vurguyu hareket ettirmek temayı hemen önizler, **Enter**
-uygular ve `ui.theme` değerini `config.toml` dosyasına kaydeder, **Esc** (ya da listenin
+uygular ve `ui.theme` değerini `tui.toml` dosyasına kaydeder, **Esc** (ya da listenin
 dışına tıklamak) önceki temayı geri koyar ve hiçbir şey kaydetmez.
 
 Filtre alanının altında bölümlü bir ön filtre listeyi daraltır: **Tümü**, **Koyu**,

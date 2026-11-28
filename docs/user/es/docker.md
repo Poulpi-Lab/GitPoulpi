@@ -24,11 +24,11 @@ docker run -it --rm \
 | Ruta | Qué contiene |
 |---|---|
 | `/work` | El directorio de trabajo. Monta aquí tus repositorios (bind mount). |
-| `/config` | Ajustes (`config.toml`), sesiones y, como subcarpetas, datos y caché (`GITPOULPI_CONFIG_DIR=/config`). Usa un volumen con nombre o un bind mount para conservarlos. |
+| `/config` | Ajustes (`config.toml`, `tui.toml`), sesiones y, como subcarpetas, datos y caché (`GITPOULPI_CONFIG_DIR=/config`). Usa un volumen con nombre o un bind mount para conservarlos. |
 | `/data`, `/cache` | Declaradas también como volúmenes, para herramientas que siguen las variables XDG (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. No es un volumen: uno nuevo por contenedor. |
 
-Sin un volumen para `/config`, cada ejecución con `--rm` empieza con los ajustes por defecto. Para partir de tu propio `config.toml`, móntalo: `-v "$PWD/config.toml":/config/config.toml:ro` (solo lectura significa que Ajustes no puede guardar).
+Sin un volumen para `/config`, cada ejecución con `--rm` empieza con los ajustes por defecto. Para partir de tu propio `config.toml`, móntalo: `-v "$PWD/config.toml":/config/config.toml:ro` (solo lectura significa que Ajustes no puede guardar). Los ajustes de interfaz están en un segundo archivo, `tui.toml`, que se monta igual (`-v "$PWD/tui.toml":/config/tui.toml:ro`); ver la [Referencia de configuración](config-reference.md#dos-archivos-configtoml-y-tuitoml).
 
 ## Repositorios de otro usuario
 

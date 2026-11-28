@@ -219,7 +219,7 @@ existe (el archivo se eliminó o se renombró), el grafo usa los colores de carr
 activo, y Ajustes muestra el nombre marcado como *no encontrado* hasta que
 elijas otro. ![El combo Tema de color del grafo en Apariencia: Seguir el tema, luego cada paleta de carriles con algunos de sus colores](../images/settings-log-graph-lanes.png)
 
-En `config.toml`:
+En `tui.toml`:
 
 ```toml
 [ui]
@@ -287,7 +287,7 @@ color incorrecto se ignora, una `base` desconocida recurre a `dark`, y
 muestra una vez en la barra de estado).
 
 Los archivos se vuelven a leer al abrir el combo Tema y al cerrar Ajustes. Una
-ventana en marcha también nota cuando se reescriben `config.toml` (un
+ventana en marcha también nota cuando se reescribe `tui.toml` (un
 `gitpoulpi config set ui.theme ...` desde una shell) y el archivo del tema activo,
 y aplica los colores nuevos en aproximadamente un segundo, sin reiniciar.
 
@@ -358,7 +358,7 @@ fila.
 Ajustes: **Sistema (sigue el terminal)**, los presets y luego tus propios
 archivos de tema, cada uno con cuatro pequeños chips de color. El tema actual aparece marcado.
 Escribe para filtrar la lista; al mover el resaltado se previsualiza el tema al instante,
-**Enter** lo aplica y guarda `ui.theme` en `config.toml`, **Esc** (o un clic
+**Enter** lo aplica y guarda `ui.theme` en `tui.toml`, **Esc** (o un clic
 fuera de la lista) devuelve el tema anterior y no guarda nada.
 
 Bajo el campo de filtro, un prefiltro segmentado acota la lista: **Todos**,

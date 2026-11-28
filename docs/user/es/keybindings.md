@@ -12,7 +12,7 @@ muestran la nueva. Para el ratón, consulta [Ratón y gestos](mouse-and-gestures
 
 Abre **Ajustes > Teclado y ratón**. La página se describe en
 [Ajustes](settings.md#teclado-y-ratón). Los cambios se aplican al instante y se
-guardan en la tabla `[keybindings]` de `config.toml`. También puedes editar esa
+guardan en la tabla `[keybindings]` de `tui.toml` (el archivo de interfaz de la interfaz de terminal, junto a `config.toml`). También puedes editar esa
 tabla a mano:
 
 ```toml
@@ -476,7 +476,9 @@ para ver todo su grupo.
 
 Cada fila de la paleta termina con un botón de tecla (`[k]`), y `Alt+K` hace lo mismo en la fila resaltada: abre **Ajustes > Teclado y ratón** filtrado por el atajo de ese comando, listo para reasignarlo. Un comando sin atajo propio recibe uno aquí: aparece en **Comandos de la paleta**, sin tecla por defecto, y la tecla que le des ejecuta el comando igual que al elegirlo en la paleta (un comando que ahora no puede ejecutarse dice por qué). La fila muestra entonces tu tecla.
 
-En `config.toml` es la tabla `[keybindings.palette]`, con el nombre del comando (`toggle_minimap = "Ctrl+Alt+M"`). Una tecla que choca con otra acción se muestra en rojo, y `c` en su fila lista todas las acciones con las que choca.
+En `tui.toml` es la tabla `[keybindings.palette]`, con el nombre del comando (`toggle_minimap = "Ctrl+Alt+M"`). Una tecla que choca con otra acción se muestra en rojo, y `c` en su fila lista todas las acciones con las que choca.
+
+Una secuencia que definiste (una cadena con nombre de comandos de la paleta) recibe una tecla de la misma forma: `[keybindings.sequence]` toma el id de la secuencia (`backup = "Ctrl+Alt+B"`), una tecla para un id que no existe se notifica y se ignora, y la tabla sigue a `tui.toml` mientras la aplicación está en marcha. Cada secuencia es también una fila de la paleta, `Secuencia: <nombre>`, que muestra su tecla.
 
 La banda de ayuda bajo la lista indica esta tecla (`Alt+K` por defecto). Es la acción `palette.configure_shortcut`, así que se reasigna como cualquier otra.
 

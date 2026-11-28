@@ -6,163 +6,31 @@ use super::DiffViewMode;
 use crate::cell_text::{cells, char_at_cell, char_cells, pad_to, slice_cells};
 use crate::editor_buffer::tab_width;
 use crate::th;
+use gitpoulpi_app::diff::styled::{gutter_text, marker as role_marker, GUTTER_WIDTH as APP_GUTTER};
+use gitpoulpi_app::diff::{
+    effective_hunks as app_effective_hunks, line_numbers, split_change, split_pairs, EffectiveHunk,
+    SplitSide,
+};
 
-use gitpoulpi_core::domain::{DiffLine, FileDiff, Hunk, LineOrigin};
+use gitpoulpi_core::domain::{FileDiff, LineOrigin};
 use ratatui::prelude::*;
 
 use crate::text_select::{RowSegs, Seg};
 use crate::truncate_with_ellipsis;
 
-/// A hunk as the view shows it, plus the thread back to the hunk as the
-/// backend sees it.
-///
-/// `origin[i]` is the position of `hunk.lines[i]` in the original
-/// `FileDiff`'s hunk. The two numberings differ when the whitespace
-/// toggle is off and `effective_hunks` drops, rewrites and reorders
-/// lines; the backend resolves a `LineSelector` against its own diff, so
-/// shipping the rewritten positions would stage lines the user never
-/// pointed at.
-pub(super) struct EffectiveHunk {
-    pub(super) hunk: Hunk,
-    pub(super) origin: Vec<u32>,
-}
-
-/// Applies the whitespace toggle. With it on, hunks pass through
-/// untouched. With it off, each run of `-` lines followed by `+` lines is
-/// paired positionally; a pair whose contents match after `trim_end` is a
-/// whitespace-only change and collapses to one context line.
-///
-/// Within a change run the collapsed context lines are emitted ahead of
-/// the remaining `-`/`+` lines, which reorders rows only inside that run.
-/// Dropping them instead would lose lines that exist in the file.
 pub(super) fn effective_hunks(file: &FileDiff, show_whitespace: bool) -> Vec<EffectiveHunk> {
-    if show_whitespace {
-        return file
-            .hunks
-            .iter()
-            .map(|hunk| EffectiveHunk {
-                origin: (0..hunk.lines.len() as u32).collect(),
-                hunk: hunk.clone(),
-            })
-            .collect();
-    }
-    file.hunks
-        .iter()
-        .filter_map(|hunk| {
-            let mut out: Vec<DiffLine> = Vec::with_capacity(hunk.lines.len());
-            let mut origin: Vec<u32> = Vec::with_capacity(hunk.lines.len());
-            let mut i = 0usize;
-            while i < hunk.lines.len() {
-                if hunk.lines[i].origin == LineOrigin::Context {
-                    out.push(hunk.lines[i].clone());
-                    origin.push(i as u32);
-                    i += 1;
-                    continue;
-                }
-                let del_start = i;
-                while i < hunk.lines.len() && hunk.lines[i].origin == LineOrigin::Delete {
-                    i += 1;
-                }
-                let dels = &hunk.lines[del_start..i];
-                let add_start = i;
-                while i < hunk.lines.len() && hunk.lines[i].origin == LineOrigin::Add {
-                    i += 1;
-                }
-                let adds = &hunk.lines[add_start..i];
-
-                let mut collapsed: Vec<(u32, DiffLine)> = Vec::new();
-                let mut kept_dels: Vec<(u32, DiffLine)> = Vec::new();
-                let mut kept_adds: Vec<(u32, DiffLine)> = Vec::new();
-                for n in 0..dels.len().max(adds.len()) {
-                    match (dels.get(n), adds.get(n)) {
-                        (Some(d), Some(a)) if d.content.trim_end() == a.content.trim_end() => {
-                            collapsed.push((
-                                (add_start + n) as u32,
-                                DiffLine {
-                                    origin: LineOrigin::Context,
-                                    content: a.content.clone(),
-                                    staged: a.staged,
-                                },
-                            ));
-                        }
-                        (d, a) => {
-                            if let Some(d) = d {
-                                kept_dels.push(((del_start + n) as u32, d.clone()));
-                            }
-                            if let Some(a) = a {
-                                kept_adds.push(((add_start + n) as u32, a.clone()));
-                            }
-                        }
-                    }
-                }
-                for (idx, line) in collapsed.into_iter().chain(kept_dels).chain(kept_adds) {
-                    origin.push(idx);
-                    out.push(line);
-                }
-            }
-            let still_changes = out.iter().any(|l| l.origin != LineOrigin::Context);
-            still_changes.then(|| EffectiveHunk {
-                hunk: Hunk {
-                    lines: out,
-                    ..hunk.clone()
-                },
-                origin,
-            })
-        })
-        .collect()
-}
-
-/// Old/new line numbers for every line of a hunk, in order.
-fn line_numbers(hunk: &Hunk) -> Vec<(Option<u32>, Option<u32>)> {
-    let mut old = hunk.old_start;
-    let mut new = hunk.new_start;
-    hunk.lines
-        .iter()
-        .map(|l| match l.origin {
-            LineOrigin::Context => {
-                let pair = (Some(old), Some(new));
-                old += 1;
-                new += 1;
-                pair
-            }
-            LineOrigin::Delete => {
-                let pair = (Some(old), None);
-                old += 1;
-                pair
-            }
-            LineOrigin::Add => {
-                let pair = (None, Some(new));
-                new += 1;
-                pair
-            }
-        })
-        .collect()
+    app_effective_hunks(file, show_whitespace)
 }
 
 fn gutter(old: Option<u32>, new: Option<u32>) -> String {
-    if !crate::editor_prefs::line_numbers() {
-        // Same width, so the selection geometry does not move.
-        return " ".repeat(GUTTER_WIDTH);
-    }
-    let o = old.map(|n| n.to_string()).unwrap_or_default();
-    let n = new.map(|n| n.to_string()).unwrap_or_default();
-    format!("{o:>5} {n:>5} ")
+    gutter_text(old, new, crate::editor_prefs::line_numbers())
 }
 
-pub(super) const GUTTER_WIDTH: usize = 12;
+pub(super) const GUTTER_WIDTH: usize = APP_GUTTER;
 
 pub(crate) fn marker(origin: &LineOrigin) -> (&'static str, Style) {
-    match origin {
-        LineOrigin::Add => (
-            "+",
-            Style::default().fg(th().diff.add_fg).bg(th().diff.add_bg),
-        ),
-        LineOrigin::Delete => (
-            "-",
-            Style::default().fg(th().diff.del_fg).bg(th().diff.del_bg),
-        ),
-        LineOrigin::Context => (" ", Style::default().fg(th().ui.text)),
-    }
+    let (mark, role) = role_marker(origin);
+    (mark, super::term::role_style(role))
 }
 
 /// The three knobs (wrap, width, scroll) every row emitter needs, grouped
@@ -267,39 +135,8 @@ pub(super) struct SideLine<'a> {
 /// deleted file) still reads correctly.
 pub(super) fn emit_split(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts<'_>) {
     let hunk = &eh.hunk;
-    let numbers = line_numbers(hunk);
     let emph = opts.intraline.then(|| hunk_emphasis(&hunk.lines));
-    // A side as (index into the hunk, number to print).
-    type SplitSide = Option<(usize, u32)>;
-    let mut split_rows: Vec<(SplitSide, SplitSide)> = Vec::new();
-    let mut i = 0usize;
-    while i < hunk.lines.len() {
-        if hunk.lines[i].origin == LineOrigin::Context {
-            let (o, n) = numbers[i];
-            split_rows.push((Some((i, o.unwrap_or(0))), Some((i, n.unwrap_or(0)))));
-            i += 1;
-            continue;
-        }
-        let del_start = i;
-        while i < hunk.lines.len() && hunk.lines[i].origin == LineOrigin::Delete {
-            i += 1;
-        }
-        let del_range: Vec<usize> = (del_start..i).collect();
-        let add_start = i;
-        while i < hunk.lines.len() && hunk.lines[i].origin == LineOrigin::Add {
-            i += 1;
-        }
-        let add_range: Vec<usize> = (add_start..i).collect();
-        for n in 0..del_range.len().max(add_range.len()) {
-            let left = del_range
-                .get(n)
-                .map(|&idx| (idx, numbers[idx].0.unwrap_or(0)));
-            let right = add_range
-                .get(n)
-                .map(|&idx| (idx, numbers[idx].1.unwrap_or(0)));
-            split_rows.push((left, right));
-        }
-    }
+    let split_rows = split_pairs(hunk);
 
     for (left, right) in split_rows {
         // A split row shows a delete and its paired add, so it carries
@@ -320,17 +157,8 @@ pub(super) fn emit_split(sink: &mut Sink, eh: &EffectiveHunk, opts: LayoutOpts<'
             sink,
             side_line(left),
             side_line(right),
-            DiffRow::body(hunk.id, [carried(left), carried(right)]).with_change(
-                match (
-                    left.map(|(i, _)| RowChange::of(&hunk.lines[i].origin)),
-                    right.map(|(i, _)| RowChange::of(&hunk.lines[i].origin)),
-                ) {
-                    (Some(RowChange::Del), Some(RowChange::Add)) => RowChange::Both,
-                    (Some(RowChange::Del), _) => RowChange::Del,
-                    (_, Some(RowChange::Add)) => RowChange::Add,
-                    _ => RowChange::None,
-                },
-            ),
+            DiffRow::body(hunk.id, [carried(left), carried(right)])
+                .with_change(split_change(hunk, left, right)),
             opts,
         );
         annotate(

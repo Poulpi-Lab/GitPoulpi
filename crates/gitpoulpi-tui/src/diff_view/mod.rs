@@ -37,6 +37,7 @@ mod interaction;
 mod intraline;
 mod layout;
 mod model;
+mod term;
 
 #[cfg(test)]
 pub(crate) use interaction::hunk_button;
@@ -51,6 +52,7 @@ pub(crate) use interaction::{
 };
 pub(crate) use layout::marker as line_marker;
 pub(crate) use layout::{h_scroll_max, h_track_content, minimap_row};
+pub(crate) use model::DiffTextExt;
 pub(crate) use model::{
     diff_bar, hunk_at, render_diff_with, selected_lines, DiffBarRender, DiffRender, DiffRenderOpts,
     DiffRow,

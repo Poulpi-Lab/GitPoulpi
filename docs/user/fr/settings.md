@@ -460,7 +460,7 @@ que dans les builds qui incluent le serveur ; voir [MCP et agents](mcp-and-agen
 
 ![La liste Thème de couleurs du graphe : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
 
-Le thème et les couleurs du graphe (le Thème, le thème de couleurs du graphe, la colorisation et le fond des voies, l'intensité de la teinte de ligne) appartiennent à chaque installation : quand plusieurs installations partagent un même `config.toml`, en modifier une ne change jamais les autres. Seule l'installation principale écrit aussi les clés `ui.*` partagées.
+Le thème et les couleurs du graphe (le Thème, le thème de couleurs du graphe, la colorisation et le fond des voies, l'intensité de la teinte de ligne) appartiennent à chaque installation : quand plusieurs installations partagent un même dossier de paramètres, en modifier une ne change jamais les autres. Seule l'installation principale écrit aussi les clés `ui.*` partagées, dans `tui.toml` ; les autres conservent les leurs dans leur propre entrée de `config.toml`.
 
 ### Clavier et souris
 

@@ -33,6 +33,8 @@ impl LogPanel {
         self.count_method = method;
         self.generation += 1;
         let generation = self.generation;
+        self.reloading = true;
+        self._page = None;
         let backend = self.backend.clone();
         let refs = backend.refs();
         let stashes = backend.stashes();
@@ -67,6 +69,9 @@ impl LogPanel {
                     return;
                 }
                 let loaded = held.len();
+                this.reloading = false;
+                let kept = this.data.key_at(this.selected);
+                let old_row = this.selected;
                 this.data = LogData::new(
                     held,
                     shown,
@@ -82,11 +87,14 @@ impl LogPanel {
                 this.lazy.set_front(front);
                 this.lazy.on_refresh_asked(loaded, asked);
                 this.last_ms = ms;
-                this.selected = 0;
+                // The selection follows its commit; when that is gone the nearest row stays selected.
+                this.selected = kept
+                    .and_then(|k| this.data.position_of_key(&k))
+                    .unwrap_or_else(|| old_row.min(this.data.entry_count().saturating_sub(1)));
                 this.recompute_matches(cx);
                 this.tick_total(cx);
                 this.emit_summary(cx);
-                if let Some(sel) = this.data.selection_at(0) {
+                if let Some(sel) = this.data.selection_at(this.selected) {
                     cx.emit(LogEvent::Selected(sel));
                 }
                 cx.notify();
@@ -125,6 +133,9 @@ impl LogPanel {
         visible_rows: usize,
         cx: &mut Context<Self>,
     ) {
+        if self.reloading {
+            return;
+        }
         let Some(request) = self.lazy.next_page(rows_below_view, visible_rows) else {
             return;
         };
@@ -134,7 +145,7 @@ impl LogPanel {
         self.lazy.mark_requested(request);
         let page = self.backend.history_page(&walk, request);
         let generation = self.generation;
-        self._load = Some(cx.spawn(async move |this, cx| {
+        self._page = Some(cx.spawn(async move |this, cx| {
             // A failed page ends the walk like a short one: nothing is asked again until the next reload.
             let page: Vec<CommitNode> = page.await.unwrap_or_default();
             let _ = this.update(cx, |this, cx| {

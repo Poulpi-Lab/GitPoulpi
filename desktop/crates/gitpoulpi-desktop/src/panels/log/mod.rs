@@ -106,6 +106,10 @@ pub struct LogPanel {
     generation: u64,
     _subs: Vec<Subscription>,
     _load: Option<Task<()>>,
+    /// The page fetch in flight: its own slot, so a page never cancels a reload.
+    _page: Option<Task<()>>,
+    /// A reload is in flight: no page is asked for the list it is replacing.
+    reloading: bool,
     _layout: Option<Task<()>>,
 }
 
@@ -155,6 +159,8 @@ impl LogPanel {
             generation: 0,
             _subs: subs,
             _load: None,
+            _page: None,
+            reloading: false,
             _layout: None,
         };
         this.reload(cx);
@@ -188,6 +194,14 @@ impl LogPanel {
     /// The selected row.
     pub fn selected_row(&self) -> usize {
         self.selected
+    }
+
+    /// The commit of the selected row (`None` on the WIP, a stash or an empty Log).
+    pub fn selected_commit(&self) -> Option<Oid> {
+        match self.data.key_at(self.selected)? {
+            data::RowKey::Commit(oid) => Some(oid),
+            _ => None,
+        }
     }
 
     /// Number of rows shown, WIP and stash rows included.

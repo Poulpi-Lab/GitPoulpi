@@ -1,69 +1,224 @@
-# Which terminal UI actions the desktop frontend covers.
+# Which registry rows the desktop frontend marks done.
 #
-# Ids are the terminal UI's action ids (`crates/gitpoulpi-tui/src/keymap/action.rs`). Only what the
-# desktop really does today is listed; an action that is not listed is not tracked yet. See README.md.
+# Ids are the shared registry's: an action's config id (`global.quit`) or `palette.<command id>`.
+# Only `done` is listed; `terminal only` comes from the registry and everything else is `to do`.
+# The tests make this list equal to what the command dispatcher implements, so an id cannot be
+# added or kept by hand: implement it in `src/commands/ops.rs`, then run
+# `UPDATE_PARITY=1 cargo test -p gitpoulpi-desktop parity` (it rewrites this file and the table).
+# See README.md.
 
 [[action]]
-id = "global.palette"
+id = "diff.close"
 status = "done"
-note = "Command palette on Ctrl+P and Ctrl+Shift+P."
 
 [[action]]
-id = "global.quit"
+id = "diff.next_hunk"
 status = "done"
-note = "Ctrl+Q."
 
 [[action]]
-id = "global.find_in_log"
+id = "diff.prev_hunk"
 status = "done"
-note = "Search box over the Log (Ctrl+F)."
 
 [[action]]
-id = "nav_prefix.collapse_refs"
+id = "diff.toggle_layout"
 status = "done"
-note = "Toggle the refs sidebar."
 
 [[action]]
-id = "nav_prefix.collapse_status"
+id = "diff.toggle_whitespace"
 status = "done"
-note = "Toggle the right-hand details panel."
 
 [[action]]
-id = "nav_prefix.change_theme"
+id = "diff.toggle_wrap"
 status = "done"
-note = "Theme entries in the command palette."
-
-[[action]]
-id = "nav_prefix.change_language"
-status = "done"
-note = "Language entries in the command palette."
-
-[[action]]
-id = "nav_prefix.change_graph_color_theme"
-status = "done"
-note = "Graph colour palettes in the command palette."
-
-[[action]]
-id = "global.undo"
-status = "done"
-note = "Toolbar Undo and Ctrl+Z, through the daemon's journal."
-
-[[action]]
-id = "global.redo"
-status = "done"
-note = "Toolbar Redo, Ctrl+Y and Ctrl+Shift+Z."
 
 [[action]]
 id = "git_prefix.fetch_all"
 status = "done"
-note = "Toolbar Fetch and Ctrl+G f."
 
 [[action]]
 id = "git_prefix.pull"
 status = "done"
-note = "Toolbar Pull and Ctrl+G p (merge mode, the branch's upstream)."
 
 [[action]]
 id = "git_prefix.push"
 status = "done"
-note = "Toolbar Push and Ctrl+G Shift+P (upstream, else origin or the only remote)."
+
+[[action]]
+id = "global.find_in_log"
+status = "done"
+note = "Opens the Log's find bar."
+
+[[action]]
+id = "global.git_prefix"
+status = "done"
+note = "First key of the two-key chord; the next key is looked up in the git_prefix context."
+
+[[action]]
+id = "global.help"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "global.nav_prefix"
+status = "done"
+note = "First key of the two-key chord; the next key is looked up in the nav_prefix context."
+
+[[action]]
+id = "global.palette"
+status = "done"
+note = "Opens the command palette (shared catalogue, shortcuts, fuzzy matching, reasons)."
+
+[[action]]
+id = "global.quit"
+status = "done"
+note = "Quits the app."
+
+[[action]]
+id = "global.redo"
+status = "done"
+
+[[action]]
+id = "global.refresh"
+status = "done"
+note = "Reloads the refs and the Log."
+
+[[action]]
+id = "global.undo"
+status = "done"
+
+[[action]]
+id = "log_columns.fit_all"
+status = "done"
+
+[[action]]
+id = "log_columns.reset_width"
+status = "done"
+
+[[action]]
+id = "nav_prefix.change_graph_color_theme"
+status = "done"
+note = "Opens the graph colour picker."
+
+[[action]]
+id = "nav_prefix.change_language"
+status = "done"
+note = "Opens the language picker."
+
+[[action]]
+id = "nav_prefix.change_theme"
+status = "done"
+note = "Opens the theme picker."
+
+[[action]]
+id = "nav_prefix.collapse_refs"
+status = "done"
+note = "Shows or hides the Refs sidebar."
+
+[[action]]
+id = "nav_prefix.collapse_status"
+status = "done"
+note = "Shows or hides the right-hand details pane."
+
+[[action]]
+id = "nav_prefix.help"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "palette.browse_repository"
+status = "done"
+note = "Folder chooser of the operating system, then opens that repository (File menu)."
+
+[[action]]
+id = "palette.close_diff"
+status = "done"
+
+[[action]]
+id = "palette.diff_mode_inline"
+status = "done"
+
+[[action]]
+id = "palette.diff_mode_split"
+status = "done"
+
+[[action]]
+id = "palette.focus_log"
+status = "done"
+
+[[action]]
+id = "palette.focus_refs"
+status = "done"
+
+[[action]]
+id = "palette.focus_refs_filter"
+status = "done"
+
+[[action]]
+id = "palette.focus_status"
+status = "done"
+
+[[action]]
+id = "palette.keybindings"
+status = "done"
+note = "Opens the keybindings view."
+
+[[action]]
+id = "palette.next_hunk"
+status = "done"
+
+[[action]]
+id = "palette.prev_hunk"
+status = "done"
+
+[[action]]
+id = "palette.theme"
+status = "done"
+note = "Opens the theme picker."
+
+[[action]]
+id = "palette.toggle_hide_in_graph"
+status = "done"
+
+[[action]]
+id = "palette.toggle_hide_selected_folder"
+status = "done"
+
+[[action]]
+id = "palette.toggle_section_collapse"
+status = "done"
+
+[[action]]
+id = "palette.toggle_solo"
+status = "done"
+
+[[action]]
+id = "palette.toggle_solo_selected_folder"
+status = "done"
+
+[[action]]
+id = "palette.toggle_whitespace"
+status = "done"
+
+[[action]]
+id = "palette.toggle_word_wrap"
+status = "done"
+
+[[action]]
+id = "refs.clear_solo"
+status = "done"
+
+[[action]]
+id = "refs.collapse_all"
+status = "done"
+
+[[action]]
+id = "refs.expand_all"
+status = "done"
+
+[[action]]
+id = "refs.show_all"
+status = "done"
+
+[[action]]
+id = "refs.solo"
+status = "done"

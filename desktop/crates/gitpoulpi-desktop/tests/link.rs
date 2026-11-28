@@ -7,11 +7,12 @@ use std::time::{Duration, Instant};
 
 use gitpoulpi_core::domain::{Direction, RepoRef};
 use gitpoulpi_desktop::app::{self, Overrides, Workspace};
+use gitpoulpi_desktop::commands;
 use gitpoulpi_desktop::daemon::transfer::Transfer;
 use gitpoulpi_desktop::daemon::{Backend, DesktopHost};
 use gitpoulpi_link::Action;
 use gitpoulpi_testkit::{isolate_process_env, FixtureRepo, FixtureRepoBuilder};
-use gpui_kit::{Entity, TestAppContext};
+use gpui_kit::{AnyWindowHandle, AppContext as _, Entity, TestAppContext};
 
 fn fixture(with_origin: bool) -> FixtureRepo {
     isolate_process_env();
@@ -27,6 +28,7 @@ fn fixture(with_origin: bool) -> FixtureRepo {
 }
 
 struct Opened {
+    window: AnyWindowHandle,
     ws: Entity<Workspace>,
     session: String,
     _prefs: tempfile::TempDir,
@@ -38,8 +40,9 @@ fn open(cx: &mut TestAppContext, repo: &Path) -> Opened {
     let session = backend.session().to_string();
     cx.executor().allow_parking();
     cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
-    let (_window, ws) = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
+    let (window, ws) = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
     Opened {
+        window,
         ws,
         session,
         _prefs: prefs,
@@ -67,8 +70,17 @@ fn commits(cx: &mut TestAppContext, ws: &Entity<Workspace>) -> usize {
     ws.read_with(cx, |ws, cx| ws.log.read(cx).loaded_commits())
 }
 
-fn press(cx: &mut TestAppContext, ws: &Entity<Workspace>, what: Transfer) {
-    ws.update(cx, |ws, cx| ws.transfer(what, cx));
+/// Runs the command a toolbar button or key stands for, through the one dispatcher.
+fn press(cx: &mut TestAppContext, o: &Opened, what: Transfer) {
+    let id = match what {
+        Transfer::Fetch => "git_prefix.fetch_all",
+        Transfer::Pull => "git_prefix.pull",
+        Transfer::Push => "git_prefix.push",
+        Transfer::Undo => "global.undo",
+        Transfer::Redo => "global.redo",
+    };
+    cx.update_window(o.window, |_, w, cx| commands::run_id(id, w, cx))
+        .unwrap();
 }
 
 fn notice_text(cx: &mut TestAppContext, ws: &Entity<Workspace>) -> Option<String> {
@@ -124,6 +136,25 @@ fn a_commit_made_through_another_client_shows_in_the_log(cx: &mut TestAppContext
 }
 
 #[gpui_kit::test]
+fn a_live_reload_keeps_the_selection_on_its_commit(cx: &mut TestAppContext) {
+    let repo = fixture(false);
+    let o = open(cx, repo.root());
+    wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
+    let log = o.ws.read_with(cx, |ws, _| ws.log.clone());
+    // Row 0 is the newest commit; select the one below it.
+    log.update(cx, |l, cx| l.select(1, cx));
+    let chosen = log.read_with(cx, |l, _| l.selected_commit()).unwrap();
+    commit_through_another_client(&repo, &o.session, "c.txt", "pushes the rows down");
+    wait_for(cx, "the Log to show the new commit", |cx| {
+        commits(cx, &o.ws) == 4
+    });
+    wait_for(cx, "the selection to follow its commit", |cx| {
+        log.read_with(cx, |l, _| l.selected_row() == 2)
+    });
+    assert_eq!(log.read_with(cx, |l, _| l.selected_commit()), Some(chosen));
+}
+
+#[gpui_kit::test]
 fn a_plain_git_commit_is_picked_up_without_user_action(cx: &mut TestAppContext) {
     let repo = fixture(false);
     let o = open(cx, repo.root());
@@ -155,7 +186,7 @@ fn undo_and_redo_through_the_window_move_the_log(cx: &mut TestAppContext) {
         can(cx, &o.ws, Direction::Undo)
     });
 
-    press(cx, &o.ws, Transfer::Undo);
+    press(cx, &o, Transfer::Undo);
     wait_for(cx, "the Log to drop the commit", |cx| {
         commits(cx, &o.ws) == 3
     });
@@ -167,7 +198,7 @@ fn undo_and_redo_through_the_window_move_the_log(cx: &mut TestAppContext) {
     wait_for(cx, "the journal to offer Redo", |cx| {
         can(cx, &o.ws, Direction::Redo)
     });
-    press(cx, &o.ws, Transfer::Redo);
+    press(cx, &o, Transfer::Redo);
     wait_for(cx, "the Log to show the commit again", |cx| {
         commits(cx, &o.ws) == 4
     });
@@ -179,7 +210,7 @@ fn undo_with_nothing_to_undo_says_why_and_changes_nothing(cx: &mut TestAppContex
     let repo = fixture(false);
     let o = open(cx, repo.root());
     wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
-    press(cx, &o.ws, Transfer::Undo);
+    press(cx, &o, Transfer::Undo);
     wait_for(cx, "the refusal", |cx| {
         o.ws.read_with(cx, |ws, _| ws.notice().is_some_and(|n| n.error))
     });
@@ -194,7 +225,7 @@ fn push_fetch_and_pull_run_through_the_link(cx: &mut TestAppContext) {
     wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
 
     // Push: the branch has no upstream, so it goes to origin and sets it.
-    press(cx, &o.ws, Transfer::Push);
+    press(cx, &o, Transfer::Push);
     wait_for(cx, "the push to reach origin", |_| {
         repo.try_git(&["ls-remote", "--heads", "origin", &branch])
             .is_some_and(|out| out.contains(&branch))
@@ -210,13 +241,13 @@ fn push_fetch_and_pull_run_through_the_link(cx: &mut TestAppContext) {
     // Fetch: another user pushed; the remote-tracking ref moves.
     repo.push_from_elsewhere(&branch, "elsewhere");
     let before = repo.git(&["rev-parse", &format!("origin/{branch}")]);
-    press(cx, &o.ws, Transfer::Fetch);
+    press(cx, &o, Transfer::Fetch);
     wait_for(cx, "the fetch to move origin/<branch>", |_| {
         repo.git(&["rev-parse", &format!("origin/{branch}")]) != before
     });
 
     // Pull: fast-forward onto it, and the Log follows.
-    press(cx, &o.ws, Transfer::Pull);
+    press(cx, &o, Transfer::Pull);
     wait_for(cx, "the Log to show the pulled commit", |cx| {
         commits(cx, &o.ws) == 4
     });
@@ -228,7 +259,7 @@ fn push_without_a_remote_says_so(cx: &mut TestAppContext) {
     let repo = fixture(false);
     let o = open(cx, repo.root());
     wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
-    press(cx, &o.ws, Transfer::Push);
+    press(cx, &o, Transfer::Push);
     wait_for(cx, "the refusal", |cx| {
         notice_text(cx, &o.ws).is_some_and(|t| t == gitpoulpi_desktop::strings::PUSH_NO_REMOTE)
     });

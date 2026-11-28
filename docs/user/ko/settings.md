@@ -4,7 +4,7 @@
 
 설정은 `Ctrl+,`, `Ctrl+N` 다음 `,`, 제목 표시줄에서 × 왼쪽의 톱니바퀴, 또는 `Ctrl+P` > *설정*으로 엽니다. 설정 화면은 열려 있는 동안 창을 대체합니다. 오른쪽 위의 `✕`, `Esc` 또는 `q`로 닫습니다. 닫으면 잃는 것이 있을 때만 먼저 묻습니다([설정 닫기](#설정-닫기) 참고).
 
-변경 사항은 즉시 `config.toml`에 저장됩니다. [설정 참조](config-reference.md)는 모든 키와 그 기본값, 환경 변수를 설명합니다. 이 페이지는 설정 화면을 설명합니다.
+변경 사항은 즉시 저장됩니다. 인터페이스 설정(테마, 레이아웃, 열, diff와 이미지 표시, 단축키 등)은 `tui.toml`에, 나머지는 `config.toml`에 저장되며 둘 다 설정 폴더에 있습니다([두 파일인 이유](config-reference.md#두-파일-configtoml과-tuitoml)). [설정 참조](config-reference.md)는 모든 키와 그 기본값, 환경 변수를 설명합니다. 이 페이지는 설정 화면을 설명합니다.
 
 ![설정 화면: 왼쪽에 검색 상자와 페이지 목록, 오른쪽에 일반 페이지](../images/settings.png)
 
@@ -107,7 +107,7 @@
 
 ![Settings:로 필터링한 명령 팔레트: 설정마다 한 줄이며 오른쪽에 현재 값이 표시됩니다](../images/palette-settings.png)
 
-값은 `config.toml`에 저장되고 페이지와 똑같이 적용됩니다. 설정 키의 영어 단어(`remember tabs`)로 어느 언어에서든 해당 행을 찾을 수 있습니다.
+값은 해당 파일(`tui.toml` 또는 `config.toml`)에 저장되고 페이지와 똑같이 적용됩니다. 설정 키의 영어 단어(`remember tabs`)로 어느 언어에서든 해당 행을 찾을 수 있습니다.
 
 ## 페이지
 
@@ -370,11 +370,11 @@ AI 에이전트가 이 창에서 할 수 있는 일, MCP 서버의 실행 허용
 | **상태 표시줄 위치** | `ui.statusbar_position`: 상태 표시줄(브랜치, 개수, 메시지, 키 힌트)의 위치: 위(저장소 탭 위) 또는 아래(기본값). 홈 탭은 아래에 자체 상태 표시줄을 유지합니다. 즉시 적용됩니다. |
 | **탭 표시줄 위치** | `ui.tabs_position`: 저장소 탭의 위치: 위(기본값), 아래, 왼쪽. 왼쪽은 창의 왼쪽 가장자리에 한 줄에 탭 하나씩 목록으로 표시합니다. 80열 미만의 창에서는 위에 그립니다. 세로 도구 모음 옆에서도 탭이 가장 바깥에 놓입니다. 즉시 적용됩니다. |
 | **날짜/시간 로캘** | **시스템**(기본값): 인터페이스 언어의 월과 요일 이름. **english**: 항상 영어 이름. |
-| **날짜 형식**, **날짜/시간 형식**, **날짜 상세 형식** | 파일 기록과 Blame 날짜 열, Log의 날짜 열, commit 상세 정보의 날짜 패턴. 각각 실시간 미리 보기를 보여 줍니다. 토큰은 [설정 참조](config-reference.md#ui)를 참고하세요. |
+| **날짜 형식**, **날짜/시간 형식**, **날짜 상세 형식** | 파일 기록과 Blame 날짜 열, Log의 날짜 열, commit 상세 정보의 날짜 패턴. 각각 실시간 미리 보기를 보여 줍니다. 토큰은 [설정 참조](config-reference.md#tuitoml의-ui)를 참고하세요. |
 
 ![그래프 색상 테마 콤보: 테마 따르기, 이어서 각 레인 팔레트와 그 색상 몇 가지](../images/settings-log-graph-lanes.png)
 
-테마와 그래프 색상(테마, 그래프 색상 테마, 레인 색칠과 배경, 행 색조 강도)은 설치마다 따로입니다: 여러 설치가 하나의 `config.toml`을 공유해도 한 곳에서 바꾼 것이 다른 곳을 바꾸지 않습니다. 주 설치만 공유되는 `ui.*` 키도 함께 씁니다.
+테마와 그래프 색상(테마, 그래프 색상 테마, 레인 색칠과 배경, 행 색조 강도)은 설치마다 따로입니다: 여러 설치가 하나의 `config.toml`을 공유해도 한 곳에서 바꾼 것이 다른 곳을 바꾸지 않습니다. 주 설치만 공유되는 `ui.*` 키도 `tui.toml`에 함께 쓰고, 나머지 설치는 자기 값을 `config.toml`의 자기 항목에 보관합니다.
 
 ### 키보드 및 마우스
 
@@ -392,7 +392,7 @@ AI 에이전트가 이 창에서 할 수 있는 일, MCP 서버의 실행 허용
 | `R` | 확인 후 모든 단축키를 초기화합니다. |
 | `c` 또는 행의 `!` 클릭 | 해당 동작과 키가 충돌하는 모든 동작을 표시합니다. `Esc`로 전체 목록으로 돌아갑니다. 다른 동작과 충돌하는 키는 빨간색, 키 자체에 대한 경고(터미널이 보낼 수 없음)는 주황색입니다. |
 
-tmux, AutoHotkey, herdr 또는 터미널과의 충돌을 해결하는 데 사용하세요. 같은 설정이 `config.toml`의 `[keybindings]` 테이블에 있습니다. [설정 참조](config-reference.md#keybindings)와 [키 바인딩](keybindings.md)을 참고하세요.
+tmux, AutoHotkey, herdr 또는 터미널과의 충돌을 해결하는 데 사용하세요. 같은 설정이 `tui.toml`의 `[keybindings]` 테이블에 있습니다. [설정 참조](config-reference.md#keybindings)와 [키 바인딩](keybindings.md)을 참고하세요.
 
 ![Quit에서 c를 누른 뒤의 키보드 및 마우스 페이지: 충돌하는 두 동작인 Quit와 Stage or Unstage the Selected Row 모두에서 q 키가 빨간색으로 표시됩니다](../images/settings-keyboard-conflicts.png)
 
@@ -691,7 +691,7 @@ commit 양식이 시작할 때 채워 두는 메시지입니다(`gitpoulpi ui sh
 
 ## 파일, 환경 변수, CLI
 
-- 설정 파일은 OS 설정 폴더의 `config.toml`입니다. `gitpoulpi config path`가 위치를 출력합니다.
+- 설정 파일은 OS 설정 폴더의 `config.toml`(공통 설정)과 `tui.toml`(터미널 UI의 인터페이스 설정)입니다. `gitpoulpi config path`가 위치를 출력하며, `gitpoulpi config get <key>`는 키가 어느 파일에 있는지 알려 줍니다.
 - 저장소별 상태는 저장소 안의 `.gitpoulpi/repo-state.toml`에 있습니다.
 - `gitpoulpi config get <key>`와 `gitpoulpi config set <key> <value>`는 모든 설정을 읽고 씁니다.
 - 환경 변수와 명령줄 플래그는 파일보다 우선합니다.

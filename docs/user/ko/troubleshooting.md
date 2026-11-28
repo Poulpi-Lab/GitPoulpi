@@ -149,7 +149,9 @@ GitPoulpi는 네트워크 작업에 `git` 자체의 자격 증명 도우미와 s
 
 **GitPoulpi가 저절로 종료되었습니다.** 모든 종료는 기록됩니다. 설정 디렉터리에서 `gitpoulpi-tui-exit.log`(충돌 후에는 `gitpoulpi-tui-panic.txt`도)를 찾아 이슈에 첨부하세요(`gitpoulpi config path`가 출력하는 설정 파일이 그 디렉터리에 있습니다).
 
-**설정은 어디에 있나요?** `gitpoulpi config path`. 저장소별 상태는 저장소 안의 `.gitpoulpi/repo-state.toml`에 있습니다.
+**설정은 어디에 있나요?** `gitpoulpi config path`는 같은 폴더에 있는 `config.toml`(공통 설정)과 `tui.toml`(터미널 UI의 인터페이스 설정: 테마, 레이아웃, 열, 단축키 등)을 출력합니다. `gitpoulpi config get <key>`는 키가 둘 중 어느 파일에 있는지 알려 줍니다. 저장소별 상태는 저장소 안의 `.gitpoulpi/repo-state.toml`에 있습니다. [두 파일](config-reference.md#두-파일-configtoml과-tuitoml)을 참고하세요.
+
+**이전 GitPoulpi로 돌아갔더니 인터페이스 설정이 바뀌었습니다(또는 새 버전이 이전 버전에서 설정한 것을 무시합니다).** GitPoulpi는 인터페이스 설정을 `tui.toml`에 보관하며, 이 파일은 `config.toml`에 있던 내용의 사본으로 만들어지고 `config.toml`에서 제거되지는 않습니다. 새 버전 옆에 설치된 이전 GitPoulpi는 `tui.toml`을 알지 못하며 자신의 전체 `config.toml`을 계속 읽고 씁니다. `tui.toml`이 생기면 새 버전은 인터페이스 설정을 그 파일에서만 읽으므로, 이후 이전 버전에서 바꾼 테마나 레이아웃은 반영되지 않고, `tui.toml`에 없는 키는 `config.toml`의 옛 값이 아니라 기본값을 씁니다. 새 버전을 맞추려면 그쪽에서 설정을 바꾸세요(설정 화면 또는 `gitpoulpi config set`). 인터페이스 설정을 `config.toml`에서 다시 시작하려면 GitPoulpi를 종료하고 `tui.toml`을 삭제하세요(다음 시작 때 새 사본으로 다시 만들어집니다).
 
 **GitPoulpi가 어딘가로 무언가를 보내나요?** 사용자가 요청한 것만 보냅니다. 리모트로의 git 작업, 계정을 연결한 뒤의 호스팅 요청, AI 버튼을 누른 뒤의 AI 요청, 그리고 아바타를 켜면 작성자 이메일의 해시를 Gravatar로 보냅니다. 원격 측정은 없습니다. [AI 지원](ai.md#개인정보)을 참고하세요.
 

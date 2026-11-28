@@ -2,17 +2,47 @@
 
 # 설정 참조
 
-`config.toml`의 모든 키와 기본값, 그리고 그 역할입니다. 파일을 직접 편집해야 하는 일은
+설정 파일의 모든 키와 기본값, 그리고 그 역할입니다. 파일을 직접 편집해야 하는 일은
 드뭅니다. [설정 화면](settings.md)(`Ctrl+,`)이 값을 바꿀 때마다 파일에 기록하며,
 `gitpoulpi config set`도 마찬가지입니다.
+
+## 두 파일: `config.toml`과 `tui.toml`
+
+설정은 같은 폴더에 있는 두 파일에 나뉘어 있습니다.
+
+| 파일 | 담고 있는 것 |
+|---|---|
+| `config.toml` | GitPoulpi를 어떤 방식으로 쓰든 공통인 모든 것: 저장소, 계정과 통합, git 동작, AI, MCP, 업데이트, 설치, 외부 도구, 그리고 [`config.toml`의 `[ui]`](#configtoml의-ui)에 나열된 소수의 `[ui]` 키. |
+| `tui.toml` | 터미널 UI의 인터페이스 설정: `[ui]`의 대부분(테마, 레이아웃, 열, diff와 이미지 표시, 언어, 마우스와 터미널 옵션 등), `[keybindings]` 테이블 전체, 그리고 `merge.side_by_side_min_width`. [`tui.toml`의 `[ui]`](#tuitoml의-ui), [`[keybindings]`](#keybindings), [`[merge]`](#merge)에 나열되어 있습니다. |
+
+- **`tui.toml`이 생기는 방식.** GitPoulpi가 스스로 만들며, `config.toml`에 있는
+  인터페이스 설정의 사본으로 시작합니다. 터미널 UI가 시작될 때 `config.toml`이 있으면
+  그때, 아니면 인터페이스 설정을 처음 바꿀 때입니다. 이 과정에서 `config.toml`은
+  수정되지 않습니다.
+- **일단 생기면 그 파일이 유일한 출처입니다.** 파일이 담당하는 키 중 언급되지 않은
+  키는 기본값을 쓰며, 예전 `config.toml`에 아직 남아 있을 수 있는 값은 쓰지 않습니다.
+  그런 키를 초기화하려면 `tui.toml`에서 지우세요.
+- **이전 GitPoulpi**를 이 버전 옆에 설치해 두면 그 버전은 자신의 전체 `config.toml`을
+  계속 읽습니다. 이전 버전에서 나중에 바꾼 설정은 새 버전이 반영하지 않으며, 반대도
+  마찬가지입니다.
+- **키가 어느 파일에 있는지.** `gitpoulpi config get <key>`는 파일을 JSON 필드 `file`로
+  출력하고(`--json`), `gitpoulpi config set <key> <value>`는 그 파일에 기록하며,
+  `gitpoulpi config path`는 `path`(`config.toml`)와 `tui_file`(`tui.toml`)을 출력합니다.
+  `gitpoulpi config get`, `set`과 `GITPOULPI_UI_*` 변수는 키를 어느 파일이 담고 있든
+  같은 키 이름(`ui.theme`)을 씁니다. 변수는 여전히 두 파일보다 우선합니다.
+- **설치.** 주 설치가 아닌 설치의 모양은 `config.toml`의
+  `[installation.settings.<id>]` 항목에 그대로 있습니다([`[installation]`](#installation-이-컴퓨터의-gitpoulpi마다-항목-하나) 참고).
+
+아래 섹션마다 어느 파일에 있는지 밝혀 둡니다. 테이블을 보여 주는 예시(`[ui]`,
+`[[ui.open_in]]`)는 섹션 제목에 적힌 파일에 기록됩니다.
 
 ## 위치와 값이 정해지는 방식
 
 | | |
 |---|---|
-| 파일 | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS). `gitpoulpi config path`가 경로를 출력합니다. |
-| 다른 폴더 | `GITPOULPI_CONFIG_DIR=<dir>`은 설정 폴더 전체(파일, `sessions/`, 데몬 포트 파일)를 옮깁니다. 포터블 설치, 테스트, 또는 에이전트를 자신의 설정과 분리해 두는 용도입니다. |
-| 우선순위 | 내장 기본값, 그다음 `config.toml`, 그다음 `GITPOULPI_*` 변수, 그다음 명령줄 플래그입니다. 가장 뒤의 것이 이깁니다. 잘못된 값(파일의 철자가 틀린 선택지, 잘못된 변수)은 조용히 무시되지 않고 항상 오류가 됩니다. |
+| 파일 | `%APPDATA%\GitPoulpi\config.toml` (Windows), `~/.config/gitpoulpi/config.toml` (Linux), `~/Library/Application Support/GitPoulpi/config.toml` (macOS), 그리고 그 옆의 `tui.toml`. `gitpoulpi config path`가 둘 다 출력합니다. |
+| 다른 폴더 | `GITPOULPI_CONFIG_DIR=<dir>`은 설정 폴더 전체(파일들, `sessions/`, 데몬 포트 파일)를 옮깁니다. 포터블 설치, 테스트, 또는 에이전트를 자신의 설정과 분리해 두는 용도입니다. |
+| 우선순위 | 내장 기본값, 그다음 `config.toml`(`tui.toml`이 담당하는 키는 `tui.toml`), 그다음 `GITPOULPI_*` 변수, 그다음 명령줄 플래그입니다. 가장 뒤의 것이 이깁니다. 잘못된 값(파일의 철자가 틀린 선택지, 잘못된 변수)은 조용히 무시되지 않고 항상 오류가 됩니다. |
 | 변수 | 키를 대문자로 바꾸고 점을 밑줄로 바꿉니다. `general.auto_prune`은 `GITPOULPI_GENERAL_AUTO_PRUNE`입니다. GitPoulpi가 실제로 읽는 키에만 해당합니다(아래에서 *사용하지 않음*으로 표시된 키나 `ui.log_columns_hidden` 같은 목록은 제외). |
 | 플래그 | `--backend git2\|system`은 그 명령이 시작하는 데몬에 한해 `general.default_backend`를 재정의합니다. |
 | 토큰과 키 | 이 파일에는 절대 저장하지 않습니다. 호스팅 토큰과 AI API 키는 시스템 자격 증명 도우미(Git Credential Manager, libsecret / `pass`, Keychain)로 가며, 파일에는 참조(`token_ref`)만 남습니다. 도우미가 없으면 토큰 저장이 메시지와 함께 실패하고 토큰은 세션 동안만 유지됩니다. |
@@ -82,7 +112,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `tui.toml`의 `[ui]`
 
 **로그 및 그래프**
 
@@ -120,7 +150,6 @@ author_email = "jane@work.example"
 | `ui.mouse_enabled` | `true` | `false`이면 마우스(및 텍스트 선택)를 터미널에 맡깁니다. **다시 시작.** |
 | `ui.mouse_scroll_lines` | `3` | 휠 한 칸당 Log 행 수, 1~20. **다시 시작.** |
 | `ui.kitty_keyboard` | `"auto"` | `auto`는 터미널에 kitty 키보드 프로토콜을 요청합니다(그러면 `Ctrl+,`, `Ctrl+Enter`, `Ctrl+Shift+N`이 도착함. Unix 전용이며 tmux는 응답하지 않음: [멀티플렉서](multiplexers.md#tmux) 참고). `off`는 요청하지 않습니다. **다시 시작.** |
-| `ui.logo_color` | `""` | 정보 창의 로고 색 구성, 슬러그(`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`). 비어 있거나 알 수 없는 값이면 빌드의 기본값(`lavender`). 정보에서 로고를 클릭하거나 색을 고르면 기록됩니다. |
 
 **아바타**(기본적으로 꺼짐. 켜면 작성자 이메일의 SHA-256 해시를 Gravatar에 보내고 연결된
 GitHub/GitLab 계정에도 질의합니다)
@@ -128,7 +157,6 @@ GitHub/GitLab 계정에도 질의합니다)
 | 키 | 기본값 | 값과 효과 |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph`(그림 그래프의 commit 원 안), `author`(작성자 열 안), `off`. 예전 `ui.show_avatars`(`true`)는 `ui.avatars`가 없는 동안 `author`로 읽힙니다. |
-| `ui.avatar_sources` | `"gravatar_hosting"` | 조회 순서: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. GitLab 호스트는 연결된 프로필을 통해서만 질의합니다. |
 | `ui.avatar_fallback` | `"identicon"` | `identicon`(로컬에서 생성) 또는 `initials`. 그림 프로토콜이 없는 터미널에서는 항상 이니셜 배지를 씁니다. |
 
 **Diff와 편집기 표시**
@@ -141,10 +169,6 @@ GitHub/GitLab 계정에도 질의합니다)
 | `ui.diff_word_wrap` | `false` | 긴 diff 줄을 줄 바꿈합니다(`w`. 설정 > Diff 및 편집기). |
 | `ui.diff_intraline` | `true` | 변경된 줄에서 바뀐 단어를 더 진한 배경으로 칠합니다(팔레트 `Diff: 변경된 단어 강조 전환`. 설정 > Diff 및 편집기). |
 | `ui.minimap` | `false` | diff와 편집기의 스크롤바 옆에 미니맵을 표시합니다(`M`). |
-| `ui.mermaid_detail` | `refs` | Log의 Mermaid gitGraph로 복사의 상세 수준: `structure`, `refs`, `subjects`, `full`(팝업에서 기억되며 `log --format mermaid`의 기본값). |
-| `ui.mermaid_orientation` | `lr` | 그 그래프의 방향: `lr`(왼쪽에서 오른쪽) 또는 `tb`(위에서 아래). |
-| `ui.mermaid_fence` | `false` | 복사한 Mermaid 스크립트를 `mermaid` 코드 펜스로 감쌉니다. |
-| `ui.mermaid_subject_width` | `40` | Mermaid id에서 커밋 제목을 이 글자 수로 자릅니다(`subjects`, `full`). |
 | `ui.text_cursor` | `"terminal"` | 포커스된 텍스트 필드의 캐럿이 표시되는 위치: `terminal`은 터미널 자체의 커서를 그 자리에 놓고(깜박이는 막대이므로 터미널의 커서 설정과 입력기의 후보 창이 따라가며, 키보드를 받는 필드가 없으면 숨겨지고 종료할 때 사용자의 커서 모양으로 복원됨), `drawn`은 GitPoulpi 자체의 캐럿 글리프를 그리고 터미널 커서는 숨깁니다. 즉시 적용. |
 | `ui.color_depth` | `"auto"` | `auto`, `truecolor`, `256`, `16`: 그리는 데 쓸 색 수. `auto`는 Apple Terminal(256), Linux 콘솔(16), `COLORTERM`이 없는 `*-256color` 터미널(256)을 제외하면 truecolor입니다. 실시간. [테마](themes.md)를 참고하세요. |
 | `ui.input_color` | `"theme"` | 텍스트 필드 배경: `theme`(테마 자체의 것), `gray`, `blue`, `slate`, `dark`, `custom`. |
@@ -174,16 +198,38 @@ commit 상세, 날짜 툴팁, *복사 > 날짜*). 토큰: `YYYY` `YY` `MMMM` `MM
 | `ui.launch` | `"off"` | 열린 창이 없을 때 에이전트가 GitPoulpi 창을 열 수 있는지 여부: `off`, 프리셋(`kitty`, `foot`, `alacritty`, `wezterm`, `wezterm-tab`, `ghostty`, `gnome-terminal`, `xdg-terminal-exec`, `windows-terminal`, `windows-terminal-tab`, `tmux`, `zellij`, `cmux`) 또는 `custom`. |
 | `ui.launch_command` | `""` | `custom` 템플릿: `{repo}`, `{session}`, `{gitpoulpi}`. 인수로 분할되며 셸은 사용되지 않습니다. |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons`(탭 줄이 *종료 후 cd*를 제공) 또는 `auto`(종료할 때마다 셸의 폴더가 바뀌고, 새 탭은 기본 *열기 위치* 항목을 실행). [활성 탭의 폴더 따라가기](following-the-tab-folder.md)를 참고하세요. |
+| `ui.launch_terminal` | `"auto"` | 데스크톱 바로 가기(설정 > 런처)와 Windows의 다시 열기가 GitPoulpi를 시작하는 터미널입니다. `auto`는 설치된 것 중에서 고릅니다(Windows: Windows Terminal, 없으면 WezTerm, Alacritty, 일반 콘솔. Linux: `xdg-terminal-exec`, 없으면 처음 찾은 터미널. macOS: iTerm2, Ghostty, WezTerm, kitty가 설치되어 있으면 그것, 없으면 Terminal). `default`는 OS 자체의 기본값이며, `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal` 같은 터미널 ID를 지정할 수도 있습니다. |
+| `ui.relaunch_in_terminal` | `true` | Windows 전용: exe가 더블 클릭으로 자체 콘솔에서 시작되면 GitPoulpi가 `ui.launch_terminal`에서 다시 열리고 종료합니다. exe를 직접 실행하는 터미널(`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`)도 자체 콘솔이지만 고전적인 콘솔 창이 아니므로 다시 시작되지 않습니다. 끄면 그 콘솔에 그대로 있습니다. |
+| `ui.reuse_window` | `true` | GitPoulpi 바로 가기(`gitpoulpi launch`)를 클릭하면 새로 시작하지 않고 이미 열려 있는 GitPoulpi의 창을 보여 줍니다. 끄면 클릭할 때마다 새 창을 시작합니다. |
+
+### 이미지
+
+| 키 | 기본값 | 의미 |
+|---|---|---|
+| `ui.image_view` | `true` | 이미지(PNG, JPEG, GIF, WebP, BMP, ...)인 바이너리 파일을 Diff 보기와 파일 보기에서 그림으로 표시합니다. 끄면 일반 바이너리 안내가 표시됩니다. |
+| `ui.image_view_max_mib` | `32` | 이보다 큰 이미지(MiB)는 디코딩하지 않으며 대신 정보 카드가 표시됩니다. |
+| `ui.image_view_max_unit` | `"auto"` | 설정이 한도를 표시하는 단위: `mib`, `gib`(1024 MiB), `auto`. 표시 전용이며 한도는 항상 `image_view_max_mib` MiB(1에서 1024)입니다. |
+| `ui.image_view_text_fallback` | `"halfblock"` | 이미지 프로토콜이 없는 터미널에서: `halfblock`(색이 있는 반블록 문자) 또는 `card`(정보 카드만). |
+| `ui.image_view_pixelated_from` | `"2x"` | 확대할 때 부드럽게 처리하는 대신 정사각형 픽셀을 보여 주기 시작하는 배율: `1x`, `2x`, `never`. |
+| `ui.image_view_sync` | `true` | 이전과 이후 창이 하나의 확대/축소와 스크롤 위치를 공유합니다. |
+
+**아직 사용하지 않음**(허용되고 저장되지만 아무것도 읽지 않음):
+`ui.graph_colorization`(설정에서 제거됨. 로드할 때는 여전히
+허용됨), `ui.date_word_format`(설정에서 제거됨. 로드할 때는 여전히 허용됨). 예전 `ui.diff_view_mode`는
+`diff_layout` / `diff_hunks_only`로 한 번 읽힙니다.
+
+## `config.toml`의 `[ui]`
+
+어떤 인터페이스를 쓰든 같은 `[ui]` 키는 소수입니다. 이 컴퓨터의 외부 도구, 이 설치의 식별 정보, 아바타를 어느 네트워크 서비스에 질의할지, 그리고 `log --format mermaid`의 기본값입니다. 이 키들은 `config.toml`에서만 읽습니다. 나머지 `[ui]` 키는 [`tui.toml`](#tuitoml의-ui)에 있습니다.
+
+**폴더를 다른 곳에서 열기**
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
 | `ui.terminal_launch` | `"auto"` | 레거시. 아래와 [열기 위치](open-in.md)를 참고하세요. 예전 *여기서 터미널*이 터미널을 여는 방식: `auto`(`ui.launch` 프리셋, 없으면 `$TERMINAL`, `xdg-terminal-exec`, Windows Terminal, Terminal), 프리셋 또는 `custom`. |
 | `ui.terminal_launch_command` | `""` | `custom` 템플릿. `{repo}`는 폴더입니다. |
 | `ui.open_in` | *(없음)* | [열기 위치](open-in.md) 목록. `label`과 `command`를 가진 테이블 배열 `[[ui.open_in]]`입니다. 없으면 "아직 구성되지 않음"을 뜻하며, 목록은 레거시 `ui.terminal_launch*` 키(`auto`가 아닌 값은 첫 항목이 됨), OS 파일 탐색기, 환경에서 감지한 멀티플렉서와 터미널(herdr, tmux, zellij, WezTerm, kitty, Windows Terminal, ...), `PATH`에서 찾은 편집기로부터 계산됩니다. 설정에서 처음 저장할 때 목록이 기록됩니다. `open_in = []`는 빈 목록입니다. `config set`으로는 설정할 수 없습니다(파일을 편집). |
 | `ui.open_in_default` | `""` | "기본 위치에서 열기"가 실행하는 항목의 레이블. 비어 있거나 알 수 없는 값이면 첫 항목. |
-| `ui.launch_terminal` | `"auto"` | 데스크톱 바로 가기(설정 > 런처)와 Windows의 다시 열기가 GitPoulpi를 시작하는 터미널입니다. `auto`는 설치된 것 중에서 고릅니다(Windows: Windows Terminal, 없으면 WezTerm, Alacritty, 일반 콘솔. Linux: `xdg-terminal-exec`, 없으면 처음 찾은 터미널. macOS: iTerm2, Ghostty, WezTerm, kitty가 설치되어 있으면 그것, 없으면 Terminal). `default`는 OS 자체의 기본값이며, `windows-terminal`, `wezterm`, `alacritty`, `console`, `kitty`, `foot`, `ghostty`, `gnome-terminal`, `konsole`, `iterm`, `apple-terminal` 같은 터미널 ID를 지정할 수도 있습니다. |
-| `ui.launcher_build` | `"current"` | 개발 모드 전용(`general.dev_mode` 참고. 그때만 설정 > 런처에 표시되며 그 밖에는 무시됨). `"current"`: 바로 가기와 명령 별칭이 자신을 만든 빌드를 시작합니다. `"newest"`: 체크아웃의 `target/dist`와 `target/release` 중 가장 최근에 빌드된 것을 클릭할 때마다 판단해 시작하며, 어느 빌드를 시작해도 바로 가기를 다시 쓰지 않습니다. |
-| `ui.command_alias` | `""` | 터미널에서 GitPoulpi를 시작하는 명령의 이름, 예를 들어 `gp`(설정 > 런처, `gitpoulpi alias create`). 비어 있으면 없음입니다. 영문자, 숫자, `-`, `_`, `.`만 쓸 수 있습니다. **만들기: 명령 별칭** 버튼이 쓰는 이름일 뿐이며 만들기 전에는 아무것도 생기지 않습니다. |
-| `ui.command_alias_add` | `""` | `gitpoulpi --add`를 실행하는 두 번째 명령의 이름, 예를 들어 `gpa`. 현재 폴더를 이미 실행 중인 GitPoulpi의 새 탭으로 엽니다(설정 > 런처, `gitpoulpi alias create gpa --add`). 비어 있으면 없음입니다. 이름 규칙은 같으며, **만들기** 버튼이 `ui.command_alias`와 함께 만듭니다. |
-| `ui.relaunch_in_terminal` | `true` | Windows 전용: exe가 더블 클릭으로 자체 콘솔에서 시작되면 GitPoulpi가 `ui.launch_terminal`에서 다시 열리고 종료합니다. exe를 직접 실행하는 터미널(`wezterm-gui start -- gitpoulpi.exe`, `wt.exe gitpoulpi.exe`, Rio, Tabby, Alacritty `-e`)도 자체 콘솔이지만 고전적인 콘솔 창이 아니므로 다시 시작되지 않습니다. 끄면 그 콘솔에 그대로 있습니다. |
-| `ui.reuse_window` | `true` | GitPoulpi 바로 가기(`gitpoulpi launch`)를 클릭하면 새로 시작하지 않고 이미 열려 있는 GitPoulpi의 창을 보여 줍니다. 끄면 클릭할 때마다 새 창을 시작합니다. |
 
 **`ui.open_in` 명령**은 먼저 인수로 분할되고(공백, `'...'`, `"..."`), 그다음 각 인수 안에서 변수가 치환되므로 공백이 있는 폴더도 하나의 인수로 유지됩니다. 명령이 셸을 시작하지 않는 한(`sh -c '... "$GITPOULPI_CWD"'`) 셸은 사용되지 않습니다. 변수: `${cwd}`(탭의 폴더), `${repo}`(저장소 루트), `${name}`(폴더의 기본 이름), `${branch}`(detached 상태에서는 비어 있음), `${web_url}`(`origin` 리모트가 GitHub 또는 GitLab 프로젝트이면 그 웹 페이지, 아니면 비어 있음. 이를 사용하는 항목은 비어 있으면 실행을 거부함), `${env:NAME}`(설정되지 않았으면 비어 있음). 예전 `{repo}`는 여전히 `${cwd}`를 뜻합니다. 그 밖의 `${...}`는 그 이름을 알려 주는 오류입니다. 예시:
 
@@ -202,16 +248,10 @@ command = "code ${cwd}"
 
 레거시: `ui.terminal_launch`와 `ui.terminal_launch_command`는 여전히 읽히지만(`ui.open_in`이 없는 동안 목록의 초기값이 됩니다. `custom`은 `{repo}`가 `${cwd}`로 바뀐 "Terminal (custom)"이 되고, 프리셋 ID는 그 프리셋이 됩니다) `ui.open_in`으로 대체되었습니다.
 
-### 이미지
+**이미지 편집기**
 
-| 키 | 기본값 | 의미 |
+| 키 | 기본값 | 값과 효과 |
 |---|---|---|
-| `ui.image_view` | `true` | 이미지(PNG, JPEG, GIF, WebP, BMP, ...)인 바이너리 파일을 Diff 보기와 파일 보기에서 그림으로 표시합니다. 끄면 일반 바이너리 안내가 표시됩니다. |
-| `ui.image_view_max_mib` | `32` | 이보다 큰 이미지(MiB)는 디코딩하지 않으며 대신 정보 카드가 표시됩니다. |
-| `ui.image_view_max_unit` | `"auto"` | 설정이 한도를 표시하는 단위: `mib`, `gib`(1024 MiB), `auto`. 표시 전용이며 한도는 항상 `image_view_max_mib` MiB(1에서 1024)입니다. |
-| `ui.image_view_text_fallback` | `"halfblock"` | 이미지 프로토콜이 없는 터미널에서: `halfblock`(색이 있는 반블록 문자) 또는 `card`(정보 카드만). |
-| `ui.image_view_pixelated_from` | `"2x"` | 확대할 때 부드럽게 처리하는 대신 정사각형 픽셀을 보여 주기 시작하는 배율: `1x`, `2x`, `never`. |
-| `ui.image_view_sync` | `true` | 이전과 이후 창이 하나의 확대/축소와 스크롤 위치를 공유합니다. |
 | `ui.image_editors` | *(없음)* | "편집 프로그램" 이미지 편집기. `label`과 `command`를 가진 테이블 배열 `[[ui.image_editors]]`입니다. 없으면 "아직 구성되지 않음"을 뜻하며, 목록은 이 컴퓨터에서 감지한 편집기(`PATH`의 프로그램, Flatpak 설치, Windows의 알려진 설치 폴더, macOS의 `/Applications`)와 그다음 OS 기본 앱입니다. 설정에서 처음 저장할 때 목록이 기록됩니다. `image_editors = []`는 빈 목록입니다. `config set`으로는 설정할 수 없습니다(파일을 편집). |
 | `ui.image_editor_default` | `""` | "기본 편집 프로그램"이 실행하는 편집기의 레이블. 비어 있거나 알 수 없는 값이면 첫 항목. |
 
@@ -230,10 +270,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**아직 사용하지 않음**(허용되고 저장되지만 아무것도 읽지 않음):
-`ui.graph_colorization`(설정에서 제거됨. 로드할 때는 여전히
-허용됨), `ui.date_word_format`(설정에서 제거됨. 로드할 때는 여전히 허용됨). 예전 `ui.diff_view_mode`는
-`diff_layout` / `diff_hunks_only`로 한 번 읽힙니다.
+**런처와 식별 정보**
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `ui.logo_color` | `""` | 정보 창의 로고 색 구성, 슬러그(`violet`, `orange`, `teal`, `ocean`, `magenta`, `candy`, `coral`, `green`, `cyan`, `indigo`, `lavender`, `sun`, `mint`, `slate`). 비어 있거나 알 수 없는 값이면 빌드의 기본값(`lavender`). 정보에서 로고를 클릭하거나 색을 고르면 기록됩니다. |
+| `ui.command_alias` | `""` | 터미널에서 GitPoulpi를 시작하는 명령의 이름, 예를 들어 `gp`(설정 > 런처, `gitpoulpi alias create`). 비어 있으면 없음입니다. 영문자, 숫자, `-`, `_`, `.`만 쓸 수 있습니다. **만들기: 명령 별칭** 버튼이 쓰는 이름일 뿐이며 만들기 전에는 아무것도 생기지 않습니다. |
+| `ui.command_alias_add` | `""` | `gitpoulpi --add`를 실행하는 두 번째 명령의 이름, 예를 들어 `gpa`. 현재 폴더를 이미 실행 중인 GitPoulpi의 새 탭으로 엽니다(설정 > 런처, `gitpoulpi alias create gpa --add`). 비어 있으면 없음입니다. 이름 규칙은 같으며, **만들기** 버튼이 `ui.command_alias`와 함께 만듭니다. |
+| `ui.launcher_build` | `"current"` | 개발 모드 전용(`general.dev_mode` 참고. 그때만 설정 > 런처에 표시되며 그 밖에는 무시됨). `"current"`: 바로 가기와 명령 별칭이 자신을 만든 빌드를 시작합니다. `"newest"`: 체크아웃의 `target/dist`와 `target/release` 중 가장 최근에 빌드된 것을 클릭할 때마다 판단해 시작하며, 어느 빌드를 시작해도 바로 가기를 다시 쓰지 않습니다. |
+
+**아바타 조회**
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | 조회 순서: `hosting_gravatar`, `gravatar_hosting`, `gravatar`, `hosting`. GitLab 호스트는 연결된 프로필을 통해서만 질의합니다. |
+
+**Mermaid 기본값**(`log --format mermaid`. Log의 Mermaid gitGraph로 복사는 팝업에서 고른 값을 기억합니다)
+
+| 키 | 기본값 | 값과 효과 |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | Log의 Mermaid gitGraph로 복사의 상세 수준: `structure`, `refs`, `subjects`, `full`(팝업에서 기억되며 `log --format mermaid`의 기본값). |
+| `ui.mermaid_orientation` | `lr` | 그 그래프의 방향: `lr`(왼쪽에서 오른쪽) 또는 `tb`(위에서 아래). |
+| `ui.mermaid_fence` | `false` | 복사한 Mermaid 스크립트를 `mermaid` 코드 펜스로 감쌉니다. |
+| `ui.mermaid_subject_width` | `40` | Mermaid id에서 커밋 제목을 이 글자 수로 자릅니다(`subjects`, `full`). |
 
 ## `[editor]`
 
@@ -246,6 +305,8 @@ command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 | `editor.follow_selection` | `true` | 편집기가 열려 있는 동안 오른쪽 창에서 다른 파일을 선택하면 그 파일도 편집기에서 열리며, 저장하지 않은 변경 사항이 있으면 먼저 저장할지 묻습니다. 편집할 수 없는 파일은 기본 보기로 열립니다. commit의 파일을 고르면 편집기를 떠나 그 diff가 열립니다. |
 
 ## `[merge]`
+
+파일: `tui.toml`.
 
 merge 충돌 편집기([merge 충돌 해결](merge-conflicts.md))입니다. 설정 > Diff 및 편집기에 표시됩니다.
 
@@ -567,6 +628,8 @@ open_tab = true
 `backup = "Ctrl+G b"`.
 
 ## `[keybindings]`
+
+파일: `tui.toml`.
 
 TUI의 단축키를 다시 할당합니다. 설정 > 키보드 및 마우스에서 편집합니다.
 

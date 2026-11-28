@@ -205,8 +205,25 @@ assistance](ai.md#troubleshooting).
 `gitpoulpi-tui-exit.log` (and `gitpoulpi-tui-panic.txt` after a crash) in the
 config directory (`gitpoulpi config path` prints the settings file, which sits there), and attach it to an issue.
 
-**Where are my settings?** `gitpoulpi config path`. Per-repository state is in
-`.gitpoulpi/repo-state.toml` inside the repository.
+**Where are my settings?** `gitpoulpi config path` prints `config.toml` (common
+settings) and `tui.toml` (the terminal UI's interface settings: theme, layout,
+columns, shortcuts...), which sit in the same folder. `gitpoulpi config get <key>`
+says which of the two a key is in. Per-repository state is in
+`.gitpoulpi/repo-state.toml` inside the repository. See
+[Two files](config-reference.md#two-files-configtoml-and-tuitoml).
+
+**I went back to an older GitPoulpi and my interface settings changed (or the
+newer one ignores what I set in the older one).** GitPoulpi keeps the interface
+settings in `tui.toml`, created as a copy of what `config.toml` held and never
+taken out of `config.toml`. An older GitPoulpi installed next to the newer one
+does not know `tui.toml`: it keeps reading and writing its own full
+`config.toml`. Once `tui.toml` exists, the newer one reads the interface
+settings from it only, so a theme or layout you change in the older version
+afterwards is not picked up, and a key missing from `tui.toml` takes its default
+rather than the old value in `config.toml`. To bring the newer version in line,
+change the setting there (Settings, or `gitpoulpi config set`); to start the
+interface settings over from `config.toml`, quit GitPoulpi and delete `tui.toml`
+(it is created again, as a fresh copy, at the next start).
 
 **Does GitPoulpi send anything anywhere?** Only what you ask for: git
 operations to your remotes, hosting requests after you connect an account, AI

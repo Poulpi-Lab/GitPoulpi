@@ -144,7 +144,7 @@ scripts and one undo.
 
 ## Reference and help
 
-28. **[Configuration reference](config-reference.md)**: every `config.toml` key,
+28. **[Configuration reference](config-reference.md)**: every `config.toml` and `tui.toml` key,
     its default and effect, the per-repository settings, environment variables.
 29. **[Troubleshooting and FAQ](troubleshooting.md)**: icons, graph rendering,
     keys that do not arrive, stuck daemons, speed, LFS pointers.

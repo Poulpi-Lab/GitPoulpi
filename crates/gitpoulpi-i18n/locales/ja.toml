@@ -2794,7 +2794,7 @@ hint_conflicts = "競合"
 conflicts_of = "{label} の競合 - Esc ですべてのショートカットを表示"
 no_conflicts = "このショートカットに競合はありません"
 hint_controls = "操作"
-config_issues = { one = "config.toml：{n} 件のエントリを無視しました - {id}：{message}", other = "config.toml：{n} 件のエントリを無視しました - {id}：{message}" }
+config_issues = { one = "{file}：{n} 件のエントリを無視しました - {id}：{message}", other = "{file}：{n} 件のエントリを無視しました - {id}：{message}" }
 no_match = "条件に一致するショートカットはありません"
 unbound = "（未割り当て）"
 none = "（なし）"

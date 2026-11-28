@@ -2795,7 +2795,7 @@ hint_conflicts = "konflikter"
 conflicts_of = "Konflikter för {label} - Esc visar alla kortkommandon"
 no_conflicts = "Det här kortkommandot har ingen konflikt"
 hint_controls = "kontroller"
-config_issues = { one = "config.toml: {n} post ignorerades - {id}: {message}", other = "config.toml: {n} poster ignorerades - {id}: {message}" }
+config_issues = { one = "{file}: {n} post ignorerades - {id}: {message}", other = "{file}: {n} poster ignorerades - {id}: {message}" }
 no_match = "inget kortkommando matchar filtren"
 unbound = "(obunden)"
 none = "(inga)"

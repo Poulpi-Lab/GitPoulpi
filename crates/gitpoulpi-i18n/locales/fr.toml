@@ -2797,7 +2797,7 @@ hint_conflicts = "conflits"
 conflicts_of = "Conflits de {label} - Esc affiche tous les raccourcis"
 no_conflicts = "Ce raccourci n'a aucun conflit"
 hint_controls = "champs"
-config_issues = { one = "config.toml : {n} entrée ignorée - {id} : {message}", other = "config.toml : {n} entrées ignorées - {id} : {message}" }
+config_issues = { one = "{file} : {n} entrée ignorée - {id} : {message}", other = "{file} : {n} entrées ignorées - {id} : {message}" }
 no_match = "aucun raccourci ne correspond aux filtres"
 unbound = "(non assigné)"
 none = "(aucune)"

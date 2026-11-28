@@ -2794,7 +2794,7 @@ hint_conflicts = "conflicten"
 conflicts_of = "Conflicten van {label} - Esc toont alle sneltoetsen"
 no_conflicts = "Deze sneltoets heeft geen conflict"
 hint_controls = "bediening"
-config_issues = { one = "config.toml: {n} item genegeerd - {id}: {message}", other = "config.toml: {n} items genegeerd - {id}: {message}" }
+config_issues = { one = "{file}: {n} item genegeerd - {id}: {message}", other = "{file}: {n} items genegeerd - {id}: {message}" }
 no_match = "geen sneltoets komt overeen met de filters"
 unbound = "(niet gebonden)"
 none = "(geen)"

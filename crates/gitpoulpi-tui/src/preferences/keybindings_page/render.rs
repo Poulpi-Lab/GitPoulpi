@@ -175,7 +175,12 @@ impl PreferencesState {
                 Style::default().fg(th().ui.accent),
             );
         } else if let Some(first) = page.issues.first() {
-            let text = msg::config_issues(page.issues.len() as u64, &first.id, &first.message);
+            let text = msg::config_issues(
+                page.issues.len() as u64,
+                page.issues_file,
+                &first.id,
+                &first.message,
+            );
             dialog_kit::put(
                 buf,
                 area.x,

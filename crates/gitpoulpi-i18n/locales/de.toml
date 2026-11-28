@@ -2795,7 +2795,7 @@ hint_conflicts = "Konflikte"
 conflicts_of = "Konflikte von {label} - Esc zeigt alle Tastenkürzel"
 no_conflicts = "Dieses Tastenkürzel hat keinen Konflikt"
 hint_controls = "Bedienung"
-config_issues = { one = "config.toml: {n} Eintrag ignoriert - {id}: {message}", other = "config.toml: {n} Einträge ignoriert - {id}: {message}" }
+config_issues = { one = "{file}: {n} Eintrag ignoriert - {id}: {message}", other = "{file}: {n} Einträge ignoriert - {id}: {message}" }
 no_match = "kein Kürzel passt zu den Filtern"
 unbound = "(frei)"
 none = "(keine)"

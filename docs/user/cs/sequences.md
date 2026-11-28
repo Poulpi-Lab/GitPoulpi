@@ -242,7 +242,7 @@ ponechají.
 
 ## Spuštění sekvence
 
-Sekvence je pojmenovaný seznam kroků, každý je příkaz palety (stage všeho, napsat zprávu commitu pomocí AI, commit, push...). Spusťte ji z palety (`Sekvence: <název>`), klávesou, kterou jste jí dali v Nastavení > Klávesnice a myš (`[keybindings.sequence]` v `config.toml`), nebo z příkazové řádky (`gitpoulpi sequence run`).
+Sekvence je pojmenovaný seznam kroků, každý je příkaz palety (stage všeho, napsat zprávu commitu pomocí AI, commit, push...). Spusťte ji z palety (`Sekvence: <název>`), klávesou, kterou jste jí dali v Nastavení > Klávesnice a myš (`[keybindings.sequence]` v `tui.toml`), nebo z příkazové řádky (`gitpoulpi sequence run`).
 
 Při běhu ukazuje pás nad horním okrajem Logu `<název> k/n`, krok a na co čeká. Běh je vidět i v panelu Jobs jako `Sekvence <název> k/n: <krok>`. Najednou běží jedna sekvence; spuštění druhé řekne, která běží.
 

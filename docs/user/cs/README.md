@@ -143,7 +143,7 @@ skripty v Lua a jedním vrácením zpět.
 
 ## Reference a nápověda
 
-28. **[Referenční příručka konfigurace](config-reference.md)**: každý klíč `config.toml`,
+28. **[Referenční příručka konfigurace](config-reference.md)**: každý klíč `config.toml` a `tui.toml`,
     jeho výchozí hodnota a účinek, nastavení pro jednotlivé repozitáře,
     proměnné prostředí.
 29. **[Řešení potíží a FAQ](troubleshooting.md)**: ikony, vykreslování grafu,

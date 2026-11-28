@@ -226,7 +226,7 @@ GitPoulpi uchovává také tyto soubory:
 
 | Co | Kde |
 |---|---|
-| Nastavení (`config.toml`) a relace | Konfigurační složka vašeho OS. Změní ji `GITPOULPI_CONFIG_DIR`. |
+| Nastavení (`config.toml` a `tui.toml`) a relace | Konfigurační složka vašeho OS. Změní ji `GITPOULPI_CONFIG_DIR`. |
 | Stav jednotlivých repozitářů | Ve výchozím stavu `gitpoulpi/` uvnitř složky `.git` repozitáře (`session.per_repo_state_dir` ho může přesunout do `.gitpoulpi/` v pracovním stromu nebo do uživatelské datové složky). |
 | Cache (avatary) | Složka cache vašeho OS. |
 | Tokeny a API klíče | Váš credential helper. **Nastavení > SSH a přihlášení > Zapomenout všechna jména a hesla** je odstraní. |

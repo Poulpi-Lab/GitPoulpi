@@ -214,8 +214,25 @@ výkonu.
 adresáři (`gitpoulpi config path` vypíše soubor nastavení, který je právě
 tam), a přiložte jej k issue.
 
-**Kde jsou moje nastavení?** `gitpoulpi config path`. Stav jednotlivých
-repozitářů je v `.gitpoulpi/repo-state.toml` uvnitř repozitáře.
+**Kde jsou moje nastavení?** `gitpoulpi config path` vypíše `config.toml`
+(společná nastavení) a `tui.toml` (nastavení rozhraní terminálového UI: motiv,
+rozvržení, sloupce, zkratky...), které jsou ve stejné složce. `gitpoulpi config get <key>`
+řekne, ve kterém z obou klíč je. Stav jednotlivých repozitářů je v
+`.gitpoulpi/repo-state.toml` uvnitř repozitáře. Viz
+[Dva soubory](config-reference.md#dva-soubory-configtoml-a-tuitoml).
+
+**Vrátil(a) jsem se ke starší verzi GitPoulpi a má nastavení rozhraní se změnila
+(nebo novější verze ignoruje, co jsem nastavil(a) ve starší).** GitPoulpi drží
+nastavení rozhraní v `tui.toml`, vytvořeném jako kopie toho, co držel
+`config.toml`, a nikdy z `config.toml` neodebraném. Starší GitPoulpi
+nainstalované vedle novější `tui.toml` nezná: dál čte a zapisuje svůj vlastní
+úplný `config.toml`. Jakmile `tui.toml` existuje, novější verze čte nastavení
+rozhraní jen z něj, takže motiv nebo rozvržení, které pak změníte ve starší
+verzi, nepřevezme, a klíč chybějící v `tui.toml` má výchozí hodnotu, ne starou
+hodnotu z `config.toml`. Chcete-li novější verzi srovnat, změňte nastavení tam
+(Nastavení nebo `gitpoulpi config set`); chcete-li nastavení rozhraní začít
+znovu z `config.toml`, ukončete GitPoulpi a smažte `tui.toml` (při dalším
+spuštění se vytvoří znovu, jako čerstvá kopie).
 
 **Posílá GitPoulpi něco někam?** Jen to, o co požádáte: operace gitu na vaše
 remoty, požadavky na hosting po připojení účtu, požadavky AI po stisknutí

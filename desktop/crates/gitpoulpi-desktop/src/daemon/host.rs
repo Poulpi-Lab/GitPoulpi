@@ -38,6 +38,18 @@ struct Shared {
     said: Vec<(Option<PathBuf>, String)>,
     /// The last success per repository.
     done: BTreeMap<PathBuf, String>,
+    /// Stages the staging guard refused, waiting for the window to ask the person.
+    prompts: Vec<SensitivePrompt>,
+}
+
+/// A stage the guard refused because some files look like secrets: nothing was staged. The answer is
+/// "Stage anyway" (the action again, wrapped in `Action::AllowSensitive`) or cancel (the ticket ends).
+#[derive(Clone, Debug)]
+pub struct SensitivePrompt {
+    pub root: PathBuf,
+    pub action: Action,
+    pub files: Vec<Sensitive>,
+    pub ticket: Option<Ticket>,
 }
 
 /// What the link told the window since the last [`DesktopHost::take_news`].
@@ -123,6 +135,16 @@ impl DesktopHost {
         }
     }
 
+    /// The refused stages of the repository at `root` that no dialog asked about yet.
+    pub fn take_prompts(&self, root: &Path) -> Vec<SensitivePrompt> {
+        let mut s = self.lock();
+        let (mine, others): (Vec<_>, Vec<_>) = std::mem::take(&mut s.prompts)
+            .into_iter()
+            .partition(|p| p.root == root);
+        s.prompts = others;
+        mine
+    }
+
     fn say(&self, repo: Option<&Path>, text: String) {
         self.lock().said.push((repo.map(Path::to_path_buf), text));
         self.bump();
@@ -183,14 +205,23 @@ impl LinkHost for DesktopHost {
 
     fn ask_sensitive_stage(
         &self,
-        _root: std::path::PathBuf,
-        _action: Action,
+        root: std::path::PathBuf,
+        action: Action,
         files: Vec<Sensitive>,
         ticket: Option<Ticket>,
     ) {
-        // No dialog yet: the stage is not done, and the person is told where to confirm it.
-        gitpoulpi_link::report_ticket(ticket, StepOutcome::Canceled);
-        self.say(None, strings::sensitive_stage(files.len()));
+        // The window asks (`app::live` takes the prompt on its next wake); the ticket stays waiting.
+        gitpoulpi_link::report_ticket(
+            ticket,
+            StepOutcome::NeedsUser(gitpoulpi_link::UserWait::SensitiveStage),
+        );
+        self.lock().prompts.push(SensitivePrompt {
+            root,
+            action,
+            files,
+            ticket,
+        });
+        self.bump();
     }
 
     fn on_connected(&self, _requester: Requester) {

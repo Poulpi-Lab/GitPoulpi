@@ -7,9 +7,10 @@
 //! rows in view), word wrap with the line numbers kept in their own column, or one line per row with a
 //! horizontal scroll, and the theme's diff colours.
 
+mod paint;
 mod rows;
+mod stage;
 
-use std::ops::Range;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{FileDiff, LineOrigin};
@@ -19,17 +20,30 @@ use gpui_kit::component::{h_flex, scroll::Scrollbar, spinner::Spinner, v_flex, I
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
     actions, div, list, px, AnyElement, App, AppContext as _, Context, EventEmitter, FocusHandle,
-    Focusable, FontStyle, FontWeight, HighlightStyle, Hsla, InteractiveElement as _, IntoElement,
-    KeyBinding, ListAlignment, ListOffset, ListState, ParentElement as _, Render, ScrollHandle,
-    SharedString, StatefulInteractiveElement as _, Styled as _, StyledText, Subscription, Task,
-    TextRun, Window,
+    Focusable, FontWeight, InteractiveElement as _, IntoElement, KeyBinding, ListAlignment,
+    ListOffset, ListState, ParentElement as _, Render, ScrollHandle,
+    StatefulInteractiveElement as _, Styled as _, Subscription, Task, Window,
 };
-use rows::{body_look, Line, Look, Opts, Rows};
+use paint::{char_width, Paint};
+use rows::{Opts, Rows};
+pub use stage::{DiffSource, PartRequest};
 
-use crate::fonts;
-use crate::theme::{DiffColors, Skin};
+use crate::daemon::staging::PartOp;
+use crate::theme::Skin;
+use gitpoulpi_i18n::msg::diff_actions as msg_actions;
 
-actions!(gp_diff, [CloseDiff, NextDiffFile, PrevDiffFile]);
+actions!(
+    gp_diff,
+    [
+        CloseDiff,
+        NextDiffFile,
+        PrevDiffFile,
+        CursorUp,
+        CursorDown,
+        ExtendUp,
+        ExtendDown
+    ]
+);
 
 /// Key context of the pane. Only Escape (the palette's close key) and `[` / `]` (previous and next file,
 /// which the terminal UI's diff has no command for) are bound here. The registry's diff keys (`n`, `p`,
@@ -41,11 +55,22 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("escape", CloseDiff, Some(CONTEXT)),
         KeyBinding::new("]", NextDiffFile, Some(CONTEXT)),
         KeyBinding::new("[", PrevDiffFile, Some(CONTEXT)),
+        // The cursor row (the hunk and lines a stage acts on); `j` / `k` are the terminal UI's spelling.
+        KeyBinding::new("up", CursorUp, Some(CONTEXT)),
+        KeyBinding::new("k", CursorUp, Some(CONTEXT)),
+        KeyBinding::new("down", CursorDown, Some(CONTEXT)),
+        KeyBinding::new("j", CursorDown, Some(CONTEXT)),
+        KeyBinding::new("shift-up", ExtendUp, Some(CONTEXT)),
+        KeyBinding::new("shift-down", ExtendDown, Some(CONTEXT)),
     ]);
 }
 
 pub enum DiffPaneEvent {
     Close,
+    /// Stage, unstage or discard a hunk or some lines: the window carries it out.
+    Part(PartRequest),
+    /// A line for the status line (why a request did nothing).
+    Say(String),
 }
 
 /// Height of one text row.
@@ -63,6 +88,12 @@ pub struct DiffPane {
     hscroll: ScrollHandle,
     loading: bool,
     revision: u64,
+    source: DiffSource,
+    /// The row the keyboard is on, and where a line selection started (`v`).
+    cursor: usize,
+    anchor: Option<usize>,
+    /// Set by a refresh after a stage: the cursor row to restore once the rows are rebuilt.
+    keep_cursor: Option<usize>,
     focus: FocusHandle,
     _task: Option<Task<()>>,
     _subs: Vec<Subscription>,
@@ -82,6 +113,10 @@ impl DiffPane {
             hscroll: ScrollHandle::new(),
             loading: false,
             revision: 0,
+            source: DiffSource::Commit,
+            cursor: 0,
+            anchor: None,
+            keep_cursor: None,
             focus: cx.focus_handle(),
             _task: None,
             _subs: Vec::new(),
@@ -89,13 +124,22 @@ impl DiffPane {
     }
 
     /// Shows file `ix` of `files`; the arrows and `[` / `]` move through the rest.
-    pub fn show(&mut self, files: Arc<Vec<FileDiff>>, ix: usize, cx: &mut Context<Self>) {
+    pub fn show(
+        &mut self,
+        files: Arc<Vec<FileDiff>>,
+        ix: usize,
+        source: DiffSource,
+        cx: &mut Context<Self>,
+    ) {
         self.files = files;
+        self.source = source;
+        self.keep_cursor = None;
         self.select(ix, cx);
     }
 
     fn select(&mut self, ix: usize, cx: &mut Context<Self>) {
         self.selected = ix.min(self.files.len().saturating_sub(1));
+        self.anchor = None;
         self.rebuild(cx);
     }
 
@@ -124,6 +168,10 @@ impl DiffPane {
                 this.loading = false;
                 this.list.reset(built.lines.len());
                 this.rows = Arc::new(built);
+                this.cursor = match this.keep_cursor.take() {
+                    Some(row) => row.min(this.rows.lines.len().saturating_sub(1)),
+                    None => this.home_row(),
+                };
                 cx.notify();
             });
         }));
@@ -205,129 +253,6 @@ impl Focusable for DiffPane {
     }
 }
 
-/// The width of one monospace character at the diff's size.
-fn char_width(window: &Window) -> f32 {
-    let mut font = window.text_style().font();
-    font.family = fonts::MONO_FAMILY.into();
-    let sample = "0000000000";
-    let run = TextRun {
-        len: sample.len(),
-        font,
-        color: Hsla::default(),
-        background_color: None,
-        underline: None,
-        strikethrough: None,
-    };
-    window
-        .text_system()
-        .shape_line(sample.into(), px(TEXT_PX), &[run], None)
-        .width
-        .as_f32()
-        / sample.len() as f32
-}
-
-/// A run of spans as one text with the looks laid over it.
-fn text_of(spans: &[gitpoulpi_app::diff::StyledSpan], c: &DiffColors) -> StyledText {
-    let mut text = String::new();
-    let mut runs: Vec<(Range<usize>, HighlightStyle)> = Vec::new();
-    for s in spans {
-        if s.text.is_empty() {
-            continue;
-        }
-        let start = text.len();
-        text.push_str(&s.text);
-        let look = Look::of(s).style(c);
-        runs.push((
-            start..text.len(),
-            HighlightStyle {
-                color: Some(look.fg),
-                background_color: look.bg,
-                font_weight: look.bold.then_some(FontWeight::BOLD),
-                font_style: look.italic.then_some(FontStyle::Italic),
-                ..HighlightStyle::default()
-            },
-        ));
-    }
-    StyledText::new(SharedString::from(text)).with_highlights(runs)
-}
-
-/// What the row closure of the list needs; owned so the closure outlives `render`.
-struct Paint {
-    rows: Arc<Rows>,
-    colors: DiffColors,
-    wrap: bool,
-    /// Width of one text column in pixels when not wrapping.
-    text_w: f32,
-    cw: f32,
-}
-
-impl Paint {
-    /// One half (or a whole Inline line): its gutter in a column of its own, then the text, which
-    /// wraps under itself rather than under the line number.
-    fn half(&self, line: &gitpoulpi_app::diff::StyledLine) -> gpui_kit::Div {
-        let (gutter, rest) = match line.spans.split_first() {
-            Some((g, rest)) if g.role == gitpoulpi_app::diff::DiffRole::Gutter => (Some(g), rest),
-            _ => (None, line.spans.as_slice()),
-        };
-        let bg = body_look(line).and_then(|l| l.row_bg(&self.colors));
-        let gutter_w = gutter.map(|g| g.text.chars().count() as f32 * self.cw);
-        h_flex()
-            .items_start()
-            .min_h(px(LINE_H))
-            .when_some(bg, |d, bg| d.bg(bg))
-            .when_some(gutter.zip(gutter_w), |d, (g, w)| {
-                d.child(
-                    div()
-                        .flex_none()
-                        .w(px(w))
-                        .child(text_of(std::slice::from_ref(g), &self.colors)),
-                )
-            })
-            .child(if self.wrap {
-                div().flex_1().min_w_0().child(text_of(rest, &self.colors))
-            } else {
-                div()
-                    .flex_none()
-                    .w(px(self.text_w))
-                    .whitespace_nowrap()
-                    .child(text_of(rest, &self.colors))
-            })
-    }
-
-    fn row(&self, ix: usize) -> AnyElement {
-        let base = div()
-            .w_full()
-            .font_family(fonts::MONO_FAMILY)
-            .text_size(px(TEXT_PX))
-            .line_height(px(LINE_H));
-        match &self.rows.lines[ix] {
-            Line::Full(line) => base.child(self.half(line)).into_any_element(),
-            Line::Split(left, right) => {
-                let blank = || div().flex_1().min_w_0().min_h(px(LINE_H));
-                let side = |l: &Option<gitpoulpi_app::diff::StyledLine>| match l {
-                    Some(l) => self.half(l).flex_1().min_w_0(),
-                    None => blank(),
-                };
-                base.child(
-                    h_flex()
-                        .w_full()
-                        .items_stretch()
-                        .child(side(left))
-                        .child(
-                            div()
-                                .w(px(1.0))
-                                .flex_none()
-                                .bg(self.colors.gutter_fg)
-                                .opacity(0.4),
-                        )
-                        .child(side(right)),
-                )
-                .into_any_element()
-            }
-        }
-    }
-}
-
 impl Render for DiffPane {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let skin = cx.global::<Skin>().clone();
@@ -390,6 +315,11 @@ impl Render for DiffPane {
             wrap: self.wrap,
             text_w: (self.rows.max_chars as f32 + 2.0) * cw,
             cw,
+            cursor: self.cursor,
+            selection: self.selection(),
+            source: self.source,
+            skin: skin.clone(),
+            me: cx.entity().downgrade(),
         };
         // Inline: gutter (12) + text; Side by side: two halves of gutter (6) + text.
         let content_w = if self.wrap {
@@ -438,6 +368,10 @@ impl Render for DiffPane {
             .on_action(cx.listener(|_, _: &CloseDiff, _, cx| cx.emit(DiffPaneEvent::Close)))
             .on_action(cx.listener(|this, _: &NextDiffFile, _, cx| this.step(1, cx)))
             .on_action(cx.listener(|this, _: &PrevDiffFile, _, cx| this.step(-1, cx)))
+            .on_action(cx.listener(|this, _: &CursorUp, _, cx| this.move_cursor(-1, false, cx)))
+            .on_action(cx.listener(|this, _: &CursorDown, _, cx| this.move_cursor(1, false, cx)))
+            .on_action(cx.listener(|this, _: &ExtendUp, _, cx| this.move_cursor(-1, true, cx)))
+            .on_action(cx.listener(|this, _: &ExtendDown, _, cx| this.move_cursor(1, true, cx)))
             .border_1()
             .border_color(border)
             .rounded(px(3.0))
@@ -502,6 +436,39 @@ impl Render for DiffPane {
                     .child(
                         toggle("wrap", msg::diff_view::B_WRAP.get(), self.wrap)
                             .on_click(cx.listener(|this, _, _, cx| this.toggle_wrap(cx))),
+                    )
+                    .when(
+                        self.source.is_working() && self.selection().is_some(),
+                        |d| {
+                            let staged = self.source == DiffSource::Staged;
+                            d.child(
+                                toggle(
+                                    "lines-stage",
+                                    if staged {
+                                        msg_actions::LINES_UNSTAGE.get()
+                                    } else {
+                                        msg_actions::LINES_STAGE.get()
+                                    },
+                                    true,
+                                )
+                                .on_click(
+                                    cx.listener(|this, _, _, cx| this.request_toggle_lines(cx)),
+                                ),
+                            )
+                            .when(!staged, |d| {
+                                d.child(
+                                    toggle(
+                                        "lines-discard",
+                                        msg_actions::LINES_DISCARD.get(),
+                                        false,
+                                    )
+                                    .text_color(danger)
+                                    .on_click(cx.listener(
+                                        |this, _, _, cx| this.request_lines(PartOp::Discard, cx),
+                                    )),
+                                )
+                            })
+                        },
                     ),
             )
             .child(div().flex_1().min_h_0().p(px(4.0)).child(body))

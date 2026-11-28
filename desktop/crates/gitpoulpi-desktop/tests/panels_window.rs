@@ -9,7 +9,7 @@ use gitpoulpi_app::graph::TotalShown;
 use gitpoulpi_core::domain::{DiffLine, FileDiff, FileStatus, Hunk, HunkId, LineOrigin};
 use gitpoulpi_desktop::app::{self, Overrides, Workspace};
 use gitpoulpi_desktop::daemon::Backend;
-use gitpoulpi_desktop::panels::diff::DiffPane;
+use gitpoulpi_desktop::panels::diff::{DiffPane, DiffSource};
 use gitpoulpi_desktop::panels::refs::SectionKind;
 use gitpoulpi_testkit::{isolate_process_env, FixtureRepo, FixtureRepoBuilder};
 use gpui_kit::{AnyWindowHandle, AppContext as _, Entity, TestAppContext};
@@ -349,7 +349,9 @@ fn the_diff_pane_builds_both_layouts_and_follows_the_toggles(cx: &mut TestAppCon
         diff_line(LineOrigin::Add, "    let a = 2;"),
         diff_line(LineOrigin::Context, "}"),
     ]);
-    pane.update(cx, |p, cx| p.show(Arc::new(vec![file]), 0, cx));
+    pane.update(cx, |p, cx| {
+        p.show(Arc::new(vec![file]), 0, DiffSource::Commit, cx)
+    });
     wait_until(cx, "the rows", |cx| {
         pane.read_with(cx, |p, _| p.row_count()) > 0
     });
@@ -372,7 +374,7 @@ fn the_diff_pane_builds_both_layouts_and_follows_the_toggles(cx: &mut TestAppCon
         diff_line(LineOrigin::Add, "x"),
     ]);
     pane.update(cx, |p, cx| {
-        p.show(Arc::new(vec![ws_only]), 0, cx);
+        p.show(Arc::new(vec![ws_only]), 0, DiffSource::Commit, cx);
         p.toggle_whitespace(cx);
     });
     wait_until(cx, "the notice", |cx| {
@@ -396,7 +398,9 @@ fn a_huge_diff_builds_off_the_ui_thread_and_paints_in_bounded_time(cx: &mut Test
             &format!("new line {i} with some text"),
         ));
     }
-    pane.update(cx, |p, cx| p.show(Arc::new(vec![file_with(lines)]), 0, cx));
+    pane.update(cx, |p, cx| {
+        p.show(Arc::new(vec![file_with(lines)]), 0, DiffSource::Commit, cx)
+    });
     wait_until(cx, "the rows", |cx| {
         pane.read_with(cx, |p, _| p.row_count()) > 1
     });

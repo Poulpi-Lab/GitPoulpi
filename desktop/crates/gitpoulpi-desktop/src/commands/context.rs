@@ -17,6 +17,14 @@ pub struct WindowState {
     pub selected_commit: bool,
     /// The working tree has uncommitted changes.
     pub has_wip: bool,
+    /// A file of the Unstaged / Staged list is selected (or has the cursor).
+    pub unstaged_selected: bool,
+    pub staged_selected: bool,
+    /// Some file is conflicted: git refuses to commit.
+    pub has_conflicts: bool,
+    /// The open diff is one of the two working-tree halves (its hunks can be staged), and which one.
+    pub stageable_diff: bool,
+    pub diff_stages: bool,
     /// What the journal offers for Undo and Redo.
     pub undo: Avail,
     pub redo: Avail,
@@ -29,6 +37,11 @@ impl Default for WindowState {
             diff_open: false,
             selected_commit: false,
             has_wip: false,
+            unstaged_selected: false,
+            staged_selected: false,
+            has_conflicts: false,
+            stageable_diff: false,
+            diff_stages: false,
             undo: Avail::Nothing,
             redo: Avail::Nothing,
         }
@@ -46,6 +59,11 @@ impl WindowState {
             in_diff_view: self.diff_open,
             selected_commit: self.selected_commit,
             has_wip: self.has_wip,
+            unstaged_file_selected: self.unstaged_selected,
+            staged_file_selected: self.staged_selected,
+            has_conflicts: self.has_conflicts,
+            in_stageable_diff: self.stageable_diff,
+            diff_stages: self.diff_stages,
             undo: self.undo,
             redo: self.redo,
             lfs_program_ok: true,
@@ -75,6 +93,7 @@ mod tests {
             has_wip: true,
             undo: Avail::Ready,
             redo: Avail::Nothing,
+            ..WindowState::default()
         };
         let ctx = state.palette_context();
         assert!(ctx.in_refs_pane && ctx.in_diff_view && ctx.selected_commit && ctx.has_wip);

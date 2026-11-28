@@ -20,8 +20,6 @@ use crate::theme::Skin;
 pub(super) enum ListKind {
     /// Files of the selected commit.
     Commit,
-    /// Working tree changes, unstaged or staged.
-    Working { staged: bool },
 }
 
 pub(super) fn boxed(
@@ -100,7 +98,6 @@ impl RightPanel {
                             let (glyph, class) = status_glyph(r.status);
                             let color: Hsla = [success, warning, danger, info][class as usize];
                             let me = me.clone();
-                            let path = r.path.clone();
                             let is_selected = selected == Some(r.ix) && !r.folder && commit_list;
                             h_flex()
                                 .id((id, i))
@@ -158,9 +155,6 @@ impl RightPanel {
                                     }
                                     let _ = me.update(cx, |this, cx| match kind {
                                         ListKind::Commit => this.open_commit_file(r.ix, cx),
-                                        ListKind::Working { staged } => {
-                                            this.open_working(path.clone(), staged, cx)
-                                        }
                                     });
                                 })
                                 .into_any_element()
@@ -223,8 +217,11 @@ impl RightPanel {
             .when(matches!(self.mode, Mode::Wip), |d| {
                 d.child(
                     div()
+                        .id("collapse-all")
                         .text_color(skin.accent)
-                        .child(msg::button_bar::COLLAPSE_ALL.get()),
+                        .cursor_pointer()
+                        .child(msg::button_bar::COLLAPSE_ALL.get())
+                        .on_click(cx.listener(|this, _, _, cx| this.toggle_fold_all(cx))),
                 )
             })
             .child(div().flex_1())

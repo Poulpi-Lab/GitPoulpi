@@ -141,6 +141,12 @@ impl Workspace {
         if let Some(outcome) = drained.outcome {
             self.apply_outcome(outcome, drained.filter_generation, cx);
         }
+        // What became of the commit that was sent, and the stages the guard refused.
+        self.right.update(cx, |r, cx| r.settle(cx));
+        let prompts = self.backend.host().take_prompts(&self.backend.repo_root());
+        if !prompts.is_empty() {
+            self.ask_sensitive(prompts, cx);
+        }
         cx.notify();
     }
 
@@ -161,6 +167,9 @@ impl Workspace {
         }
         if changes.log || changes.stashes || status_changed {
             self.log.update(cx, |l, cx| l.reload(cx));
+        }
+        if status_changed {
+            self.refresh_working_diff(cx);
         }
         if changes.refs || changes.stashes {
             self.refs.update(cx, |r, cx| r.reload(cx));

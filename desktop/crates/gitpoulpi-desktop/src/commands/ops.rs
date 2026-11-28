@@ -10,6 +10,7 @@ use std::collections::BTreeSet;
 use gitpoulpi_app::keymap::{Action, Ctx};
 use gitpoulpi_app::palette::vocab::diff_view::DiffViewMode;
 use gitpoulpi_app::palette::vocab::log_table::LogColumnCmd;
+use gitpoulpi_app::palette::vocab::status_pane::{FileContextAction, StatusSection};
 use gitpoulpi_app::palette::vocab::tree_fold::TreeFold;
 use gitpoulpi_app::palette::{palette_entry, PaletteCommand};
 use gitpoulpi_app::registry::{parity_rows, ParityKind};
@@ -64,6 +65,57 @@ pub enum Op {
     DiffStepHunk {
         forward: bool,
     },
+    /// Staging and committing in the working-changes pane.
+    Status(StatusOp),
+    /// Stage, unstage or discard a hunk or lines of the open working-tree diff.
+    DiffPart(DiffPartOp),
+}
+
+/// What the working-changes pane does (its lists and the commit form).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StatusOp {
+    StageSelected,
+    UnstageSelected,
+    StageAll,
+    DiscardAll,
+    DiscardSelected,
+    /// Stage what is selected in Unstaged, unstage what is selected in Staged (`Ctrl+Space`).
+    ToggleStage,
+    OpenDiff,
+    TogglePathTree,
+    ToggleAmend,
+    ToggleSkipHooks,
+    /// The keyboard goes to the commit summary.
+    FocusMessage,
+    /// The commit button.
+    Commit,
+    /// `Ctrl+G Enter`: commit when ready, else take the keyboard to the summary.
+    CommitNow,
+    SelectAll,
+    ClearSelection,
+    ToggleSelection,
+    FocusSection(StatusSection),
+    /// Fold or unfold the folders of the Tree lists (`=`, `-`, `*`, `_`).
+    Fold(TreeFold),
+    /// `z`: fold all folders, or unfold them when some are folded.
+    ToggleFoldAll,
+}
+
+/// What the open diff does with the hunk under the cursor or the selected lines.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiffPartOp {
+    /// `Space`: stage or unstage the hunk, by the half the diff was opened from.
+    ToggleHunk,
+    /// `Enter`: stage or unstage the selected lines.
+    ToggleLines,
+    StageHunk,
+    UnstageHunk,
+    StageLines,
+    UnstageLines,
+    DiscardHunk,
+    DiscardLines,
+    /// `v`: start or drop a line selection.
+    SelectLines,
 }
 
 /// The op of a key action, if the desktop implements it.
@@ -100,6 +152,28 @@ pub fn op_for_action(action: Action) -> Option<Op> {
         A::DiffToggleLayout => Op::DiffLayout(None),
         A::DiffToggleWrap => Op::DiffToggleWrap,
         A::DiffToggleWhitespace => Op::DiffToggleWhitespace,
+        A::GitStageFile => Op::Status(StatusOp::StageSelected),
+        A::GitUnstageFile => Op::Status(StatusOp::UnstageSelected),
+        A::GitStageAll => Op::Status(StatusOp::StageAll),
+        A::GitDiscardAll => Op::Status(StatusOp::DiscardAll),
+        A::GitCommitNow | A::GitCompose => Op::Status(StatusOp::CommitNow),
+        A::StatusCompose => Op::Status(StatusOp::FocusMessage),
+        A::StatusToggleFileMode => Op::Status(StatusOp::TogglePathTree),
+        A::StatusAmend => Op::Status(StatusOp::ToggleAmend),
+        A::StatusSkipHooks => Op::Status(StatusOp::ToggleSkipHooks),
+        A::StatusStageToggle => Op::Status(StatusOp::ToggleStage),
+        A::StatusOpenDiff => Op::Status(StatusOp::OpenDiff),
+        A::ComposerCommit => Op::Status(StatusOp::Commit),
+        A::StatusCollapseAll => Op::Status(StatusOp::ToggleFoldAll),
+        A::StatusExpandAll => Op::Status(StatusOp::Fold(TreeFold::ExpandAll)),
+        A::StatusCollapseAllFolders => Op::Status(StatusOp::Fold(TreeFold::CollapseAll)),
+        A::StatusExpandBelow => Op::Status(StatusOp::Fold(TreeFold::ExpandBelow)),
+        A::StatusCollapseBelow => Op::Status(StatusOp::Fold(TreeFold::CollapseBelow)),
+        A::DiffStageHunk => Op::DiffPart(DiffPartOp::ToggleHunk),
+        A::DiffStageLines => Op::DiffPart(DiffPartOp::ToggleLines),
+        A::DiffDiscardHunk => Op::DiffPart(DiffPartOp::DiscardHunk),
+        A::DiffDiscardLines => Op::DiffPart(DiffPartOp::DiscardLines),
+        A::DiffSelectLines => Op::DiffPart(DiffPartOp::SelectLines),
         // A palette command bound to a key of its own.
         A::Palette(_) => return palette_entry(action).and_then(|e| op_for_palette(e.command)),
         _ => return None,
@@ -141,6 +215,30 @@ pub fn op_for_palette(command: PaletteCommand) -> Option<Op> {
         C::DiffMode(mode) => Op::DiffLayout(Some(mode)),
         C::ToggleWordWrap => Op::DiffToggleWrap,
         C::ToggleWhitespace => Op::DiffToggleWhitespace,
+        C::StageSelectedFile | C::FileMenu(FileContextAction::Stage) => {
+            Op::Status(StatusOp::StageSelected)
+        }
+        C::UnstageSelectedFile | C::FileMenu(FileContextAction::Unstage) => {
+            Op::Status(StatusOp::UnstageSelected)
+        }
+        C::FileMenu(FileContextAction::Discard) => Op::Status(StatusOp::DiscardSelected),
+        C::StageAll => Op::Status(StatusOp::StageAll),
+        C::DiscardAllChanges => Op::Status(StatusOp::DiscardAll),
+        C::Commit | C::CommitNow => Op::Status(StatusOp::CommitNow),
+        C::FilesTogglePathTree => Op::Status(StatusOp::TogglePathTree),
+        C::CommitToggleSkipHooks => Op::Status(StatusOp::ToggleSkipHooks),
+        C::FilesSelectAll => Op::Status(StatusOp::SelectAll),
+        C::FilesClearSelection => Op::Status(StatusOp::ClearSelection),
+        C::FilesToggleSelection => Op::Status(StatusOp::ToggleSelection),
+        C::FocusStatusSection(section) => Op::Status(StatusOp::FocusSection(section)),
+        C::FilesFold(f) => Op::Status(StatusOp::Fold(f)),
+        C::StageHunk => Op::DiffPart(DiffPartOp::StageHunk),
+        C::UnstageHunk => Op::DiffPart(DiffPartOp::UnstageHunk),
+        C::StageLines => Op::DiffPart(DiffPartOp::StageLines),
+        C::UnstageLines => Op::DiffPart(DiffPartOp::UnstageLines),
+        C::DiscardHunk => Op::DiffPart(DiffPartOp::DiscardHunk),
+        C::DiscardLines => Op::DiffPart(DiffPartOp::DiscardLines),
+        C::SelectLines => Op::DiffPart(DiffPartOp::SelectLines),
         C::LogColumn(LogColumnCmd::FitAllToContent) => Op::FitColumns,
         C::LogColumn(LogColumnCmd::ResetWidth) => Op::ResetColumns,
         _ => return None,

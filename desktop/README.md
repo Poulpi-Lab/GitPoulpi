@@ -25,6 +25,26 @@ key (`Ctrl+G f`, `Ctrl+Z`, `o` in the Refs, `n` in a diff, ...) all end in the s
 "not available yet" answer for what the desktop does not do yet. The toolbar's Fetch, Pull, Push, Undo and
 Redo run git operations; the other toolbar buttons answer "not available yet". `--session NAME` joins another session.
 
+## Staging and committing
+
+Select the WIP row of the Log and the right pane lists the working changes: **Unstaged Files** (edited,
+new and conflicted files) and **Staged Files**, each with its count and its bulk buttons. Click selects
+(Ctrl+click toggles, Shift+click takes a range), a double click or Enter opens the file's diff, the hover
+button stages or unstages a row, and a row can be dragged onto the other list. The keyboard has all of
+it: Up / Down (Shift extends), Space, Ctrl+A, Esc, Ctrl+Space, `d`, `m` (Path or Tree), `z` and the
+`Ctrl+G s / u / a / x` chords. Stage and unstage never ask; discard always asks first (how many files, how
+many untracked) and Undo takes it back. Each action is one undo entry, a multi-selection included.
+
+In a working-tree diff the cursor row (Up / Down, `j` / `k`, or a click) picks the hunk: `Space` stages or
+unstages it, `x` discards it, `v` starts a line selection that `Enter` stages and `Shift+X` discards.
+The hunk header has the same buttons. The diff follows the index after each action.
+
+The commit form under the lists has the summary (with the 72-character counter), the description,
+Amend and Skip hooks, the identity the commit is made as, and the commit button, which says why it cannot
+commit yet. `Ctrl+Enter` in a field, `Ctrl+G Enter` and the button commit; the form clears only after the
+commit succeeded, and a refusal (a hook, nothing staged) keeps the text and shows the daemon's message.
+A stage that would add files that look like secrets asks first (Stage anyway or Cancel).
+
 ## Layout
 
 `desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The

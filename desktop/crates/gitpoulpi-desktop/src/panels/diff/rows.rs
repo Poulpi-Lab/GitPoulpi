@@ -138,7 +138,12 @@ pub fn build(file: &FileDiff, opts: Opts) -> Rows {
                     })
                 };
                 rows.lines.push(Line::Split(half(left), half(right)));
-                let pick = |s: Option<(usize, u32)>| s.map(|(i, _)| eh.origin[i]);
+                // Only changed lines are selectable: context is kept by the daemon whatever is picked.
+                let pick = |s: Option<(usize, u32)>| {
+                    s.and_then(|(i, _)| {
+                        (hunk.lines[i].origin != LineOrigin::Context).then_some(eh.origin[i])
+                    })
+                };
                 let mut row = DiffRow::body(hunk.id, [pick(left), pick(right)])
                     .with_change(split_change(hunk, left, right));
                 row.numbers = [left.map(|(_, n)| n), right.map(|(_, n)| n)];
@@ -390,6 +395,38 @@ mod tests {
                 "[gutter]   41 [context] [context]end || [gutter]   41 [context] [context]end",
             ]
         );
+    }
+
+    /// Only changed lines can be selected, in both layouts: a context row (both halves in Side by side)
+    /// carries no line index, or a stage would name lines git keeps anyway.
+    #[test]
+    fn only_changed_lines_are_selectable_in_both_layouts() {
+        for split in [true, false] {
+            let rows = build(
+                &fixture(),
+                Opts {
+                    split,
+                    ..Opts::default()
+                },
+            );
+            let picked: Vec<u32> = rows
+                .meta
+                .iter()
+                .flat_map(|m| m.lines.into_iter().flatten())
+                .collect();
+            // fixture hunk 0: lines 1, 2 and 3 are changed (0 and 4 are context); hunk 1 has one pair.
+            assert_eq!(picked[..3], [1, 2, 3], "split = {split}");
+            for (i, m) in rows.meta.iter().enumerate() {
+                if let Line::Split(Some(l), _) | Line::Full(l) = &rows.lines[i] {
+                    if describe(l).contains("[context] [context]") {
+                        assert!(
+                            m.lines.iter().all(Option::is_none),
+                            "row {i}, split = {split}"
+                        );
+                    }
+                }
+            }
+        }
     }
 
     #[test]

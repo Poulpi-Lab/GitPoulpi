@@ -1,4 +1,4 @@
-//! Vector painter for the TUI's graph cells (`lanes.rs`). The geometry is a port of
+//! Vector painter for the TUI's graph cells (from `gitpoulpi-app`). The geometry is a port of
 //! `crates/gitpoulpi-tui/src/graph/raster/{metrics,shape}.rs` and of `shapes_for` in `raster.rs`:
 //! same stroke width, node radius, ring thickness, elbow fillets, dash pattern and pending alpha,
 //! with the cell size (9 x 22 px here) standing where the terminal's cell pixels stood. A lane takes
@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use gpui_kit::{fill, point, px, size, Bounds, Hsla, PathBuilder, Pixels, Point, Window};
 
-use super::lanes::{ColorRef, GraphRow, NodeKind, Sides, TreeCell, TreePart};
+use gitpoulpi_app::graph::{ColorRef, GraphRow, NodeKind, Sides, TreeCell, TreePart};
 
 pub const CW: f32 = 9.0;
 pub const CH: f32 = 22.0;
@@ -24,6 +24,7 @@ pub struct Palette {
 impl Palette {
     pub(super) fn color(&self, c: ColorRef) -> Hsla {
         match c {
+            ColorRef::None => self.color(ColorRef::Lane(0)),
             ColorRef::Lane(n) => self.lanes[n % self.lanes.len().max(1)],
             ColorRef::Wip => self.wip,
             ColorRef::Stash => self.stash,

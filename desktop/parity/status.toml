@@ -1,0 +1,44 @@
+# Which terminal UI actions the desktop frontend covers.
+#
+# Ids are the terminal UI's action ids (`crates/gitpoulpi-tui/src/keymap/action.rs`). Only what the
+# desktop really does today is listed; an action that is not listed is not tracked yet. See README.md.
+
+[[action]]
+id = "global.palette"
+status = "done"
+note = "Command palette on Ctrl+P and Ctrl+Shift+P."
+
+[[action]]
+id = "global.quit"
+status = "done"
+note = "Ctrl+Q."
+
+[[action]]
+id = "global.find_in_log"
+status = "done"
+note = "Search box over the Log (Ctrl+F)."
+
+[[action]]
+id = "nav_prefix.collapse_refs"
+status = "done"
+note = "Toggle the refs sidebar."
+
+[[action]]
+id = "nav_prefix.collapse_status"
+status = "done"
+note = "Toggle the right-hand details panel."
+
+[[action]]
+id = "nav_prefix.change_theme"
+status = "done"
+note = "Theme entries in the command palette."
+
+[[action]]
+id = "nav_prefix.change_language"
+status = "done"
+note = "Language entries in the command palette."
+
+[[action]]
+id = "nav_prefix.change_graph_color_theme"
+status = "done"
+note = "Graph colour palettes in the command palette."

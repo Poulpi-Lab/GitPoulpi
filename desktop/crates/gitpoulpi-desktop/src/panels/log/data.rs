@@ -1,6 +1,6 @@
 //! What the Log holds once loaded: commits, refs, stashes, working changes and the graph layout.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use gitpoulpi_core::domain::{CommitNode, Oid, Ref, RefKind, Stash, StatusEntry};
@@ -113,10 +113,9 @@ pub fn compute_layout(
     head: Option<Oid>,
     palette_len: usize,
 ) -> GraphLayout {
-    let ref_targets: HashSet<Oid> = refs.iter().map(|r| r.target).collect();
     GraphLayout::build(&GraphInput {
         nodes,
-        ref_targets: &ref_targets,
+        refs,
         stashes,
         dirty,
         head,

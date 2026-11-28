@@ -22,6 +22,7 @@ path = "src/main.rs"
 gpui-kit = { version = "=0.11.0", features = ["tree-sitter-rust", "tree-sitter-toml", "tree-sitter-markdown", "tree-sitter-bash", "tree-sitter-yaml", "tree-sitter-javascript", "tree-sitter-typescript"] }
 
 gitpoulpi-core = { path = "../../../crates/gitpoulpi-core" }
+gitpoulpi-app = { path = "../../../crates/gitpoulpi-app" }
 gitpoulpi-config = { path = "../../../crates/gitpoulpi-config" }
 gitpoulpi-i18n = { path = "../../../crates/gitpoulpi-i18n" }
 gitpoulpi-ipc = { path = "../../../crates/gitpoulpi-ipc" }

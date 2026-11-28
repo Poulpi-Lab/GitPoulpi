@@ -2284,6 +2284,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gitpoulpi-app"
+version = "1.3.0"
+dependencies = [
+ "gitpoulpi-config",
+ "gitpoulpi-core",
+]
+
+[[package]]
 name = "gitpoulpi-cli-backend"
 version = "1.3.0"
 dependencies = [
@@ -2359,6 +2367,7 @@ name = "gitpoulpi-desktop"
 version = "1.3.0"
 dependencies = [
  "anyhow",
+ "gitpoulpi-app",
  "gitpoulpi-config",
  "gitpoulpi-core",
  "gitpoulpi-daemon",

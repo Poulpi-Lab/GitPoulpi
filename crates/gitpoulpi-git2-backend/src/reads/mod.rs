@@ -233,7 +233,15 @@ fn push_all_refs(
         let heads = revwalk.push_glob("refs/heads/*");
         let tags = revwalk.push_glob("refs/tags/*");
         let remotes = revwalk.push_glob("refs/remotes/*");
-        return if heads.is_ok() || tags.is_ok() || remotes.is_ok() {
+        // A detached HEAD is always walked, like the current branch: the
+        // commits made there that no ref reaches would otherwise vanish.
+        // (On a branch HEAD is a ref already; no extra seed.)
+        let head = if git_repo.head_detached().unwrap_or(false) {
+            revwalk.push_head()
+        } else {
+            Err(git2::Error::from_str("on a branch"))
+        };
+        return if heads.is_ok() || tags.is_ok() || remotes.is_ok() || head.is_ok() {
             Ok(())
         } else {
             heads

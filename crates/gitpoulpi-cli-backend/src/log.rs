@@ -73,6 +73,32 @@ pub(crate) fn tips_stdin(tips: &[Oid]) -> Vec<u8> {
     text.into_bytes()
 }
 
+/// A detached HEAD is always walked, like the current branch: `HEAD` is
+/// added to the revisions of an unfiltered all-refs walk so commits only a
+/// detached HEAD reaches are not lost (on a branch it duplicates a ref the
+/// walk has, which git dedupes; no extra spawn to ask). An unborn HEAD
+/// makes git refuse it: `without_head` is the same arguments without it.
+pub(crate) fn with_head(args: &[String]) -> Vec<String> {
+    let mut with = args.to_vec();
+    // Before the path separator when there is one; else add the separator,
+    // so a file named `HEAD` cannot make the revision ambiguous.
+    let at = with.iter().position(|a| a == "--").unwrap_or_else(|| {
+        with.push("--".to_string());
+        with.len() - 1
+    });
+    with.insert(at, "HEAD".to_string());
+    with
+}
+
+/// Runs `args` with `HEAD` as an extra revision, else (unborn HEAD, other
+/// branches present) without it.
+pub(crate) fn run_with_head_fallback(
+    args: &[String],
+    mut go: impl FnMut(&[String]) -> Result<Vec<u8>>,
+) -> Result<Vec<u8>> {
+    go(&with_head(args)).or_else(|_| go(args))
+}
+
 pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
     // `%aN`/`%aE` are `%an`/`%ae` through the `.mailmap` (`log.use_mailmap`).
     let (name, email) = if opts.use_mailmap {
@@ -103,6 +129,7 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         args.push(format!("-n{limit}"));
     }
     let mut stdin: Option<Vec<u8>> = None;
+    let mut head_seed = false;
     if opts.all_refs && !opts.hidden.is_empty() {
         // Hidden refs change the walk: start from the visible tips only.
         // `--stdin` with no input would fall back to HEAD, so an empty list
@@ -121,6 +148,7 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
         args.push("--branches".to_string());
         args.push("--tags".to_string());
         args.push("--remotes".to_string());
+        head_seed = true;
     } else if let Some(start) = &opts.start_ref {
         args.push(start.clone());
     }
@@ -135,11 +163,17 @@ pub fn log(repo: &RepoRef, opts: &LogOptions) -> Result<CommitGraph> {
                 .map(|p| p.to_string_lossy().replace('\\', "/")),
         );
     }
-    let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
-
-    let result = match &stdin {
-        Some(input) => run_bytes_with_stdin(&repo.root, &args_ref, input),
-        None => run_bytes(&repo.root, &args_ref),
+    let go = |args: &[String]| {
+        let args_ref: Vec<&str> = args.iter().map(String::as_str).collect();
+        match &stdin {
+            Some(input) => run_bytes_with_stdin(&repo.root, &args_ref, input),
+            None => run_bytes(&repo.root, &args_ref),
+        }
+    };
+    let result = if head_seed {
+        run_with_head_fallback(&args, go)
+    } else {
+        go(&args)
     };
     let raw = match result {
         Ok(raw) => raw,

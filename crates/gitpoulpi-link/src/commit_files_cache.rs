@@ -191,7 +191,7 @@ impl CommitFilesCache {
         }
     }
 
-    #[cfg(any(test, feature = "test-support"))]
+    #[cfg(test)]
     #[allow(clippy::len_without_is_empty)]
     pub fn len(&self) -> usize {
         self.entries.len()
@@ -312,19 +312,19 @@ impl CommitFilesQueue {
     }
 
     /// Everything, most urgent first.
-    #[cfg(any(test, feature = "test-support"))]
+    #[cfg(test)]
     pub fn pop(&mut self) -> Option<QueuedFetch> {
         self.pop_urgent().or_else(|| self.pop_prefetch())
     }
 
     /// Whether a selection newer than the one being served is waiting: the
     /// worker's cue to stop spending time on the old one.
-    #[cfg(any(test, feature = "test-support"))]
+    #[cfg(test)]
     pub fn has_selection(&self) -> bool {
         self.selection.is_some()
     }
 
-    #[cfg(any(test, feature = "test-support"))]
+    #[cfg(test)]
     pub fn is_empty(&self) -> bool {
         self.selection.is_none() && self.wip.is_empty() && self.prefetch.is_empty()
     }

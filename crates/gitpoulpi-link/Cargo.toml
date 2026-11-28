@@ -44,5 +44,5 @@ gitpoulpi-cli-backend.workspace = true
 tempfile.workspace = true
 # The tests read the optional parts and the French catalog: a build of this
 # crate alone turns them on for its own tests (a self dev-dependency).
-gitpoulpi-link = { path = ".", features = ["lfs", "worktree", "submodule"] }
+gitpoulpi-link = { path = ".", features = ["lfs", "worktree", "submodule", "test-support"] }
 gitpoulpi-i18n = { workspace = true, features = ["lang-fr"] }

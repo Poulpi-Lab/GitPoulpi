@@ -240,7 +240,7 @@ la page enregistre.
 
 ## Lancer une séquence
 
-Une séquence est une liste nommée d'étapes, chacune étant une commande de la palette (stager tout, écrire le message de commit avec l'IA, commit, push...). Lancez-la depuis la palette (`Séquence : <nom>`), avec la touche que vous lui avez donnée dans Paramètres > Clavier et souris (`[keybindings.sequence]` dans `config.toml`), ou en ligne de commande (`gitpoulpi sequence run`).
+Une séquence est une liste nommée d'étapes, chacune étant une commande de la palette (stager tout, écrire le message de commit avec l'IA, commit, push...). Lancez-la depuis la palette (`Séquence : <nom>`), avec la touche que vous lui avez donnée dans Paramètres > Clavier et souris (`[keybindings.sequence]` dans `tui.toml`), ou en ligne de commande (`gitpoulpi sequence run`).
 
 Pendant son exécution, une bande au-dessus du Log montre `<nom> k/n`, l'étape, et ce qu'elle attend. L'exécution apparaît aussi dans le panneau des tâches sous la forme `Séquence <nom> k/n : <étape>`. Une seule séquence s'exécute à la fois ; en démarrer une deuxième dit laquelle est en cours.
 

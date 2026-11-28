@@ -218,7 +218,7 @@ plus (le fichier a été supprimé ou renommé), le graphe utilise les couleurs 
 thème actif, et les Paramètres montrent le nom marqué *introuvable* jusqu'à ce que vous
 en choisissiez un autre. ![La liste Thème de couleurs du graphe dans Apparence : Suivre le thème, puis chaque palette de voies avec quelques-unes de ses couleurs](../images/settings-log-graph-lanes.png)
 
-Dans `config.toml` :
+Dans `tui.toml` :
 
 ```toml
 [ui]
@@ -287,7 +287,7 @@ signale chaque problème sous `warnings` (l'application les montre une fois dans
 d'état).
 
 Les fichiers sont relus à l'ouverture de la liste Thème et à la fermeture des Paramètres.
-Une fenêtre en cours remarque aussi que `config.toml` (un `gitpoulpi config set ui.theme ...`
+Une fenêtre en cours remarque aussi que `tui.toml` (un `gitpoulpi config set ui.theme ...`
 lancé depuis un shell) ou le fichier du thème actif a été réécrit, et applique les nouvelles
 couleurs en environ une seconde, sans redémarrage.
 
@@ -357,7 +357,7 @@ réaffectable sous `nav_prefix.change_theme`) ouvre une liste des mêmes thèmes
 par les Paramètres : **Système (suit le terminal)**, les préréglages, puis vos propres
 fichiers de thème, chacun avec quatre petites pastilles de couleur. Le thème courant est
 coché. Tapez pour restreindre la liste ; déplacer la surbrillance prévisualise le thème
-aussitôt, **Enter** l'applique et enregistre `ui.theme` dans `config.toml`, **Esc** (ou un
+aussitôt, **Enter** l'applique et enregistre `ui.theme` dans `tui.toml`, **Esc** (ou un
 clic hors de la liste) remet le thème précédent et n'enregistre rien.
 
 Sous le champ de filtre, un préfiltre segmenté restreint la liste : **Tous**,

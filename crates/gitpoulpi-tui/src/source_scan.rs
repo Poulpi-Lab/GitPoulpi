@@ -571,11 +571,7 @@ fn the_color_lint_flags_what_it_should() {
 /// `ratatui` nor `crossterm` and glob nothing from their parent module, so
 /// they can move to a neutral crate unchanged. A comment may still mention
 /// either name.
-const PURE_FILES: &[&str] = &[
-    "event_loop/fetch_policy.rs",
-    "log_table/rows_now.rs",
-    "ref_name.rs",
-];
+const PURE_FILES: &[&str] = &["event_loop/fetch_policy.rs", "log_table/rows_now.rs"];
 
 #[test]
 fn the_pure_files_name_no_terminal_crate() {

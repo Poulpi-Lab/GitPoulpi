@@ -8,141 +8,12 @@ use gitpoulpi_i18n::msg::sidebar as msg;
 mod vocab;
 pub(crate) use vocab::SidebarSection;
 
-/// The sections to render this frame, in order. Worktrees and stashes are
-/// elided entirely when empty.
-///
-/// `linked_worktree_count` excludes the main worktree on purpose: every repo
-/// has one, so keying on the raw count would show a WORKTREES pane holding a
-/// single "main" row in *every* repo. The pane appears once you actually use
-/// worktrees, and then lists the main one too, for context.
 #[cfg(test)]
-pub(crate) fn visible_sections(
-    linked_worktree_count: usize,
-    stash_count: usize,
-) -> Vec<SidebarSection> {
-    visible_sections_with(
-        linked_worktree_count,
-        stash_count,
-        (false, false),
-        0,
-        &HashSet::new(),
-    )
-}
-
-/// [`visible_sections`] plus the hosting sections: `(pull requests, issues)`
-/// are shown only when a hosting profile answers for this repository and can
-/// list them.
-pub(crate) fn visible_sections_with(
-    linked_worktree_count: usize,
-    stash_count: usize,
-    hosting: (bool, bool),
-    submodule_count: usize,
-    hidden: &HashSet<SidebarSection>,
-) -> Vec<SidebarSection> {
-    let available =
-        available_sections(linked_worktree_count, stash_count, hosting, submodule_count);
-    let marked = hidden.contains(&SidebarSection::WorktreesEmpty);
-    let hidden = effective_hidden(hidden, linked_worktree_count);
-    let shown: Vec<SidebarSection> = available
-        .iter()
-        .copied()
-        .filter(|s| !hidden.contains(s))
-        .collect();
-    // The pane never goes blank: a config that hides everything that exists
-    // here (or sections that vanished under the hidden ones) shows them all.
-    if shown.is_empty() {
-        // Everything is shown, except WORKTREES where it is empty and was not
-        // asked for: that default is not the user's hiding.
-        let default_hidden = effective_hidden(&HashSet::new(), linked_worktree_count);
-        available
-            .into_iter()
-            .filter(|s| !default_hidden.contains(s) || marked)
-            .collect()
-    } else {
-        shown
-    }
-}
-
-/// Every section that exists in this repository right now, whatever the user
-/// hid: what the show/hide menu can act on.
-pub(crate) fn available_sections(
-    _linked_worktree_count: usize,
-    stash_count: usize,
-    hosting: (bool, bool),
-    submodule_count: usize,
-) -> Vec<SidebarSection> {
-    SidebarSection::ORDER
-        .into_iter()
-        .filter(|s| match s {
-            // Always offered (the show/hide list and "Show Worktrees
-            // section" reach it); `effective_hidden` keeps it out of a
-            // repository without linked worktrees until the user shows it.
-            SidebarSection::Worktrees => crate::build_features::WORKTREE,
-            SidebarSection::Stashes => stash_count > 0,
-            SidebarSection::PullRequests => hosting.0,
-            SidebarSection::Issues => hosting.1,
-            SidebarSection::Submodules => crate::build_features::SUBMODULE && submodule_count > 0,
-            _ => true,
-        })
-        .collect()
-}
-
-/// The set the pane is painted from: the stored one, where WORKTREES counts
-/// as hidden in a repository with no linked worktree unless the user showed
-/// it there ([`SidebarSection::WorktreesEmpty`] in the set). The mark never
-/// leaves the stored set.
-pub(crate) fn effective_hidden(
-    hidden: &HashSet<SidebarSection>,
-    linked_worktree_count: usize,
-) -> HashSet<SidebarSection> {
-    let mut out = hidden.clone();
-    if linked_worktree_count == 0 && !hidden.contains(&SidebarSection::WorktreesEmpty) {
-        out.insert(SidebarSection::Worktrees);
-    }
-    out.remove(&SidebarSection::WorktreesEmpty);
-    out
-}
-
-/// Flips WORKTREES in the stored set the way the user sees it: with linked
-/// worktrees the section's own entry, without any the "shown while empty"
-/// mark. `show` is what the user asked for.
-pub(crate) fn set_worktrees_shown(
-    hidden: &mut HashSet<SidebarSection>,
-    linked_worktree_count: usize,
-    show: bool,
-) {
-    if linked_worktree_count == 0 {
-        if show {
-            hidden.insert(SidebarSection::WorktreesEmpty);
-        } else {
-            hidden.remove(&SidebarSection::WorktreesEmpty);
-        }
-        // The plain entry would hide it the day a worktree exists.
-        hidden.remove(&SidebarSection::Worktrees);
-    } else if show {
-        hidden.remove(&SidebarSection::Worktrees);
-    } else {
-        hidden.insert(SidebarSection::Worktrees);
-    }
-}
-
-/// The hidden set stored in `[ui]`; unknown names are ignored.
-pub(crate) fn hidden_from_names(names: &[String]) -> HashSet<SidebarSection> {
-    names
-        .iter()
-        .filter_map(|n| SidebarSection::from_config_name(n))
-        .collect()
-}
-
-/// The hidden set as names, in section order, for the config writer.
-pub(crate) fn hidden_to_names(hidden: &HashSet<SidebarSection>) -> Vec<String> {
-    SidebarSection::ORDER
-        .into_iter()
-        .chain([SidebarSection::WorktreesEmpty])
-        .filter(|s| hidden.contains(s))
-        .map(|s| s.config_name().to_string())
-        .collect()
-}
+pub(crate) use gitpoulpi_app::refs_sections::visible_sections;
+pub(crate) use gitpoulpi_app::refs_sections::{
+    available_sections, can_hide, effective_hidden, hidden_from_names, hidden_to_names,
+    linked_worktree_count, set_worktrees_shown, visible_sections_with,
+};
 
 /// Writes the hidden set to `config.toml` on a short-lived thread (the input
 /// loop never waits on the disk); one process-wide lock keeps successive saves
@@ -155,23 +26,6 @@ pub(crate) fn save_hidden_in_background(path: &std::path::Path, hidden: &HashSet
         let _guard = WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let _ = gitpoulpi_config::set_sidebar_sections_hidden_in_file(&path, &names);
     });
-}
-
-/// Whether `section` may be hidden now: another available section must stay
-/// shown (the last one cannot be unchecked).
-pub(crate) fn can_hide(
-    section: SidebarSection,
-    hidden: &HashSet<SidebarSection>,
-    available: &[SidebarSection],
-) -> bool {
-    available
-        .iter()
-        .any(|s| *s != section && !hidden.contains(s))
-}
-
-/// Worktrees excluding the main one - what `visible_sections` keys on.
-pub(crate) fn linked_worktree_count(worktrees: &[gitpoulpi_core::domain::Worktree]) -> usize {
-    worktrees.iter().filter(|w| !w.is_main).count()
 }
 
 /// The Refs sidebar's per-section `ListState`s. One struct rather than
@@ -362,89 +216,10 @@ pub(crate) fn step_sidebar_section(
     *active = visible[next];
 }
 
-/// The Refs sidebar's three sections' filtered+sorted ref names. Each is
-/// rendered as its own bordered sub-pane, so each needs its own `Vec`.
-#[derive(Default)]
-pub(crate) struct RefsGroups {
-    pub(crate) local: Vec<String>,
-    pub(crate) remote: Vec<String>,
-    pub(crate) tags: Vec<String>,
-}
-
-impl RefsGroups {
-    pub(crate) fn names(&self, kind: RefRowKind) -> &[String] {
-        match kind {
-            RefRowKind::Local => &self.local,
-            RefRowKind::Remote => &self.remote,
-            RefRowKind::Tag => &self.tags,
-        }
-    }
-}
-
-pub(crate) use crate::ref_name::ref_full_name;
-
-/// Splits refs into LOCAL/REMOTE/TAGS groups, sorted by name
-/// within each, keeping only names containing `filter` (case-insensitive;
-/// empty keeps everything). This is the sidebar's search field, opened with
-/// `/`.
-pub(crate) fn group_refs(refs: &[gitpoulpi_core::domain::Ref], filter: &str) -> RefsGroups {
-    let mut groups = RefsGroups::default();
-    collect_groups(refs, filter, None, &mut groups);
-    groups
-}
-
-/// `group_refs(refs, filter).names(kind)` for one section only: per-event
-/// callers (row counts, hit tests, the selected leaf) need a single
-/// section's names, and the other two are pure waste on a repo with
-/// thousands of refs.
-pub(crate) fn group_refs_kind(
-    refs: &[gitpoulpi_core::domain::Ref],
-    filter: &str,
-    kind: RefRowKind,
-) -> Vec<String> {
-    let mut groups = RefsGroups::default();
-    collect_groups(refs, filter, Some(kind), &mut groups);
-    match kind {
-        RefRowKind::Local => groups.local,
-        RefRowKind::Remote => groups.remote,
-        RefRowKind::Tag => groups.tags,
-    }
-}
-
-/// Shared body of `group_refs` / `group_refs_kind`: `only` limits the work
-/// to one kind (the others stay empty).
-fn collect_groups(
-    refs: &[gitpoulpi_core::domain::Ref],
-    filter: &str,
-    only: Option<RefRowKind>,
-    groups: &mut RefsGroups,
-) {
-    let filter_lower = filter.to_lowercase();
-    let matches =
-        |name: &str| filter_lower.is_empty() || name.to_lowercase().contains(&filter_lower);
-    let want = |k: RefRowKind| only.is_none_or(|o| o == k);
-
-    for r in refs {
-        match &r.kind {
-            RefKind::LocalBranch { name } if want(RefRowKind::Local) && matches(name) => {
-                groups.local.push(name.clone())
-            }
-            RefKind::RemoteBranch { remote: rem, name } if want(RefRowKind::Remote) => {
-                let full = format!("{rem}/{name}");
-                if matches(&full) {
-                    groups.remote.push(full);
-                }
-            }
-            RefKind::Tag { name } if want(RefRowKind::Tag) && matches(name) => {
-                groups.tags.push(name.clone())
-            }
-            _ => {}
-        }
-    }
-    groups.local.sort_unstable();
-    groups.remote.sort_unstable();
-    groups.tags.sort_unstable();
-}
+pub(crate) use gitpoulpi_app::refs_tree::{
+    folder_fully_in, group_refs, group_refs_kind, ref_full_name, refs_title,
+    toggle_folder_membership, RefsGroups,
+};
 
 /// Row count for one Refs section as currently displayed (flat or
 /// hierarchical): the single source of truth every Up/Down/selection bound
@@ -904,89 +679,11 @@ pub(crate) fn toggle_ref_tree(hierarchical_refs: &mut bool) -> String {
     }
 }
 
-/// The Refs pane's title-bar line: plain `"Refs"` normally, `"Soloing X/Y"`
-/// while Solo is active, `"Hidden n"` while at least one ref is hidden and
-/// nothing is soloed, or both joined with a middle dot when both are active.
-///
-/// The right-aligned action button favours "Stop Soloing" when soloing is
-/// active, the louder state to be stuck in since it hides every commit that
-/// is not an ancestor of the soloed refs. "Show All" takes that slot only
-/// when nothing is soloed. Either way "Refs: Show All Hidden Refs" in the
-/// command palette reaches it.
-pub(crate) fn refs_title(
-    soloed: usize,
-    total_refs: usize,
-    hidden: usize,
-) -> (String, Option<&'static str>) {
-    let soloing = soloed > 0;
-    let any_hidden = hidden > 0;
-    let left = match (soloing, any_hidden) {
-        (true, true) => msg::title_soloing_hidden(soloed, total_refs, hidden),
-        (true, false) => msg::title_soloing(soloed, total_refs),
-        (false, true) => msg::title_hidden(hidden),
-        (false, false) => msg::TITLE_REFS.get().to_string(),
-    };
-    let right = if soloing {
-        Some(msg::STOP_SOLOING.get())
-    } else if any_hidden {
-        Some(msg::SHOW_ALL.get())
-    } else {
-        None
-    };
-    (left, right)
-}
-
-/// Every leaf ref's full name reachable beneath a folder or remote-root row
-/// at `path`: what "hide/solo this whole folder" (or "this whole remote")
-/// operates on.
-///
-/// A remote's own node and a `/`-derived folder are the same shape here:
-/// both are a `RefTreeRow::Folder` whose `path` is a prefix every descendant
-/// leaf's `full_name` starts with, followed by `/` (a remote's path is its
-/// bare name, so `origin/main` and `origin/feature/login` both qualify).
-/// `names` is one section's full ref-name list (`RefsGroups::names`), not the
-/// display rows: collapse state plays no part in which refs a bulk hide/solo
-/// touches.
+/// [`gitpoulpi_app::refs_tree::refs_under_folder`] with the window's
+/// workflow view (so a workflow-group folder resolves its members).
 pub(crate) fn refs_under_folder(names: &[String], path: &str) -> Vec<String> {
-    if crate::flow::view::is_group_path(path) {
-        return crate::flow::view::group_members(names, path);
-    }
-    let prefix = format!("{path}/");
-    names
-        .iter()
-        .filter(|n| n.starts_with(&prefix))
-        .cloned()
-        .collect()
-}
-
-/// Whether every ref in `refs` (as `refs_under_folder` returns) is already in
-/// `set`: the folder/remote row's "fully hidden" or "fully soloed" state,
-/// which decides whether its bulk toggle hides or shows (see
-/// `toggle_folder_membership`). An empty list is never "all hidden".
-pub(crate) fn folder_fully_in(set: &std::collections::HashSet<String>, refs: &[String]) -> bool {
-    !refs.is_empty() && refs.iter().all(|r| set.contains(r))
-}
-
-/// Hides (or reveals) every ref in `refs` at once ("click the
-/// folder's eye"): if every descendant is already in `set` this removes them
-/// all (a second click undoes the first), otherwise it adds every one, so the
-/// folder always ends up in exactly one state. Shared by "hide this folder"
-/// and "solo this folder"; which set it mutates is the only difference.
-pub(crate) fn toggle_folder_membership(
-    set: &mut std::collections::HashSet<String>,
-    refs: &[String],
-) {
-    if refs.is_empty() {
-        return;
-    }
-    let all_in = folder_fully_in(set, refs);
-    for r in refs {
-        if all_in {
-            set.remove(r);
-        } else {
-            set.insert(r.clone());
-        }
-    }
+    let flow = crate::flow::view::configured();
+    gitpoulpi_app::refs_tree::refs_under_folder(flow.as_deref(), names, path)
 }
 
 /// The folder or remote-root row selected in the active Refs section, as
@@ -1012,82 +709,12 @@ pub(crate) fn selected_ref_folder(
 }
 
 pub(crate) trait SidebarSectionExt: Sized {
-    const ORDER: [SidebarSection; 8];
-    /// Position in [`Self::ORDER`] - the key of the persisted section
-    /// heights (`PaneLayout::sidebar_heights`).
-    fn index(self) -> usize;
-    /// The stable English name: the key of the persisted fold state, never shown.
-    fn title(self) -> &'static str;
-    /// The section header's text in the current language (the stable key is
-    /// [`Self::title`]).
-    fn display_title(self) -> &'static str;
+    /// The section's icon (a terminal glyph; the section model itself is
+    /// `gitpoulpi_app::palette::vocab::refs_sidebar::SidebarSection`).
     fn icon(self) -> &'static str;
-    /// The inverse of `ref_kind`: which sidebar section a ref of this kind lives
-    /// in. A ref chip in the Log carries a `RefRowKind` while the menu is keyed
-    /// by section, and the two must not be mapped by hand at each call site.
-    fn from_ref_kind(kind: RefRowKind) -> Self;
-    /// The ref kind this section lists, or `None` for the sections that don't
-    /// hold refs at all (worktrees, stashes).
-    fn ref_kind(self) -> Option<RefRowKind>;
-    /// The stable lowercase name persisted in `ui.sidebar_sections_hidden`.
-    fn config_name(self) -> &'static str;
-    /// Whether this build has the feature the section needs.
-    fn compiled_in(self) -> bool;
-    fn from_config_name(name: &str) -> Option<Self>;
 }
 
 impl SidebarSectionExt for SidebarSection {
-    const ORDER: [SidebarSection; 8] = [
-        SidebarSection::Local,
-        SidebarSection::Remote,
-        SidebarSection::Worktrees,
-        SidebarSection::Stashes,
-        SidebarSection::Tags,
-        SidebarSection::PullRequests,
-        SidebarSection::Issues,
-        SidebarSection::Submodules,
-    ];
-    /// Position in [`Self::ORDER`] - the key of the persisted section
-    /// heights (`PaneLayout::sidebar_heights`).
-    fn index(self) -> usize {
-        Self::ORDER
-            .iter()
-            .position(|s| *s == self)
-            .expect("every section is in ORDER")
-    }
-    /// The stable English name: the key of the persisted fold state, never shown.
-    // i18n-scan: off
-    fn title(self) -> &'static str {
-        match self {
-            SidebarSection::Local => "LOCAL",
-            SidebarSection::Remote => "REMOTE",
-            SidebarSection::Worktrees => "WORKTREES",
-            SidebarSection::Stashes => "STASHES",
-            SidebarSection::Tags => "TAGS",
-            SidebarSection::PullRequests => "PULL REQUESTS",
-            SidebarSection::Issues => "ISSUES",
-            SidebarSection::Submodules => "SUBMODULES",
-            SidebarSection::WorktreesEmpty => "WORKTREES (EMPTY)",
-        }
-    }
-    // i18n-scan: on
-    /// The section header's text in the current language (the stable key is
-    /// [`Self::title`]).
-    fn display_title(self) -> &'static str {
-        use gitpoulpi_i18n::msg::sidebar as m;
-        match self {
-            SidebarSection::Local => m::SECTION_LOCAL,
-            SidebarSection::Remote => m::SECTION_REMOTE,
-            SidebarSection::Worktrees => m::SECTION_WORKTREES,
-            SidebarSection::Stashes => m::SECTION_STASHES,
-            SidebarSection::Tags => m::SECTION_TAGS,
-            SidebarSection::PullRequests => m::SECTION_PULL_REQUESTS,
-            SidebarSection::Issues => m::SECTION_ISSUES,
-            SidebarSection::Submodules => m::SECTION_SUBMODULES,
-            SidebarSection::WorktreesEmpty => m::SECTION_WORKTREES,
-        }
-        .get()
-    }
     fn icon(self) -> &'static str {
         match self {
             SidebarSection::Local => LOCAL_ICON,
@@ -1100,62 +727,6 @@ impl SidebarSectionExt for SidebarSection {
             SidebarSection::Submodules => SUBMODULE_ICON,
             SidebarSection::WorktreesEmpty => WORKTREE_ICON,
         }
-    }
-    /// The inverse of `ref_kind`: which sidebar section a ref of this kind lives
-    /// in. A ref chip in the Log carries a `RefRowKind` while the menu is keyed
-    /// by section, and the two must not be mapped by hand at each call site.
-    fn from_ref_kind(kind: RefRowKind) -> Self {
-        match kind {
-            RefRowKind::Local => SidebarSection::Local,
-            RefRowKind::Remote => SidebarSection::Remote,
-            RefRowKind::Tag => SidebarSection::Tags,
-        }
-    }
-    /// The ref kind this section lists, or `None` for the sections that don't
-    /// hold refs at all (worktrees, stashes).
-    fn ref_kind(self) -> Option<RefRowKind> {
-        match self {
-            SidebarSection::Local => Some(RefRowKind::Local),
-            SidebarSection::Remote => Some(RefRowKind::Remote),
-            SidebarSection::Tags => Some(RefRowKind::Tag),
-            SidebarSection::Worktrees
-            | SidebarSection::Stashes
-            | SidebarSection::PullRequests
-            | SidebarSection::Issues
-            | SidebarSection::Submodules
-            | SidebarSection::WorktreesEmpty => None,
-        }
-    }
-    /// The stable lowercase name persisted in `ui.sidebar_sections_hidden`.
-    // i18n-scan: off
-    fn config_name(self) -> &'static str {
-        match self {
-            SidebarSection::Local => "local",
-            SidebarSection::Remote => "remote",
-            SidebarSection::Worktrees => "worktrees",
-            SidebarSection::Stashes => "stashes",
-            SidebarSection::Tags => "tags",
-            SidebarSection::PullRequests => "pull_requests",
-            SidebarSection::Issues => "issues",
-            SidebarSection::Submodules => "submodules",
-            SidebarSection::WorktreesEmpty => "worktrees_empty",
-        }
-    }
-    // i18n-scan: on
-    /// Whether this build has the feature the section needs.
-    fn compiled_in(self) -> bool {
-        match self {
-            SidebarSection::Worktrees => crate::build_features::WORKTREE,
-            SidebarSection::Submodules => crate::build_features::SUBMODULE,
-            SidebarSection::PullRequests | SidebarSection::Issues => crate::build_features::HOSTING,
-            _ => true,
-        }
-    }
-    fn from_config_name(name: &str) -> Option<Self> {
-        Self::ORDER
-            .into_iter()
-            .chain([SidebarSection::WorktreesEmpty])
-            .find(|s| s.config_name() == name)
     }
 }
 
@@ -1669,73 +1240,6 @@ mod tests {
     }
 
     #[test]
-    fn empty_worktree_and_stash_sections_are_hidden_entirely() {
-        // A repo with neither shows just the three ref sections.
-        assert_eq!(
-            visible_sections(0, 0),
-            vec![
-                SidebarSection::Local,
-                SidebarSection::Remote,
-                SidebarSection::Tags
-            ]
-        );
-    }
-
-    #[cfg(all(feature = "worktree", feature = "submodule"))]
-    #[test]
-    fn non_empty_worktree_and_stash_sections_appear_in_a_fixed_order() {
-        assert_eq!(
-            visible_sections(2, 1),
-            vec![
-                SidebarSection::Local,
-                SidebarSection::Remote,
-                SidebarSection::Worktrees,
-                SidebarSection::Stashes,
-                SidebarSection::Tags
-            ]
-        );
-        // Independently: stashes present, worktrees not.
-        assert_eq!(
-            visible_sections(0, 3),
-            vec![
-                SidebarSection::Local,
-                SidebarSection::Remote,
-                SidebarSection::Stashes,
-                SidebarSection::Tags
-            ]
-        );
-    }
-
-    /// Every repo has a main worktree, so the pane must key on *linked* ones,
-    /// or a WORKTREES pane holding a single "main" row appears in every repo.
-    #[cfg(feature = "worktree")]
-    #[test]
-    fn a_repo_with_only_its_main_worktree_shows_no_worktrees_pane() {
-        let main_only = vec![gitpoulpi_core::domain::Worktree {
-            path: "/repo".into(),
-            branch: Some("main".into()),
-            is_main: true,
-            is_locked: false,
-        }];
-        assert_eq!(linked_worktree_count(&main_only), 0);
-        assert!(!visible_sections(linked_worktree_count(&main_only), 0)
-            .contains(&SidebarSection::Worktrees));
-
-        let with_linked = vec![
-            main_only[0].clone(),
-            gitpoulpi_core::domain::Worktree {
-                path: "/wt".into(),
-                branch: Some("feature".into()),
-                is_main: false,
-                is_locked: false,
-            },
-        ];
-        assert_eq!(linked_worktree_count(&with_linked), 1);
-        assert!(visible_sections(linked_worktree_count(&with_linked), 0)
-            .contains(&SidebarSection::Worktrees));
-    }
-
-    #[test]
     fn stepping_sections_skips_the_hidden_ones() {
         let visible = visible_sections(0, 0);
         let mut active = SidebarSection::Remote;
@@ -1942,41 +1446,6 @@ mod tests {
     // -- hidden-refs counter, show-all, and folder/remote bulk hide/solo --
 
     #[test]
-    fn refs_title_is_plain_refs_with_nothing_hidden_or_soloed() {
-        assert_eq!(refs_title(0, 5, 0), ("Refs".to_string(), None));
-    }
-
-    #[test]
-    fn refs_title_shows_hidden_count_and_a_show_all_button() {
-        assert_eq!(
-            refs_title(0, 5, 2),
-            (" Hidden 2 ".to_string(), Some(msg::SHOW_ALL.get()))
-        );
-    }
-
-    #[test]
-    fn refs_title_shows_soloing_and_a_stop_soloing_button_unchanged() {
-        assert_eq!(
-            refs_title(1, 5, 0),
-            (" Soloing 1/5 ".to_string(), Some(msg::STOP_SOLOING.get()))
-        );
-    }
-
-    /// Both active at once: the left side names both counts, and the
-    /// right-aligned button favours Stop Soloing (the documented choice in
-    /// `refs_title`, with "Show All" still reachable via the palette).
-    #[test]
-    fn refs_title_combines_both_when_both_are_active() {
-        assert_eq!(
-            refs_title(1, 5, 2),
-            (
-                " Soloing 1/5 \u{00B7} Hidden 2 ".to_string(),
-                Some(msg::STOP_SOLOING.get())
-            )
-        );
-    }
-
-    #[test]
     fn refs_under_folder_matches_by_prefix_including_a_remotes_own_root() {
         let names = vec![
             "origin/main".to_string(),
@@ -2004,40 +1473,6 @@ mod tests {
                 "origin/feature/signup".to_string(),
             ]
         );
-    }
-
-    #[test]
-    fn toggling_a_folder_hides_every_descendant_then_shows_them_all_again() {
-        let refs = vec!["origin/main".to_string(), "origin/dev".to_string()];
-        let mut hidden = HashSet::new();
-        // Nothing hidden yet: the first toggle hides everything.
-        assert!(!folder_fully_in(&hidden, &refs));
-        toggle_folder_membership(&mut hidden, &refs);
-        assert_eq!(hidden, refs.iter().cloned().collect::<HashSet<_>>());
-        assert!(folder_fully_in(&hidden, &refs));
-
-        // Fully hidden: the second toggle reveals everything.
-        toggle_folder_membership(&mut hidden, &refs);
-        assert!(hidden.is_empty());
-    }
-
-    /// A folder only *partly* hidden reads as "not fully hidden" and a
-    /// toggle hides the rest rather than revealing the one that already was,
-    /// so the folder always ends up in exactly one state.
-    #[test]
-    fn toggling_a_partially_hidden_folder_hides_the_rest_rather_than_revealing() {
-        let refs = vec!["origin/main".to_string(), "origin/dev".to_string()];
-        let mut hidden = HashSet::new();
-        hidden.insert("origin/main".to_string());
-        assert!(!folder_fully_in(&hidden, &refs));
-
-        toggle_folder_membership(&mut hidden, &refs);
-        assert_eq!(hidden, refs.iter().cloned().collect::<HashSet<_>>());
-    }
-
-    #[test]
-    fn folder_fully_in_is_false_for_an_empty_folder() {
-        assert!(!folder_fully_in(&HashSet::new(), &[]));
     }
 
     #[test]
@@ -2074,84 +1509,5 @@ mod tests {
         for (i, section) in SidebarSection::ORDER.iter().enumerate() {
             assert_eq!(states.state_mut(*section).selected(), Some(i));
         }
-    }
-
-    /// A build without `worktree` / `submodule` never shows those panes,
-    /// whatever the lists hold.
-    #[test]
-    fn the_worktree_and_submodule_panes_follow_their_features() {
-        let sections = visible_sections_with(2, 0, (false, false), 3, &HashSet::new());
-        assert_eq!(
-            sections.contains(&SidebarSection::Worktrees),
-            crate::build_features::WORKTREE
-        );
-        assert_eq!(
-            sections.contains(&SidebarSection::Submodules),
-            crate::build_features::SUBMODULE
-        );
-    }
-
-    #[test]
-    fn hidden_sections_are_not_visible_but_the_pane_never_goes_blank() {
-        let hidden = HashSet::from([SidebarSection::Local, SidebarSection::Tags]);
-        let shown = visible_sections_with(0, 0, (false, false), 0, &hidden);
-        assert_eq!(shown, vec![SidebarSection::Remote]);
-        // Everything that exists is hidden (a hand-edited config): all show.
-        let all = HashSet::from([
-            SidebarSection::Local,
-            SidebarSection::Remote,
-            SidebarSection::Tags,
-        ]);
-        assert_eq!(
-            visible_sections_with(0, 0, (false, false), 0, &all),
-            vec![
-                SidebarSection::Local,
-                SidebarSection::Remote,
-                SidebarSection::Tags
-            ]
-        );
-    }
-
-    #[test]
-    fn worktrees_stay_hidden_without_linked_ones_until_shown_on_purpose() {
-        let none = HashSet::new();
-        assert!(!visible_sections_with(0, 0, (false, false), 0, &none)
-            .contains(&SidebarSection::Worktrees));
-        let mut shown = HashSet::new();
-        set_worktrees_shown(&mut shown, 0, true);
-        assert!(visible_sections_with(0, 0, (false, false), 0, &shown)
-            .contains(&SidebarSection::Worktrees));
-        // The mark survives the file: stored as `worktrees_empty`.
-        assert_eq!(hidden_to_names(&shown), vec!["worktrees_empty"]);
-        assert_eq!(hidden_from_names(&["worktrees_empty".to_string()]), shown);
-        // With linked worktrees the plain rule applies and the mark is inert.
-        assert!(visible_sections_with(1, 0, (false, false), 0, &shown)
-            .contains(&SidebarSection::Worktrees));
-        let mut hidden = HashSet::new();
-        set_worktrees_shown(&mut hidden, 1, false);
-        assert!(!visible_sections_with(1, 0, (false, false), 0, &hidden)
-            .contains(&SidebarSection::Worktrees));
-        // Hiding it again where it is empty drops the mark.
-        set_worktrees_shown(&mut shown, 0, false);
-        assert!(shown.is_empty());
-    }
-
-    #[test]
-    fn the_last_shown_section_cannot_be_hidden() {
-        let available = [SidebarSection::Local, SidebarSection::Remote];
-        let none = HashSet::new();
-        assert!(can_hide(SidebarSection::Local, &none, &available));
-        let one = HashSet::from([SidebarSection::Remote]);
-        assert!(!can_hide(SidebarSection::Local, &one, &available));
-    }
-
-    #[test]
-    fn hidden_names_round_trip_and_unknown_names_are_ignored() {
-        let hidden = hidden_from_names(&["tags".into(), "nope".into(), "issues".into()]);
-        assert_eq!(
-            hidden,
-            HashSet::from([SidebarSection::Tags, SidebarSection::Issues])
-        );
-        assert_eq!(hidden_to_names(&hidden), vec!["tags", "issues"]);
     }
 }

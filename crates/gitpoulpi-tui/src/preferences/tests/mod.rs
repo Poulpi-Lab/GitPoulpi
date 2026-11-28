@@ -1,8 +1,9 @@
 use super::*;
 use crate::live_settings::{
-    active_profile_author, date_time_pattern, install_date_time_format, DATE_PATTERNS_TEST_LOCK,
+    active_profile_author, date_time_pattern, format_date, install_date_time_format,
+    DATE_PATTERNS_TEST_LOCK,
 };
-use gitpoulpi_config::{Integration, IntegrationKind};
+use gitpoulpi_config::{Integration, IntegrationKind, TabDirFollow};
 use gitpoulpi_secrets::InMemoryTokens;
 
 mod buttons;

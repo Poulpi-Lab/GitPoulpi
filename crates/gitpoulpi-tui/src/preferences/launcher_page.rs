@@ -57,20 +57,6 @@ impl Default for LauncherState {
     }
 }
 
-/// Whether `reason` is one of this page's own notes (shown as the row's value
-/// as is, not behind "coming").
-pub(super) fn is_note(reason: &str) -> bool {
-    [
-        t::CHECKING,
-        t::STATE_NONE,
-        t::STATE_FOREIGN,
-        t::WINDOWS_ONLY,
-    ]
-    .iter()
-    .any(|m| m.get() == reason)
-        || super::launcher_install::is_note(reason)
-}
-
 fn place_label(place: Place) -> &'static str {
     match (place, Os::current()) {
         (Place::Launcher, Os::Macos) => t::PLACE_APPLICATIONS.get(),

@@ -9,32 +9,13 @@
 //! need not be open, and nothing here keeps the screen's state.
 
 use super::*;
+#[cfg(test)]
+use gitpoulpi_app::settings as shared;
 use gitpoulpi_secrets::InMemoryTokens;
-
-/// How a palette row edits its setting.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum SettingKind {
-    /// `Settings: Toggle <label>`: flips it.
-    Toggle,
-    /// `Settings: <label>...`: a sub-list of these choices (shown text).
-    Choice(Vec<String>),
-    /// `Settings: <label>...`: a prompt over a whole number in `min..=max`.
-    Number { min: i64, max: i64 },
-    /// `Settings: <label>...`: a prompt over free text.
-    Text,
-    /// Needs the page (a combo, a button, a list): opens Settings on it.
-    Page,
-}
-
-/// One setting the palette can reach.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct SettingRow {
-    /// The config key (`ui.minimap`): the stable identity.
-    pub(crate) key: &'static str,
-    /// The page's own label, in the current language.
-    pub(crate) label: String,
-    pub(crate) kind: SettingKind,
-}
+#[cfg(test)]
+pub(crate) use shared::SettingKind;
+#[cfg(test)]
+pub(crate) use shared::SettingRow;
 
 /// A setting's value right now.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -57,12 +38,6 @@ pub(crate) enum Edit {
     #[cfg_attr(not(test), allow(dead_code))]
     Text(String),
 }
-
-/// Choices whose options are discovered at run time (installed terminals):
-/// the page lists them, a fixed palette sub-list cannot.
-/// "Become the primary" asks first when another installation is primary, which
-/// only the page can show.
-const PAGE_ONLY: &[&str] = &["ui.launch_terminal", "ui.language", "installation.primary"];
 
 impl PreferencesState {
     /// A state that edits `config.toml` and nothing else: no repository,
@@ -89,6 +64,7 @@ impl PreferencesState {
         )
     }
 
+    #[cfg(test)]
     pub(super) fn setting_rows(&self) -> Vec<SettingRow> {
         let mut seen = std::collections::HashSet::new();
         let mut out = Vec::new();
@@ -96,36 +72,17 @@ impl PreferencesState {
             let Target::Global(key) = field.target else {
                 continue;
             };
-            // A row that is "coming" today (undo depth with undo off) is still
-            // listed: running it says why it cannot be edited now.
-            let shown = !matches!(
-                field.control,
-                Control::Heading | Control::Info(_) | Control::Swatches(_)
-            );
-            if !shown || !seen.insert(key) {
+            if !seen.insert(key) {
                 continue;
             }
-            let kind = if PAGE_ONLY.contains(&key) {
-                SettingKind::Page
-            } else {
-                match &field.control {
-                    Control::Toggle(_) => SettingKind::Toggle,
-                    Control::Choice { options, .. } => {
-                        SettingKind::Choice(options.iter().map(|o| field.option_label(o)).collect())
-                    }
-                    Control::Number { min, max, .. } => SettingKind::Number {
-                        min: *min,
-                        max: *max,
-                    },
-                    Control::Text(_) => SettingKind::Text,
-                    _ => SettingKind::Page,
-                }
-            };
-            out.push(SettingRow {
+            // A row that is "coming" today (undo depth with undo off) is still
+            // listed: running it says why it cannot be edited now.
+            out.extend(shared::setting_row(
                 key,
-                label: field.label.clone(),
-                kind,
-            });
+                &field.label,
+                &field.control,
+                |raw| field.option_label(raw),
+            ));
         }
         out
     }
@@ -182,8 +139,9 @@ impl PreferencesState {
     }
 }
 
-/// Every setting the palette offers, labels in the current language. The
-/// list does not depend on the user's file, so it never reads it.
+/// Every setting as the terminal UI's own rows build it (the palette's list
+/// comes from the shared model; a test compares the two).
+#[cfg(test)]
 pub(crate) fn rows() -> Vec<SettingRow> {
     PreferencesState::with_parts(
         Config::default(),

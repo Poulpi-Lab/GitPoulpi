@@ -93,7 +93,7 @@ impl PreferencesState {
     /// The strip under the Theme row: bg, text, muted, accent, selection,
     /// danger, diff add, diff del, then the first lane colors - of the
     /// theme currently installed, so it follows the live preview.
-    pub(super) fn theme_swatch_row(&self) -> Field {
+    pub(super) fn theme_swatches(&self) -> Vec<Swatch> {
         let t = th();
         let bg = if t.ui.bg == Color::Reset {
             t.ui.blend_bg
@@ -111,18 +111,7 @@ impl PreferencesState {
             t.diff.del_bg,
         ];
         chips.extend(t.graph.palette.iter().take(LANE_CHIPS).copied());
-        Field {
-            label: format!("  {}", msg::settings_ui::THEME_SWATCHES.get()),
-            control: Control::Swatches(chips),
-            help: None,
-            warning: None,
-            danger: false,
-            target: Target::None,
-            live: true,
-            coming: None,
-            placeholder: None,
-            ellipsize: None,
-        }
+        chips.into_iter().map(swatch_of).collect()
     }
 
     /// The slug the Theme combo is highlighting right now, if it is open.

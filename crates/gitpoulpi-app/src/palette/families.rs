@@ -1,12 +1,14 @@
-//! What a frontend feeds the palette: the generated rows (`Settings: ...`,
-//! `Flow: Start <Type>...`, `Jobs: Cancel <job>`) and the few facts about
+//! What a frontend feeds the palette: the generated rows that depend on its
+//! window (`Flow: Start <Type>...`, `Jobs: Cancel <job>`, the sequence run),
+//! the value shown beside a `Settings: ...` row and the few facts about
 //! process state that the availability rules read.
 //!
-//! The catalogue, the matching and the availability rules live here and are
-//! shared; the rows and the state belong to the frontend that owns them (the
-//! Settings rows are generated from its Preferences model), so it installs
-//! them once with [`install_families`]. Until it does, every family is empty
-//! and every probe says "nothing".
+//! The catalogue, the matching, the availability rules and the `Settings: ...`
+//! rows (generated from the shared Settings model,
+//! [`crate::settings::palette_rows`]) live here and are shared; the rows and
+//! the state that belong to the frontend that owns them are installed once
+//! with [`install_families`]. Until it does, every family is empty and every
+//! probe says "nothing".
 
 use super::vocab::flow::FlowCmd;
 use super::{PaletteEntry, SettingOp};
@@ -16,11 +18,6 @@ use std::sync::OnceLock;
 /// can build it as a `static` or a literal.
 #[derive(Clone, Copy)]
 pub struct Families {
-    /// The `Settings: ...` rows, in the current language.
-    pub settings_entries: fn() -> &'static [PaletteEntry],
-    /// Each setting's `settings: <label>:` prefix (lower case), parallel to
-    /// the settings, for [`settings_listed`].
-    pub settings_prefixes: fn() -> &'static [String],
     /// The text shown in the shortcut column of a `Settings: ...` row.
     pub settings_value_text: fn(SettingOp) -> String,
     /// The `Flow: Start <Type>...` rows of the repository's workflow.
@@ -51,9 +48,6 @@ pub struct Families {
 fn no_entries() -> &'static [PaletteEntry] {
     &[]
 }
-fn no_prefixes() -> &'static [String] {
-    &[]
-}
 fn no_text(_: SettingOp) -> String {
     String::new()
 }
@@ -73,8 +67,6 @@ fn nothing() -> &'static str {
 impl Families {
     /// No generated rows and no process state.
     pub const NONE: Families = Families {
-        settings_entries: no_entries,
-        settings_prefixes: no_prefixes,
         settings_value_text: no_text,
         flow_entries: no_entries,
         flow_signature: zero,

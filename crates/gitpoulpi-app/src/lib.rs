@@ -33,6 +33,7 @@ pub mod repo_facts;
 pub mod reword;
 pub mod rewrite_rules;
 pub mod sequences;
+pub mod settings;
 pub mod status_rows;
 pub mod surface;
 pub mod tag_where;

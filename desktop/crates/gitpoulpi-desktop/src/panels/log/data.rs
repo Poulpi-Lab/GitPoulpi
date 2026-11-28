@@ -18,6 +18,24 @@ pub enum Selection {
     Stash(Stash),
 }
 
+/// What a selected row is, independent of where it sits: a reload keeps the selection on it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RowKey {
+    Wip,
+    Commit(Oid),
+    Stash(Option<Oid>, String),
+}
+
+impl RowKey {
+    fn of(selection: &Selection) -> Self {
+        match selection {
+            Selection::Wip => RowKey::Wip,
+            Selection::Commit(n) => RowKey::Commit(n.id),
+            Selection::Stash(s) => RowKey::Stash(s.commit, s.message.clone()),
+        }
+    }
+}
+
 #[derive(Clone, Default)]
 pub struct LogData {
     /// Every commit held, in walk order (the detached-HEAD ones in front): what paging appends to.
@@ -100,6 +118,16 @@ impl LogData {
             Entry::Commit(i) => self.nodes.get(i).cloned().map(Selection::Commit),
             Entry::Stash(i) => self.stashes.get(i).cloned().map(Selection::Stash),
         }
+    }
+
+    /// The identity of the row at `ix`.
+    pub fn key_at(&self, ix: usize) -> Option<RowKey> {
+        self.selection_at(ix).map(|s| RowKey::of(&s))
+    }
+
+    /// Display index of the row `key` names, if it is still there.
+    pub fn position_of_key(&self, key: &RowKey) -> Option<usize> {
+        (0..self.entry_count()).find(|&ix| self.key_at(ix).as_ref() == Some(key))
     }
 
     /// Display index of a commit.

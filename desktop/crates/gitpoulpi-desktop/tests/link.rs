@@ -124,6 +124,25 @@ fn a_commit_made_through_another_client_shows_in_the_log(cx: &mut TestAppContext
 }
 
 #[gpui_kit::test]
+fn a_live_reload_keeps_the_selection_on_its_commit(cx: &mut TestAppContext) {
+    let repo = fixture(false);
+    let o = open(cx, repo.root());
+    wait_for(cx, "the first load", |cx| commits(cx, &o.ws) == 3);
+    let log = o.ws.read_with(cx, |ws, _| ws.log.clone());
+    // Row 0 is the newest commit; select the one below it.
+    log.update(cx, |l, cx| l.select(1, cx));
+    let chosen = log.read_with(cx, |l, _| l.selected_commit()).unwrap();
+    commit_through_another_client(&repo, &o.session, "c.txt", "pushes the rows down");
+    wait_for(cx, "the Log to show the new commit", |cx| {
+        commits(cx, &o.ws) == 4
+    });
+    wait_for(cx, "the selection to follow its commit", |cx| {
+        log.read_with(cx, |l, _| l.selected_row() == 2)
+    });
+    assert_eq!(log.read_with(cx, |l, _| l.selected_commit()), Some(chosen));
+}
+
+#[gpui_kit::test]
 fn a_plain_git_commit_is_picked_up_without_user_action(cx: &mut TestAppContext) {
     let repo = fixture(false);
     let o = open(cx, repo.root());

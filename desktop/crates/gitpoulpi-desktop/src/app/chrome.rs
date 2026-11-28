@@ -17,8 +17,9 @@ use gpui_kit::{
 use super::actions::{
     FitColumns, OpenPalette, OpenRecent, OpenRepo, ResetColumns, SetLaneTheme, SetLang, SetTheme,
 };
+use super::live::Notice;
 use super::workspace::Workspace;
-use crate::daemon::SESSION;
+use crate::daemon::transfer::Transfer;
 use crate::prefs::PrefsStore;
 use crate::strings;
 use crate::theme::{self, CurrentTheme, Skin};
@@ -265,16 +266,22 @@ impl Workspace {
         );
         let disabled_bg = skin.tb_disabled_bg;
         let icons = skin.toolbar;
+        let can_undo = self
+            .backend
+            .can_undo_redo(gitpoulpi_core::domain::Direction::Undo);
+        let can_redo = self
+            .backend
+            .can_undo_redo(gitpoulpi_core::domain::Direction::Redo);
         // (id, icon, colour index, label, drop-down chevron, disabled)
         #[allow(clippy::type_complexity)]
-        let defs: [(&'static str, AssetIcon, usize, String, bool, bool); 10] = [
+        let defs: [(&'static str, AssetIcon, usize, String, bool, bool); 11] = [
             (
                 "tb-undo",
                 AssetIcon::Undo2,
                 0,
                 msg::toolbar::UNDO.get().to_string(),
                 true,
-                true,
+                !can_undo,
             ),
             (
                 "tb-redo",
@@ -282,7 +289,15 @@ impl Workspace {
                 0,
                 msg::toolbar::REDO.get().to_string(),
                 false,
-                true,
+                !can_redo,
+            ),
+            (
+                "tb-fetch",
+                AssetIcon::RefreshCw,
+                1,
+                msg::menu_ref::FETCH.get().to_string(),
+                false,
+                false,
             ),
             (
                 "tb-pull",
@@ -387,6 +402,8 @@ impl Workspace {
                     b.on_click(cx.listener(|this, _, window, cx| {
                         this.log.update(cx, |l, cx| l.toggle_search(window, cx))
                     }))
+                } else if let Some(what) = transfer_of(id) {
+                    b.on_click(cx.listener(move |this, _, _, cx| this.transfer(what, cx)))
                 } else {
                     b.on_click(|_, window, cx| window.push_notification(strings::NOT_AVAILABLE, cx))
                 };
@@ -394,6 +411,25 @@ impl Workspace {
             row = row.child(b);
         }
         row
+    }
+
+    /// What the status line says about writes: a running action or job first, else the last result.
+    /// `true` marks a failure.
+    fn activity_text(&self, _cx: &Context<Self>) -> Option<(String, bool)> {
+        let running = self.backend.with_link(|l| {
+            l.activity_handle()
+                .in_flight_text(std::time::Duration::ZERO)
+        });
+        if let Some(text) = running {
+            return Some((text, false));
+        }
+        let jobs = self.backend.host().live_jobs();
+        if !jobs.is_empty() {
+            return Some((strings::jobs_running(jobs.len()), false));
+        }
+        self.notice
+            .as_ref()
+            .map(|Notice { text, error }| (text.clone(), *error))
     }
 
     pub(super) fn status_line(&self, cx: &mut Context<Self>) -> impl IntoElement {
@@ -422,6 +458,7 @@ impl Workspace {
                 .unwrap_or_else(|| msg::sidebar::DETACHED.get().to_string()),
             None => String::new(),
         };
+        let text_color = text;
         let hint = |t: String| div().child(t);
         h_flex()
             .flex_none()
@@ -452,8 +489,13 @@ impl Workspace {
                     }),
             )
             .child("\u{2022}")
-            .child(div().child(msg::footer::session(SESSION)))
+            .child(div().child(msg::footer::session(self.backend.session())))
             .child("\u{2022}")
+            .children(self.activity_text(cx).map(|(text, error)| {
+                div()
+                    .text_color(if error { warning } else { text_color })
+                    .child(text)
+            }))
             .child(hint(msg::footer::HINT_HELP.get().to_string()))
             .child(hint(msg::footer::hint_git("Ctrl+G")))
             .child(hint(msg::footer::hint_nav("Ctrl+N")))
@@ -467,4 +509,16 @@ impl Workspace {
                     .child(msg::activity_log::BUTTON.get()),
             )
     }
+}
+
+/// The write a toolbar button starts, if it has one.
+fn transfer_of(id: &str) -> Option<Transfer> {
+    Some(match id {
+        "tb-fetch" => Transfer::Fetch,
+        "tb-pull" => Transfer::Pull,
+        "tb-push" => Transfer::Push,
+        "tb-undo" => Transfer::Undo,
+        "tb-redo" => Transfer::Redo,
+        _ => return None,
+    })
 }

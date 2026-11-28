@@ -6,7 +6,7 @@
 //! | Module    | Role |
 //! |-----------|------|
 //! | `app`     | startup, the main window, chrome (title bar, tabs, toolbar, status line), palette, actions |
-//! | `daemon`  | the embedded daemon link: typed requests, the Log's paging plan |
+//! | `daemon`  | the link to the session daemon (`gitpoulpi-link`): typed reads, the link host, Fetch/Pull/Push/Undo/Redo, the Log's paging plan |
 //! | `panels`  | Refs sidebar, Log, right pane, diff view |
 //! | `graph`   | commit graph layout and painter behind a small interface |
 //! | `theme`   | GitPoulpi themes mapped onto the toolkit and the app's own colour set |

@@ -42,3 +42,28 @@ note = "Language entries in the command palette."
 id = "nav_prefix.change_graph_color_theme"
 status = "done"
 note = "Graph colour palettes in the command palette."
+
+[[action]]
+id = "global.undo"
+status = "done"
+note = "Toolbar Undo and Ctrl+Z, through the daemon's journal."
+
+[[action]]
+id = "global.redo"
+status = "done"
+note = "Toolbar Redo, Ctrl+Y and Ctrl+Shift+Z."
+
+[[action]]
+id = "git_prefix.fetch_all"
+status = "done"
+note = "Toolbar Fetch and Ctrl+G f."
+
+[[action]]
+id = "git_prefix.pull"
+status = "done"
+note = "Toolbar Pull and Ctrl+G p (merge mode, the branch's upstream)."
+
+[[action]]
+id = "git_prefix.push"
+status = "done"
+note = "Toolbar Push and Ctrl+G Shift+P (upstream, else origin or the only remote)."

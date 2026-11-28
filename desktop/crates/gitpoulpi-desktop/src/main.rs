@@ -11,7 +11,11 @@ fn main() {
             std::process::exit(2);
         }
     };
-    let backend = match Backend::start(&args.repo) {
+    let started = match &args.session {
+        Some(session) => Backend::start_in(session.clone(), &args.repo),
+        None => Backend::start(&args.repo),
+    };
+    let backend = match started {
         Ok(b) => b,
         Err(e) => {
             eprintln!("gitpoulpi-desktop: cannot start: {e}");

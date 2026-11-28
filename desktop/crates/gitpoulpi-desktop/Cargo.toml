@@ -26,8 +26,7 @@ gitpoulpi-app = { path = "../../../crates/gitpoulpi-app" }
 gitpoulpi-config = { path = "../../../crates/gitpoulpi-config" }
 gitpoulpi-i18n = { path = "../../../crates/gitpoulpi-i18n" }
 gitpoulpi-ipc = { path = "../../../crates/gitpoulpi-ipc" }
-gitpoulpi-daemon = { path = "../../../crates/gitpoulpi-daemon" }
-tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync"] }
+gitpoulpi-link = { path = "../../../crates/gitpoulpi-link" }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 toml = "1.2"
@@ -38,3 +37,4 @@ anyhow = "1"
 gpui-kit = { version = "=0.11.0", features = ["test-support"] }
 gitpoulpi-testkit = { path = "../../../crates/gitpoulpi-testkit" }
 tempfile = "3"
+tokio = { version = "1", features = ["rt", "time"] }

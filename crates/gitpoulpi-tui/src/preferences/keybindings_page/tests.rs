@@ -390,7 +390,7 @@ fn the_french_reset_confirmation_and_refusals_are_translated() {
     let _ = s;
     let refusal = crate::keymap::conflict::analyse(
         &Keymap::defaults(),
-        crate::keymap::conflict::Platform {
+        crate::keymap::conflict::KeyTransport::Terminal {
             windows: false,
             enhanced: true,
         },

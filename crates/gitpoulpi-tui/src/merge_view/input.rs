@@ -10,6 +10,7 @@
 //! No IPC here: the window turns an effect into a link request
 //! (`merge_flow.rs`) and feeds the answer back.
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEventKind};
 use ratatui::layout::Rect;
 

@@ -8,6 +8,7 @@ use crate::commit_column::{
     viewed_commit, ColumnCmd, ColumnHit, ColumnMode, ColumnState, Pref, Side, PART_STEP, STEP,
 };
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use gitpoulpi_i18n::msg::commit_column as msg;
 

@@ -4,6 +4,7 @@
 //! live in `repo_dialogs`.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg;
 
 /// The `RepoRef` a window with no repository subscribes with.

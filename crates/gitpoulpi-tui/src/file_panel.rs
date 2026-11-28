@@ -18,6 +18,7 @@
 //! function of its arguments, so it is unit-tested directly.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg::file_panel as msg;
 
 use gitpoulpi_core::domain::{FileStatus, StatusEntry};

@@ -19,6 +19,7 @@
 //! inside the popup, rather than a separate modal first: the user sees
 //! the message they are about to rewrite while deciding.
 
+use crate::keymap::term::TermKeymap;
 use crate::keymap::Action as Bind;
 use std::collections::{HashMap, HashSet};
 

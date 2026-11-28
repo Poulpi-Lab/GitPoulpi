@@ -29,6 +29,7 @@
 //! window restarts on every tab switch. The status bar's Activity button (a
 //! badge counts the errors not looked at) and `View: Activity Log` open it.
 
+use crate::keymap::term::TermKeymap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 

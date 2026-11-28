@@ -9,6 +9,7 @@
 //! once, and has a key (`merge_card` keymap context), a button and a
 //! palette command, all running the same [`MergeCmd`](super::MergeCmd).
 
+use crate::keymap::term::TermKeymap;
 use crate::th;
 use gitpoulpi_core::domain::{human_size, BlobContent, ConflictKind, ConflictSide, MergeDocument};
 use gitpoulpi_i18n::msg::merge as tr;

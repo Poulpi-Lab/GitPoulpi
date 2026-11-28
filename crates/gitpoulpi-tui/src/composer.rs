@@ -8,6 +8,7 @@
 //! affordance or a grayed-out one naming the reason it cannot be clicked yet.
 
 use super::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg::composer as msg;
 
 /// The shortest the composer ever renders at: separator, amend row, the

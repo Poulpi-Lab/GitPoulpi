@@ -18,6 +18,7 @@
 //! started by the owner (`repo_dialogs`) from [`InitOutcome::Submit`];
 //! Browse is the shared folder picker, also opened by the owner.
 
+use crate::keymap::term::TermKeymap;
 use crate::th;
 use std::path::{Path, PathBuf};
 

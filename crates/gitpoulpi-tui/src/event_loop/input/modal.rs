@@ -5,6 +5,7 @@
 use super::commands::{run_blame_op, CommandCtx, Flow};
 use super::KeyEnv;
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg;
 
 /// `Flow::Handled` when a surface consumed `key`, `Flow::Continue` to pass it on.

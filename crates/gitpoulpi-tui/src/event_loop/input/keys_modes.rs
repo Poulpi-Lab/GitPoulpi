@@ -5,6 +5,7 @@
 use super::commands::{self, CommandCtx, Flow};
 use super::{keys_prefix, KeyEnv};
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use crossterm::event::MouseEvent;
 use gitpoulpi_i18n::msg;
 

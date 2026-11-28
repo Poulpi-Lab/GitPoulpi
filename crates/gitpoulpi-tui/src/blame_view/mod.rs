@@ -36,6 +36,7 @@ mod pending;
 #[cfg(test)]
 mod tests;
 
+use crate::keymap::term::TermKeymap;
 use std::time::{Duration, Instant};
 
 use crossterm::event::{KeyCode, KeyEvent, MouseEventKind};

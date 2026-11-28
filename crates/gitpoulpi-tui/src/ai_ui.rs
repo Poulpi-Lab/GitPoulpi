@@ -16,6 +16,7 @@
 //! the model. Esc sends on a `oneshot`; the worker's `select!` then drops
 //! the request future, which kills a local agent's process.
 
+use crate::keymap::term::TermKeymap;
 use crate::redraw::NotifySend as _;
 use crate::th;
 use std::cell::Cell;

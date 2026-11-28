@@ -8,6 +8,7 @@
 //! All user-visible strings are plain literals in this file, so the i18n
 //! extraction (slice I11) finds them in one place.
 
+use crate::keymap::term::TermChord;
 use crate::th;
 use std::time::{Duration, Instant};
 

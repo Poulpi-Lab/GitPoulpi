@@ -1,4 +1,5 @@
 use super::*;
+use crate::keymap::term::TermKeymap;
 use crate::keymap::{Action, Ctx, Keymap, ACTIONS};
 use std::collections::HashSet;
 

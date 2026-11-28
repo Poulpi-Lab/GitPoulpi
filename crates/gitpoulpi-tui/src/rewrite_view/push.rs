@@ -9,6 +9,7 @@
 //! ref; a rejected row offers "Fetch and review" (the workbench closes and
 //! the remotes are fetched, so the Log shows what moved).
 
+use crate::keymap::term::TermKeymap;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::layout::Rect;
 use ratatui::style::Style;

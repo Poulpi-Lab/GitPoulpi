@@ -38,6 +38,7 @@ mod dismiss;
 mod groups;
 mod render;
 
+use crate::keymap::term::TermKeymap;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};

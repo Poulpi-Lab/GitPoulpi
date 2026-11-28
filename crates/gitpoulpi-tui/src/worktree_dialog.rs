@@ -32,6 +32,7 @@
 //! [`WorktreeOutcome::NameWithAi`] to the AI worker and turns
 //! [`WorktreeOutcome::Submit`] into a daemon action.
 
+use crate::keymap::term::TermKeymap;
 use crate::th;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};

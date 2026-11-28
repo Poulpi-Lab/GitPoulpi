@@ -4,6 +4,7 @@
 use super::commands::{CommandCtx, Flow};
 use super::KeyEnv;
 use crate::event_loop::*;
+use crate::keymap::term::TermKeymap;
 use gitpoulpi_i18n::msg;
 
 /// The leader chord is armed: the next key picks the command.

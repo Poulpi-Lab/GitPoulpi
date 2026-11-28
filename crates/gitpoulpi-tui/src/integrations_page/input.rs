@@ -1,4 +1,5 @@
 use super::*;
+use crate::keymap::term::TermKeymap;
 
 impl IntegrationsPage {
     pub(super) fn activate(&mut self, item: Item, env: &mut Env) {

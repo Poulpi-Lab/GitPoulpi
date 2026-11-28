@@ -12,7 +12,8 @@ lugares mostram a nova tecla. Para o mouse, veja
 
 Abra **Configurações > Teclado e mouse**. A página é descrita em
 [Configurações](settings.md#teclado-e-mouse). As mudanças valem na hora e são salvas
-na tabela `[keybindings]` do `config.toml`. Você também pode editar essa tabela
+na tabela `[keybindings]` do `tui.toml` (o arquivo de interface da interface de terminal, ao
+lado do `config.toml`). Você também pode editar essa tabela
 manualmente:
 
 ```toml
@@ -469,9 +470,9 @@ inteiro.
 
 Cada linha da paleta termina com um botão de tecla (`[k]`), e `Alt+K` faz o mesmo na linha destacada: abre **Configurações > Teclado e mouse** filtrado pelo atalho desse comando, pronto para redefinir. Um comando sem atalho próprio ganha um aqui: ele aparece em **Comandos da paleta**, sem tecla por padrão, e a tecla que você der executa o comando exatamente como escolhê-lo na paleta (um comando que não pode rodar agora diz o motivo). A linha passa a mostrar a sua tecla.
 
-No `config.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`toggle_minimap = "Ctrl+Alt+M"`). Uma tecla que conflita com outra ação aparece em vermelho, e `c` na linha lista todas as ações com as quais ela conflita.
+No `tui.toml` é a tabela `[keybindings.palette]`, com o nome do comando (`toggle_minimap = "Ctrl+Alt+M"`). Uma tecla que conflita com outra ação aparece em vermelho, e `c` na linha lista todas as ações com as quais ela conflita.
 
-Uma sequência que você definiu (uma cadeia nomeada de comandos da paleta) recebe uma tecla do mesmo modo: `[keybindings.sequence]` recebe o id da sequência (`backup = "Ctrl+Alt+B"`), uma tecla para um id que não existe é informada e ignorada, e a tabela acompanha o `config.toml` enquanto o aplicativo roda. Cada sequência também é uma linha da paleta, `Sequência: <nome>`, mostrando a tecla dela.
+Uma sequência que você definiu (uma cadeia nomeada de comandos da paleta) recebe uma tecla do mesmo modo: `[keybindings.sequence]` recebe o id da sequência (`backup = "Ctrl+Alt+B"`), uma tecla para um id que não existe é informada e ignorada, e a tabela acompanha o `tui.toml` enquanto o aplicativo roda. Cada sequência também é uma linha da paleta, `Sequência: <nome>`, mostrando a tecla dela.
 
 A faixa de dica abaixo da lista mostra essa tecla (`Alt+K` por padrão). É a ação `palette.configure_shortcut`, então pode ser redefinida como qualquer outra.
 

@@ -155,7 +155,7 @@ muitos commits, com prévia, scripts Lua e um único desfazer.
 ## Referência e ajuda
 
 28. **[Referência de configuração](config-reference.md)**: cada chave do
-    `config.toml`, seu valor padrão e seu efeito, as configurações por
+    `config.toml` e do `tui.toml`, seu valor padrão e seu efeito, as configurações por
     repositório, as variáveis de ambiente.
 29. **[Solução de problemas e perguntas frequentes](troubleshooting.md)**: ícones, desenho do
     grafo, teclas que não chegam, daemons travados, velocidade, ponteiros do LFS.

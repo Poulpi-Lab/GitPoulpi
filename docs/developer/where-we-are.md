@@ -190,11 +190,20 @@ directory or `*_tests.rs` for the big ones); shared fixtures in
   written and the exact line (`src/a/b.txt` becomes `/a/b.txt` in
   `src/.gitignore`). Shared by both backends, the TUI's "which file" picker and
   the CLI, so they cannot disagree.
-- `palette/settings.rs` + `preferences/palette_settings.rs`: the `Settings: ...`
-  palette rows, generated from the Preferences field model (`row_pool`), applied by
-  the page's own commit functions on a *detached* state. Never list one by hand.
-  The TUI feeds them (and the flow / jobs rows and the process-state probes) to
-  the shared palette through `palette::install_families` (`palette::tui_families`).
+- `gitpoulpi-app` `settings/`: the Settings as data for every frontend. The
+  pages and their tables (`pages.rs`: `Page`, which key sits on which page), the
+  row pool of the plain config rows (`pool_*.rs`, built from a `PoolCtx` = config
+  plus the `Facts` only a frontend knows), the descriptors of the machine and
+  installation rows (`host.rs`: the TUI builds those with their values, a test
+  keeps both in step), `rows_for(Interface)` (a per-interface row of the desktop
+  targets `desktop.ui.*`, terminal-only rows are absent), the search rule
+  (`search.rs`) and the generated `Settings: ...` palette rows
+  (`palette_rows.rs`, never list one by hand; `Families` no longer carries them).
+  The TUI keeps `palette/settings.rs` (the value column, running a row) and
+  `preferences/palette_settings.rs`: a value is applied by the page's own commit
+  functions on a *detached* state. The flow / jobs rows and the process-state
+  probes still reach the shared palette through `palette::install_families`
+  (`palette::tui_families`).
   `gitpoulpi-app` `palette/bindings.rs`: a palette command with no key action gets
   `Action::Palette(i)`, config `[keybindings.palette] <command id>`; the id is
   derived from the variant and payload, so renaming a command id breaks users'
@@ -1194,7 +1203,7 @@ touching date patterns).
 - **A number with a unit is `Control::Quantity`** (`preferences/quantity.rs`), never a preset dropdown of "1 week, 2 weeks...":
   a number field and a unit dropdown on one line, the row's key storing `number x unit weight` and `unit_key` the unit read
   in. Its two parts are the row's `btn_cells` (part 0 number, 1 unit, `ai.chip` is the focused part), so hover and click
-  rects come from the same walk as inline buttons. Reuse it for the next duration or size row: `quantity_rows.rs` builds the
+  rects come from the same walk as inline buttons. Reuse it for the next duration or size row: `gitpoulpi-app` `settings/pool_quantity.rs` builds the
   six that exist besides the retention (one `Row` spec each: base unit, offered units, range, `allow_zero`), the config side is
   `DisplayUnit` + `read_quantity` (`gitpoulpi-config/src/schema/quantity.rs`), and the key is `<name>_unit` next to the number.
 - `popup_list::View` is wiped each frame, so a list's double click owns a `ClickPair`; the add dropdown and the remove

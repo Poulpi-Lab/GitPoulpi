@@ -69,14 +69,6 @@ pub(crate) enum SparseRequest {
     Disable,
 }
 
-/// Whether `reason` is one of this page's own notes (shown as a greyed button's
-/// value as is, not behind "coming").
-pub(super) fn is_note(reason: &str) -> bool {
-    [t::SPARSE_NEEDS_ENABLED, t::SPARSE_NEEDS_PATHS]
-        .iter()
-        .any(|m| m.get() == reason)
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum EditorButton {
     Save,

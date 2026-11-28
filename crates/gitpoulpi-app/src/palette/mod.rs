@@ -870,7 +870,7 @@ pub enum PaletteCommand {
 }
 
 /// What a `Settings: ...` row does. The numbers index the generated rows
-/// (`families::Families::settings_entries`).
+/// ([`crate::settings::palette_rows`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingOp {
     Toggle(u16),

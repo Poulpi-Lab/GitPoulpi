@@ -75,8 +75,6 @@ impl crate::ToolbarButton {
 /// state the availability rules read.
 pub(crate) fn tui_families() -> Families {
     Families {
-        settings_entries: settings::entries,
-        settings_prefixes: settings::prefixes,
         settings_value_text: settings::value_text,
         flow_entries: flow::entries,
         flow_signature: flow::signature,

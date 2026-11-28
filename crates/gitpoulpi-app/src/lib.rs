@@ -21,5 +21,6 @@ pub mod refs_sections;
 pub mod refs_tree;
 pub mod registry;
 pub mod sequences;
+pub mod settings;
 pub mod surface;
 pub mod tag_where;

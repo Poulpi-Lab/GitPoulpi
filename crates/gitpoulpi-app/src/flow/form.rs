@@ -9,27 +9,27 @@ use gitpoulpi_core::workflow::{
 
 /// What the form can prefill besides the issue and the slug.
 #[derive(Debug, Clone, Default)]
-pub(crate) struct Suggestions {
+pub struct Suggestions {
     /// `{user}`: the active profile's name, slugified by the pattern.
-    pub(crate) user: Option<String>,
+    pub user: Option<String>,
     /// `{date}`: today, `YYYY-MM-DD`.
-    pub(crate) today: String,
+    pub today: String,
     /// `{version}`: the next version after the repository's tags.
-    pub(crate) version: Option<String>,
+    pub version: Option<String>,
 }
 
 /// One input of the form, in pattern order.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct FormField {
-    pub(crate) token: Token,
-    pub(crate) value: String,
+pub struct FormField {
+    pub token: Token,
+    pub value: String,
 }
 
 /// The form of one topic type.
 #[derive(Debug, Clone)]
-pub(crate) struct StartForm {
+pub struct StartForm {
     pattern: Option<BranchPattern>,
-    pub(crate) fields: Vec<FormField>,
+    pub fields: Vec<FormField>,
     /// `{slug}` still holds what an issue's title put there (a pick may
     /// replace it; a typed slug is never replaced).
     slug_from_issue: bool,
@@ -37,7 +37,7 @@ pub(crate) struct StartForm {
 
 impl StartForm {
     /// The form for `pattern` (the type's rendering pattern), prefilled.
-    pub(crate) fn new(pattern: &str, suggest: &Suggestions) -> Self {
+    pub fn new(pattern: &str, suggest: &Suggestions) -> Self {
         let parsed = BranchPattern::parse(pattern).ok();
         let fields = parsed
             .as_ref()
@@ -61,11 +61,11 @@ impl StartForm {
         }
     }
 
-    pub(crate) fn has(&self, token: Token) -> bool {
+    pub fn has(&self, token: Token) -> bool {
         self.fields.iter().any(|f| f.token == token)
     }
 
-    pub(crate) fn value(&self, token: Token) -> &str {
+    pub fn value(&self, token: Token) -> &str {
         self.fields
             .iter()
             .find(|f| f.token == token)
@@ -73,7 +73,7 @@ impl StartForm {
     }
 
     /// Typing into field `index`.
-    pub(crate) fn edited(&mut self, index: usize) {
+    pub fn edited(&mut self, index: usize) {
         if self
             .fields
             .get(index)
@@ -86,7 +86,7 @@ impl StartForm {
     /// An issue was picked: `reference` is its reference (`#12`, `ABC-7`),
     /// `title` its title. Fills `{issue}` / `{issue_key}` and, unless the
     /// user typed one, `{slug}` from the title.
-    pub(crate) fn pick_issue(&mut self, reference: &str, title: &str) {
+    pub fn pick_issue(&mut self, reference: &str, title: &str) {
         let digits: String = reference
             .trim_start_matches('#')
             .chars()
@@ -110,7 +110,7 @@ impl StartForm {
     }
 
     /// The token values, by name.
-    pub(crate) fn values(&self) -> Fields {
+    pub fn values(&self) -> Fields {
         self.fields
             .iter()
             .filter(|f| !f.value.trim().is_empty())
@@ -120,7 +120,7 @@ impl StartForm {
 
     /// The branch name the fields render to, or why they do not.
     /// `exists` says whether a branch of that name is already there.
-    pub(crate) fn name(&self, exists: impl Fn(&str) -> bool) -> Result<String, String> {
+    pub fn name(&self, exists: impl Fn(&str) -> bool) -> Result<String, String> {
         let pattern = self
             .pattern
             .as_ref()
@@ -136,7 +136,7 @@ impl StartForm {
 
 /// How the next version is derived from the highest tag.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Bump {
+pub enum Bump {
     Minor,
     Patch,
 }
@@ -156,7 +156,7 @@ fn parse_version(tag: &str) -> Option<Vec<u64>> {
 
 /// The version after the highest release tag (`v1.4.2` gives `1.4.3` for a
 /// patch bump, `1.5.0` for a minor one); `None` when no tag is a version.
-pub(crate) fn next_version(tags: &[String], bump: Bump) -> Option<String> {
+pub fn next_version(tags: &[String], bump: Bump) -> Option<String> {
     let mut best = tags
         .iter()
         .filter_map(|t| parse_version(t))
@@ -176,7 +176,7 @@ pub(crate) fn next_version(tags: &[String], bump: Bump) -> Option<String> {
 }
 
 /// Today (UTC) as `YYYY-MM-DD`.
-pub(crate) fn today_iso() -> String {
+pub fn today_iso() -> String {
     let secs = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs());

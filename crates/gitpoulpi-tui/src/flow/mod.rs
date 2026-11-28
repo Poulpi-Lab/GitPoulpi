@@ -16,7 +16,6 @@ pub(crate) mod actions;
 pub(crate) mod cmd;
 pub(crate) mod daemon;
 pub(crate) mod dialog;
-pub(crate) mod form;
 pub(crate) mod hook_trust;
 #[cfg(feature = "hosting")]
 pub(crate) mod issue_flow;
@@ -25,6 +24,8 @@ pub(crate) mod issue_watch;
 pub(crate) mod mr;
 pub(crate) mod source;
 pub(crate) mod view;
+
+pub(crate) use gitpoulpi_app::flow::form;
 
 pub(crate) use actions::{default_actions, FlowActions};
 pub(crate) use cmd::{menu_rows, request, take_request, FlowCmd};

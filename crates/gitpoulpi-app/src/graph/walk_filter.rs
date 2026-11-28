@@ -17,7 +17,7 @@ use gitpoulpi_core::domain::RefFilter;
 ///
 /// `keep` is every soloed ref that is also hidden: solo shows that ref's
 /// ancestry whatever hiding says (the solo filter itself stays client-side).
-pub(crate) fn walk_filter(hidden: &HashSet<String>, solo: &HashSet<String>) -> RefFilter {
+pub fn walk_filter(hidden: &HashSet<String>, solo: &HashSet<String>) -> RefFilter {
     let (names, remotes) = crate::refs_tree::split_hidden(hidden);
     let in_hidden_remote = |name: &str| {
         remotes.iter().any(|r| {
@@ -40,7 +40,7 @@ pub(crate) fn walk_filter(hidden: &HashSet<String>, solo: &HashSet<String>) -> R
 
 /// The filter the repository's persisted visibility describes: what a link
 /// starts with, so the first paint is already filtered.
-pub(crate) fn load_walk_filter(repo_root: &Path) -> RefFilter {
+pub fn load_walk_filter(repo_root: &Path) -> RefFilter {
     let (hidden, solo) = crate::refs_tree::load_ref_visibility(repo_root);
     walk_filter(&hidden, &solo)
 }

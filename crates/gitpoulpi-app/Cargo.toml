@@ -11,8 +11,13 @@ readme.workspace = true
 keywords.workspace = true
 categories.workspace = true
 exclude.workspace = true
-description = "Frontend-neutral application logic shared by the terminal UI and the desktop UI: the commit-graph lane model, stash rows, lazy log paging."
+description = "Frontend-neutral application logic shared by the terminal UI and the desktop UI: the commit-graph lane model, stash rows, lazy log paging, the refs sidebar tree, the branching-workflow models."
 
 [dependencies]
 gitpoulpi-config.workspace = true
 gitpoulpi-core.workspace = true
+gitpoulpi-i18n.workspace = true
+gitpoulpi-session.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

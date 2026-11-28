@@ -398,3 +398,131 @@ fn config_get_and_set_name_the_file_of_each_key() {
     assert_eq!(got["source"], Value::String("file".into()));
     assert_eq!(file_of(&got), config.path().join("tui.toml"));
 }
+
+#[test]
+fn config_path_names_the_desktop_file_and_a_desktop_write_creates_only_it() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let before = ok(config.path(), cwd.path(), &[], &["config", "path"]);
+    assert_eq!(
+        Path::new(before["desktop_file"].as_str().unwrap()),
+        config.path().join("desktop.toml")
+    );
+    assert_eq!(before["desktop_exists"], Value::Bool(false));
+    let set = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "desktop.ui.left_pane_width", "300"],
+    );
+    assert_eq!(set["value"], serde_json::json!(300));
+    assert_eq!(
+        Path::new(set["file"].as_str().unwrap()),
+        config.path().join("desktop.toml")
+    );
+    let after = ok(config.path(), cwd.path(), &[], &["config", "path"]);
+    assert_eq!(after["desktop_exists"], Value::Bool(true));
+    assert_eq!(after["exists"], Value::Bool(false));
+    assert_eq!(after["tui_exists"], Value::Bool(false));
+}
+
+#[test]
+fn desktop_keys_are_separate_from_ui_keys() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "desktop.ui.minimap", "true"],
+    );
+    let desktop = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "desktop.ui.minimap"],
+    );
+    assert_eq!(desktop["value"], Value::Bool(true));
+    assert_eq!(desktop["source"], Value::String("file".into()));
+    assert_eq!(desktop["implemented"], Value::Bool(true));
+    assert_eq!(
+        Path::new(desktop["file"].as_str().unwrap()),
+        config.path().join("desktop.toml")
+    );
+    // `ui.*` is still the terminal UI.
+    let tui = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "ui.minimap"],
+    );
+    assert_eq!(tui["value"], Value::Bool(false));
+    assert_eq!(tui["source"], Value::String("default".into()));
+    assert_eq!(
+        Path::new(tui["file"].as_str().unwrap()),
+        config.path().join("tui.toml")
+    );
+    assert!(!config.path().join("tui.toml").exists());
+    // The desktop's defaults: language auto, theme following the system.
+    let language = ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "get", "desktop.ui.language"],
+    );
+    assert_eq!(language["value"], Value::String("auto".into()));
+    assert_eq!(language["source"], Value::String("default".into()));
+    // Keybindings of the desktop's own table.
+    ok(
+        config.path(),
+        cwd.path(),
+        &[],
+        &["config", "set", "desktop.keybindings.global.quit", "Ctrl+Q"],
+    );
+    let text = std::fs::read_to_string(config.path().join("desktop.toml")).unwrap();
+    let doc: toml::Value = toml::from_str(&text).unwrap();
+    assert_eq!(
+        doc["keybindings"]["global"]["quit"].as_str(),
+        Some("Ctrl+Q")
+    );
+    assert!(!config.path().join("config.toml").exists());
+}
+
+#[test]
+fn a_bad_desktop_value_or_key_is_refused_and_writes_nothing() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let cases: [&[&str]; 4] = [
+        &["config", "set", "desktop.ui.left_pane_width", "5"],
+        &["config", "set", "desktop.ui.toolbar_position", "sideways"],
+        &["config", "set", "desktop.ui.mouse_enabled", "true"],
+        &["config", "get", "desktop.ui.no_such_key"],
+    ];
+    for args in cases {
+        let (success, _) = run(config.path(), cwd.path(), &[], args);
+        assert!(!success, "{args:?} should fail");
+    }
+    assert!(!config.path().join("desktop.toml").exists());
+}
+
+#[test]
+fn the_desktop_environment_variable_wins_and_the_terminal_one_does_not_apply() {
+    let config = tempfile::tempdir().unwrap();
+    let cwd = tempfile::tempdir().unwrap();
+    let got = ok(
+        config.path(),
+        cwd.path(),
+        &[("GITPOULPI_DESKTOP_UI_MINIMAP", "true")],
+        &["config", "get", "desktop.ui.minimap"],
+    );
+    assert_eq!(got["value"], Value::Bool(true));
+    assert_eq!(got["source"], Value::String("env".into()));
+    let got = ok(
+        config.path(),
+        cwd.path(),
+        &[("GITPOULPI_UI_MINIMAP", "true")],
+        &["config", "get", "desktop.ui.minimap"],
+    );
+    assert_eq!(got["value"], Value::Bool(false));
+    assert_eq!(got["source"], Value::String("default".into()));
+}

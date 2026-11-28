@@ -123,7 +123,7 @@ fn bad_bindings(key: &str) -> impl FnOnce(toml::de::Error) -> Error + '_ {
     }
 }
 
-fn check_name(key: &str, part: &str) -> Result<()> {
+pub(crate) fn check_name(key: &str, part: &str) -> Result<()> {
     if part.is_empty() || part.contains(['.', ' ', '[', ']', '"']) {
         return Err(Error::UnknownKey(key.to_string()));
     }

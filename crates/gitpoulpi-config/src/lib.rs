@@ -1,6 +1,7 @@
 mod ai;
 pub mod browser;
 pub mod desktop;
+pub mod desktop_ui_file;
 pub mod dev_mode;
 pub mod image_editors;
 pub mod installation;
@@ -58,6 +59,10 @@ pub use repo_data::{
     LEGACY_DIR_NAME,
 };
 pub use schema::{default_clone_root, home_dir, CLONE_START_LAST, CLONE_START_URL};
+pub use schema::{
+    pixel_range, DesktopColumn, DesktopColumnWidths, DesktopConfig, DesktopRepoConfig,
+    DesktopUiConfig, DESKTOP_ONLY_KEYS,
+};
 pub use schema::{
     read_quantity, AutoCrlf, AutoStashMode, AvatarFallback, AvatarPlacement, AvatarSources,
     BaseList, BaseOrigin, BlameSide, ColorDepth, ColumnResize, CommitCountMethod, ComposerFiles,

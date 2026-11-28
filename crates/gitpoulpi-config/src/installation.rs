@@ -540,6 +540,43 @@ pub fn overlay_look(config: &Config, eff: &Effective) -> Config {
     out
 }
 
+/// The value a [`crate::DesktopUiConfig`] holds for a look key, as text.
+pub fn desktop_look_value(ui: &crate::DesktopUiConfig, key: &str) -> String {
+    match key {
+        "theme" => crate::theme::canonical_slug(&ui.theme).to_string(),
+        "graph_color_theme" => crate::theme::canonical_slug(&ui.graph_color_theme).to_string(),
+        _ => serde_json::to_value(ui)
+            .ok()
+            .and_then(|v| v.get(key).and_then(|s| s.as_str().map(str::to_string)))
+            .unwrap_or_default(),
+    }
+}
+
+/// The colour keys the desktop frontend of installation `id` shows, by
+/// [`LOOK_KEYS`] name: the entry's `desktop_look`, else (for the primary) the
+/// shared `desktop.toml` `[ui]` value, else the built-in default. The same
+/// fallbacks as [`effective`]'s `look`, with `desktop.toml` in the place of
+/// `ui.*`.
+pub fn effective_desktop_look(
+    config: &Config,
+    desktop: &crate::DesktopUiConfig,
+    id: &str,
+) -> BTreeMap<String, String> {
+    let primary = config.installation.primary.as_deref() == Some(id);
+    let own = config.installation.settings.get(id);
+    LOOK_KEYS
+        .iter()
+        .map(|k| {
+            let value = match own.and_then(|e| e.desktop_look.get(*k)) {
+                Some(v) if !v.is_empty() => v.clone(),
+                _ if primary => desktop_look_value(desktop, k),
+                _ => desktop_look_value(&crate::DesktopUiConfig::default(), k),
+            };
+            (k.to_string(), value)
+        })
+        .collect()
+}
+
 /// What an installation actually uses, after the fallbacks.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Effective {
@@ -1162,6 +1199,62 @@ pub fn set_look_in_file(
                 .or_insert_with(|| look_value(&config.ui, key));
         }
         entry.look.insert(k, v);
+    })?;
+    Ok(value.to_string())
+}
+
+/// Stores the desktop colour key `key` that `identity` picked. The primary
+/// writes the shared `desktop.toml` `[ui]` key (and drops a stale entry value,
+/// which would outrank it); every other installation writes only its own
+/// entry's `desktop_look` in `config.toml`, so one installation's pick never
+/// recolours another. `paths` locates both files. Returns the stored text.
+pub fn set_desktop_look_in_file(
+    paths: &crate::ConfigPaths,
+    identity: &Identity,
+    key: &str,
+    value: &str,
+) -> Result<String> {
+    if !LOOK_KEYS.contains(&key) {
+        return Err(Error::UnknownKey(format!("desktop.ui.{key}")));
+    }
+    let path = paths.config_file();
+    let config = Config::load(&path).unwrap_or_default();
+    let id = identity.id.clone();
+    if config.installation.primary.as_deref() == Some(id.as_str()) {
+        let stored = crate::DesktopConfig::set_in_file(paths, &format!("ui.{key}"), value)?;
+        if config
+            .installation
+            .settings
+            .get(&id)
+            .is_some_and(|e| e.desktop_look.contains_key(key))
+        {
+            set_installation_in_file(&path, |i| {
+                if let Some(e) = i.settings.get_mut(&id) {
+                    e.desktop_look.remove(key);
+                }
+            })?;
+        }
+        return Ok(stored.as_str().unwrap_or(value).to_string());
+    }
+    // Validated before the entry is touched.
+    let mut probe = crate::DesktopConfig::default();
+    probe.set(&format!("ui.{key}"), value)?;
+    let desktop = crate::DesktopConfig::load(paths).unwrap_or_default();
+    let ident = identity.clone();
+    let (k, v) = (key.to_string(), value.to_string());
+    set_installation_in_file(&path, |i| {
+        let entry = i.settings.entry(id).or_insert_with(|| InstallationEntry {
+            path: ident.root.clone(),
+            kind: ident.kind,
+            ..Default::default()
+        });
+        for key in LOOK_KEYS {
+            entry
+                .desktop_look
+                .entry(key.to_string())
+                .or_insert_with(|| desktop_look_value(&desktop.ui, key));
+        }
+        entry.desktop_look.insert(k, v);
     })?;
     Ok(value.to_string())
 }

@@ -385,7 +385,7 @@ pub(crate) fn ensure_tui_at(config_file: &Path, target: &Path) -> Result<bool> {
 }
 
 /// The document at `path`; an empty one when the file is missing or blank.
-fn read_doc(path: &Path) -> Result<toml::Value> {
+pub(crate) fn read_doc(path: &Path) -> Result<toml::Value> {
     if !path.exists() {
         return Ok(empty_table());
     }
@@ -486,12 +486,16 @@ fn open_new(path: &Path) -> std::io::Result<std::fs::File> {
     options.open(path)
 }
 
-fn create_new_file(target: &Path, bytes: &[u8]) -> std::io::Result<bool> {
+pub(crate) fn create_new_file(target: &Path, bytes: &[u8]) -> std::io::Result<bool> {
     use std::sync::atomic::{AtomicU64, Ordering};
     static COUNTER: AtomicU64 = AtomicU64::new(0);
 
+    let name = target
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .unwrap_or_else(|| TUI_FILE_NAME.to_string());
     let tmp = target.with_file_name(format!(
-        ".{TUI_FILE_NAME}.{}.{}.tmp",
+        ".{name}.{}.{}.tmp",
         std::process::id(),
         COUNTER.fetch_add(1, Ordering::Relaxed)
     ));

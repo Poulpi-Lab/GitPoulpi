@@ -9,6 +9,7 @@
 //! actually reads that key, so an ignored key can be told from a
 //! misspelled one.
 
+use gitpoulpi_config::desktop_ui_file::{self as desktop, DesktopSettings};
 use gitpoulpi_config::installation::{self, is_look_key};
 use gitpoulpi_config::{ConfigPaths, Overrides, Settings};
 use serde_json::json;
@@ -31,12 +32,22 @@ pub fn execute(action: ConfigAction, overrides: &Overrides) -> Result<Emitted, S
             json!({
                 "path": file.to_string_lossy(),
                 "tui_file": paths.tui_file().to_string_lossy(),
+                "desktop_file": paths.desktop_file().to_string_lossy(),
                 "config_dir": paths.config_dir().to_string_lossy(),
                 "exists": file.exists(),
                 "tui_exists": paths.tui_file().exists(),
+                "desktop_exists": paths.desktop_file().exists(),
             }),
             file.display().to_string(),
         )),
+
+        ConfigAction::Get { key } if desktop::strip_prefix(&key).is_some() => {
+            get_desktop(&paths, &key)
+        }
+
+        ConfigAction::Set { key, value } if desktop::strip_prefix(&key).is_some() => {
+            set_desktop(&paths, &key, &value)
+        }
 
         ConfigAction::Get { key } => {
             let settings = Settings::resolve(Some(&paths), overrides).map_err(|e| e.to_string())?;
@@ -126,6 +137,90 @@ pub fn execute(action: ConfigAction, overrides: &Overrides) -> Result<Emitted, S
             ))
         }
     }
+}
+
+/// `config get desktop.<key>`: the value in force for the desktop frontend,
+/// resolved from `desktop.toml` and `GITPOULPI_DESKTOP_UI_*`.
+fn get_desktop(paths: &ConfigPaths, key: &str) -> Result<Emitted, String> {
+    let settings = DesktopSettings::resolve(paths).map_err(|e| e.to_string())?;
+    let mut value = settings.get(key).map_err(|e| e.to_string())?;
+    let mut source = settings.source_of(key);
+    let short = key
+        .strip_prefix("desktop.ui.")
+        .filter(|k| is_look_key(&format!("ui.{k}")));
+    if let Some(short) = short {
+        // This installation's own colours, as for `ui.*`.
+        let cur = installation::current();
+        let own = installation::effective_desktop_look(
+            &cur.config,
+            &settings.config().ui,
+            &cur.identity.id,
+        );
+        if let Some(v) = own.get(short) {
+            value = json!(v);
+            let own_entry = cur.config.installation.settings.get(&cur.identity.id);
+            if own_entry.is_some_and(|e| e.desktop_look.contains_key(short)) {
+                source = gitpoulpi_config::Source::File;
+            }
+        }
+    }
+    let implemented = desktop::key_is_implemented(key);
+    let mut human = format!("{key} = {value}  (source: {})", source.as_str());
+    if !implemented {
+        human.push_str(&format!("\nnote: {UNREAD_NOTE}"));
+    }
+    Ok(emitted(
+        json!({
+            "key": key,
+            "value": value,
+            "source": source,
+            "implemented": implemented,
+            "file": paths.desktop_file().to_string_lossy(),
+        }),
+        human,
+    ))
+}
+
+/// `config set desktop.<key> <value>`: written to `desktop.toml` (a colour of
+/// a non-primary installation is its `[installation]` entry in `config.toml`).
+fn set_desktop(paths: &ConfigPaths, key: &str, value: &str) -> Result<Emitted, String> {
+    let short = desktop::strip_prefix(key).unwrap_or(key);
+    match short {
+        "ui.theme" => crate::theme_cmd::validate_ui_theme(value)?,
+        "ui.graph_color_theme" => crate::theme_cmd::validate_graph_color_theme(value)?,
+        _ => {}
+    }
+    let mut written = paths.desktop_file();
+    let look = short
+        .strip_prefix("ui.")
+        .filter(|k| is_look_key(&format!("ui.{k}")));
+    let stored = if let Some(look) = look {
+        let cur = installation::current();
+        let primary = gitpoulpi_config::Config::load(&paths.config_file())
+            .ok()
+            .and_then(|c| c.installation.primary);
+        if primary.as_deref() != Some(cur.identity.id.as_str()) {
+            written = paths.config_file();
+        }
+        installation::set_desktop_look_in_file(paths, &cur.identity, look, value)
+            .map(serde_json::Value::String)
+    } else {
+        gitpoulpi_config::DesktopConfig::set_in_file(paths, short, value)
+    }
+    .map_err(|e| e.to_string())?;
+    let mut human = format!("{key} = {stored}  ->  {}", written.display());
+    if !desktop::key_is_implemented(key) {
+        human.push_str(&format!("\nnote: {UNREAD_NOTE}"));
+    }
+    Ok(emitted(
+        json!({
+            "key": key,
+            "value": stored,
+            "path": paths.config_file().to_string_lossy(),
+            "file": written.to_string_lossy(),
+        }),
+        human,
+    ))
 }
 
 /// The file that owns `key` in `paths`' directory.

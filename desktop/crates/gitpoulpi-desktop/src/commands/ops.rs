@@ -72,6 +72,8 @@ pub enum Op {
     DiffPart(DiffPartOp),
     /// The Log's commit operations and the comparison of selected rows (`commit_ops`).
     Commit(CommitOp),
+    /// Branches, tags and stashes (`refs_ops.rs`).
+    Refs(super::refs_ops::RefOp),
 }
 
 /// What the working-changes pane does (its lists and the commit form).
@@ -179,7 +181,11 @@ pub fn op_for_action(action: Action) -> Option<Op> {
         A::DiffSelectLines => Op::DiffPart(DiffPartOp::SelectLines),
         // A palette command bound to a key of its own.
         A::Palette(_) => return palette_entry(action).and_then(|e| op_for_palette(e.command)),
-        _ => return commit_ops::op_for_action(action).map(Op::Commit),
+        _ => {
+            return commit_ops::op_for_action(action)
+                .map(Op::Commit)
+                .or_else(|| super::refs_ops::for_action(action).map(Op::Refs))
+        }
     })
 }
 
@@ -244,7 +250,11 @@ pub fn op_for_palette(command: PaletteCommand) -> Option<Op> {
         C::SelectLines => Op::DiffPart(DiffPartOp::SelectLines),
         C::LogColumn(LogColumnCmd::FitAllToContent) => Op::FitColumns,
         C::LogColumn(LogColumnCmd::ResetWidth) => Op::ResetColumns,
-        _ => return commit_ops::op_for_palette(command).map(Op::Commit),
+        _ => {
+            return commit_ops::op_for_palette(command)
+                .map(Op::Commit)
+                .or_else(|| super::refs_ops::for_palette(command).map(Op::Refs))
+        }
     })
 }
 
@@ -321,6 +331,6 @@ mod tests {
         ] {
             assert!(ids.contains(id), "{id}");
         }
-        assert!(!ids.contains("git_prefix.new_branch"));
+        assert!(!ids.contains("git_prefix.pull_all_branches"));
     }
 }

@@ -13,6 +13,10 @@
 //! RefsPanel::toggle_solo) and friends, which the keys below call and a shared keymap can call too.
 
 mod model;
+mod navigation;
+mod ops;
+mod rows;
+mod visibility;
 
 use std::collections::{HashMap, HashSet};
 use std::ops::Range;
@@ -39,13 +43,15 @@ use gpui_kit::component::{
 };
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
-    actions, div, px, uniform_list, AnyElement, App, AppContext as _, Context, Entity,
+    actions, canvas, div, px, uniform_list, AnyElement, App, AppContext as _, Context, Entity,
     EventEmitter, FocusHandle, Focusable, FontWeight, Hsla, InteractiveElement as _, IntoElement,
     KeyBinding, MouseButton, ParentElement as _, Render, ScrollStrategy, SharedString,
     StatefulInteractiveElement as _, Styled as _, Subscription, Task, UniformListScrollHandle,
     WeakEntity, Window,
 };
 use model::{Inputs, Kind, Row, RowKind, Section};
+pub use ops::{target_of, RowBounds};
+use ops::{DragPreview, DraggedRef};
 
 use crate::daemon::Shared;
 use crate::theme::Skin;
@@ -78,6 +84,19 @@ pub fn init(cx: &mut App) {
 }
 
 pub enum RefsEvent {
+    /// A right click on a row: the window opens the ref menu there.
+    Menu {
+        target: crate::ref_target::RefTarget,
+        at: gpui_kit::Point<gpui_kit::Pixels>,
+    },
+    /// A double click on a row: check the branch out (a stash: show its changes).
+    Open(crate::ref_target::RefTarget),
+    /// A ref dropped on another row: the window opens the drop menu.
+    Dropped {
+        source: crate::ref_target::RefTarget,
+        target: crate::ref_target::RefTarget,
+        at: gpui_kit::Point<gpui_kit::Pixels>,
+    },
     /// Show this commit in the Log (Enter or a click on a ref).
     Selected(Oid),
     /// The hidden or soloed refs changed; the Log re-reads its walk.
@@ -119,6 +138,8 @@ pub struct RefsPanel {
     vis_pending: usize,
     /// An event arrived while calls were out: re-read once the last one is answered.
     vis_stale: bool,
+    /// Where the selected row was drawn (a menu opened by the keyboard appears there).
+    row_bounds: RowBounds,
     filter: Entity<InputState>,
     query: String,
     focus: FocusHandle,
@@ -186,6 +207,7 @@ impl RefsPanel {
             vis_gen: 0,
             vis_pending: 0,
             vis_stale: false,
+            row_bounds: RowBounds::default(),
             filter,
             query: String::new(),
             focus: cx.focus_handle(),
@@ -312,331 +334,6 @@ impl RefsPanel {
             .collect()
     }
 
-    // -- selection and keys ---------------------------------------------------
-
-    fn select(&mut self, kind: Kind, ix: usize, cx: &mut Context<Self>) {
-        let Some(row) = self.section(kind).and_then(|s| s.rows.get(ix)) else {
-            return;
-        };
-        self.cursor = Some((kind, row.key.clone()));
-        self.scrolls
-            .entry(kind)
-            .or_default()
-            .scroll_to_item(ix, ScrollStrategy::Nearest);
-        cx.notify();
-    }
-
-    /// Moves the selection by `delta` rows across the open sections (the first move selects the first
-    /// row).
-    pub fn move_selection(&mut self, delta: isize, cx: &mut Context<Self>) {
-        let vis = self.visible();
-        if vis.is_empty() {
-            return;
-        }
-        let at = self.cursor.as_ref().and_then(|(kind, key)| {
-            vis.iter().position(|(k, i)| {
-                k == kind
-                    && self
-                        .section(*k)
-                        .and_then(|s| s.rows.get(*i))
-                        .is_some_and(|r| &r.key == key)
-            })
-        });
-        let next = match at {
-            Some(p) => (p as isize + delta).clamp(0, vis.len() as isize - 1) as usize,
-            None if delta >= 0 => 0,
-            None => vis.len() - 1,
-        };
-        let (kind, ix) = vis[next];
-        self.select(kind, ix, cx);
-    }
-
-    /// Enter: reveals the selected ref (or stash) in the Log, folds or unfolds a folder.
-    pub fn activate(&mut self, cx: &mut Context<Self>) {
-        let Some((section, row)) = self.cursor_row() else {
-            return;
-        };
-        match &row.kind {
-            RowKind::Folder { .. } => self.toggle_folder(&section, &row, None, cx),
-            _ => {
-                if let Some(oid) = row.target() {
-                    cx.emit(RefsEvent::Selected(oid));
-                }
-            }
-        }
-    }
-
-    /// Left: folds the selected folder, else moves to the folder around the row.
-    pub fn collapse_selected(&mut self, cx: &mut Context<Self>) {
-        let Some((section, row)) = self.cursor_row() else {
-            return;
-        };
-        if matches!(row.kind, RowKind::Folder { expanded: true, .. }) {
-            self.toggle_folder(&section, &row, Some(false), cx);
-            return;
-        }
-        let at = section
-            .rows
-            .iter()
-            .position(|r| r.key == row.key)
-            .unwrap_or(0);
-        let parent = section.rows[..at]
-            .iter()
-            .rposition(|r| r.depth < row.depth && matches!(r.kind, RowKind::Folder { .. }));
-        if let Some(p) = parent {
-            self.select(section.kind, p, cx);
-        }
-    }
-
-    /// Right: unfolds the selected folder, else moves into it.
-    pub fn expand_selected(&mut self, cx: &mut Context<Self>) {
-        let Some((section, row)) = self.cursor_row() else {
-            return;
-        };
-        match row.kind {
-            RowKind::Folder {
-                expanded: false, ..
-            } => self.toggle_folder(&section, &row, Some(true), cx),
-            RowKind::Folder { .. } => self.move_selection(1, cx),
-            _ => {}
-        }
-    }
-
-    /// Folds or unfolds a folder row (`want` forces the state) and remembers it for the repository.
-    fn toggle_folder(
-        &mut self,
-        section: &Section,
-        row: &Row,
-        want: Option<bool>,
-        cx: &mut Context<Self>,
-    ) {
-        let (Some(kind), RowKind::Folder { path, expanded, .. }) =
-            (section.kind.ref_kind(), &row.kind)
-        else {
-            return;
-        };
-        if want.is_some_and(|w| w == *expanded) {
-            return;
-        }
-        let key = (kind, path.clone());
-        if !self.collapsed.remove(&key) {
-            self.collapsed.insert(key);
-        }
-        save_collapsed(&self.backend.repo_root(), &self.collapsed);
-        self.rebuild(cx);
-    }
-
-    /// `=`: unfolds every folder.
-    pub fn expand_all(&mut self, cx: &mut Context<Self>) {
-        self.collapsed.clear();
-        save_collapsed(&self.backend.repo_root(), &self.collapsed);
-        self.rebuild(cx);
-    }
-
-    /// `-`: folds every folder.
-    pub fn collapse_all(&mut self, cx: &mut Context<Self>) {
-        self.collapsed = model::all_folders(&self.refs, self.hierarchical);
-        save_collapsed(&self.backend.repo_root(), &self.collapsed);
-        self.rebuild(cx);
-    }
-
-    /// Folds or unfolds the section the selection is in.
-    pub fn toggle_selected_section(&mut self, cx: &mut Context<Self>) {
-        if let Some((kind, _)) = self.cursor.clone() {
-            self.toggle_section(kind, cx);
-        }
-    }
-
-    fn toggle_section(&mut self, kind: Kind, cx: &mut Context<Self>) {
-        if !self.closed.remove(&kind) {
-            self.closed.insert(kind);
-        }
-        cx.notify();
-    }
-
-    // -- hide and solo --------------------------------------------------------
-
-    /// Hides the ref with this full name from the graph, or shows it again (a local branch or tag's
-    /// name, a remote branch's `remote/name`). A remote branch of a remote hidden as a whole stays
-    /// hidden with it, and the panel says so.
-    pub fn toggle_hidden(&mut self, full_name: &str, cx: &mut Context<Self>) {
-        let kind = self.ref_kind_of(full_name);
-        self.note = toggle_hide_ref(&mut self.hidden, kind, full_name);
-        self.visibility_changed(cx);
-    }
-
-    /// Solos the ref with this full name (the Log then shows only what it reaches), or clears it.
-    pub fn toggle_solo(&mut self, full_name: &str, cx: &mut Context<Self>) {
-        self.note = None;
-        if !self.solo.remove(full_name) {
-            self.solo.insert(full_name.to_string());
-        }
-        self.visibility_changed(cx);
-    }
-
-    /// Hides the selected row: a ref, or every ref under a folder or remote.
-    pub fn toggle_hidden_selected(&mut self, cx: &mut Context<Self>) {
-        let Some((section, row)) = self.cursor_row() else {
-            return;
-        };
-        self.hide_row(&section, &row, cx);
-    }
-
-    /// Solos the selected row: a ref, or every ref under a folder or remote.
-    pub fn toggle_solo_selected(&mut self, cx: &mut Context<Self>) {
-        let Some((section, row)) = self.cursor_row() else {
-            return;
-        };
-        self.solo_row(&section, &row, cx);
-    }
-
-    fn hide_row(&mut self, section: &Section, row: &Row, cx: &mut Context<Self>) {
-        let kind = section.kind.ref_kind();
-        match &row.kind {
-            RowKind::Ref { full_name, .. } => {
-                self.note = toggle_hide_ref(&mut self.hidden, kind, full_name);
-            }
-            RowKind::Folder {
-                path,
-                is_remote_root,
-                ..
-            } => match hide_folder(&mut self.hidden, kind, path, *is_remote_root) {
-                FolderHide::Done(note) => self.note = Some(note),
-                FolderHide::Plain => {
-                    self.note = None;
-                    let under = refs_under_folder(None, &section.names, path);
-                    toggle_folder_membership(&mut self.hidden, &under);
-                }
-            },
-            _ => return,
-        }
-        self.visibility_changed(cx);
-    }
-
-    fn solo_row(&mut self, section: &Section, row: &Row, cx: &mut Context<Self>) {
-        self.note = None;
-        match &row.kind {
-            RowKind::Ref { full_name, .. } => {
-                if !self.solo.remove(full_name) {
-                    self.solo.insert(full_name.clone());
-                }
-            }
-            RowKind::Folder { path, .. } => {
-                let under = refs_under_folder(None, &section.names, path);
-                toggle_folder_membership(&mut self.solo, &under);
-            }
-            _ => return,
-        }
-        self.visibility_changed(cx);
-    }
-
-    /// Stops soloing.
-    pub fn clear_solo(&mut self, cx: &mut Context<Self>) {
-        if self.solo.is_empty() {
-            return;
-        }
-        self.solo.clear();
-        self.note = None;
-        self.visibility_changed(cx);
-    }
-
-    /// Shows every hidden ref (and remote) again.
-    pub fn show_all_hidden(&mut self, cx: &mut Context<Self>) {
-        if self.hidden.is_empty() {
-            return;
-        }
-        self.hidden.clear();
-        self.note = None;
-        self.visibility_changed(cx);
-    }
-
-    fn ref_kind_of(&self, full_name: &str) -> Option<RefRowKind> {
-        self.refs.iter().find_map(|r| match &r.kind {
-            RefKind::LocalBranch { name } if name == full_name => Some(RefRowKind::Local),
-            RefKind::Tag { name } if name == full_name => Some(RefRowKind::Tag),
-            RefKind::RemoteBranch { remote, name } if format!("{remote}/{name}") == full_name => {
-                Some(RefRowKind::Remote)
-            }
-            _ => None,
-        })
-    }
-
-    /// The sets changed: redraw, tell the Log, and write them where the terminal UI reads them.
-    fn visibility_changed(&mut self, cx: &mut Context<Self>) {
-        self.rebuild(cx);
-        cx.emit(RefsEvent::VisibilityChanged {
-            hidden: self.hidden.clone(),
-            solo: self.solo.clone(),
-        });
-        let (hidden, hidden_remotes) = split_hidden(&self.hidden);
-        let mut solo: Vec<String> = self.solo.iter().cloned().collect();
-        solo.sort();
-        self.vis_gen += 1;
-        self.vis_pending += 1;
-        let call = self.backend.call::<serde_json::Value>(
-            OperationKind::SetRefVisibility,
-            serde_json::json!({
-                "mode": "replace",
-                "hidden": hidden,
-                "solo": solo,
-                "hidden_remotes": hidden_remotes,
-            }),
-        );
-        cx.spawn(async move |this, cx| {
-            let _ = call.await;
-            let _ = this.update(cx, |this, cx| {
-                this.vis_pending -= 1;
-                if this.vis_pending == 0 && std::mem::take(&mut this.vis_stale) {
-                    this.reread_visibility(cx);
-                }
-            });
-        })
-        .detach();
-    }
-
-    /// Another frontend (the CLI, the terminal UI) changed the hidden or soloed refs
-    /// (`LinkEvent::RefVisibilityChanged`): shows what is stored now, in this panel and in the Log.
-    ///
-    /// The daemon may also echo this panel's own change. That is harmless (the stored sets equal the
-    /// shown ones, nothing changes), but the stored sets lag behind a change made here while its call
-    /// is out, and a read taken then would undo it: so events wait for the calls, and a read that a
-    /// newer local change overtook is dropped (`vis_gen`).
-    pub fn on_visibility_event(&mut self, cx: &mut Context<Self>) {
-        if self.vis_pending > 0 {
-            self.vis_stale = true;
-            return;
-        }
-        self.reread_visibility(cx);
-    }
-
-    fn reread_visibility(&mut self, cx: &mut Context<Self>) {
-        let generation = self.vis_gen;
-        let root = self.backend.repo_root();
-        cx.spawn(async move |this, cx| {
-            let stored = cx
-                .background_spawn(async move { load_ref_visibility(&root) })
-                .await;
-            let _ = this.update(cx, |this, cx| {
-                if this.vis_gen != generation || this.vis_pending > 0 {
-                    return;
-                }
-                let (hidden, solo) = stored;
-                if hidden == this.hidden && solo == this.solo {
-                    return;
-                }
-                this.hidden = hidden;
-                this.solo = solo;
-                this.note = None;
-                this.rebuild(cx);
-                cx.emit(RefsEvent::VisibilityChanged {
-                    hidden: this.hidden.clone(),
-                    solo: this.solo.clone(),
-                });
-            });
-        })
-        .detach();
-    }
-
     // -- drawing --------------------------------------------------------------
 
     /// The pane's title and the label of its button, from the shared rule (`refs_title`).
@@ -655,326 +352,6 @@ impl RefsPanel {
         let (title, button) = refs_title(self.solo.len(), total, hidden);
         (title.trim().to_string(), button)
     }
-
-    fn row_element(
-        me: &WeakEntity<RefsPanel>,
-        section: &Arc<Section>,
-        ix: usize,
-        salt: usize,
-        view: &RowView,
-        pal: &Palette,
-    ) -> AnyElement {
-        let row = &section.rows[ix];
-        let kind = section.kind;
-        let (hidden, soloed) = (
-            model::row_hidden(section, row, &view.hidden),
-            model::row_soloed(section, row, &view.solo),
-        );
-        let selected = view.cursor.as_deref() == Some(row.key.as_str());
-        let color = pal.section[Kind::ALL.iter().position(|k| *k == kind).unwrap_or(0)];
-        let (folder, is_head, tag_where, expanded, remote_root) = match &row.kind {
-            RowKind::Folder {
-                expanded,
-                is_remote_root,
-                ..
-            } => (true, false, None, *expanded, *is_remote_root),
-            RowKind::Ref {
-                is_head, tag_where, ..
-            } => (false, *is_head, *tag_where, false, false),
-            _ => (false, false, None, false, false),
-        };
-        let refish = kind.ref_kind().is_some();
-        // Where a tag lives, in words: the shared tooltip.
-        let tip: Option<String> = match &row.kind {
-            RowKind::Ref {
-                full_name,
-                tag_where: Some(_),
-                ..
-            } => view
-                .tags
-                .get(full_name)
-                .map(|info| tooltip_lines(full_name, info).join("\n")),
-            _ => None,
-        };
-        let (text, muted, accent) = (pal.text, pal.muted, pal.accent);
-        let hover_bg = pal.hover;
-        let sel_bg = pal.selection;
-        let label_color = if hidden {
-            muted
-        } else if folder {
-            pal.text
-        } else {
-            color
-        };
-        let me_row = me.clone();
-        let (sec_idx, row_idx) = (section.clone(), ix);
-        let btn = |id: &'static str, icon: AssetIcon, active: bool, tint: Hsla| {
-            div()
-                .id((id, salt + ix))
-                .flex_none()
-                .p(px(3.0))
-                .rounded(px(3.0))
-                .cursor_pointer()
-                .opacity(if active { 1.0 } else { 0.0 })
-                .group_hover("ref-row", |s| s.opacity(1.0))
-                .hover(move |d| d.bg(hover_bg))
-                .child(
-                    Icon::new(icon)
-                        .size(px(12.0))
-                        .text_color(if active { tint } else { muted }),
-                )
-        };
-        let hide_btn = {
-            let (me, section, row) = (me.clone(), section.clone(), row.clone());
-            btn(
-                "ref-hide",
-                if hidden {
-                    AssetIcon::EyeOff
-                } else {
-                    AssetIcon::Eye
-                },
-                hidden,
-                muted,
-            )
-            .on_mouse_down(MouseButton::Left, move |_, _, cx| {
-                cx.stop_propagation();
-                let _ = me.update(cx, |this, cx| this.hide_row(&section, &row, cx));
-            })
-        };
-        let solo_btn = {
-            let (me, section, row) = (me.clone(), section.clone(), row.clone());
-            btn("ref-solo", AssetIcon::Star, soloed, accent).on_mouse_down(
-                MouseButton::Left,
-                move |_, _, cx| {
-                    cx.stop_propagation();
-                    let _ = me.update(cx, |this, cx| this.solo_row(&section, &row, cx));
-                },
-            )
-        };
-        h_flex()
-            .id(("ref-row", salt + ix))
-            .group("ref-row")
-            .w_full()
-            .h(px(ROW_H))
-            .flex_none()
-            .items_center()
-            .gap(px(5.0))
-            .pl(px(8.0 + row.depth as f32 * 14.0))
-            .pr(px(4.0))
-            .cursor_pointer()
-            .when(selected, |d| d.bg(sel_bg))
-            .hover(move |d| d.bg(hover_bg))
-            .child(
-                div()
-                    .w(px(12.0))
-                    .flex_none()
-                    .text_xs()
-                    .text_color(text)
-                    .child(if folder {
-                        ""
-                    } else if is_head {
-                        "\u{2713}"
-                    } else {
-                        ""
-                    }),
-            )
-            .when(folder, |d| {
-                d.child(
-                    Icon::new(if expanded {
-                        AssetIcon::ChevronDown
-                    } else {
-                        AssetIcon::ChevronRight
-                    })
-                    .size(px(11.0))
-                    .text_color(muted),
-                )
-                .child(
-                    Icon::new(if remote_root {
-                        AssetIcon::Globe
-                    } else if expanded {
-                        AssetIcon::FolderOpen
-                    } else {
-                        AssetIcon::Folder
-                    })
-                    .size(px(14.0))
-                    .text_color(if remote_root { color } else { pal.folder }),
-                )
-            })
-            .child(
-                div()
-                    .flex_1()
-                    .min_w_0()
-                    .truncate()
-                    .text_sm()
-                    .text_color(label_color)
-                    .when(is_head, |d| d.font_weight(FontWeight::BOLD))
-                    .when(hidden, |d| d.opacity(0.6))
-                    .child(SharedString::from(row.label.clone())),
-            )
-            .when_some(tag_where, |d, w| {
-                d.child(
-                    div()
-                        .flex_none()
-                        .text_xs()
-                        .text_color(match w {
-                            TagWhere::Local | TagWhere::Differs => pal.warning,
-                            TagWhere::Remote => pal.section[1],
-                            TagWhere::Both => muted,
-                        })
-                        .child(model::tag_glyph(w)),
-                )
-            })
-            .when(refish, |d| d.child(hide_btn).child(solo_btn))
-            .when_some(tip, |d, tip| {
-                d.tooltip(move |window, cx| {
-                    gpui_kit::component::tooltip::Tooltip::new(tip.clone()).build(window, cx)
-                })
-            })
-            .on_click(move |_, window, cx| {
-                let section = sec_idx.clone();
-                let _ = me_row.update(cx, |this, cx| {
-                    window.focus(&this.focus, cx);
-                    this.select(section.kind, row_idx, cx);
-                    let row = &section.rows[row_idx];
-                    match row.kind {
-                        RowKind::Folder { .. } => {
-                            let row = row.clone();
-                            this.toggle_folder(&section, &row, None, cx);
-                        }
-                        _ => {
-                            if let Some(oid) = row.target() {
-                                cx.emit(RefsEvent::Selected(oid));
-                            }
-                        }
-                    }
-                });
-            })
-            .into_any_element()
-    }
-
-    fn section_box(
-        &mut self,
-        si: usize,
-        pal: &Palette,
-        border: Hsla,
-        cx: &mut Context<Self>,
-    ) -> gpui_kit::Div {
-        let section = self.sections[si].clone();
-        let kind = section.kind;
-        let ki = Kind::ALL.iter().position(|k| *k == kind).unwrap_or(0);
-        let color = pal.section[ki];
-        let open = !self.closed.contains(&kind);
-        let rows = section.rows.len();
-        let tall = rows > 9;
-        let body_h = (rows.max(1) as f32 * ROW_H + 8.0).min(240.0);
-        let soloing = !self.solo.is_empty() && kind.ref_kind().is_some();
-        let count_text = if soloing {
-            let soloed = section
-                .names
-                .iter()
-                .filter(|n| self.solo.contains(*n))
-                .count();
-            format!("{} ({soloed}/{})", kind.title(), section.count)
-        } else {
-            format!("{} ({})", kind.title(), section.count)
-        };
-        let scroll = self.scrolls.entry(kind).or_default().clone();
-        let view = RowView {
-            tags: self.tags.clone(),
-            hidden: self.hidden.clone(),
-            solo: self.solo.clone(),
-            cursor: self
-                .cursor
-                .as_ref()
-                .filter(|(k, _)| *k == kind)
-                .map(|(_, key)| key.clone()),
-        };
-        let me = cx.entity().downgrade();
-        let salt = (ki + 1) * 1_000_000;
-        let pal_rows = pal.clone();
-        let rows_section = section.clone();
-        let list = uniform_list(
-            SharedString::from(format!("refs-{ki}")),
-            rows,
-            move |range: Range<usize>, _window, _cx| {
-                range
-                    .map(|ix| Self::row_element(&me, &rows_section, ix, salt, &view, &pal_rows))
-                    .collect::<Vec<_>>()
-            },
-        )
-        .size_full()
-        .track_scroll(&scroll);
-        let header = h_flex()
-            .id(("sec-head", si))
-            .flex_none()
-            .h(px(28.0))
-            .px(px(8.0))
-            .gap(px(6.0))
-            .items_center()
-            .cursor_pointer()
-            .on_click(cx.listener(move |this, _, _, cx| this.toggle_section(kind, cx)))
-            .child(
-                Icon::new(if open {
-                    AssetIcon::ChevronDown
-                } else {
-                    AssetIcon::ChevronRight
-                })
-                .size(px(12.0))
-                .text_color(pal.muted),
-            )
-            .child(
-                Icon::new(section_icon(kind))
-                    .size(px(15.0))
-                    .text_color(color),
-            )
-            .child(
-                div()
-                    .min_w_0()
-                    .truncate()
-                    .text_xs()
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(pal.text)
-                    .child(count_text),
-            )
-            .child(div().flex_1())
-            .when(kind == Kind::Remote, |d| {
-                d.child(
-                    Icon::new(AssetIcon::Plus)
-                        .size(px(13.0))
-                        .text_color(pal.muted),
-                )
-            });
-        let mut boxed = v_flex()
-            .w_full()
-            .border_1()
-            .border_color(border)
-            .rounded(px(3.0))
-            .overflow_hidden()
-            .child(header);
-        if open && rows > 0 {
-            let body = div()
-                .relative()
-                .child(list)
-                .child(Scrollbar::vertical(&scroll));
-            boxed = if tall {
-                boxed
-                    .flex_1()
-                    .min_h(px(120.0))
-                    .child(body.flex_1().min_h_0())
-            } else {
-                boxed.flex_none().child(body.h(px(body_h)))
-            };
-        }
-        boxed
-    }
-}
-
-/// What a row needs besides the section: the sets and the selection.
-struct RowView {
-    tags: Arc<HashMap<String, TagInfo>>,
-    hidden: HashSet<String>,
-    solo: HashSet<String>,
-    cursor: Option<String>,
 }
 
 impl Focusable for RefsPanel {

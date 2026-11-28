@@ -65,6 +65,19 @@ A merge, cherry-pick or revert stopped on conflicts shows a banner above the pan
 line: Resolve conflicts (the merge editor is not available yet), Continue (takes you to the commit form), Skip and
 Abort, which ask first.
 
+## Branches, tags and stashes
+
+The toolbar's Branch, Tag, Stash and Pop buttons, the `Ctrl+G` chords (`b`, `t`, `Shift+T`, `m`, `o`, `d`, `r`, `Shift+U`)
+and the palette create branches and tags (small forms that check the name as the terminal UI does), check out, merge,
+rebase onto, rename, fast-forward, set or remove an upstream, delete (always after a question, never with a default
+destructive answer), push or annotate a tag, and stash, pop, apply or drop. The Refs rows and the Log's ref pills have the
+terminal UI's context menu (right click, or the menu key / `Shift+F10`: in the Refs on the selected row, in the Log on
+the pill you clicked, else the commit menu); a double click checks out; a
+branch dropped on another offers merge, rebase and fast-forward. Rows of that menu the desktop cannot run yet are dimmed
+with the reason. A checkout, merge, rebase or pull blocked by local changes asks to stash them and continue. A rebase or
+merge that stops on conflicts shows the operation banner (Resolve conflicts is not available yet; Continue, Skip and Abort work).
+The auto-stash question is the same for a ref's checkout, a commit's checkout or cherry-pick, a merge, a rebase and a pull.
+
 ## Layout
 
 `desktop/` is its own cargo workspace with its own `Cargo.lock`; the root workspace excludes it. The

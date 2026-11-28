@@ -216,7 +216,10 @@ mod tests {
 
     #[test]
     fn a_command_not_implemented_yet_says_so() {
-        let rows = rows("new branch", WindowState::default().palette_context());
+        let rows = rows(
+            "pull all branches",
+            WindowState::default().palette_context(),
+        );
         let row = rows.first().expect("a match");
         assert!(row.dim);
         assert_eq!(row.reason.as_deref(), Some(strings::NOT_AVAILABLE_YET));

@@ -163,7 +163,13 @@ impl RowsContext {
             .pl(px(4.0))
             .overflow_hidden()
             .when_some(pills.first(), |d, p| {
-                d.child(pill_element(p, pills.len() - 1, lane, skin)).child(
+                d.child(super::ref_menu::interactive(
+                    ci,
+                    node.id,
+                    p,
+                    pill_element(p, pills.len() - 1, lane, skin),
+                ))
+                .child(
                     div()
                         .flex_1()
                         .min_w(px(4.0))

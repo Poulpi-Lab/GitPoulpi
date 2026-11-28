@@ -19,6 +19,7 @@ pub mod menu_items;
 mod ops;
 mod pick;
 mod pills;
+mod ref_menu;
 mod rows;
 mod search;
 
@@ -113,6 +114,9 @@ pub struct LogPanel {
     marked_rows: Arc<HashSet<usize>>,
     /// The two ends of a two-row comparison were traded.
     swapped: bool,
+    /// The ref pill last clicked, with its display row: the menu key then opens the ref menu for it
+    /// (the keyboard twin of a right click on a pill). Any other row selection drops it.
+    pill: Option<(Oid, crate::ref_target::RefTarget)>,
     /// The open commit menu.
     menu: Option<Entity<menu::CommitMenu>>,
     _menu_sub: Option<Subscription>,
@@ -176,6 +180,7 @@ impl LogPanel {
             marks: Marks::default(),
             marked_rows: Arc::default(),
             swapped: false,
+            pill: None,
             menu: None,
             _menu_sub: None,
             scroll: UniformListScrollHandle::new(),
@@ -254,6 +259,13 @@ impl LogPanel {
         }
         let ix = ix.min(total - 1);
         self.selected = ix;
+        if self
+            .pill
+            .as_ref()
+            .is_some_and(|(oid, _)| self.data.key_at(ix) != Some(data::RowKey::Commit(*oid)))
+        {
+            self.pill = None;
+        }
         self.drop_marks();
         self.scroll.scroll_to_item(ix, ScrollStrategy::Nearest);
         if let Some(sel) = self.data.selection_at(ix) {

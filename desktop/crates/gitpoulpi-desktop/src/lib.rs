@@ -9,6 +9,9 @@
 //! | `daemon`  | the link to the session daemon (`gitpoulpi-link`): typed reads, the link host, Fetch/Pull/Push/Undo/Redo, the Log's page fetching (paging itself is `gitpoulpi_app::graph::LazyLog`) |
 //! | `panels`  | Refs sidebar, Log, right pane, diff view |
 //! | `dialogs` | question dialogs (a title, lines, numbered answers): the discard confirmation, the sensitive-files question |
+//! | `form_dialog` | small forms in a dialog (text fields, check boxes, a reason line when the entry is refused): the branch, tag, rename, stash and upstream forms |
+//! | `ref_menu` | the ref context menu: the terminal UI's rows and order for a branch, remote branch, tag or stash, and the view that shows them |
+//! | `ref_target` | what a ref command acts on (a Refs row or a Log pill) and the selection facts the palette reads |
 //! | `sensitive` | the sensitive-files question a refused stage raises |
 //! | `commands`| the shared command registry in use: key bindings, command palette, the one dispatcher |
 //! | `menu`    | the menu bar generated from the registry |
@@ -28,12 +31,15 @@ pub mod commands;
 pub mod daemon;
 pub mod dialogs;
 pub mod fonts;
+pub mod form_dialog;
 pub mod graph;
 pub mod help;
 pub mod menu;
 pub mod panels;
 pub mod parity;
 pub mod prefs;
+pub mod ref_menu;
+pub mod ref_target;
 pub mod sensitive;
 pub mod strings;
 pub mod theme;

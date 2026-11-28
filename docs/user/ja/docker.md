@@ -24,11 +24,11 @@ docker run -it --rm \
 | パス | 内容 |
 |---|---|
 | `/work` | 作業ディレクトリ。リポジトリをここにバインドマウントします。 |
-| `/config` | 設定（`config.toml`）、セッション、およびサブフォルダーとしてデータとキャッシュ（`GITPOULPI_CONFIG_DIR=/config`）。保持するには名前付きボリュームかバインドマウントを使います。 |
+| `/config` | 設定（`config.toml`、`tui.toml`）、セッション、およびサブフォルダーとしてデータとキャッシュ（`GITPOULPI_CONFIG_DIR=/config`）。保持するには名前付きボリュームかバインドマウントを使います。 |
 | `/data`、`/cache` | XDG 変数に従うツール向けに、これらもボリュームとして宣言されています（`XDG_DATA_HOME=/data`、`XDG_CACHE_HOME=/cache`）。 |
 | `/home/gitpoulpi` | `HOME`。ボリュームではなく、コンテナーごとに新しくなります。 |
 
-`/config` のボリュームがないと、`--rm` で実行するたびに既定の設定で始まります。自分の `config.toml` で始めるには、マウントします：`-v "$PWD/config.toml":/config/config.toml:ro`（読み取り専用なので、設定は保存できません）。
+`/config` のボリュームがないと、`--rm` で実行するたびに既定の設定で始まります。自分の `config.toml` で始めるには、マウントします：`-v "$PWD/config.toml":/config/config.toml:ro`（読み取り専用なので、設定は保存できません）。インターフェース設定は 2つ目のファイル `tui.toml` にあり、同じ方法でマウントします（`-v "$PWD/tui.toml":/config/tui.toml:ro`）。[設定リファレンス](config-reference.md#2つのファイルconfigtoml-と-tuitoml)を参照してください。
 
 ## 別のユーザーが所有するリポジトリ
 

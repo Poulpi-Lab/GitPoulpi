@@ -2,15 +2,32 @@
 
 # 設定リファレンス
 
-`config.toml` のすべてのキーについて、既定値と働きを説明します。ファイルを手で編集する必要はほとんどありません。[設定画面](settings.md)（`Ctrl+,`）が変更に合わせて書き込み、`gitpoulpi config set` でも書き込めます。
+設定ファイルのすべてのキーについて、既定値と働きを説明します。ファイルを手で編集する必要はほとんどありません。[設定画面](settings.md)（`Ctrl+,`）が変更に合わせて書き込み、`gitpoulpi config set` でも書き込めます。
+
+## 2つのファイル：`config.toml` と `tui.toml`
+
+設定は、同じフォルダーにある 2つのファイルに保存されます。
+
+| ファイル | 内容 |
+|---|---|
+| `config.toml` | GitPoulpi のどの使い方にも共通するすべて：リポジトリ、アカウントと連携、git の動作、AI、MCP、更新、インストール、外部ツール、そして [`config.toml` の `[ui]`](#configtoml-の-ui) に挙げた少数の `[ui]` キー。 |
+| `tui.toml` | ターミナル UI のインターフェース設定：`[ui]` の大部分（テーマ、レイアウト、列、diff と画像の表示、言語、マウスとターミナルのオプションなど）、`[keybindings]` テーブル全体、`merge.side_by_side_min_width`。これらは [`tui.toml` の `[ui]`](#tuitoml-の-ui)、[`[keybindings]`](#keybindings)、[`[merge]`](#merge) に挙げています。 |
+
+- **`tui.toml` が作られるとき。** GitPoulpi が自動的に作成します。`config.toml` にあるインターフェース設定のコピーとして、`config.toml` が存在する状態でターミナル UI が起動したとき、またはインターフェース設定を最初に変更したときに作られます。それによって `config.toml` が変更されることはありません。
+- **作られた後は、そのファイルが唯一の情報源**になります（そのファイルが持つキーについて）。記載のないキーは既定値になり、古い `config.toml` にまだ残っている値は使われません。そのようなキーをリセットするには、`tui.toml` から削除してください。
+- **古い GitPoulpi** が同じマシンにインストールされている場合、そちらは自分の完全な `config.toml` を読み続けます。その後に古いバージョンで変更した設定は新しいバージョンには反映されず、その逆も同様です。
+- **キーがどのファイルにあるか。** `gitpoulpi config get <key>` は（`--json` を付けると）JSON のフィールド `file` にそのファイルを表示し、`gitpoulpi config set <key> <value>` はそのファイルに書き込み、`gitpoulpi config path` は `path`（`config.toml`）と `tui_file`（`tui.toml`）を表示します。`gitpoulpi config get`、`set`、`GITPOULPI_UI_*` 変数は、キーをどちらのファイルが持っていても同じキー名（`ui.theme`）を使います。変数は引き続き両方のファイルより優先されます。
+- **インストール。** プライマリ以外のインストールの見た目は、`config.toml` のその `[installation.settings.<id>]` 項目に残ります（[`[installation]`](#installationこのマシンの-gitpoulpi-ごとに1項目)を参照）。
+
+以下の各セクションは、どちらのファイルにあるかを示します。テーブルを示す例（`[ui]`、`[[ui.open_in]]`）は、セクションの見出しに書かれたファイルに書き込みます。
 
 ## 保存場所と値の決まり方
 
 | | |
 |---|---|
-| ファイル | `%APPDATA%\GitPoulpi\config.toml`（Windows）、`~/.config/gitpoulpi/config.toml`（Linux）、`~/Library/Application Support/GitPoulpi/config.toml`（macOS）。`gitpoulpi config path` で表示できます。 |
-| 別のフォルダー | `GITPOULPI_CONFIG_DIR=<dir>` で設定フォルダー全体（ファイル、`sessions/`、デーモンのポートファイル）を移せます。ポータブルインストール、テスト、自分の設定に触れさせたくないエージェントに使えます。 |
-| 優先順位 | 組み込みの既定値、次に `config.toml`、次に `GITPOULPI_*` 変数、最後にコマンドラインフラグの順で、後のものが優先されます。誤った値（ファイル内の選択肢の綴り間違い、不正な変数）はエラーになり、黙って無視されることはありません。 |
+| ファイル | `%APPDATA%\GitPoulpi\config.toml`（Windows）、`~/.config/gitpoulpi/config.toml`（Linux）、`~/Library/Application Support/GitPoulpi/config.toml`（macOS）、およびその隣の `tui.toml`。`gitpoulpi config path` で両方を表示できます。 |
+| 別のフォルダー | `GITPOULPI_CONFIG_DIR=<dir>` で設定フォルダー全体（各ファイル、`sessions/`、デーモンのポートファイル）を移せます。ポータブルインストール、テスト、自分の設定に触れさせたくないエージェントに使えます。 |
+| 優先順位 | 組み込みの既定値、次に `config.toml`（そのファイルが持つキーは `tui.toml`）、次に `GITPOULPI_*` 変数、最後にコマンドラインフラグの順で、後のものが優先されます。誤った値（ファイル内の選択肢の綴り間違い、不正な変数）はエラーになり、黙って無視されることはありません。 |
 | 変数 | キーを大文字にし、ドットをアンダースコアに替えます。`general.auto_prune` は `GITPOULPI_GENERAL_AUTO_PRUNE` です。GitPoulpi が実際に読むキーだけが対象です（下で「*未使用*」とされているキーや、`ui.log_columns_hidden` のようなリストは対象外です）。 |
 | フラグ | `--backend git2\|system` は、そのコマンドが起動するデーモンについて `general.default_backend` を上書きします。 |
 | トークンと鍵 | このファイルには決して保存されません。ホスティングのトークンと AI の API キーはシステムの認証情報ヘルパー（Git Credential Manager、libsecret / `pass`、キーチェーン）に保存され、ファイルには参照（`token_ref`）だけが残ります。ヘルパーがない場合、トークンの保存はメッセージとともに失敗し、トークンはそのセッションの間だけ保持されます。 |
@@ -75,7 +92,7 @@ author_name = "Jane Doe"
 author_email = "jane@work.example"
 ```
 
-## `[ui]`
+## `tui.toml` の `[ui]`
 
 **ログとグラフ**
 
@@ -114,14 +131,12 @@ author_email = "jane@work.example"
 | `ui.mouse_scroll_lines` | `3` | ホイール 1 ノッチあたりのログの行数（1〜20）。**再起動が必要。** |
 | `ui.kitty_keyboard` | `"auto"` | `auto` はターミナルに kitty キーボードプロトコルを要求します（`Ctrl+,`、`Ctrl+Enter`、`Ctrl+Shift+N` が届くようになります。Unix のみ。tmux は応答しません：[マルチプレクサ](multiplexers.md#tmux)を参照）。`off` は要求しません。**再起動が必要。** |
 | `ui.text_cursor` | `"terminal"` | テキスト欄のキャレットをどこに表示するか：`terminal` はターミナル自身のカーソルをそこに置きます（点滅するバーなので、ターミナルのカーソル設定と入力メソッドの候補ウィンドウが追従します。どの欄にもキーボードがないときは非表示になり、終了時にあなたのカーソル形状に戻ります）。`drawn` は GitPoulpi 独自のキャレットの字形を描画し、ターミナルのカーソルは非表示のままにします。即時反映。 |
-| `ui.logo_color` | `""` | 「GitPoulpi について」ウィンドウのロゴの配色で、スラッグ（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）で指定します。空または未知の値はビルドの既定（`lavender`）になります。ロゴをクリックするか、「GitPoulpi について」ウィンドウで色を選ぶと書き込まれます。 |
 
 **アバター**（既定ではオフです。オンにすると、作者のメールアドレスの SHA-256 ハッシュが Gravatar に送られ、接続済みの GitHub / GitLab アカウントにも問い合わせます）
 
 | キー | 既定値 | 値と効果 |
 |---|---|---|
 | `ui.avatars` | `"off"` | `graph`（画像グラフの commit の円の中）、`author`（作成者列）、`off`。古い `ui.show_avatars`（`true`）は、`ui.avatars` がない間は `author` として読まれます。 |
-| `ui.avatar_sources` | `"gravatar_hosting"` | 検索の順序：`hosting_gravatar`、`gravatar_hosting`、`gravatar`、`hosting`。GitLab ホストには、接続済みのプロファイルを通してのみ問い合わせます。 |
 | `ui.avatar_fallback` | `"identicon"` | `identicon`（ローカルで生成）または `initials`。画像プロトコルのないターミナルでは、常にイニシャルのバッジが使われます。 |
 
 **diffとエディターの表示**
@@ -134,10 +149,6 @@ author_email = "jane@work.example"
 | `ui.diff_word_wrap` | `false` | 長い diff の行を折り返します（`w`。設定 > diffとエディター）。 |
 | `ui.diff_intraline` | `true` | 変更された行の変更された単語を、より濃い背景色で塗ります（パレットの `Diff: 変更された単語のハイライトを切り替え`。設定 > diffとエディター）。 |
 | `ui.minimap` | `false` | diffとエディターのスクロールバーの横にミニマップを表示します（`M`）。 |
-| `ui.mermaid_detail` | `refs` | ログの Mermaid gitGraph としてコピーの詳細度：`structure`、`refs`、`subjects`、`full`（ポップアップでの選択が保存され、`log --format mermaid` の既定になります）。 |
-| `ui.mermaid_orientation` | `lr` | そのグラフの方向：`lr`（左から右）または `tb`（上から下）。 |
-| `ui.mermaid_fence` | `false` | コピーする Mermaid スクリプトを `mermaid` のコードフェンスで囲みます。 |
-| `ui.mermaid_subject_width` | `40` | Mermaid の ID に入る commit の件名を、この文字数で切り詰めます（`subjects`、`full`）。 |
 | `ui.color_depth` | `"auto"` | `auto`、`truecolor`、`256`、`16`：描画に使う色数です。`auto` は、Apple Terminal（256）、Linux コンソール（16）、`COLORTERM` のない `*-256color` ターミナル（256）を除いて truecolor です。即時反映。[テーマ](themes.md)を参照してください。 |
 | `ui.input_color` | `"theme"` | テキスト入力欄の背景：`theme`（テーマ自身の色）、`gray`、`blue`、`slate`、`dark`、`custom`。 |
 | `ui.input_color_custom` | `"#2a2a2a"` | `custom` の色（`#rrggbb`）。 |
@@ -159,16 +170,35 @@ diff の中で切り替えたトグルはここにすぐ保存され、その後
 | `ui.launch` | `"off"` | GitPoulpi のウィンドウが開いていないときに、エージェントがウィンドウを開いてよいかどうか：`off`、プリセット（`kitty`、`foot`、`alacritty`、`wezterm`、`wezterm-tab`、`ghostty`、`gnome-terminal`、`xdg-terminal-exec`、`windows-terminal`、`windows-terminal-tab`、`tmux`、`zellij`、`cmux`）、または `custom`。 |
 | `ui.launch_command` | `""` | `custom` のテンプレート：`{repo}`、`{session}`、`{gitpoulpi}`。引数に分割され、シェルは介しません。 |
 | `ui.tab_dir_follow` | `"buttons"` | `buttons`（タブバーに*終了して cd*を表示）または `auto`（終了のたびにシェルのフォルダーを変更し、新しいタブでは既定の*開く場所*のエントリを実行）。[タブのフォルダーを追従する](following-the-tab-folder.md)を参照してください。 |
-| `ui.terminal_launch` | `"auto"` | 旧仕様です。下の説明と[開く場所](open-in.md)を参照してください。旧「ここでターミナル」がターミナルを開く方法：`auto`（`ui.launch` のプリセット、なければ `$TERMINAL`、`xdg-terminal-exec`、Windows Terminal、Terminal）、プリセット、または `custom`。 |
-| `ui.terminal_launch_command` | `""` | `custom` のテンプレート。`{repo}` はフォルダーです。 |
-| `ui.open_in` | *(なし)* | [開く場所](open-in.md)の一覧で、`label` と `command` を持つテーブルの配列 `[[ui.open_in]]` です。なしは「まだ設定されていない」ことを意味し、一覧は旧 `ui.terminal_launch*` キー（`auto` 以外の値は最初のエントリになります）、OS のファイルエクスプローラー、環境から検出したマルチプレクサとターミナル（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal など）、`PATH` で見つかったエディターから組み立てられます。設定画面から最初に保存したときに一覧が書き込まれます。`open_in = []` は空の一覧です。`config set` では設定できません（ファイルを編集してください）。 |
-| `ui.open_in_default` | `""` | 「既定の開く場所を実行」が実行するエントリのラベルです。空または未知の場合は最初のエントリになります。 |
 | `ui.launch_terminal` | `"auto"` | デスクトップのショートカット（設定 > ランチャー）と、Windows での開き直しが GitPoulpi を起動するターミナルです。`auto` はインストール済みのものから選びます（Windows：Windows Terminal、なければ WezTerm、Alacritty、通常のコンソール。Linux：`xdg-terminal-exec`、なければ最初に見つかったターミナル。macOS：iTerm2、Ghostty、WezTerm、kitty のいずれかがあればそれ、なければ Terminal）。`default` は OS 自身の既定です。`windows-terminal`、`wezterm`、`alacritty`、`console`、`kitty`、`foot`、`ghostty`、`gnome-terminal`、`konsole`、`iterm`、`apple-terminal` のようなターミナル ID も指定できます。 |
-| `ui.launcher_build` | `"current"` | 開発モードのときだけ有効です（`general.dev_mode` を参照。そのときだけ設定 > ランチャーに表示され、それ以外は無視されます）。`"current"`：ショートカットとコマンドエイリアスは、それらを作成したビルドを起動します。`"newest"`：ソースの `target/dist` と `target/release` のうち最も新しくビルドされたものを、クリックのたびに判定して起動します。どちらのビルドを起動しても、ショートカットは書き換えられません。 |
-| `ui.command_alias` | `""` | ターミナルから GitPoulpi を起動するコマンドの名前です（例：`gp`。設定 > ランチャー、`gitpoulpi alias create`）。空：なし。英数字と `-`、`_`、`.` のみ。**作成：コマンドのエイリアス**ボタンが使う名前にすぎず、作成するまで何も存在しません。 |
-| `ui.command_alias_add` | `""` | `gitpoulpi --add` を実行する 2つ目のコマンドの名前です（例：`gpa`）。すでに起動中の GitPoulpi に、現在のフォルダーを新しいタブとして開きます（設定 > ランチャー、`gitpoulpi alias create gpa --add`）。空：なし。名前の規則は同じで、**作成**ボタンで `ui.command_alias` と一緒に作られます。 |
 | `ui.relaunch_in_terminal` | `true` | Windows のみ：exe がダブルクリックで専用のコンソールに起動された場合、GitPoulpi は `ui.launch_terminal` で開き直して終了します。exe を直接実行するターミナル（`wezterm-gui start -- gitpoulpi.exe`、`wt.exe gitpoulpi.exe`、Rio、Tabby、Alacritty の `-e`）も専用のコンソールですが、従来のコンソールウィンドウではないため、開き直されることはありません。オフの場合はそのコンソールにとどまります。 |
 | `ui.reuse_window` | `true` | GitPoulpi のショートカット（`gitpoulpi launch`）をクリックすると、新しく起動せず、すでに開いている GitPoulpi のウィンドウを表示します。 オフ：クリックのたびに新しいウィンドウを起動します。 |
+
+### 画像
+
+| キー | 既定値 | 意味 |
+|---|---|---|
+| `ui.image_view` | `true` | 画像であるバイナリファイル（PNG、JPEG、GIF、WebP、BMP など）を、Diff ビューとファイルビューで画像として表示します。オフの場合は、ふつうのバイナリの通知になります。 |
+| `ui.image_view_max_mib` | `32` | これ（MiB）より大きい画像はデコードされず、代わりに情報カードが表示されます。 |
+| `ui.image_view_max_unit` | `"auto"` | 設定が上限を表示する単位：`mib`、`gib`（1024 MiB）、`auto`。表示専用で、上限は常に `image_view_max_mib` MiB（1〜1024）です。 |
+| `ui.image_view_text_fallback` | `"halfblock"` | 画像プロトコルのないターミナルで：`halfblock`（色付きの半ブロック文字）または `card`（情報カードのみ）。 |
+| `ui.image_view_pixelated_from` | `"2x"` | これ以上の拡大で、滑らかにせず四角いピクセルで表示します：`1x`、`2x`、`never`。 |
+| `ui.image_view_sync` | `true` | 変更前と変更後のペインで、ズームとスクロール位置を共有します。 |
+
+**まだ使われていません**（受け付けられ、保存されますが、何も読み取りません）：`ui.graph_colorization`（設定から削除済みで、読み込み時には受け付けます）、`ui.date_word_format`（設定から削除済みで、読み込み時には受け付けます）。古い `ui.diff_view_mode` は一度だけ読まれ、`diff_layout` / `diff_hunks_only` になります。
+
+## `config.toml` の `[ui]`
+
+どのインターフェースを使っても同じになる `[ui]` のいくつかのキーです。このマシンの外部ツール、このインストールの識別情報、アバターをどのネットワークサービスに問い合わせるか、そして `log --format mermaid` の既定値です。これらは `config.toml` からだけ読み込まれます。それ以外の `[ui]` のキーは [`tui.toml`](#tuitoml-の-ui) にあります。
+
+**別の場所でフォルダーを開く**
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `ui.open_in` | *(なし)* | [開く場所](open-in.md)の一覧で、`label` と `command` を持つテーブルの配列 `[[ui.open_in]]` です。なしは「まだ設定されていない」ことを意味し、一覧は旧 `ui.terminal_launch*` キー（`auto` 以外の値は最初のエントリになります）、OS のファイルエクスプローラー、環境から検出したマルチプレクサとターミナル（herdr、tmux、zellij、WezTerm、kitty、Windows Terminal など）、`PATH` で見つかったエディターから組み立てられます。設定画面から最初に保存したときに一覧が書き込まれます。`open_in = []` は空の一覧です。`config set` では設定できません（ファイルを編集してください）。 |
+| `ui.open_in_default` | `""` | 「既定の開く場所を実行」が実行するエントリのラベルです。空または未知の場合は最初のエントリになります。 |
+| `ui.terminal_launch` | `"auto"` | 旧仕様です。下の説明と[開く場所](open-in.md)を参照してください。旧「ここでターミナル」がターミナルを開く方法：`auto`（`ui.launch` のプリセット、なければ `$TERMINAL`、`xdg-terminal-exec`、Windows Terminal、Terminal）、プリセット、または `custom`。 |
+| `ui.terminal_launch_command` | `""` | `custom` のテンプレート。`{repo}` はフォルダーです。 |
 
 **`ui.open_in` のコマンド**は、まず引数に分割され（空白、`'...'`、`"..."`）、その後で各引数の中で変数が置き換えられるため、空白を含むフォルダーも 1 つの引数のままです。コマンド自身がシェルを起動しない限り（`sh -c '... "$GITPOULPI_CWD"'`）、シェルは介しません。変数：`${cwd}`（タブのフォルダー）、`${repo}`（リポジトリのルート）、`${name}`（フォルダー名）、`${branch}`（detached のときは空）、`${web_url}`（`origin` リモートが GitHub または GitLab のプロジェクトであればその Web ページ、そうでなければ空。これを使うエントリは、空の場合は実行を拒否します）、`${env:NAME}`（未設定なら空）。古い `{repo}` は今も `${cwd}` を意味します。それ以外の `${...}` はその名前を挙げたエラーになります。例：
 
@@ -187,16 +217,10 @@ command = "code ${cwd}"
 
 旧仕様：`ui.terminal_launch` と `ui.terminal_launch_command` は今も読み込まれますが（`ui.open_in` がない間は一覧の元になります。`custom` は `{repo}` を `${cwd}` に書き換えた「Terminal（custom）」に、プリセット ID はそのプリセットになります）、`ui.open_in` に置き換えられています。
 
-### 画像
+**画像エディター**
 
-| キー | 既定値 | 意味 |
+| キー | 既定値 | 値と効果 |
 |---|---|---|
-| `ui.image_view` | `true` | 画像であるバイナリファイル（PNG、JPEG、GIF、WebP、BMP など）を、Diff ビューとファイルビューで画像として表示します。オフの場合は、ふつうのバイナリの通知になります。 |
-| `ui.image_view_max_mib` | `32` | これ（MiB）より大きい画像はデコードされず、代わりに情報カードが表示されます。 |
-| `ui.image_view_max_unit` | `"auto"` | 設定が上限を表示する単位：`mib`、`gib`（1024 MiB）、`auto`。表示専用で、上限は常に `image_view_max_mib` MiB（1〜1024）です。 |
-| `ui.image_view_text_fallback` | `"halfblock"` | 画像プロトコルのないターミナルで：`halfblock`（色付きの半ブロック文字）または `card`（情報カードのみ）。 |
-| `ui.image_view_pixelated_from` | `"2x"` | これ以上の拡大で、滑らかにせず四角いピクセルで表示します：`1x`、`2x`、`never`。 |
-| `ui.image_view_sync` | `true` | 変更前と変更後のペインで、ズームとスクロール位置を共有します。 |
 | `ui.image_editors` | *(なし)* | 「Edit in」の画像エディターで、`label` と `command` を持つテーブルの配列 `[[ui.image_editors]]` です。なしは「まだ設定されていない」ことを意味し、一覧はこのマシンで検出されたエディター（`PATH` 上のプログラム、Flatpak のインストール、Windows の既知のインストール先、macOS の `/Applications`）、続いて OS の既定アプリになります。設定画面から最初に保存したときに一覧が書き込まれます。`image_editors = []` は空の一覧です。`config set` では設定できません（ファイルを編集してください）。 |
 | `ui.image_editor_default` | `""` | 「Edit in default」が実行するエディターのラベルです。空または未知の場合は最初のエントリになります。 |
 
@@ -215,7 +239,29 @@ label = "Paint.NET"
 command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 ```
 
-**まだ使われていません**（受け付けられ、保存されますが、何も読み取りません）：`ui.graph_colorization`（設定から削除済みで、読み込み時には受け付けます）、`ui.date_word_format`（設定から削除済みで、読み込み時には受け付けます）。古い `ui.diff_view_mode` は一度だけ読まれ、`diff_layout` / `diff_hunks_only` になります。
+**ランチャーと識別情報**
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `ui.logo_color` | `""` | 「GitPoulpi について」ウィンドウのロゴの配色で、スラッグ（`violet`、`orange`、`teal`、`ocean`、`magenta`、`candy`、`coral`、`green`、`cyan`、`indigo`、`lavender`、`sun`、`mint`、`slate`）で指定します。空または未知の値はビルドの既定（`lavender`）になります。ロゴをクリックするか、「GitPoulpi について」ウィンドウで色を選ぶと書き込まれます。 |
+| `ui.command_alias` | `""` | ターミナルから GitPoulpi を起動するコマンドの名前です（例：`gp`。設定 > ランチャー、`gitpoulpi alias create`）。空：なし。英数字と `-`、`_`、`.` のみ。**作成：コマンドのエイリアス**ボタンが使う名前にすぎず、作成するまで何も存在しません。 |
+| `ui.command_alias_add` | `""` | `gitpoulpi --add` を実行する 2つ目のコマンドの名前です（例：`gpa`）。すでに起動中の GitPoulpi に、現在のフォルダーを新しいタブとして開きます（設定 > ランチャー、`gitpoulpi alias create gpa --add`）。空：なし。名前の規則は同じで、**作成**ボタンで `ui.command_alias` と一緒に作られます。 |
+| `ui.launcher_build` | `"current"` | 開発モードのときだけ有効です（`general.dev_mode` を参照。そのときだけ設定 > ランチャーに表示され、それ以外は無視されます）。`"current"`：ショートカットとコマンドエイリアスは、それらを作成したビルドを起動します。`"newest"`：ソースの `target/dist` と `target/release` のうち最も新しくビルドされたものを、クリックのたびに判定して起動します。どちらのビルドを起動しても、ショートカットは書き換えられません。 |
+
+**アバターの検索**
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `ui.avatar_sources` | `"gravatar_hosting"` | 検索の順序：`hosting_gravatar`、`gravatar_hosting`、`gravatar`、`hosting`。GitLab ホストには、接続済みのプロファイルを通してのみ問い合わせます。 |
+
+**Mermaid の既定値**（`log --format mermaid`。ログの「Mermaid gitGraph としてコピー」は、ポップアップでの選択を記憶します）
+
+| キー | 既定値 | 値と効果 |
+|---|---|---|
+| `ui.mermaid_detail` | `refs` | ログの Mermaid gitGraph としてコピーの詳細度：`structure`、`refs`、`subjects`、`full`（ポップアップでの選択が保存され、`log --format mermaid` の既定になります）。 |
+| `ui.mermaid_orientation` | `lr` | そのグラフの方向：`lr`（左から右）または `tb`（上から下）。 |
+| `ui.mermaid_fence` | `false` | コピーする Mermaid スクリプトを `mermaid` のコードフェンスで囲みます。 |
+| `ui.mermaid_subject_width` | `40` | Mermaid の ID に入る commit の件名を、この文字数で切り詰めます（`subjects`、`full`）。 |
 
 ## `[editor]`
 
@@ -228,6 +274,8 @@ command = "\"C:\\Program Files\\paint.net\\paintdotnet.exe\" ${file}"
 | `editor.follow_selection` | `true` | エディターを開いている間、右ペインで別のファイルを選ぶとそのファイルもエディターで開きます。未保存の変更がある場合は先に保存するかどうかを尋ねます。編集できないファイルは通常のビューで開きます。commit のファイルを選ぶと、エディターを離れてその diff が開きます。 |
 
 ## `[merge]`
+
+ファイル：`tui.toml`。
 
 merge 競合エディター（[merge の競合を解決する](merge-conflicts.md)）の設定です。設定 > diffとエディターに表示されます。
 
@@ -525,6 +573,8 @@ open_tab = true
 `backup = "Ctrl+G b"` です。
 
 ## `[keybindings]`
+
+ファイル：`tui.toml`。
 
 TUI のショートカットを割り当て直します。設定 > キーボードとマウスで編集できます。
 

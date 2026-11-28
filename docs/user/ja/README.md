@@ -132,7 +132,7 @@ GitPoulpi は、クリックできる commit グラフ、コマンドパレッ�
 
 ## リファレンスとヘルプ
 
-28. **[設定リファレンス](config-reference.md)**：`config.toml` のすべてのキー、
+28. **[設定リファレンス](config-reference.md)**：`config.toml` と `tui.toml` のすべてのキー、
     その既定値と効果、リポジトリごとの設定、環境変数。
 29. **[トラブルシューティングと FAQ](troubleshooting.md)**：アイコン、グラフの描画、
     届かないキー、固まったデーモン、速度、LFS ポインター。

@@ -211,7 +211,7 @@ GitPoulpi は次のファイルも保持しています。
 
 | 内容 | 場所 |
 |---|---|
-| 設定（`config.toml`）とセッション | OS の設定フォルダー。`GITPOULPI_CONFIG_DIR` で変更できます。 |
+| 設定（`config.toml` と `tui.toml`）とセッション | OS の設定フォルダー。`GITPOULPI_CONFIG_DIR` で変更できます。 |
 | リポジトリごとの状態 | 既定では、各リポジトリの `.git` フォルダー内の `gitpoulpi/`（`session.per_repo_state_dir` で、作業ツリーの `.gitpoulpi/` またはユーザーデータフォルダーに移せます）。 |
 | キャッシュ（アバター） | OS のキャッシュフォルダー。 |
 | トークンと API キー | 認証情報ヘルパー。**設定 > SSH と認証情報 > すべてのユーザー名とパスワードを削除**で削除できます。 |

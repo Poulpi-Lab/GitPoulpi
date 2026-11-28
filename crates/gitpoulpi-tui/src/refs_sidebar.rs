@@ -515,18 +515,7 @@ impl RefsGroups {
     }
 }
 
-/// A ref's display/lookup name exactly as `group_refs` formats it (a local
-/// branch or tag's bare name, a remote branch's `remote/name`), shared so
-/// `hidden_from_graph`'s keys (built from `RefTreeRow::Leaf::full_name`)
-/// match what this computes from a raw `Ref` when filtering
-/// `refs_for_pills`.
-pub(crate) fn ref_full_name(r: &gitpoulpi_core::domain::Ref) -> String {
-    match &r.kind {
-        RefKind::LocalBranch { name } => name.clone(),
-        RefKind::RemoteBranch { remote, name } => format!("{remote}/{name}"),
-        RefKind::Tag { name } => name.clone(),
-    }
-}
+pub(crate) use crate::ref_name::ref_full_name;
 
 /// Splits refs into LOCAL/REMOTE/TAGS groups, sorted by name
 /// within each, keeping only names containing `filter` (case-insensitive;

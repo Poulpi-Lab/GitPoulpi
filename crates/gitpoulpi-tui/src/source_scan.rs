@@ -564,3 +564,51 @@ fn the_color_lint_flags_what_it_should() {
         assert!(hard_coded_colors(fine).is_empty(), "{fine}");
     }
 }
+
+/// The files the daemon client (and later a second frontend) depends on
+/// without wanting a terminal: plain data and logic. They name neither
+/// `ratatui` nor `crossterm` and glob nothing from their parent module, so
+/// they can move to a neutral crate unchanged. A comment may still mention
+/// either name.
+const PURE_FILES: &[&str] = &[
+    "activity.rs",
+    "binary_hint.rs",
+    "commit_files_cache.rs",
+    "commit_settings.rs",
+    "diff_recode.rs",
+    "event_loop/fetch_policy.rs",
+    "history_view/rename.rs",
+    "lfs_ui_pure.rs",
+    "live_settings_pure.rs",
+    "log_table/rows_now.rs",
+    "no_repository.rs",
+    "oid_text.rs",
+    "redraw.rs",
+    "ref_name.rs",
+    "repo_state_path.rs",
+    "safety_panel/label.rs",
+    "ui_viewer_pure.rs",
+    "undo_ui_pure.rs",
+    "wip_view.rs",
+];
+
+#[test]
+fn the_pure_files_name_no_terminal_crate() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut problems = Vec::new();
+    for name in PURE_FILES {
+        let text = std::fs::read_to_string(root.join(name))
+            .unwrap_or_else(|e| panic!("pure file {name} is missing: {e}"));
+        for (n, line) in production_lines(&text) {
+            if line.trim_start().starts_with("//") {
+                continue;
+            }
+            for banned in ["ratatui", "crossterm", "use super::*"] {
+                if line.contains(banned) {
+                    problems.push(format!("{name}:{n}: {banned}: {}", line.trim()));
+                }
+            }
+        }
+    }
+    assert!(problems.is_empty(), "{}", problems.join("\n"));
+}

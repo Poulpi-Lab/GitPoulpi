@@ -77,12 +77,7 @@ pub(crate) fn default_remote(
     gitpoulpi_session::resolve_default_remote(chosen, upstream.as_deref(), remotes)
 }
 
-pub(crate) fn repo_state_path(repo_root: &Path) -> PathBuf {
-    let state_dir = gitpoulpi_config::Settings::resolve_ambient()
-        .map(|s| s.config().session.per_repo_state_dir.clone())
-        .unwrap_or_else(|_| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
-    gitpoulpi_session::RepoState::path_for(repo_root, &state_dir)
-}
+pub(crate) use crate::repo_state_path::repo_state_path;
 
 /// The remote chosen with "Set as default remote" for this repository.
 pub(crate) fn load_chosen_default_remote(repo_root: &Path) -> Option<String> {

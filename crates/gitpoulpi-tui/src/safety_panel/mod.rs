@@ -49,7 +49,7 @@ use crate::combo::Combo;
 use crate::daemon_link::{error_text, Reply, Requester};
 use detail::Detail;
 
-pub(crate) use label::{summary_text, text as label_text};
+pub(crate) use label::{offer_of, summary_text, text as label_text};
 pub(crate) use palette::SafetyCmd;
 use panes::Panes;
 #[cfg(test)]
@@ -1318,26 +1318,6 @@ impl SafetyPanel {
             },
         }
     }
-}
-
-/// The reflog position a blocked top undo entry offers, with the label of
-/// the operation: `(ref to restore, oid, label)`.
-pub(crate) fn offer_of(
-    state: &gitpoulpi_core::domain::JournalState,
-) -> Option<(String, Oid, String)> {
-    let Some(UndoRefusal::RefMoved {
-        restore: Some(pos), ..
-    }) = state.blocked.as_ref()
-    else {
-        return None;
-    };
-    let label = label::summary_text(state.undo.as_ref()?);
-    let name = pos
-        .refname
-        .strip_prefix("refs/heads/")
-        .unwrap_or(&pos.refname)
-        .to_string();
-    Some((name, pos.oid, label))
 }
 
 impl HistoryView {

@@ -5,10 +5,7 @@
 
 use super::*;
 
-/// Abbreviated object id, the 7 hex chars git itself shows by default.
-pub(crate) fn short_oid(oid: Oid) -> String {
-    oid.to_hex()[..7].to_string()
-}
+pub(crate) use crate::oid_text::short_oid;
 
 /// A `percent_x` x `percent_y` box centered in `area`, for the help
 /// overlay popup.

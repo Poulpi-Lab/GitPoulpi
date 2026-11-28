@@ -83,13 +83,11 @@ impl Workspace {
         prompts: Vec<SensitivePrompt>,
         cx: &mut Context<Self>,
     ) {
+        let (window, backend) = (self.window, self.backend.clone());
         cx.defer(move |cx| {
-            let Some(window) = cx.windows().first().copied() else {
-                return;
-            };
             let _ = window.update(cx, move |_, window, cx| {
                 for prompt in prompts {
-                    crate::sensitive::ask(prompt, window, cx);
+                    crate::sensitive::ask(prompt, backend.clone(), window, cx);
                 }
             });
         });

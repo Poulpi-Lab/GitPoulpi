@@ -4,15 +4,22 @@
 
 use std::collections::{BTreeSet, HashMap, HashSet};
 
+use gitpoulpi_app::palette::vocab::refs_sidebar::SidebarSection;
+use gitpoulpi_app::refs_sections::{linked_worktree_count, visible_sections_with};
 use gitpoulpi_app::refs_tree::{
-    hidden_in_graph, hidden_through_remote, ref_display_rows, remote_hidden, CollapsedFolders,
-    RefRowKind, RefTreeRow,
+    folder_fully_in, group_refs, hidden_in_graph, hidden_through_remote, ref_display_rows,
+    ref_full_name, refs_under_folder, remote_hidden, CollapsedFolders, RefRowKind, RefTreeRow,
 };
-use gitpoulpi_core::domain::{Oid, Ref, RefKind, Stash, TagWhere, Worktree};
+use gitpoulpi_app::tag_where::{snapshot_of, TagInfo};
+use gitpoulpi_core::domain::{
+    Oid, Ref, RefKind, Stash, Submodule, SubmoduleState, TagWhere, Worktree,
+};
 use gitpoulpi_i18n::msg;
 
 use crate::strings;
 
+/// The sections of the pane the desktop shows. Their order and titles are the shared
+/// [`SidebarSection`]'s; PULL REQUESTS and ISSUES are not here until the hosting state is.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Kind {
     Local,
@@ -20,36 +27,44 @@ pub enum Kind {
     Worktrees,
     Stashes,
     Tags,
+    Submodules,
 }
 
 impl Kind {
-    /// The terminal UI's order.
-    pub const ALL: [Kind; 5] = [
+    /// The shared order (`SidebarSection::ORDER`) without the sections the desktop has no data for.
+    pub const ALL: [Kind; 6] = [
         Kind::Local,
         Kind::Remote,
         Kind::Worktrees,
         Kind::Stashes,
         Kind::Tags,
+        Kind::Submodules,
     ];
 
-    pub fn title(self) -> &'static str {
+    /// The shared section this one stands for.
+    pub fn section(self) -> SidebarSection {
         match self {
-            Kind::Local => msg::sidebar::SECTION_LOCAL.get(),
-            Kind::Remote => msg::sidebar::SECTION_REMOTE.get(),
-            Kind::Worktrees => msg::sidebar::SECTION_WORKTREES.get(),
-            Kind::Stashes => msg::sidebar::SECTION_STASHES.get(),
-            Kind::Tags => msg::sidebar::SECTION_TAGS.get(),
+            Kind::Local => SidebarSection::Local,
+            Kind::Remote => SidebarSection::Remote,
+            Kind::Worktrees => SidebarSection::Worktrees,
+            Kind::Stashes => SidebarSection::Stashes,
+            Kind::Tags => SidebarSection::Tags,
+            Kind::Submodules => SidebarSection::Submodules,
         }
     }
 
-    /// The ref kind a section lists; `None` for worktrees and stashes, which hold no refs.
+    /// The desktop's section for a shared one, `None` for those it does not show.
+    pub fn of_section(section: SidebarSection) -> Option<Kind> {
+        Kind::ALL.into_iter().find(|k| k.section() == section)
+    }
+
+    pub fn title(self) -> &'static str {
+        self.section().display_title()
+    }
+
+    /// The ref kind a section lists; `None` for the sections that hold no refs.
     pub fn ref_kind(self) -> Option<RefRowKind> {
-        match self {
-            Kind::Local => Some(RefRowKind::Local),
-            Kind::Remote => Some(RefRowKind::Remote),
-            Kind::Tags => Some(RefRowKind::Tag),
-            Kind::Worktrees | Kind::Stashes => None,
-        }
+        self.section().ref_kind()
     }
 }
 
@@ -73,6 +88,7 @@ pub enum RowKind {
         target: Option<Oid>,
     },
     Worktree,
+    Submodule,
 }
 
 /// The glyph the terminal UI puts after a tag, by where the tag lives.
@@ -120,6 +136,9 @@ pub struct Inputs<'a> {
     pub refs: &'a [Ref],
     pub stashes: &'a [Stash],
     pub worktrees: &'a [Worktree],
+    pub submodules: &'a [Submodule],
+    /// The sections the user hid (`ui.sidebar_sections_hidden`).
+    pub hidden_sections: &'a HashSet<SidebarSection>,
     /// The sidebar filter, matched case-insensitively against full names; empty keeps everything.
     pub filter: &'a str,
     /// `ui.ref_tree`: split names on `/` into folders.
@@ -127,13 +146,11 @@ pub struct Inputs<'a> {
     pub collapsed: &'a CollapsedFolders,
 }
 
-fn full_name(r: &Ref) -> Option<(RefRowKind, String)> {
+fn row_kind_of(r: &Ref) -> RefRowKind {
     match &r.kind {
-        RefKind::LocalBranch { name } => Some((RefRowKind::Local, name.clone())),
-        RefKind::RemoteBranch { remote, name } => {
-            Some((RefRowKind::Remote, format!("{remote}/{name}")))
-        }
-        RefKind::Tag { name } => Some((RefRowKind::Tag, name.clone())),
+        RefKind::LocalBranch { .. } => RefRowKind::Local,
+        RefKind::RemoteBranch { .. } => RefRowKind::Remote,
+        RefKind::Tag { .. } => RefRowKind::Tag,
     }
 }
 
@@ -149,67 +166,59 @@ pub fn remote_names(refs: &[Ref]) -> Vec<String> {
     set.into_iter().map(str::to_string).collect()
 }
 
-/// The sections shown, in the terminal UI's order: LOCAL, REMOTE, TAGS always; WORKTREES once a linked
-/// worktree exists; STASHES when there is a stash.
+/// The sections shown, in the shared order and by the shared rule (`refs_sections`): LOCAL, REMOTE and
+/// TAGS always; WORKTREES once a linked worktree exists; STASHES when there is a stash; SUBMODULES when
+/// there is one; minus what the user hid.
 pub fn build_sections(input: &Inputs) -> Vec<Section> {
     let remotes = remote_names(input.refs);
-    let filter = input.filter.to_lowercase();
-    let mut info: HashMap<(RefRowKind, String), &Ref> = HashMap::new();
-    let mut names: HashMap<RefRowKind, Vec<String>> = HashMap::new();
-    for r in input.refs {
-        let Some((kind, name)) = full_name(r) else {
-            continue;
-        };
-        if !filter.is_empty() && !name.to_lowercase().contains(&filter) {
-            continue;
-        }
-        names.entry(kind).or_default().push(name.clone());
-        info.insert((kind, name), r);
-    }
+    let groups = group_refs(input.refs, input.filter);
+    let tags = snapshot_of(input.refs);
+    let info: HashMap<(RefRowKind, String), &Ref> = input
+        .refs
+        .iter()
+        .map(|r| ((row_kind_of(r), ref_full_name(r)), r))
+        .collect();
+    let shown = visible_sections_with(
+        linked_worktree_count(input.worktrees),
+        input.stashes.len(),
+        (false, false),
+        input.submodules.len(),
+        input.hidden_sections,
+    );
     let mut out = Vec::new();
-    for kind in Kind::ALL {
-        match kind {
-            Kind::Worktrees => {
-                if input.worktrees.iter().all(|w| w.is_main) {
-                    continue;
-                }
-                let rows: Vec<Row> = input.worktrees.iter().map(worktree_row).collect();
-                out.push(Section {
-                    kind,
-                    count: rows.len(),
-                    names: Vec::new(),
-                    rows,
-                });
-            }
-            Kind::Stashes => {
-                if input.stashes.is_empty() {
-                    continue;
-                }
-                let rows: Vec<Row> = input.stashes.iter().map(stash_row).collect();
-                out.push(Section {
-                    kind,
-                    count: rows.len(),
-                    names: Vec::new(),
-                    rows,
-                });
-            }
+    for kind in shown.into_iter().filter_map(Kind::of_section) {
+        let (rows, names): (Vec<Row>, Vec<String>) = match kind {
+            Kind::Worktrees => (
+                input.worktrees.iter().map(worktree_row).collect(),
+                Vec::new(),
+            ),
+            Kind::Stashes => (input.stashes.iter().map(stash_row).collect(), Vec::new()),
+            Kind::Submodules => (
+                input.submodules.iter().map(submodule_row).collect(),
+                Vec::new(),
+            ),
             _ => {
                 let rk = kind.ref_kind().expect("a ref section");
-                let mut list = names.remove(&rk).unwrap_or_default();
-                list.sort_unstable();
+                let list = groups.names(rk).to_vec();
                 let rows =
                     ref_display_rows(&list, rk, input.hierarchical, input.collapsed, &remotes)
                         .into_iter()
-                        .map(|row| ref_row(row, rk, &info, input.collapsed))
+                        .map(|row| ref_row(row, rk, &info, &tags, input.collapsed))
                         .collect();
-                out.push(Section {
-                    kind,
-                    count: list.len(),
-                    names: list,
-                    rows,
-                });
+                (rows, list)
             }
-        }
+        };
+        let count = if kind.ref_kind().is_some() {
+            names.len()
+        } else {
+            rows.len()
+        };
+        out.push(Section {
+            kind,
+            count,
+            names,
+            rows,
+        });
     }
     out
 }
@@ -218,6 +227,7 @@ fn ref_row(
     row: RefTreeRow,
     kind: RefRowKind,
     info: &HashMap<(RefRowKind, String), &Ref>,
+    tags: &HashMap<String, TagInfo>,
     collapsed: &CollapsedFolders,
 ) -> Row {
     match row {
@@ -252,7 +262,7 @@ fn ref_row(
                 kind: RowKind::Ref {
                     target: r.map(|r| r.target),
                     is_head: r.is_some_and(|r| r.is_head),
-                    tag_where: r.and_then(|r| r.tag_where()),
+                    tag_where: tags.get(&full_name).map(|t| t.place),
                     full_name,
                 },
             }
@@ -290,6 +300,21 @@ fn worktree_row(w: &Worktree) -> Row {
     }
 }
 
+fn submodule_row(m: &Submodule) -> Row {
+    let state = match m.state {
+        SubmoduleState::Uninitialized => " (-)",
+        SubmoduleState::UpToDate => "",
+        SubmoduleState::Modified => " (+)",
+        SubmoduleState::Conflicted => " (U)",
+    };
+    Row {
+        key: format!("M:{}", m.path),
+        label: format!("{}{state}", m.name),
+        depth: 0,
+        kind: RowKind::Submodule,
+    }
+}
+
 /// Every folder path of every ref section, unfolded: what "collapse all" puts in the collapsed set.
 pub fn all_folders(refs: &[Ref], hierarchical: bool) -> CollapsedFolders {
     let none = CollapsedFolders::new();
@@ -297,6 +322,8 @@ pub fn all_folders(refs: &[Ref], hierarchical: bool) -> CollapsedFolders {
         refs,
         stashes: &[],
         worktrees: &[],
+        submodules: &[],
+        hidden_sections: &HashSet::new(),
         filter: "",
         hierarchical,
         collapsed: &none,
@@ -317,37 +344,6 @@ pub fn all_folders(refs: &[Ref], hierarchical: bool) -> CollapsedFolders {
 
 // -- hide and solo ---------------------------------------------------------
 
-/// Every leaf ref beneath the folder at `path` (a remote's node included): what "hide / solo this
-/// folder" acts on. `names` is the section's full list, not the rows, so folds play no part.
-pub fn refs_under_folder(names: &[String], path: &str) -> Vec<String> {
-    let prefix = format!("{path}/");
-    names
-        .iter()
-        .filter(|n| n.starts_with(&prefix))
-        .cloned()
-        .collect()
-}
-
-/// Whether every ref of `refs` is in `set` (an empty list never is).
-pub fn folder_fully_in(set: &HashSet<String>, refs: &[String]) -> bool {
-    !refs.is_empty() && refs.iter().all(|r| set.contains(r))
-}
-
-/// Adds every ref of `refs` to `set`, or removes them all when they were all in already.
-pub fn toggle_folder_membership(set: &mut HashSet<String>, refs: &[String]) {
-    if refs.is_empty() {
-        return;
-    }
-    let all_in = folder_fully_in(set, refs);
-    for r in refs {
-        if all_in {
-            set.remove(r);
-        } else {
-            set.insert(r.clone());
-        }
-    }
-}
-
 /// Whether a row is hidden from the graph (a leaf named in the set or under a hidden remote, a folder
 /// whose every ref is hidden, a remote hidden as a whole).
 pub fn row_hidden(section: &Section, row: &Row, hidden: &HashSet<String>) -> bool {
@@ -365,7 +361,7 @@ pub fn row_hidden(section: &Section, row: &Row, hidden: &HashSet<String>) -> boo
             if remote_section && hidden_through_remote(hidden, path) {
                 return true;
             }
-            let under = refs_under_folder(&section.names, path);
+            let under = refs_under_folder(None, &section.names, path);
             !under.is_empty()
                 && under
                     .iter()
@@ -380,7 +376,7 @@ pub fn row_soloed(section: &Section, row: &Row, solo: &HashSet<String>) -> bool 
     match &row.kind {
         RowKind::Ref { full_name, .. } => solo.contains(full_name),
         RowKind::Folder { path, .. } if section.kind.ref_kind().is_some() => {
-            folder_fully_in(solo, &refs_under_folder(&section.names, path))
+            folder_fully_in(solo, &refs_under_folder(None, &section.names, path))
         }
         _ => false,
     }
@@ -393,18 +389,6 @@ pub fn hidden_count(hidden: &HashSet<String>, remote_names: &[String]) -> usize 
             .iter()
             .filter(|n| !hidden.contains(*n) && hidden_through_remote(hidden, n))
             .count()
-}
-
-/// The Refs pane's title: `Refs`, `Soloing 1/9`, `Hidden 2` or both.
-pub fn title(soloed: usize, total_refs: usize, hidden: usize) -> String {
-    use msg::sidebar as m;
-    let text = match (soloed > 0, hidden > 0) {
-        (true, true) => m::title_soloing_hidden(soloed, total_refs, hidden),
-        (true, false) => m::title_soloing(soloed, total_refs),
-        (false, true) => m::title_hidden(hidden),
-        (false, false) => m::TITLE_REFS.get().to_string(),
-    };
-    text.trim().to_string()
 }
 
 /// The text each section's rows read as, one per line, for the golden tests: a fold marker, the
@@ -522,6 +506,8 @@ mod tests {
             refs,
             stashes,
             worktrees: &[],
+            submodules: &[],
+            hidden_sections: &HashSet::new(),
             filter,
             hierarchical: true,
             collapsed,
@@ -638,23 +624,10 @@ TAGS (0)
     }
 
     #[test]
-    fn a_folder_toggles_all_its_refs_at_once_and_back() {
+    fn a_folders_refs_are_the_names_beneath_it() {
         let sections = build(&refs(), &[], "", &CollapsedFolders::new());
-        let under = refs_under_folder(&sections[0].names, "feature");
+        let under = refs_under_folder(None, &sections[0].names, "feature");
         assert_eq!(under, vec!["feature/login", "feature/signup"]);
-        let mut set = HashSet::new();
-        set.insert("feature/login".to_string());
-        toggle_folder_membership(&mut set, &under);
-        assert!(
-            folder_fully_in(&set, &under),
-            "a partly hidden folder hides the rest"
-        );
-        toggle_folder_membership(&mut set, &under);
-        assert!(set.is_empty(), "the second toggle undoes the first");
-        assert!(
-            !folder_fully_in(&set, &[]),
-            "an empty folder is never all hidden"
-        );
     }
 
     #[test]
@@ -708,14 +681,6 @@ TAGS (0)
     }
 
     #[test]
-    fn the_title_counts_what_is_soloed_and_hidden() {
-        assert_eq!(title(0, 9, 0), "Refs");
-        assert_eq!(title(0, 9, 2), "Hidden 2");
-        assert_eq!(title(1, 9, 0), "Soloing 1/9");
-        assert_eq!(title(1, 9, 2), "Soloing 1/9 \u{b7} Hidden 2");
-    }
-
-    #[test]
     fn a_hidden_remote_counts_every_branch_it_covers() {
         let h: HashSet<String> = ["origin/".to_string(), "zeta".to_string()]
             .into_iter()
@@ -726,6 +691,66 @@ TAGS (0)
             "up/x".to_string(),
         ];
         assert_eq!(hidden_count(&h, &remotes), 3);
+    }
+
+    fn submodule(name: &str, state: SubmoduleState) -> Submodule {
+        Submodule {
+            name: name.into(),
+            path: name.into(),
+            url: String::new(),
+            branch: None,
+            state,
+            expected: None,
+            head: None,
+        }
+    }
+
+    #[test]
+    fn worktrees_and_submodules_follow_the_shared_rule_and_order() {
+        let none = HashSet::new();
+        let subs = [
+            submodule("vendor/lib", SubmoduleState::UpToDate),
+            submodule("tools", SubmoduleState::Modified),
+        ];
+        let sections = build_sections(&Inputs {
+            refs: &refs(),
+            stashes: &[stash(0, "wip")],
+            worktrees: &[],
+            submodules: &subs,
+            hidden_sections: &none,
+            filter: "",
+            hierarchical: true,
+            collapsed: &CollapsedFolders::new(),
+        });
+        let kinds: Vec<Kind> = sections.iter().map(|s| s.kind).collect();
+        assert_eq!(
+            kinds,
+            vec![
+                Kind::Local,
+                Kind::Remote,
+                Kind::Stashes,
+                Kind::Tags,
+                Kind::Submodules
+            ],
+            "SUBMODULES comes last, as in the terminal pane"
+        );
+        let last = sections.last().unwrap();
+        assert_eq!(last.count, 2);
+        let labels: Vec<&str> = last.rows.iter().map(|r| r.label.as_str()).collect();
+        assert_eq!(labels, vec!["vendor/lib", "tools (+)"]);
+        // What the user hid stays out.
+        let hidden: HashSet<SidebarSection> = [SidebarSection::Stashes].into_iter().collect();
+        let sections = build_sections(&Inputs {
+            refs: &refs(),
+            stashes: &[stash(0, "wip")],
+            worktrees: &[],
+            submodules: &subs,
+            hidden_sections: &hidden,
+            filter: "",
+            hierarchical: true,
+            collapsed: &CollapsedFolders::new(),
+        });
+        assert!(sections.iter().all(|s| s.kind != Kind::Stashes));
     }
 
     #[test]

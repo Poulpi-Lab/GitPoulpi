@@ -137,8 +137,8 @@ fn answer(cx: &mut TestAppContext, window: AnyWindowHandle, ix: usize) {
 }
 
 fn notice(cx: &mut TestAppContext, ws: &Entity<Workspace>) -> String {
-    ws.read_with(cx, |ws, _| {
-        ws.notice().map(|n| n.text.clone()).unwrap_or_default()
+    ws.read_with(cx, |ws, cx| {
+        ws.notice(cx).map(|n| n.text).unwrap_or_default()
     })
 }
 

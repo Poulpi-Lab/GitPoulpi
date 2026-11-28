@@ -49,10 +49,10 @@ impl LogPanel {
             let stashes: Vec<Stash> = stashes.await.unwrap_or_default();
             let status = status.await.map(|w| w.files).unwrap_or_default();
             let head = head.await.ok();
-            let refresh = backend.history_refresh(&refs, filter, depth).await;
-            let (held, front, asked, walk) = match refresh {
-                Ok(r) => (r.nodes, r.front, r.asked, Some(r.walk)),
-                Err(_) => (Vec::new(), 0, depth, None),
+            let refresh = backend.history_refresh(filter, depth).await;
+            let (held, asked, walk) = match refresh {
+                Ok(r) => (r.nodes, r.asked, Some(r.walk)),
+                Err(_) => (Vec::new(), depth, None),
             };
             let dirty = !status.is_empty();
             let (held, refs, stashes) = (Arc::new(held), Arc::new(refs), Arc::new(stashes));
@@ -84,7 +84,6 @@ impl LogPanel {
                 );
                 // Everything the old list had in flight (a page, the "end of history" latch) described it.
                 this.lazy.restart();
-                this.lazy.set_front(front);
                 this.lazy.on_refresh_asked(loaded, asked);
                 this.last_ms = ms;
                 // The selection follows its commit; when that is gone the nearest row stays selected.
@@ -200,7 +199,6 @@ impl LogPanel {
             return;
         };
         let backend = self.backend.clone();
-        let front = self.lazy.front();
         let key = refs_key(&self.data.refs);
         self.total.tick(
             self.count_method,
@@ -209,7 +207,7 @@ impl LogPanel {
             || {
                 let reply: Arc<Mutex<Option<Option<u64>>>> = Arc::default();
                 let answer = reply.clone();
-                let count = backend.history_total(&walk, front);
+                let count = backend.history_total(&walk);
                 let task = cx.spawn(async move |this, cx| {
                     let n = count.await.ok();
                     *answer.lock().unwrap() = Some(n);

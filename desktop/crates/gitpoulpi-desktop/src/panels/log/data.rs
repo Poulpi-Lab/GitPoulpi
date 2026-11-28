@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use gitpoulpi_app::graph::{solo_filter_nodes, solo_target_oid};
 use gitpoulpi_core::domain::{CommitNode, Oid, Ref, RefKind, Stash, StatusEntry};
 
 use std::collections::HashSet;
@@ -38,7 +39,7 @@ impl RowKey {
 
 #[derive(Clone, Default)]
 pub struct LogData {
-    /// Every commit held, in walk order (the detached-HEAD ones in front): what paging appends to.
+    /// Every commit held, in walk order: what paging appends to.
     pub held: Arc<Vec<CommitNode>>,
     /// The commits the Log shows: `held`, or only what the soloed refs reach.
     pub nodes: Arc<Vec<CommitNode>>,
@@ -164,19 +165,11 @@ impl LogData {
     }
 }
 
-/// The name the Refs sidebar and the hidden/solo sets key a ref on: a local branch's or tag's bare
-/// name, a remote branch's `remote/name`.
-pub fn ref_full_name(r: &Ref) -> String {
-    match &r.kind {
-        RefKind::LocalBranch { name } | RefKind::Tag { name } => name.clone(),
-        RefKind::RemoteBranch { remote, name } => format!("{remote}/{name}"),
-    }
-}
-
 /// The commits the Log shows for the soloed refs: everything they reach (first parents and merge
-/// parents alike), in held order. Soloed refs that no longer exist are skipped, and when nothing is
-/// soloed or nothing resolves the whole list is shown (solo silently doing nothing beats a blank
-/// graph), the terminal UI's rule. The same list (`Arc`) is returned when nothing is filtered.
+/// parents alike), in held order (`gitpoulpi_app::graph::solo_filter_nodes`). Soloed refs that no longer
+/// exist are skipped, and when nothing is soloed or nothing resolves the whole list is shown (solo
+/// silently doing nothing beats a blank graph), the terminal UI's rule. The same list (`Arc`) is
+/// returned when nothing is filtered.
 pub fn shown_nodes(
     held: &Arc<Vec<CommitNode>>,
     refs: &[Ref],
@@ -187,26 +180,9 @@ pub fn shown_nodes(
     }
     let targets: Vec<Oid> = solo
         .iter()
-        .filter_map(|name| refs.iter().find(|r| &ref_full_name(r) == name))
-        .map(|r| r.target)
+        .filter_map(|name| solo_target_oid(name, refs))
         .collect();
-    let by_id: std::collections::HashMap<Oid, &CommitNode> =
-        held.iter().map(|c| (c.id, c)).collect();
-    let mut reachable: HashSet<Oid> = HashSet::new();
-    let mut stack = targets;
-    while let Some(id) = stack.pop() {
-        if !reachable.insert(id) {
-            continue;
-        }
-        if let Some(c) = by_id.get(&id) {
-            stack.extend(c.parents.iter().copied());
-        }
-    }
-    let kept: Vec<CommitNode> = held
-        .iter()
-        .filter(|c| reachable.contains(&c.id))
-        .cloned()
-        .collect();
+    let kept = solo_filter_nodes(held, &targets);
     if kept.is_empty() {
         held.clone()
     } else {

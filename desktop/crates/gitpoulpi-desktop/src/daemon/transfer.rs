@@ -78,16 +78,9 @@ impl Backend {
     /// Starts `what` and returns the status-line text for it: what started, or why nothing did. A
     /// refusal changes nothing. The outcome arrives later (see `app::live`).
     pub async fn start_transfer(&self, what: Transfer) -> Result<String, String> {
-        use gitpoulpi_i18n::msg::link as l;
         match what {
-            Transfer::Fetch => {
-                self.with_link(|link| link.submit_action(Action::FetchAll));
-                Ok(l::ACT_FETCHING.get().to_string())
-            }
-            Transfer::Pull => {
-                self.with_link(|link| link.submit_action(Action::Pull(PullOptions::default())));
-                Ok(l::ACT_PULLING.get().to_string())
-            }
+            Transfer::Fetch => Ok(self.submit_labelled(Action::FetchAll)),
+            Transfer::Pull => Ok(self.submit_labelled(Action::Pull(PullOptions::default()))),
             Transfer::Push => {
                 let refs = self.refs().await?;
                 let remotes: Vec<Remote> = self
@@ -96,13 +89,18 @@ impl Backend {
                         serde_json::json!({}),
                     )
                     .await?;
-                let action = push_action(&refs, &remotes)?;
-                self.with_link(|link| link.submit_action(action));
-                Ok(l::ACT_PUSHING.get().to_string())
+                Ok(self.submit_labelled(push_action(&refs, &remotes)?))
             }
             Transfer::Undo => self.start_undo_redo(Direction::Undo),
             Transfer::Redo => self.start_undo_redo(Direction::Redo),
         }
+    }
+
+    /// Submits `action` and returns the link's own label for it ("fetching...").
+    fn submit_labelled(&self, action: Action) -> String {
+        let label = action.activity_label();
+        self.with_link(|link| link.submit_action(action));
+        label
     }
 
     /// The link's own check first: a refusal (nothing to undo, busy, blocked) is an `Err` with its

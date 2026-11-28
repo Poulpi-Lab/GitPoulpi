@@ -1,54 +1,26 @@
 //! Live updates and the write path of the window.
 //!
-//! The link's thread wakes the [`DesktopHost`] whenever it queued something. A task on the window's
-//! foreground executor waits for that wake ([`Workspace::start_pump`]), drains the link's receivers and
-//! applies what arrived: a refresh the daemon pushed because *any* client changed the repository
-//! reloads the Log and the Refs sidebar, failures and messages of actions go to the status line.
-//! Nothing here polls: no wake, no work.
+//! The link's thread wakes the link's [`crate::daemon::DesktopHost`] whenever it queued something. A
+//! task on the window's foreground executor waits for that wake ([`Workspace::start_pump`]), takes what
+//! the link has ([`gitpoulpi_link::DaemonLink::drain`]) and applies it: a refresh the daemon pushed
+//! because *any* client changed the repository reloads only the panels its [`RefreshSummary`] says
+//! changed (the Log, the Refs sidebar, the working tree), the undo journal moving redraws the toolbar,
+//! and failures and messages of actions go to the status line (`commands::status`, the one message
+//! channel). Nothing here polls: no wake, no work.
 
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-
-use gitpoulpi_link::{DaemonLink, ReadHashes, RefreshOutcome};
+use gitpoulpi_core::domain::OperationState;
+use gitpoulpi_link::{LinkEvent, RefreshSummary};
 use gpui_kit::Context;
 
 use super::workspace::Workspace;
+use crate::commands::status::{self, Notice};
 use crate::daemon::host::rejection_text;
 use crate::daemon::transfer::Transfer;
 use crate::strings;
 
-/// One line of the status line about what an action did.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Notice {
-    pub text: String,
-    pub error: bool,
-}
-
-impl Notice {
-    pub fn info(text: impl Into<String>) -> Self {
-        Self {
-            text: text.into(),
-            error: false,
-        }
-    }
-
-    pub fn error(text: impl Into<String>) -> Self {
-        Self {
-            text: text.into(),
-            error: true,
-        }
-    }
-}
-
 /// What the window remembers between two wakes.
 #[derive(Default)]
 pub struct LiveState {
-    /// The hashes of the reads the panels currently show (see `ReadHashes::apply`).
-    hashes: ReadHashes,
-    /// The working tree the Log's WIP row and the right pane show, hashed.
-    status_hash: Option<u64>,
-    /// The first outcome only records the baseline: the panels loaded the same state themselves.
-    baseline_taken: bool,
     /// Something reached the status line since the last transfer started (so a late "started" line
     /// does not overwrite a result that already arrived).
     settled: bool,
@@ -59,59 +31,74 @@ pub struct LiveState {
 /// Everything one wake took out of the link.
 #[derive(Default)]
 struct Drained {
-    outcome: Option<RefreshOutcome>,
-    filter_generation: u64,
+    /// What the refreshes since the last wake changed, all of them together.
+    changed: Option<RefreshSummary>,
+    /// The merge, cherry-pick, revert or rebase in progress as the newest refresh read it (`None`
+    /// inside: nothing is in progress). Absent when no refresh arrived or the read failed.
+    operation: Option<Option<OperationState>>,
     errors: Vec<String>,
     messages: Vec<String>,
     failure: Option<String>,
+    /// Another frontend hid, showed or soloed refs.
+    visibility: bool,
 }
 
-fn drain(link: &DaemonLink) -> Drained {
-    let mut d = Drained {
-        filter_generation: link.log_filter_generation(),
-        ..Drained::default()
-    };
-    // Only the newest refresh matters; older ones describe states that are gone.
-    while let Ok(outcome) = link.outcome_rx.try_recv() {
-        d.outcome = Some(outcome);
+/// `a` and `b` together: a part changed when it changed in either.
+fn both(a: RefreshSummary, b: RefreshSummary) -> RefreshSummary {
+    RefreshSummary {
+        first: a.first || b.first,
+        log: a.log || b.log,
+        head: a.head || b.head,
+        refs: a.refs || b.refs,
+        working_tree: a.working_tree || b.working_tree,
+        stashes: a.stashes || b.stashes,
+        worktrees: a.worktrees || b.worktrees,
+        submodules: a.submodules || b.submodules,
+        conflicts: a.conflicts || b.conflicts,
+        remotes: a.remotes || b.remotes,
+        config: a.config || b.config,
+        lfs: a.lfs || b.lfs,
     }
-    while let Ok(text) = link.action_error_rx.try_recv() {
-        d.errors.push(text);
+}
+
+fn sort(events: Vec<LinkEvent>) -> Drained {
+    let mut d = Drained::default();
+    for event in events {
+        match event {
+            LinkEvent::Refreshed(outcome) => {
+                // The banner follows the newest outcome, the first one included: it is the only
+                // place the window learns an operation another frontend left stopped.
+                if let Ok(state) = &outcome.operation_state_result {
+                    d.operation = Some(state.clone());
+                }
+                // The first outcome only says what the panels loaded themselves just now.
+                if !outcome.summary.first {
+                    d.changed = Some(match d.changed {
+                        Some(seen) => both(seen, outcome.summary),
+                        None => outcome.summary,
+                    });
+                }
+            }
+            LinkEvent::ActionError(text) => d.errors.push(text),
+            LinkEvent::PushRejected(notice) => d.errors.push(rejection_text(&notice.rejection)),
+            LinkEvent::ActionMessage(text) => d.messages.push(text),
+            LinkEvent::RefVisibilityChanged => d.visibility = true,
+            LinkEvent::Failed(why) => d.failure = Some(why),
+            // The journal moving is the wake itself: the toolbar asks the link when it draws. The
+            // other events (auto-stash, file insight, merge, ...) have no desktop surface yet.
+            _ => {}
+        }
     }
-    while let Ok(notice) = link.push_rejected_rx.try_recv() {
-        d.errors.push(rejection_text(&notice.rejection));
-    }
-    while let Ok(text) = link.action_message_rx.try_recv() {
-        d.messages.push(text);
-    }
-    // Other receivers (autostash, file insight, merge, ...) have no desktop surface yet; they are
-    // emptied so they do not grow without bound.
-    while link.autostash_rx.try_recv().is_ok() {}
-    while link.file_insight_rx.try_recv().is_ok() {}
-    while link.merge_rx.try_recv().is_ok() {}
-    while link.commit_stats_rx.try_recv().is_ok() {}
-    while link.split_source_rx.try_recv().is_ok() {}
-    while link.working_diff_rx.try_recv().is_ok() {}
-    while link.commit_files_rx.try_recv().is_ok() {}
-    while link.log_page_rx.try_recv().is_ok() {}
-    d.failure = link.failure_rx.try_recv().ok();
     d
-}
-
-fn hash_status(outcome: &RefreshOutcome) -> Option<u64> {
-    let tree = outcome.status_result.as_ref().ok()?;
-    let mut h = DefaultHasher::new();
-    format!("{:?}", tree.files).hash(&mut h);
-    Some(h.finish())
 }
 
 impl Workspace {
     /// Starts the task that applies what the link queues. Call once from `Workspace::new`.
     pub(super) fn start_pump(&mut self, cx: &mut Context<Self>) {
-        let host = self.backend.host().clone();
-        let mut seen = host.epoch();
+        let notifier = self.backend.notifier().clone();
+        let mut seen = notifier.epoch();
         self._pump = Some(cx.spawn(async move |this, cx| loop {
-            host.changed(&mut seen).await;
+            notifier.changed(&mut seen).await;
             if this.update(cx, |this, cx| this.on_link_wake(cx)).is_err() {
                 break;
             }
@@ -119,66 +106,65 @@ impl Workspace {
     }
 
     fn on_link_wake(&mut self, cx: &mut Context<Self>) {
-        let drained = self.backend.with_link(drain);
-        let news = self.backend.host().take_news(&self.backend.repo_root());
-        let mut notice = None;
-        if let Some(why) = drained.failure {
-            notice = Some(Notice::error(why));
-        }
-        if let Some(text) = drained.errors.into_iter().last() {
-            notice = Some(Notice::error(text));
-        } else if let Some(text) = drained.messages.into_iter().last() {
-            notice = Some(Notice::info(text));
-        } else if let Some(text) = news.said.into_iter().last() {
-            notice = Some(Notice::info(text));
-        } else if let Some(title) = news.done {
-            notice = Some(Notice::info(strings::finished(&title)));
-        }
+        let drained = sort(self.backend.with_link(|link| link.drain()));
+        let host = self.backend.host();
+        let news = host.take_news();
+        // An action's error outranks its message, then what the host said, then a success; the link's
+        // own failure only when nothing else spoke.
+        let notice = drained
+            .errors
+            .into_iter()
+            .last()
+            .map(Notice::error)
+            .or_else(|| drained.messages.into_iter().last().map(Notice::info))
+            .or_else(|| news.said.into_iter().last().map(Notice::info))
+            .or_else(|| {
+                news.done
+                    .map(|title| Notice::info(strings::finished(&title)))
+            })
+            .or_else(|| drained.failure.map(Notice::error));
         if let Some(n) = notice {
             self.live.settled = true;
-            self.notice = Some(n);
+            status::set_notice(cx, n);
         }
-        if let Some(outcome) = drained.outcome {
-            self.apply_outcome(outcome, drained.filter_generation, cx);
+        if let Some(state) = drained.operation {
+            self.operation = state;
+        }
+        if drained.visibility {
+            self.refs.update(cx, |r, cx| r.on_visibility_event(cx));
+        }
+        if let Some(changed) = drained.changed {
+            self.apply_changes(changed, cx);
         }
         // What became of the commit that was sent, and the stages the guard refused.
         self.right.update(cx, |r, cx| r.settle(cx));
-        let prompts = self.backend.host().take_prompts(&self.backend.repo_root());
+        let prompts = host.take_prompts();
         if !prompts.is_empty() {
             self.ask_sensitive(prompts, cx);
         }
         cx.notify();
     }
 
-    /// Reloads what a refresh says changed.
-    fn apply_outcome(&mut self, outcome: RefreshOutcome, filter_gen: u64, cx: &mut Context<Self>) {
-        let changes = self.live.hashes.apply(
-            outcome
-                .read_hashes
-                .for_filter_generation(outcome.log_filter_gen, filter_gen),
-        );
-        // A read the scope left out arrives as an error: the operation state then stays as it was.
-        if let Ok(state) = &outcome.operation_state_result {
-            self.operation = state.clone();
-        }
-        let status_hash = hash_status(&outcome);
-        let status_changed = status_hash.is_some() && status_hash != self.live.status_hash;
-        if status_hash.is_some() {
-            self.live.status_hash = status_hash;
-        }
-        if !std::mem::replace(&mut self.live.baseline_taken, true) {
-            return;
-        }
-        if changes.log || changes.stashes || status_changed {
+    /// Reloads the panels the refresh says changed, and only those.
+    fn apply_changes(&mut self, changed: RefreshSummary, cx: &mut Context<Self>) {
+        // The Log shows the commits, the ref chips, the stash rows and the WIP row.
+        let log =
+            changed.log || changed.head || changed.refs || changed.stashes || changed.working_tree;
+        let refs = changed.refs
+            || changed.head
+            || changed.stashes
+            || changed.worktrees
+            || changed.submodules;
+        if log {
             self.log.update(cx, |l, cx| l.reload(cx));
         }
-        if status_changed {
+        if changed.working_tree {
             self.refresh_working_diff(cx);
         }
-        if changes.refs || changes.stashes {
+        if refs {
             self.refs.update(cx, |r, cx| r.reload(cx));
         }
-        if changes.log || changes.refs || changes.stashes || status_changed {
+        if log || refs {
             self.live.refreshes += 1;
         }
     }
@@ -188,9 +174,9 @@ impl Workspace {
         &self.backend
     }
 
-    /// The last line an action left for the status line.
-    pub fn notice(&self) -> Option<&Notice> {
-        self.notice.as_ref()
+    /// The last line the status line shows (an action's result, a command's answer).
+    pub fn notice(&self, cx: &gpui_kit::App) -> Option<Notice> {
+        status::notice(cx)
     }
 
     /// How many times a daemon-pushed refresh reloaded the panels.
@@ -200,16 +186,16 @@ impl Workspace {
 
     /// Starts Fetch, Pull, Push, Undo or Redo; the status line follows what the daemon does.
     pub fn transfer(&mut self, what: Transfer, cx: &mut Context<Self>) {
-        self.notice = None;
+        status::clear(cx);
         self.live.settled = false;
         let backend = self.backend.clone();
         cx.spawn(async move |this, cx| {
             let started = backend.start_transfer(what).await;
             let _ = this.update(cx, |this, cx| {
                 match started {
-                    Ok(text) if !this.live.settled => this.notice = Some(Notice::info(text)),
+                    Ok(text) if !this.live.settled => status::set(cx, text),
                     Ok(_) => {}
-                    Err(why) => this.notice = Some(Notice::error(why)),
+                    Err(why) => status::set_error(cx, why),
                 }
                 cx.notify();
             });
@@ -218,9 +204,9 @@ impl Workspace {
     }
 
     /// The repository switch restarts the link: its refreshes start from scratch.
-    pub(super) fn reset_live(&mut self) {
+    pub(super) fn reset_live(&mut self, cx: &mut Context<Self>) {
         self.live = LiveState::default();
         self.operation = None;
-        self.notice = None;
+        status::clear(cx);
     }
 }

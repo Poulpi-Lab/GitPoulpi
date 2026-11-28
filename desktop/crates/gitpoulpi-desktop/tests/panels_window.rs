@@ -111,6 +111,39 @@ fn the_refs_sidebar_lists_the_terminal_uis_sections_and_folders(cx: &mut TestApp
 }
 
 #[gpui_kit::test]
+fn stashes_and_linked_worktrees_get_their_sections_in_the_shared_order(cx: &mut TestAppContext) {
+    let repo = three_commits().build();
+    repo.git(&["tag", "v1"]);
+    std::fs::write(repo.root().join("a.txt"), "changed").unwrap();
+    repo.git(&["stash", "push", "-m", "parked"]);
+    let linked = repo.root().with_extension("linked");
+    repo.git(&["worktree", "add", linked.to_str().unwrap(), "-b", "other"]);
+    let prefs = tempfile::tempdir().unwrap();
+    let (_window, ws) = open(cx, repo.root(), prefs.path());
+    wait_until(cx, "the stash and worktree sections", |cx| {
+        ws.read_with(cx, |ws, cx| ws.refs.read(cx).section_titles().len() == 5)
+    });
+    let titles = ws.read_with(cx, |ws, cx| ws.refs.read(cx).section_titles());
+    let names: Vec<&str> = titles
+        .iter()
+        .map(|t| t.split(" (").next().unwrap_or(""))
+        .collect();
+    use gitpoulpi_app::palette::vocab::refs_sidebar::SidebarSection as S;
+    assert_eq!(
+        names,
+        vec![
+            S::Local.display_title(),
+            S::Remote.display_title(),
+            S::Worktrees.display_title(),
+            S::Stashes.display_title(),
+            S::Tags.display_title(),
+        ],
+        "the shared order, no placeholder for pull requests or issues: {titles:?}"
+    );
+    let _ = std::fs::remove_dir_all(&linked);
+}
+
+#[gpui_kit::test]
 fn hiding_a_ref_leaves_its_commits_out_of_the_log_and_is_remembered(cx: &mut TestAppContext) {
     let repo = with_side_branch();
     let prefs = tempfile::tempdir().unwrap();
@@ -166,6 +199,91 @@ fn soloing_a_ref_shows_only_what_it_reaches(cx: &mut TestAppContext) {
     });
     ws.update(cx, |ws, cx| ws.refs.update(cx, |r, cx| r.clear_solo(cx)));
     wait_until(cx, "the whole Log", |cx| shown_commits(cx, &ws) == 4);
+}
+
+/// A second frontend of the same session sets the hidden and soloed refs through the daemon.
+fn set_visibility_elsewhere(session: &str, repo: &Path, hidden: &[&str], solo: &[&str]) {
+    let link = gitpoulpi_link::start(
+        session.to_string(),
+        gitpoulpi_core::domain::RepoRef::from_root(repo),
+        gitpoulpi_desktop::daemon::DesktopHost::detached(),
+    );
+    link.submit_action(gitpoulpi_link::Action::SetRefVisibility {
+        hidden: hidden.iter().map(|s| s.to_string()).collect(),
+        solo: solo.iter().map(|s| s.to_string()).collect(),
+        hidden_remotes: Vec::new(),
+    });
+    // Queued on the link's thread: wait for the write to land before the link is dropped.
+    let want_hidden = hidden.iter().map(|s| s.to_string()).collect();
+    let deadline = Instant::now() + Duration::from_secs(20);
+    while gitpoulpi_app::refs_tree::load_ref_visibility(repo).0 != want_hidden {
+        assert!(
+            Instant::now() < deadline,
+            "the other client's write never landed"
+        );
+        std::thread::sleep(Duration::from_millis(25));
+    }
+}
+
+#[gpui_kit::test]
+fn hiding_a_ref_from_another_frontend_updates_the_refs_panel_and_the_log(cx: &mut TestAppContext) {
+    let repo = with_side_branch();
+    let prefs = tempfile::tempdir().unwrap();
+    let backend = Backend::start(repo.root()).unwrap();
+    let session = backend.session().to_string();
+    cx.executor().allow_parking();
+    cx.update(|cx| app::init(cx, Some(prefs.path().to_path_buf()), &Overrides::default()).unwrap());
+    let (_window, ws) = cx.update(|cx| app::open_main_window(backend, cx).unwrap());
+    wait_until(cx, "four commits", |cx| shown_commits(cx, &ws) == 4);
+
+    set_visibility_elsewhere(&session, repo.root(), &["side"], &[]);
+    wait_until(cx, "the Log without the hidden branch", |cx| {
+        shown_commits(cx, &ws) == 3
+    });
+    assert!(ws.read_with(cx, |ws, cx| ws.refs.read(cx).hidden().contains("side")));
+
+    set_visibility_elsewhere(&session, repo.root(), &[], &[]);
+    wait_until(cx, "the Log with every ref again", |cx| {
+        shown_commits(cx, &ws) == 4
+    });
+    assert!(ws.read_with(cx, |ws, cx| ws.refs.read(cx).hidden().is_empty()));
+}
+
+#[gpui_kit::test]
+fn a_visibility_event_does_not_undo_a_change_whose_write_is_still_out(cx: &mut TestAppContext) {
+    let repo = with_side_branch();
+    let prefs = tempfile::tempdir().unwrap();
+    let (_window, ws) = open(cx, repo.root(), prefs.path());
+    wait_until(cx, "four commits", |cx| shown_commits(cx, &ws) == 4);
+
+    // The daemon's event arrives while this window's own hide has not been stored yet: reading the
+    // stored sets now would bring "side" back.
+    ws.update(cx, |ws, cx| {
+        ws.refs.update(cx, |r, cx| {
+            r.toggle_hidden("side", cx);
+            r.on_visibility_event(cx);
+            assert!(
+                r.visibility_event_deferred(),
+                "the event waits for this window's own write"
+            );
+        })
+    });
+    wait_until(cx, "the hidden set on disk", |_| {
+        gitpoulpi_app::refs_tree::load_ref_visibility(repo.root())
+            .0
+            .contains("side")
+    });
+    wait_until(cx, "the Log without the hidden branch", |cx| {
+        shown_commits(cx, &ws) == 3
+    });
+    // Let any stale read land, then check nothing was undone.
+    for _ in 0..20 {
+        cx.run_until_parked();
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    assert!(ws.read_with(cx, |ws, cx| ws.refs.read(cx).hidden().contains("side")));
+    assert!(!ws.read_with(cx, |ws, cx| ws.refs.read(cx).visibility_event_deferred()));
+    assert_eq!(shown_commits(cx, &ws), 3);
 }
 
 #[gpui_kit::test]

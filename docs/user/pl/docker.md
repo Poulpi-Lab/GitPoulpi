@@ -24,11 +24,11 @@ docker run -it --rm \
 | Ścieżka | Co zawiera |
 |---|---|
 | `/work` | Katalog roboczy. Zamontuj tu swoje repozytoria. |
-| `/config` | Ustawienia (`config.toml`), sesje oraz, jako podfoldery, dane i pamięć podręczna (`GITPOULPI_CONFIG_DIR=/config`). Użyj nazwanego wolumenu lub montowania folderu, by je zachować. |
+| `/config` | Ustawienia (`config.toml`, `tui.toml`), sesje oraz, jako podfoldery, dane i pamięć podręczna (`GITPOULPI_CONFIG_DIR=/config`). Użyj nazwanego wolumenu lub montowania folderu, by je zachować. |
 | `/data`, `/cache` | Zadeklarowane także jako wolumeny, dla narzędzi używających zmiennych XDG (`XDG_DATA_HOME=/data`, `XDG_CACHE_HOME=/cache`). |
 | `/home/gitpoulpi` | `HOME`. To nie jest wolumen: w każdym kontenerze jest nowy. |
 
-Bez wolumenu dla `/config` każde uruchomienie z `--rm` zaczyna z ustawieniami domyślnymi. Aby zacząć od własnego `config.toml`, zamontuj go: `-v "$PWD/config.toml":/config/config.toml:ro` (tylko do odczytu oznacza, że Ustawienia nie mogą zapisywać).
+Bez wolumenu dla `/config` każde uruchomienie z `--rm` zaczyna z ustawieniami domyślnymi. Aby zacząć od własnego `config.toml`, zamontuj go: `-v "$PWD/config.toml":/config/config.toml:ro` (tylko do odczytu oznacza, że Ustawienia nie mogą zapisywać). Ustawienia interfejsu są w drugim pliku, `tui.toml`, montowanym tak samo (`-v "$PWD/tui.toml":/config/tui.toml:ro`); zob. [Opis konfiguracji](config-reference.md#dwa-pliki-configtoml-i-tuitoml).
 
 ## Repozytoria należące do innego użytkownika
 

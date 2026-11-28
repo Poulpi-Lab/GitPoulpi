@@ -217,7 +217,7 @@ paletę na liście. Jeśli skonfigurowana nazwa już nie istnieje (plik usunięt
 zmieniono mu nazwę), graf używa kolorów ścieżek aktywnego motywu, a Ustawienia
 pokazują nazwę oznaczoną *nie znaleziono*, dopóki nie wybierzesz innej. ![Lista Motyw kolorów grafu na stronie Wygląd: Zgodnie z motywem, potem każda paleta ścieżek z kilkoma jej kolorami](../images/settings-log-graph-lanes.png)
 
-W `config.toml`:
+W `tui.toml`:
 
 ```toml
 [ui]
@@ -285,7 +285,7 @@ zły kolor jest ignorowany, nieznany `base` przechodzi na `dark`, a
 raz na pasku stanu).
 
 Pliki są wczytywane ponownie, gdy otwiera się lista Motyw i gdy Ustawienia się
-zamykają. Działające okno zauważa też przepisanie `config.toml` (na przykład
+zamykają. Działające okno zauważa też przepisanie `tui.toml` (na przykład
 przez `gitpoulpi config set ui.theme ...` z powłoki) oraz pliku aktywnego motywu
 i stosuje nowe kolory w ciągu około sekundy, bez restartu.
 
@@ -356,7 +356,7 @@ przechodzenia przez Ustawienia: **System (zgodny z terminalem)**, motywy wbudowa
 własne pliki motywów, każdy z czterema małymi próbkami kolorów. Bieżący
 motyw jest zaznaczony. Wpisz tekst, aby zawęzić listę; przesunięcie
 podświetlenia od razu pokazuje podgląd motywu, **Enter** go stosuje i zapisuje
-`ui.theme` w `config.toml`, **Esc** (albo kliknięcie poza listą) przywraca
+`ui.theme` w `tui.toml`, **Esc** (albo kliknięcie poza listą) przywraca
 poprzedni motyw i niczego nie zapisuje.
 
 Pod polem filtra segmentowy filtr wstępny zawęża listę: **Wszystkie**,

@@ -226,7 +226,7 @@ GitPoulpi zostawia też te pliki:
 
 | Co | Gdzie |
 |---|---|
-| Ustawienia (`config.toml`) i sesje | Folder konfiguracji systemu. Zmienia go `GITPOULPI_CONFIG_DIR`. |
+| Ustawienia (`config.toml` i `tui.toml`) i sesje | Folder konfiguracji systemu. Zmienia go `GITPOULPI_CONFIG_DIR`. |
 | Stan poszczególnych repozytoriów | domyślnie `gitpoulpi/` wewnątrz folderu `.git` repozytorium (`session.per_repo_state_dir` może go przenieść do `.gitpoulpi/` w drzewie roboczym albo do folderu danych użytkownika). |
 | Pamięć podręczna (awatary) | Folder pamięci podręcznej systemu. |
 | Tokeny i klucze API | Menedżer poświadczeń. Usuwa je **Ustawienia > SSH i poświadczenia > Zapomnij wszystkie nazwy użytkowników i hasła**. |

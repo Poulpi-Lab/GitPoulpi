@@ -162,60 +162,7 @@ pub(crate) struct MenuContext {
     pub(crate) group: Option<crate::remotes_ui::BranchGroup>,
 }
 
-/// Whether moving one branch onto another commit would be a
-/// fast-forward, as far as the loaded graph can tell.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(crate) enum FfVerdict {
-    /// Not answerable from the loaded pages (or not asked): the row is
-    /// offered and `GitBackend::fast_forward` has the last word.
-    #[default]
-    Unknown,
-    Possible,
-    /// The two are the same commit.
-    AlreadyThere,
-    /// The branch to move already contains the target.
-    Ahead,
-    Diverged,
-}
-
-impl FfVerdict {
-    /// Why the row is grayed out, or `None` when it is offered.
-    pub(crate) fn refusal(self, moving: &str) -> Option<String> {
-        match self {
-            FfVerdict::Unknown | FfVerdict::Possible => None,
-            FfVerdict::AlreadyThere => Some(menu_ref::FF_ALREADY_THERE.get().into()),
-            FfVerdict::Ahead => Some(menu_ref::ff_already_ahead(moving)),
-            FfVerdict::Diverged => Some(menu_ref::FF_DIVERGED.get().into()),
-        }
-    }
-}
-
-/// What a Merge row says it will do, from the fast-forward policy and
-/// whether the merge could fast-forward at all.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum MergeLabel {
-    /// Nothing to add: the result is a merge commit (or unknown).
-    Plain,
-    /// A fast-forward is possible but the policy makes a merge commit.
-    NewCommit,
-    /// A fast-forward is possible and the policy takes it.
-    FastForwards,
-    /// The policy only allows a fast-forward.
-    FastForwardOnly,
-}
-
-impl MergeLabel {
-    pub(crate) fn of(policy: gitpoulpi_core::domain::MergeFastForward, verdict: FfVerdict) -> Self {
-        use gitpoulpi_core::domain::MergeFastForward as P;
-        let possible = verdict == FfVerdict::Possible;
-        match (policy, possible) {
-            (P::Never, true) => Self::NewCommit,
-            (P::Allowed, true) => Self::FastForwards,
-            (P::Only, _) => Self::FastForwardOnly,
-            _ => Self::Plain,
-        }
-    }
-}
+pub(crate) use gitpoulpi_app::ref_rules::{FfVerdict, MergeLabel};
 
 /// The two Fast-forward rows' verdicts for one ref menu.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -226,46 +173,7 @@ pub(crate) struct FastForwardCheck {
     pub(crate) head_to_this: FfVerdict,
 }
 
-/// Is moving a branch at `moving` to `target` a fast-forward? Walks
-/// parents from `target` through the loaded graph only; a walk that
-/// leaves the loaded pages answers `Unknown` rather than guessing.
-pub(crate) fn ff_verdict(
-    graph: &gitpoulpi_core::domain::CommitGraph,
-    moving: Oid,
-    target: Oid,
-) -> FfVerdict {
-    if moving == target {
-        return FfVerdict::AlreadyThere;
-    }
-    let by_id: std::collections::HashMap<Oid, &gitpoulpi_core::domain::CommitNode> =
-        graph.nodes.iter().map(|n| (n.id, n)).collect();
-    // `Some(true)` reached, `Some(false)` exhausted inside the graph,
-    // `None` walked off the loaded pages.
-    let reaches = |from: Oid, wanted: Oid| -> Option<bool> {
-        let mut seen = std::collections::HashSet::new();
-        let mut stack = vec![from];
-        let mut complete = true;
-        while let Some(id) = stack.pop() {
-            if id == wanted {
-                return Some(true);
-            }
-            if !seen.insert(id) {
-                continue;
-            }
-            match by_id.get(&id) {
-                Some(node) => stack.extend(node.parents.iter().copied()),
-                None => complete = false,
-            }
-        }
-        complete.then_some(false)
-    };
-    match (reaches(target, moving), reaches(moving, target)) {
-        (Some(true), _) => FfVerdict::Possible,
-        (_, Some(true)) => FfVerdict::Ahead,
-        (Some(false), Some(false)) => FfVerdict::Diverged,
-        _ => FfVerdict::Unknown,
-    }
-}
+pub(crate) use gitpoulpi_app::ref_rules::ff_verdict;
 
 impl MenuContext {
     /// The context for one ref's menu: `from_refs`, plus the two

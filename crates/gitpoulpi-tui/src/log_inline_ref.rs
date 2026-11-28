@@ -70,93 +70,23 @@ pub(crate) fn inline_target(
     }
 }
 
-/// The refs a rename must not collide with: every ref but the branch being
-/// renamed (so `a` may become `a2`, and `a/b` may take `a`'s place).
-pub(crate) fn refs_without_branch(
-    refs: &[gitpoulpi_core::domain::Ref],
-    old: &str,
-) -> Vec<gitpoulpi_core::domain::Ref> {
-    refs.iter()
-        .filter(|r| !matches!(&r.kind, RefKind::LocalBranch { name } if name == old))
-        .cloned()
-        .collect()
-}
-
-/// `git check-ref-format`'s rules, as far as a short human message goes.
-fn check_ref_format(name: &str) -> Result<(), String> {
-    if name == "@" {
-        return Err(msg::NAME_AT.get().into());
-    }
-    if name.starts_with('/') || name.ends_with('/') || name.contains("//") {
-        return Err(msg::NAME_SLASH.get().into());
-    }
-    if name.ends_with('.') {
-        return Err(msg::NAME_DOT_END.get().into());
-    }
-    if name.contains("..") {
-        return Err(msg::NAME_DOTDOT.get().into());
-    }
-    if name.contains("@{") {
-        return Err(msg::NAME_AT_BRACE.get().into());
-    }
-    if name.starts_with('-') {
-        return Err(msg::NAME_DASH_START.get().into());
-    }
-    if let Some(bad) = name
-        .chars()
-        .find(|c| c.is_whitespace() || c.is_control() || "~^:?*[\\".contains(*c))
-    {
-        return Err(if bad.is_whitespace() {
-            msg::NAME_SPACES.get().to_string()
-        } else {
-            msg::name_bad_char(bad.escape_default())
-        });
-    }
-    for part in name.split('/') {
-        if part.starts_with('.') {
-            return Err(msg::NAME_PART_DOT.get().into());
-        }
-        if part.ends_with(".lock") {
-            return Err(msg::NAME_PART_LOCK.get().into());
-        }
-    }
-    Ok(())
-}
+pub(crate) use gitpoulpi_app::ref_rules::refs_without_branch;
 
 /// The trimmed name if it can be created, otherwise the message to show
-/// on the row. Checks git's format rules, an existing ref of the same
-/// kind, and a directory/file clash (`a` next to `a/b`), which git also
-/// refuses.
+/// on the row (the rules live in `gitpoulpi_app::ref_rules`).
 pub(crate) fn validate_new_ref(
     kind: InlineRefKind,
     raw: &str,
     refs: &[gitpoulpi_core::domain::Ref],
 ) -> Result<String, String> {
-    let name = raw.trim();
-    if name.is_empty() {
-        return Err(match kind {
-            InlineRefKind::Branch => msg::ENTER_BRANCH.get().to_string(),
-            InlineRefKind::Tag => msg::ENTER_TAG.get().to_string(),
-        });
-    }
-    check_ref_format(name)?;
-    let existing = refs.iter().filter_map(|r| match (&r.kind, kind) {
-        (RefKind::LocalBranch { name }, InlineRefKind::Branch) => Some(name.as_str()),
-        (RefKind::Tag { name }, InlineRefKind::Tag) => Some(name.as_str()),
-        _ => None,
-    });
-    for other in existing {
-        if other == name {
-            return Err(match kind {
-                InlineRefKind::Branch => msg::exists_branch(name),
-                InlineRefKind::Tag => msg::exists_tag(name),
-            });
-        }
-        if other.starts_with(&format!("{name}/")) || name.starts_with(&format!("{other}/")) {
-            return Err(msg::clashes(name, other));
-        }
-    }
-    Ok(name.to_string())
+    gitpoulpi_app::ref_rules::validate_new_ref(
+        match kind {
+            InlineRefKind::Branch => gitpoulpi_app::ref_rules::NewRef::Branch,
+            InlineRefKind::Tag => gitpoulpi_app::ref_rules::NewRef::Tag,
+        },
+        raw,
+        refs,
+    )
 }
 
 /// The Ref cell of a commit's row, when it is wide enough to hold a

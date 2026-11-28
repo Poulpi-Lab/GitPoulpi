@@ -35,13 +35,7 @@ use crate::modes::{ConfirmAction, InputMode, PendingDestructive};
 use crate::th;
 use gitpoulpi_i18n::msg::tag_where as msg;
 
-/// Which delete a row stands for.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum Scope {
-    Local,
-    Remote(String),
-    Both(String),
-}
+pub(crate) use gitpoulpi_app::ref_rules::TagDeleteScope as Scope;
 
 /// What a pick chose.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -68,17 +62,7 @@ static POPUP: Mutex<Option<Open>> = Mutex::new(None);
 /// remote-only and its both-places delete. A tag with no local ref has no
 /// local rows.
 pub(crate) fn options(has_local: bool, remotes: &[String]) -> Vec<Scope> {
-    let mut out = Vec::new();
-    if has_local {
-        out.push(Scope::Local);
-    }
-    for r in remotes {
-        out.push(Scope::Remote(r.clone()));
-        if has_local {
-            out.push(Scope::Both(r.clone()));
-        }
-    }
-    out
+    gitpoulpi_app::ref_rules::tag_delete_options(has_local, remotes)
 }
 
 /// Starts the delete of tag `name` as the context menu, the keyboard and

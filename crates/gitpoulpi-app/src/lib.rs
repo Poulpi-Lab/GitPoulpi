@@ -25,6 +25,7 @@ pub mod keymap;
 pub mod log_multiselect;
 pub mod merge_view;
 pub mod palette;
+pub mod ref_rules;
 pub mod refs_sections;
 pub mod refs_tree;
 pub mod registry;

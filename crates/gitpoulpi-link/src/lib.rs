@@ -86,6 +86,7 @@ pub mod live_settings;
 pub mod no_repository;
 pub mod oid_text;
 pub mod redraw;
+pub mod ref_drop;
 pub mod rename_pairs;
 pub mod repo_state_path;
 pub mod ui_viewer;

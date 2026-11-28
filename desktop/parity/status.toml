@@ -64,11 +64,23 @@ id = "git_prefix.compose_commit"
 status = "done"
 
 [[action]]
+id = "git_prefix.delete_ref"
+status = "done"
+
+[[action]]
 id = "git_prefix.discard_all"
 status = "done"
 
 [[action]]
 id = "git_prefix.fetch_all"
+status = "done"
+
+[[action]]
+id = "git_prefix.new_branch"
+status = "done"
+
+[[action]]
+id = "git_prefix.new_tag"
 status = "done"
 
 [[action]]
@@ -80,6 +92,14 @@ id = "git_prefix.push"
 status = "done"
 
 [[action]]
+id = "git_prefix.push_tags"
+status = "done"
+
+[[action]]
+id = "git_prefix.rebase_onto"
+status = "done"
+
+[[action]]
 id = "git_prefix.stage_all"
 status = "done"
 
@@ -88,7 +108,23 @@ id = "git_prefix.stage_file"
 status = "done"
 
 [[action]]
+id = "git_prefix.stash_message"
+status = "done"
+
+[[action]]
+id = "git_prefix.stash_pop"
+status = "done"
+
+[[action]]
+id = "git_prefix.stash_push"
+status = "done"
+
+[[action]]
 id = "git_prefix.unstage_file"
+status = "done"
+
+[[action]]
+id = "global.context_menu"
 status = "done"
 
 [[action]]
@@ -173,12 +209,60 @@ status = "done"
 note = "Opens the keybindings view."
 
 [[action]]
+id = "palette.annotate_selected_tag"
+status = "done"
+
+[[action]]
 id = "palette.browse_repository"
 status = "done"
 note = "Folder chooser of the operating system, then opens that repository (File menu)."
 
 [[action]]
+id = "palette.checkout_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.checkout_selected_ref"
+status = "done"
+
+[[action]]
 id = "palette.close_diff"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_full_ref"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_name"
+status = "done"
+
+[[action]]
+id = "palette.copy_ref_field_target_sha"
+status = "done"
+
+[[action]]
+id = "palette.create_annotated_tag_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_branch_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.create_tag_at_selected_commit"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_branch_and_remote"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_remote_branch"
+status = "done"
+
+[[action]]
+id = "palette.delete_selected_tag_from_remote"
 status = "done"
 
 [[action]]
@@ -195,6 +279,18 @@ status = "done"
 
 [[action]]
 id = "palette.discard_lines"
+status = "done"
+
+[[action]]
+id = "palette.drop_selected_ref_on_current"
+status = "done"
+
+[[action]]
+id = "palette.fast_forward_current_to_selected"
+status = "done"
+
+[[action]]
+id = "palette.fast_forward_selected_to_current"
 status = "done"
 
 [[action]]
@@ -243,6 +339,10 @@ status = "done"
 note = "Opens the keybindings view."
 
 [[action]]
+id = "palette.merge_selected_ref"
+status = "done"
+
+[[action]]
 id = "palette.next_hunk"
 status = "done"
 
@@ -251,7 +351,19 @@ id = "palette.prev_hunk"
 status = "done"
 
 [[action]]
+id = "palette.push_selected_tag"
+status = "done"
+
+[[action]]
+id = "palette.rename_selected_branch"
+status = "done"
+
+[[action]]
 id = "palette.select_lines"
+status = "done"
+
+[[action]]
+id = "palette.set_upstream"
 status = "done"
 
 [[action]]
@@ -260,6 +372,14 @@ status = "done"
 
 [[action]]
 id = "palette.stage_lines"
+status = "done"
+
+[[action]]
+id = "palette.stash_apply"
+status = "done"
+
+[[action]]
+id = "palette.stash_drop"
 status = "done"
 
 [[action]]
@@ -313,6 +433,10 @@ status = "done"
 
 [[action]]
 id = "refs.expand_all"
+status = "done"
+
+[[action]]
+id = "refs.reveal"
 status = "done"
 
 [[action]]

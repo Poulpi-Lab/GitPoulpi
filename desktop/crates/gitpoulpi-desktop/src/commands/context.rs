@@ -25,6 +25,8 @@ pub struct WindowState {
     /// The open diff is one of the two working-tree halves (its hunks can be staged), and which one.
     pub stageable_diff: bool,
     pub diff_stages: bool,
+    /// What is selected in the Refs sidebar.
+    pub refs: crate::ref_target::SelectionFacts,
     /// What the journal offers for Undo and Redo.
     pub undo: Avail,
     pub redo: Avail,
@@ -42,6 +44,7 @@ impl Default for WindowState {
             has_conflicts: false,
             stageable_diff: false,
             diff_stages: false,
+            refs: Default::default(),
             undo: Avail::Nothing,
             redo: Avail::Nothing,
         }
@@ -64,6 +67,15 @@ impl WindowState {
             has_conflicts: self.has_conflicts,
             in_stageable_diff: self.stageable_diff,
             diff_stages: self.diff_stages,
+            selected_local_branch: self.refs.local_branch,
+            selected_remote_branch: self.refs.remote_branch,
+            selected_tag: self.refs.tag,
+            selected_tag_is_unpushed: self.refs.tag_unpushed,
+            selected_tag_remote_only: self.refs.tag_remote_only,
+            selected_tag_differs: self.refs.tag_differs,
+            selected_stash: self.refs.stash,
+            selected_folder: self.refs.folder,
+            has_stash: self.refs.has_stash,
             undo: self.undo,
             redo: self.redo,
             lfs_program_ok: true,

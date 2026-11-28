@@ -13,6 +13,7 @@
 //! | `picker`   | the searchable list dialog (command palette, theme / language pickers) |
 //! | `palette`  | the command palette: shared entries, shortcuts, fuzzy matching, reasons |
 //! | `staging`  | running the staging and commit ops on the working-changes pane and the diff |
+//! | `refs_ops` | the branch, tag and stash ops: which ids map to a `RefOp`, and running one |
 //! | `status`   | the one-line message shown in the status line |
 
 pub mod catalog;
@@ -22,6 +23,7 @@ pub mod keys;
 pub mod ops;
 pub mod palette;
 pub mod picker;
+pub mod refs_ops;
 pub mod staging;
 pub mod status;
 

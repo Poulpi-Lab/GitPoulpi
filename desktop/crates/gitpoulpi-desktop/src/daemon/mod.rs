@@ -10,6 +10,7 @@
 mod history;
 pub mod host;
 mod queries;
+pub mod refs_ops;
 pub mod staging;
 pub mod transfer;
 

@@ -54,6 +54,8 @@ pub struct LiveState {
     settled: bool,
     /// Refreshes applied to the panels, for tests and diagnostics.
     pub refreshes: u64,
+    /// A merge, rebase or similar that is waiting for its conflicts: its name and the conflicted files.
+    pub operation: Option<(String, usize)>,
 }
 
 /// Everything one wake took out of the link.
@@ -64,6 +66,7 @@ struct Drained {
     errors: Vec<String>,
     messages: Vec<String>,
     failure: Option<String>,
+    autostash: Vec<gitpoulpi_link::AutoStashNeeded>,
 }
 
 fn drain(link: &DaemonLink) -> Drained {
@@ -86,7 +89,9 @@ fn drain(link: &DaemonLink) -> Drained {
     }
     // Other receivers (autostash, file insight, merge, ...) have no desktop surface yet; they are
     // emptied so they do not grow without bound.
-    while link.autostash_rx.try_recv().is_ok() {}
+    while let Ok(needed) = link.autostash_rx.try_recv() {
+        d.autostash.push(needed);
+    }
     while link.file_insight_rx.try_recv().is_ok() {}
     while link.merge_rx.try_recv().is_ok() {}
     while link.commit_stats_rx.try_recv().is_ok() {}
@@ -143,6 +148,9 @@ impl Workspace {
         }
         // What became of the commit that was sent, and the stages the guard refused.
         self.right.update(cx, |r, cx| r.settle(cx));
+        if !drained.autostash.is_empty() {
+            self.ask_autostash(drained.autostash, cx);
+        }
         let prompts = self.backend.host().take_prompts(&self.backend.repo_root());
         if !prompts.is_empty() {
             self.ask_sensitive(prompts, cx);
@@ -157,6 +165,7 @@ impl Workspace {
                 .read_hashes
                 .for_filter_generation(outcome.log_filter_gen, filter_gen),
         );
+        self.note_operation(&outcome);
         let status_hash = hash_status(&outcome);
         let status_changed = status_hash.is_some() && status_hash != self.live.status_hash;
         if status_hash.is_some() {
@@ -177,6 +186,38 @@ impl Workspace {
         if changes.log || changes.refs || changes.stashes || status_changed {
             self.live.refreshes += 1;
         }
+    }
+
+    /// A merge or rebase that stopped on conflicts has no resolution view here yet: say what is going on
+    /// (once, when it starts) and keep the state for whoever asks.
+    fn note_operation(&mut self, outcome: &RefreshOutcome) {
+        let state = outcome
+            .operation_state_result
+            .as_ref()
+            .ok()
+            .and_then(|s| s.as_ref());
+        let now = state.map(|s| {
+            let conflicts = outcome
+                .conflicts_result
+                .as_ref()
+                .map(|c| c.len())
+                .unwrap_or(0);
+            (s.name().to_string(), conflicts)
+        });
+        if now != self.live.operation {
+            if let Some((name, conflicts)) = &now {
+                self.notice = Some(Notice::error(strings::operation_in_progress(
+                    name, *conflicts,
+                )));
+                self.live.settled = true;
+            }
+            self.live.operation = now;
+        }
+    }
+
+    /// The merge, rebase or similar the daemon reports as in progress, with its conflicted file count.
+    pub fn operation_in_progress(&self) -> Option<&(String, usize)> {
+        self.live.operation.as_ref()
     }
 
     /// The window's link to the daemon.

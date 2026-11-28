@@ -16,6 +16,9 @@ use gpui_kit::{
     Task, Window,
 };
 
+mod ref_forms;
+mod ref_menu_host;
+mod refs;
 mod stage;
 
 use super::actions::WorkspaceHandle;
@@ -58,6 +61,8 @@ pub struct Workspace {
     panes: Entity<ResizableState>,
     menu_bar: Entity<MenuBar>,
     selected_commit: bool,
+    /// The ref menu, while one is open.
+    ref_menu: Option<ref_menu_host::OpenMenu>,
     pub(super) summary: Option<Summary>,
     /// What the last action said, for the status line.
     pub(super) notice: Option<Notice>,
@@ -80,17 +85,28 @@ impl Workspace {
         crate::menu::register(&menu_bar, cx);
         let subs = vec![
             cx.subscribe(&log, |this, _, ev: &LogEvent, cx| this.on_log_event(ev, cx)),
-            cx.subscribe(&refs, |this, _, ev: &RefsEvent, cx| match ev {
-                RefsEvent::Selected(oid) => {
-                    this.show_log(cx);
-                    this.log.update(cx, |l, cx| l.select_oid(*oid, cx));
-                }
-                RefsEvent::VisibilityChanged { hidden, solo } => {
-                    let (hidden, solo) = (hidden.clone(), solo.clone());
-                    this.log
-                        .update(cx, |l, cx| l.set_visibility(hidden, solo, cx));
-                }
-            }),
+            cx.subscribe_in(
+                &refs,
+                window,
+                |this, _, ev: &RefsEvent, window, cx| match ev {
+                    RefsEvent::Selected(oid) => {
+                        this.show_log(cx);
+                        this.log.update(cx, |l, cx| l.select_oid(*oid, cx));
+                    }
+                    RefsEvent::Menu { target, at } => {
+                        this.open_ref_menu(target.clone(), *at, window, cx)
+                    }
+                    RefsEvent::Open(target) => this.open_ref_row(target.clone(), window, cx),
+                    RefsEvent::Dropped { source, target, at } => {
+                        this.open_drop_menu(source.clone(), target.clone(), *at, window, cx)
+                    }
+                    RefsEvent::VisibilityChanged { hidden, solo } => {
+                        let (hidden, solo) = (hidden.clone(), solo.clone());
+                        this.log
+                            .update(cx, |l, cx| l.set_visibility(hidden, solo, cx));
+                    }
+                },
+            ),
             cx.subscribe_in(
                 &right,
                 window,
@@ -142,6 +158,7 @@ impl Workspace {
             panes,
             menu_bar,
             selected_commit: false,
+            ref_menu: None,
             summary: None,
             notice: None,
             live: LiveState::default(),
@@ -252,6 +269,7 @@ impl Workspace {
             diff_open,
             selected_commit: self.selected_commit,
             has_wip: self.summary.as_ref().is_some_and(|s| !s.status.is_empty()),
+            refs: self.refs.read(cx).selection_facts(),
             undo: self.undo_avail(Direction::Undo),
             redo: self.undo_avail(Direction::Redo),
         }
@@ -375,5 +393,6 @@ impl Render for Workspace {
             )
             .child(self.toolbar(cx))
             .child(self.status_line(cx))
+            .children(self.menu_overlay(cx))
     }
 }

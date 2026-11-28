@@ -13,6 +13,7 @@
 //! RefsPanel::toggle_solo) and friends, which the keys below call and a shared keymap can call too.
 
 mod model;
+mod ops;
 
 use std::collections::{HashMap, HashSet};
 use std::ops::Range;
@@ -33,13 +34,15 @@ use gpui_kit::component::{
 };
 use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::{
-    actions, div, px, uniform_list, AnyElement, App, AppContext as _, Context, Entity,
+    actions, canvas, div, px, uniform_list, AnyElement, App, AppContext as _, Context, Entity,
     EventEmitter, FocusHandle, Focusable, FontWeight, Hsla, InteractiveElement as _, IntoElement,
     KeyBinding, MouseButton, ParentElement as _, Render, ScrollStrategy, SharedString,
     StatefulInteractiveElement as _, Styled as _, Subscription, Task, UniformListScrollHandle,
     WeakEntity, Window,
 };
 use model::{Inputs, Kind, Row, RowKind, Section};
+pub use ops::{target_of, RowBounds};
+use ops::{DragPreview, DraggedRef};
 
 use crate::daemon::Shared;
 use crate::theme::Skin;
@@ -72,6 +75,19 @@ pub fn init(cx: &mut App) {
 }
 
 pub enum RefsEvent {
+    /// A right click on a row: the window opens the ref menu there.
+    Menu {
+        target: crate::ref_target::RefTarget,
+        at: gpui_kit::Point<gpui_kit::Pixels>,
+    },
+    /// A double click on a row: check the branch out (a stash: show its changes).
+    Open(crate::ref_target::RefTarget),
+    /// A ref dropped on another row: the window opens the drop menu.
+    Dropped {
+        source: crate::ref_target::RefTarget,
+        target: crate::ref_target::RefTarget,
+        at: gpui_kit::Point<gpui_kit::Pixels>,
+    },
     /// Show this commit in the Log (Enter or a click on a ref).
     Selected(Oid),
     /// The hidden or soloed refs changed; the Log re-reads its walk.
@@ -99,6 +115,8 @@ pub struct RefsPanel {
     cursor: Option<(Kind, String)>,
     /// A line the last action wants to say (a hide that did nothing, and why).
     note: Option<String>,
+    /// Where the selected row was drawn (a menu opened by the keyboard appears there).
+    row_bounds: RowBounds,
     filter: Entity<InputState>,
     query: String,
     focus: FocusHandle,
@@ -159,6 +177,7 @@ impl RefsPanel {
             scrolls: HashMap::new(),
             cursor: None,
             note: None,
+            row_bounds: RowBounds::default(),
             filter,
             query: String::new(),
             focus: cx.focus_handle(),
@@ -598,6 +617,12 @@ impl RefsPanel {
         };
         let me_row = me.clone();
         let (sec_idx, row_idx) = (section.clone(), ix);
+        let target = ops::target_of(section, row);
+        let draggable = matches!(
+            target,
+            Some(crate::ref_target::RefTarget::Local(_) | crate::ref_target::RefTarget::Remote(_))
+        );
+        let bounds = view.bounds.clone();
         let btn = |id: &'static str, icon: AssetIcon, active: bool, tint: Hsla| {
             div()
                 .id((id, salt + ix))
@@ -654,6 +679,18 @@ impl RefsPanel {
             .cursor_pointer()
             .when(selected, |d| d.bg(sel_bg))
             .hover(move |d| d.bg(hover_bg))
+            .when(selected, |d| {
+                d.child(
+                    canvas(
+                        move |b, _, _| {
+                            *bounds.borrow_mut() = Some(b);
+                        },
+                        |_, _, _, _| {},
+                    )
+                    .absolute()
+                    .size_full(),
+                )
+            })
             .child(
                 div()
                     .w(px(12.0))
@@ -715,11 +752,42 @@ impl RefsPanel {
                 )
             })
             .when(refish, |d| d.child(hide_btn).child(solo_btn))
-            .on_click(move |_, window, cx| {
+            .on_mouse_down(MouseButton::Right, {
+                let (me, section) = (me.clone(), section.clone());
+                move |ev, window, cx| {
+                    cx.stop_propagation();
+                    let at = ev.position;
+                    let _ = me.update(cx, |this, cx| {
+                        window.focus(&this.focus, cx);
+                        this.row_menu(section.kind, ix, at, cx)
+                    });
+                }
+            })
+            .when_some(target.clone().filter(|_| draggable), |d, t| {
+                let name = t.name();
+                d.on_drag(DraggedRef(t), move |_, _, _, cx| {
+                    cx.new(|_| DragPreview(name.clone()))
+                })
+            })
+            .on_drop({
+                let (me, section) = (me.clone(), section.clone());
+                move |dragged: &DraggedRef, window, cx| {
+                    let (source, at) = (dragged.0.clone(), window.mouse_position());
+                    let _ = me.update(cx, |this, cx| {
+                        this.row_dropped(source, section.kind, ix, at, cx)
+                    });
+                }
+            })
+            .on_click(move |ev, window, cx| {
                 let section = sec_idx.clone();
+                let double = ev.click_count() >= 2;
                 let _ = me_row.update(cx, |this, cx| {
                     window.focus(&this.focus, cx);
                     this.select(section.kind, row_idx, cx);
+                    if double && !matches!(section.rows[row_idx].kind, RowKind::Folder { .. }) {
+                        this.row_double_click(section.kind, row_idx, cx);
+                        return;
+                    }
                     let row = &section.rows[row_idx];
                     match row.kind {
                         RowKind::Folder { .. } => {
@@ -765,6 +833,7 @@ impl RefsPanel {
         };
         let scroll = self.scrolls.entry(kind).or_default().clone();
         let view = RowView {
+            bounds: self.row_bounds.clone(),
             hidden: self.hidden.clone(),
             solo: self.solo.clone(),
             cursor: self
@@ -855,6 +924,7 @@ impl RefsPanel {
 
 /// What a row needs besides the section: the sets and the selection.
 struct RowView {
+    bounds: RowBounds,
     hidden: HashSet<String>,
     solo: HashSet<String>,
     cursor: Option<String>,

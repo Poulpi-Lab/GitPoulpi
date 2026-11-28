@@ -22,6 +22,8 @@ use gitpoulpi_core::domain::{ConflictSide, ResetMode};
 
 pub mod vocab;
 
+pub use crate::surface::Surface;
+
 use vocab::diff_view::DiffViewMode;
 use vocab::hosting_command::HostingCommand;
 use vocab::log_menu::CommitField;
@@ -959,6 +961,10 @@ pub struct PaletteEntry {
     pub text: Option<&'static str>,
     /// That text in English, for a query typed in English.
     pub text_en: Option<&'static str>,
+    /// Which frontends offer the command (`Any` unless it exists only
+    /// because of what a terminal is: the generated Settings rows of the
+    /// terminal's own preferences).
+    pub surface: Surface,
 }
 
 impl PaletteEntry {
@@ -1084,6 +1090,7 @@ pub const fn entry(
         command,
         text: None,
         text_en: None,
+        surface: Surface::Any,
     }
 }
 
@@ -1100,6 +1107,7 @@ pub const fn hint_entry(
         command,
         text: None,
         text_en: None,
+        surface: Surface::Any,
     }
 }
 

@@ -88,6 +88,7 @@ pub fn palette_action_defs() -> Vec<ActionDef> {
             shadows_parent: false,
             hint: None,
             requires: e.requires,
+            surface: e.surface,
         })
         .collect()
 }

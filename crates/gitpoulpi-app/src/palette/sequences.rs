@@ -10,7 +10,7 @@
 //! A sequence that `validate` rejects stays listed but grayed out, with the
 //! reason; its key still resolves, and says the same when pressed.
 
-use super::{PaletteCommand, PaletteEntry};
+use super::{PaletteCommand, PaletteEntry, Surface};
 use crate::sequences as registry;
 use gitpoulpi_i18n::msg;
 use std::sync::Mutex;
@@ -65,6 +65,7 @@ fn model() -> &'static Model {
             hint: None,
             command: PaletteCommand::Sequence(SeqOp::Run(info.slot)),
             requires: None,
+            surface: Surface::Any,
             text: Some(leak(msg::palette::sequence_run(&info.name))),
             text_en: Some(leak(gitpoulpi_i18n::with_lang(
                 gitpoulpi_i18n::Lang::En,

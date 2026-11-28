@@ -307,6 +307,7 @@ macro_rules! actions {
                 shadows_parent: false,
                 hint: None,
                 requires: actions!(@req $($req)?),
+                surface: $crate::surface::Surface::Any,
             }),*
         ];
     };
@@ -362,6 +363,7 @@ fn sequence_pool_defs() -> Vec<ActionDef> {
             shadows_parent: false,
             hint: None,
             requires: None,
+            surface: crate::surface::Surface::Any,
         })
         .collect()
 }
@@ -387,6 +389,9 @@ pub struct ActionDef {
     /// The cargo feature this action belongs to (`@Ai` in `actions!`);
     /// `None` = always built.
     pub requires: Option<crate::features::Feature>,
+    /// Which frontends offer the action (`Any` unless it exists only
+    /// because of what a terminal is).
+    pub surface: crate::surface::Surface,
 }
 
 impl ActionDef {

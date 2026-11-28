@@ -7,7 +7,7 @@
 //! long session keeps small (a job starting or ending is the only change).
 
 use crate::jobs_ui::JobsCmd;
-use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry};
+use gitpoulpi_app::palette::{PaletteCommand, PaletteEntry, Surface};
 use gitpoulpi_i18n::msg::jobs as jobs_msg;
 use std::sync::Mutex;
 
@@ -62,6 +62,7 @@ pub(crate) fn entries() -> &'static [PaletteEntry] {
                 gitpoulpi_i18n::Lang::En,
                 || jobs_msg::palette_cancel(label),
             ))),
+            surface: Surface::Any,
         })
         .collect();
     let built: &'static [PaletteEntry] = Box::leak(built.into_boxed_slice());

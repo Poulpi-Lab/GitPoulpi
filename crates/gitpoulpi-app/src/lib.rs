@@ -15,4 +15,6 @@ pub mod features;
 pub mod graph;
 pub mod keymap;
 pub mod palette;
+pub mod registry;
 pub mod sequences;
+pub mod surface;

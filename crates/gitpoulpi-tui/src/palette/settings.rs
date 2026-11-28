@@ -53,6 +53,7 @@ fn build() -> Model {
                 requires: None,
                 text: Some(leak(now)),
                 text_en: Some(leak(english)),
+                surface: gitpoulpi_app::surface::settings_surface(row.key),
             });
         };
         let (op, now) = match &row.kind {

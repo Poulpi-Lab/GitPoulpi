@@ -120,6 +120,7 @@ macro_rules! for_each_contract_check {
             check_commit_message_body,
             check_log_all_refs_includes_every_branch_tip,
             check_log_skip_pages_history,
+            check_log_all_refs_includes_a_detached_head_no_ref_reaches,
             check_log_hidden_drops_commits_only_hidden_refs_reach,
             check_log_hidden_keeps_head_even_if_its_branch_is_hidden,
             check_log_hidden_remote_prefix_covers_nested_and_later_branches,

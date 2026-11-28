@@ -4,21 +4,23 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use gitpoulpi_app::keymap::Ctx;
 use gpui_kit::component::{
-    command::CommandState,
     resizable::{h_resizable, resizable_panel, ResizablePanelEvent, ResizableState},
     v_flex,
 };
 use gpui_kit::{
-    div, px, AppContext as _, Context, Entity, Focusable as _, Image, ImageFormat,
+    div, px, App, AppContext as _, Context, Entity, Focusable as _, Image, ImageFormat,
     InteractiveElement as _, IntoElement, ParentElement as _, Render, Styled as _, Subscription,
     Task, Window,
 };
 
 use super::actions::WorkspaceHandle;
+use crate::commands::context::WindowState;
 use crate::daemon::Shared;
+use crate::menu::MenuBar;
 use crate::panels::diff::{DiffPane, DiffPaneEvent};
-use crate::panels::log::{LogEvent, LogPanel, Summary};
+use crate::panels::log::{LogEvent, LogPanel, Selection, Summary};
 use crate::panels::refs::{RefsEvent, RefsPanel};
 use crate::panels::right::{RightEvent, RightPanel};
 use crate::prefs::{LayoutPrefs, PrefsStore, WindowPrefs};
@@ -48,7 +50,8 @@ pub struct Workspace {
     show_left: bool,
     show_right: bool,
     panes: Entity<ResizableState>,
-    pub(super) palette: Entity<CommandState>,
+    menu_bar: Entity<MenuBar>,
+    selected_commit: bool,
     pub(super) summary: Option<Summary>,
     pub(super) logo: Arc<Image>,
     _save_window: Option<Task<()>>,
@@ -62,8 +65,9 @@ impl Workspace {
         let log = cx.new(|cx| LogPanel::new(backend.clone(), window, cx));
         let right = cx.new(|cx| RightPanel::new(backend.clone(), window, cx));
         let diff = cx.new(|cx| DiffPane::new(window, cx));
-        let palette = cx.new(|cx| CommandState::new(window, cx));
         let panes = cx.new(|_| ResizableState::default());
+        let menu_bar = cx.new(MenuBar::new);
+        crate::menu::register(&menu_bar, cx);
         let subs = vec![
             cx.subscribe(&log, |this, _, ev: &LogEvent, cx| this.on_log_event(ev, cx)),
             cx.subscribe(&refs, |this, _, ev: &RefsEvent, cx| match ev {
@@ -115,7 +119,8 @@ impl Workspace {
             show_left: layout.show_left,
             show_right: layout.show_right,
             panes,
-            palette,
+            menu_bar,
+            selected_commit: false,
             summary: None,
             logo: Arc::new(Image::from_bytes(ImageFormat::Png, LOGO_PNG.to_vec())),
             _save_window: None,
@@ -126,6 +131,7 @@ impl Workspace {
     fn on_log_event(&mut self, ev: &LogEvent, cx: &mut Context<Self>) {
         match ev {
             LogEvent::Selected(sel) => {
+                self.selected_commit = matches!(sel, Selection::Commit(_));
                 let status = self
                     .summary
                     .as_ref()
@@ -160,9 +166,36 @@ impl Workspace {
         }
     }
 
-    pub(super) fn focus_log(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn focus_log(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.show_log(cx);
         self.log.read(cx).focus_handle(cx).focus(window, cx);
+    }
+
+    /// The menu bar.
+    pub fn menu_bar(&self) -> &Entity<MenuBar> {
+        &self.menu_bar
+    }
+
+    /// What the command layer needs to know: the pane with the keyboard and a few facts for the palette.
+    pub(crate) fn command_state(&self, window: &Window, cx: &App) -> WindowState {
+        let has = |handle: gpui_kit::FocusHandle| handle.contains_focused(window, cx);
+        let pane = if has(self.refs.read(cx).focus_handle(cx)) {
+            Ctx::Refs
+        } else if has(self.log.read(cx).focus_handle(cx)) {
+            Ctx::Log
+        } else if has(self.right.read(cx).focus_handle(cx)) {
+            Ctx::Status
+        } else if has(self.diff.read(cx).focus_handle(cx)) {
+            Ctx::Diff
+        } else {
+            Ctx::Global
+        };
+        WindowState {
+            pane,
+            diff_open: self.center == Center::Diff,
+            selected_commit: self.selected_commit,
+            has_wip: self.summary.as_ref().is_some_and(|s| !s.status.is_empty()),
+        }
     }
 
     pub fn toggle_left(&mut self, cx: &mut Context<Self>) {
@@ -261,6 +294,7 @@ impl Render for Workspace {
             .bg(skin.bg)
             .text_color(skin.text)
             .child(self.title_bar(cx))
+            .child(self.menu_bar.clone())
             .child(self.tab_row(cx))
             .child(
                 div()

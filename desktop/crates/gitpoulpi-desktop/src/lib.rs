@@ -8,6 +8,10 @@
 //! | `app`     | startup, the main window, chrome (title bar, tabs, toolbar, status line), palette, actions |
 //! | `daemon`  | the embedded daemon link: typed requests, the Log's paging plan |
 //! | `panels`  | Refs sidebar, Log, right pane, diff view |
+//! | `commands`| the shared command registry in use: key bindings, command palette, the one dispatcher |
+//! | `menu`    | the menu bar generated from the registry |
+//! | `help`    | the keybindings view |
+//! | `parity`  | the generated table of what the desktop covers compared with the terminal UI |
 //! | `graph`   | commit graph layout and painter behind a small interface |
 //! | `theme`   | GitPoulpi themes mapped onto the toolkit and the app's own colour set |
 //! | `prefs`   | `desktop.toml` (desktop-only settings) and the column layout rule |
@@ -18,10 +22,14 @@
 
 pub mod app;
 pub mod cli;
+pub mod commands;
 pub mod daemon;
 pub mod fonts;
 pub mod graph;
+pub mod help;
+pub mod menu;
 pub mod panels;
+pub mod parity;
 pub mod prefs;
 pub mod strings;
 pub mod theme;

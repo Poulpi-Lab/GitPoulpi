@@ -14,9 +14,7 @@ use gpui_kit::{
     StatefulInteractiveElement as _, Styled as _,
 };
 
-use super::actions::{
-    FitColumns, OpenPalette, OpenRecent, OpenRepo, ResetColumns, SetLaneTheme, SetLang, SetTheme,
-};
+use super::actions::{OpenRecent, RunCommand, SetLaneTheme, SetLang, SetTheme};
 use super::workspace::Workspace;
 use crate::daemon::SESSION;
 use crate::prefs::PrefsStore;
@@ -82,8 +80,10 @@ impl Workspace {
                             .small()
                             .label(msg::open_in_bar::BUTTON.get())
                             .dropdown_menu(move |menu, _, _| {
-                                let mut menu =
-                                    menu.menu(msg::radar::ACT_OPEN_REPO.get(), Box::new(OpenRepo));
+                                let mut menu = menu.menu(
+                                    msg::radar::ACT_OPEN_REPO.get(),
+                                    Box::new(RunCommand("palette.browse_repository".into())),
+                                );
                                 if !recent.is_empty() {
                                     menu = menu.separator();
                                 }
@@ -111,7 +111,10 @@ impl Workspace {
                             .icon(AssetIcon::Search)
                             .label(msg::tab_bar::SEARCH.get())
                             .on_click(|_, window, cx| {
-                                window.dispatch_action(Box::new(OpenPalette), cx)
+                                window.dispatch_action(
+                                    Box::new(RunCommand("global.palette".into())),
+                                    cx,
+                                )
                             }),
                     )
                     .child(
@@ -185,11 +188,15 @@ impl Workspace {
                                     .separator()
                                     .menu(
                                         msg::log_draw::COLUMN_MENU_FIT_ALL.get(),
-                                        Box::new(FitColumns),
+                                        Box::new(RunCommand(
+                                            "palette.log_column_fit_all_to_content".into(),
+                                        )),
                                     )
                                     .menu(
                                         msg::log_draw::COLUMN_MENU_RESET.get(),
-                                        Box::new(ResetColumns),
+                                        Box::new(RunCommand(
+                                            "palette.log_column_reset_width".into(),
+                                        )),
                                     )
                                 },
                             ),
@@ -453,6 +460,10 @@ impl Workspace {
             )
             .child("\u{2022}")
             .child(div().child(msg::footer::session(SESSION)))
+            .when_some(crate::commands::status::current(cx), |d, message| {
+                d.child("\u{2022}")
+                    .child(div().text_color(text).child(message))
+            })
             .child("\u{2022}")
             .child(hint(msg::footer::HINT_HELP.get().to_string()))
             .child(hint(msg::footer::hint_git("Ctrl+G")))

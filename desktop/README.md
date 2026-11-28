@@ -4,7 +4,18 @@ A native desktop frontend for GitPoulpi. It shows the same repository views as t
 sidebar, commit log with graph, commit and working-tree details, diff) and talks to the same daemon, so
 changes made from the terminal UI, the CLI or MCP show up here too.
 
-What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md).
+What the desktop covers compared with the terminal UI is tracked in [parity/](parity/README.md); the
+generated table is [docs/parity.md](docs/parity.md).
+
+## Commands, keys and menus
+
+Commands come from the shared registry in `gitpoulpi-app`, the same one the terminal UI uses: key
+bindings (`[keybindings]` of `config.toml` overrides them), the command palette (Ctrl+P) with its
+shortcuts, fuzzy matching and availability reasons, and the menu bar (File, Edit, View, Repository,
+Branch, Git, Hosting, Tools, Help; F10 or Alt + the underlined letter). Everything runs through one
+dispatcher (`src/commands/`): a command the desktop does not implement yet says so in the status line,
+and its menu item and palette row are dimmed with the reason. The keybindings view lists every bound key
+by context (`?`, or the Keybindings item of the Tools menu).
 
 This frontend is under development on the `desktop` branch. It currently reads a repository and does not
 yet run git operations.

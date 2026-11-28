@@ -2,7 +2,6 @@
 
 mod actions;
 mod chrome;
-mod palette;
 mod workspace;
 
 use std::path::PathBuf;
@@ -11,9 +10,11 @@ use gitpoulpi_i18n::Lang;
 use gpui_kit::component::TitleBar;
 use gpui_kit::{px, size, App, AppContext as _, Bounds, WindowBounds, WindowOptions};
 
-pub use actions::{set_language, set_theme};
+pub(crate) use actions::workspace as workspace_of;
+pub use actions::{set_lane_theme, set_language, set_theme};
 pub use workspace::Workspace;
 
+use crate::commands;
 use crate::daemon::Shared;
 use crate::prefs::{PrefsStore, WindowPrefs};
 use crate::theme::{self, LaneTheme};
@@ -35,6 +36,7 @@ pub struct Overrides {
 pub fn init(cx: &mut App, prefs_dir: Option<PathBuf>, overrides: &Overrides) -> anyhow::Result<()> {
     gpui_kit::init(cx);
     fonts::register(cx)?;
+    let config_dir = prefs_dir.clone();
     cx.set_global(PrefsStore::open(prefs_dir));
     let prefs = PrefsStore::get(cx).ui.clone();
 
@@ -49,6 +51,7 @@ pub fn init(cx: &mut App, prefs_dir: Option<PathBuf>, overrides: &Overrides) -> 
     theme::apply(&spec, cx);
 
     actions::init(cx);
+    commands::keys::install(config_dir.as_deref(), cx);
     panels::log::init(cx);
     panels::diff::init(cx);
     Ok(())

@@ -85,6 +85,7 @@ pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;
 pub mod oid_text;
+pub mod open_in;
 pub mod redraw;
 pub mod ref_drop;
 pub mod rename_pairs;

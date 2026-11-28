@@ -181,15 +181,8 @@ pub(crate) fn compute_divider1_pct(
         .min(divider2_pct.saturating_sub(MIN_PANE_PERCENT))
 }
 
-/// The keyboard's way to drag a pane divider: one notch of the Refs or the
-/// Status pane's width (`PANE_NUDGE` percent of the window).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum PaneResize {
-    RefsWider,
-    RefsNarrower,
-    StatusWider,
-    StatusNarrower,
-}
+mod vocab;
+pub(crate) use vocab::PaneResize;
 
 /// What one notch changes a pane's width by, in percent of the window.
 pub(crate) const PANE_NUDGE: u16 = 3;

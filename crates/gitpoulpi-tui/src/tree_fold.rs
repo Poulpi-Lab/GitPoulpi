@@ -21,15 +21,8 @@ use std::collections::HashSet;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 
-/// One expand/collapse operation. "Below" acts on a folder and everything
-/// under it; the others on every folder of the tree.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum TreeFold {
-    ExpandAll,
-    CollapseAll,
-    ExpandBelow,
-    CollapseBelow,
-}
+mod vocab;
+pub(crate) use vocab::TreeFold;
 
 /// Which pane's key table a fold operation is looked up in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

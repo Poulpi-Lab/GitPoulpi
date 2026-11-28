@@ -103,53 +103,9 @@ pub(crate) enum HostingEffect {
     Focus(HostingList),
 }
 
-/// The palette's hosting commands (never offered in this build).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum HostingCommand {
-    OpenLinkedPr,
-    EditLinkedPr,
-    RefreshHosting,
-    CopyLinkedPrUrl,
-    CheckoutPullRequest,
-    OpenIssue,
-    OpenCommitReference,
-    InsertIssueRef,
-    IntegrationsPreferences,
-    UseProfile,
-    ConnectIntegration,
-    RadarOptions,
-    CreatePullRequest,
-    CreateIssue,
-    SearchPullRequests,
-    ChoosePullRequestFilter,
-    SearchIssues,
-    ChooseIssueFilter,
-    EditIssueQuery,
-    ChooseIssueProvider,
-    ChooseIssueRepository,
-    UnlinkIssueSource,
-    ChoosePullProvider,
-    ChoosePullRepository,
-    UnlinkPullSource,
-    UnlinkProfile,
-    EditAssignees,
-    EditReviewers,
-    EditLabels,
-    SetMilestone,
-    ReviewPullRequest,
-    CloseIssue,
-    ReopenIssue,
-    OpenInObsidian,
-    CreateObsidianBase,
-    OpenBoard,
-    OpenIssueConversation,
-    PushForReview,
-}
+pub(crate) use crate::hosting_command::{HostingAvailability, HostingCommand};
 
 /// Always "unavailable": there is no provider in this build.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(crate) struct HostingAvailability;
-
 pub(crate) fn command_unavailable_from(
     _cmd: HostingCommand,
     _a: HostingAvailability,
@@ -370,7 +326,7 @@ impl HostingUi {
         HostingEffect::None
     }
     pub(crate) fn availability(&self) -> HostingAvailability {
-        HostingAvailability
+        HostingAvailability::default()
     }
     pub(crate) fn run_command(
         &mut self,

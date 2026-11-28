@@ -67,15 +67,8 @@ pub(crate) use model::{
     RowChange,
 };
 
-/// The layout axis. The other axis, whole file or only the hunks, is
-/// `DiffViewState::hunks_only`; every combination is valid.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum DiffViewMode {
-    /// `+`/`-`/context interleaved in one column.
-    Inline,
-    /// Before and after side by side, deletes paired with adds.
-    Split,
-}
+mod mode;
+pub(crate) use mode::DiffViewMode;
 
 impl DiffViewMode {
     /// `m`: the other layout.

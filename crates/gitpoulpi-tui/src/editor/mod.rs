@@ -25,6 +25,7 @@
 
 mod render;
 mod status_menu;
+mod vocab;
 
 use crate::keymap::term::TermKeymap;
 pub(crate) use status_menu::StatusMenu;

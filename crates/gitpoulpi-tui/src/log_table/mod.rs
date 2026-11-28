@@ -14,6 +14,7 @@ mod keyboard;
 mod natural;
 mod prefs;
 mod row;
+mod vocab;
 mod wip;
 
 pub(crate) use columns::*;

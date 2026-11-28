@@ -52,14 +52,8 @@ pub(crate) struct SaveRequest {
     pub expected: [Option<Oid>; 3],
 }
 
-/// The panes that can have the keyboard focus.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum MergePane {
-    A,
-    B,
-    Base,
-    Output,
-}
+mod cmd;
+pub(crate) use cmd::MergePane;
 
 #[allow(dead_code)]
 impl MergePane {

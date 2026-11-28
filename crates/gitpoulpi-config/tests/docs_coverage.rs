@@ -82,3 +82,22 @@ fn every_config_key_is_in_the_config_reference() {
         "docs/user/config-reference.md does not document: {missing:?}"
     );
 }
+
+/// `desktop.*` keys (the `desktop.toml` of the desktop frontend) are
+/// deliberately NOT required in `docs/user/config-reference.md` yet: their
+/// documentation is a pending wave with native reviewers. This named allowance
+/// keeps the list explicit; when the wave lands, delete it and check
+/// `DESKTOP_LIVE_KEYS` and the `DesktopUiConfig` keys like the test above.
+#[test]
+fn desktop_keys_are_excused_until_the_documentation_wave() {
+    let desktop_keys = gitpoulpi_config::desktop_ui_file::DESKTOP_LIVE_KEYS;
+    assert!(!desktop_keys.is_empty());
+    assert!(
+        desktop_keys.iter().all(|k| k.starts_with("desktop.ui.")),
+        "the allowance covers desktop.ui.* keys only"
+    );
+    assert!(
+        LIVE_KEYS.iter().all(|k| !k.starts_with("desktop.")),
+        "desktop keys have their own list, so the test above never asks for them"
+    );
+}

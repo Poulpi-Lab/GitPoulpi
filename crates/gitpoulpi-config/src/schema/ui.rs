@@ -365,7 +365,7 @@ impl ToolbarPosition {
 /// Reads a theme or lane palette slug, replacing a retired one
 /// by its current name, so an old `config.toml` keeps its look and the next
 /// save writes the new slug.
-fn retired_slug<'de, D: serde::Deserializer<'de>>(d: D) -> Result<String, D::Error> {
+pub(super) fn retired_slug<'de, D: serde::Deserializer<'de>>(d: D) -> Result<String, D::Error> {
     let raw = String::deserialize(d)?;
     Ok(crate::theme::canonical_slug(&raw).to_string())
 }

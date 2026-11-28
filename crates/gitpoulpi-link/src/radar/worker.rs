@@ -24,36 +24,35 @@ use std::sync::{mpsc, Arc, Mutex};
 
 use gitpoulpi_config::{ApiFamily, Integration};
 use gitpoulpi_hosting::account::{AccountCache, AccountItems, CachedAccount};
-use gitpoulpi_hosting::ResolveRemote;
 
 use super::account::{AccountAnswer, AccountJob, AccountPlan, CloneIndex, Offer};
 
 use crate::hosting_task::{
-    cache_path, fetch_snapshot, load_cache, save_cache, unix_now, ClientFactory, HostingRequest,
+    fetch_snapshot, load_cache, save_cache, unix_now, ClientFactory, HostingRequest,
     HostingSnapshot, IssueView, PrView, Problem,
 };
 use crate::redraw::NotifySend as _;
 
 /// Repositories asked at the same time.
-pub(crate) const IN_FLIGHT: usize = 4;
+pub const IN_FLIGHT: usize = 4;
 
 /// One repository of the scope.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct Job {
-    pub(crate) path: PathBuf,
-    pub(crate) name: String,
+pub struct Job {
+    pub path: PathBuf,
+    pub name: String,
 }
 
 /// What a job needs to be asked.
 #[derive(Debug, Clone)]
-pub(crate) struct Prepared {
-    pub(crate) request: HostingRequest,
-    pub(crate) cache: Option<PathBuf>,
+pub struct Prepared {
+    pub request: HostingRequest,
+    pub cache: Option<PathBuf>,
 }
 
 /// How a repository becomes a [`Prepared`]: production reads its state file,
 /// its git config and the integrations; tests hand over fixed ones.
-pub(crate) trait Prepare: Send + Sync {
+pub trait Prepare: Send + Sync {
     fn prepare(&self, repo: &Path) -> Prepared;
 
     /// A round begins: what was read once for all its repositories (the
@@ -73,7 +72,7 @@ pub(crate) trait Prepare: Send + Sync {
 }
 
 /// Something read once per round and shared by every repository of it.
-pub(crate) struct PerRound<T>(Mutex<Option<Arc<T>>>);
+pub struct PerRound<T>(Mutex<Option<Arc<T>>>);
 
 impl<T> Default for PerRound<T> {
     fn default() -> Self {
@@ -82,37 +81,37 @@ impl<T> Default for PerRound<T> {
 }
 
 impl<T> PerRound<T> {
-    pub(crate) fn get(&self, load: impl FnOnce() -> T) -> Arc<T> {
+    pub fn get(&self, load: impl FnOnce() -> T) -> Arc<T> {
         let mut slot = self.0.lock().unwrap_or_else(|e| e.into_inner());
         Arc::clone(slot.get_or_insert_with(|| Arc::new(load())))
     }
 
-    pub(crate) fn reset(&self) {
+    pub fn reset(&self) {
         *self.0.lock().unwrap_or_else(|e| e.into_inner()) = None;
     }
 }
 
 /// What the worker says about one repository.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct RepoAnswer {
-    pub(crate) path: PathBuf,
-    pub(crate) name: String,
+pub struct RepoAnswer {
+    pub path: PathBuf,
+    pub name: String,
     /// The provider's host (`github.com`), the first part of an item's key;
     /// empty when the repository is not linked.
-    pub(crate) host: String,
+    pub host: String,
     /// The signed-in login on the provider; empty when unknown.
-    pub(crate) me: String,
-    pub(crate) snapshot: HostingSnapshot,
+    pub me: String,
+    pub snapshot: HostingSnapshot,
     /// Read from the disk cache, not (yet) from the host.
-    pub(crate) cached: bool,
-    pub(crate) round: u64,
+    pub cached: bool,
+    pub round: u64,
     /// The host was paused for this round: the reason, as the user reads it.
-    pub(crate) paused: Option<String>,
+    pub paused: Option<String>,
 }
 
 impl RepoAnswer {
     /// Linked to a provider for pull requests or for issues.
-    pub(crate) fn linked(&self) -> bool {
+    pub fn linked(&self) -> bool {
         self.snapshot.linked() || self.snapshot.issues_target.is_some()
     }
 }
@@ -120,15 +119,15 @@ impl RepoAnswer {
 /// What a round starts with, before any row: the integrations whose lists
 /// are being asked, the hosts to offer a `[Turn on]` for, and the clones.
 #[derive(Debug)]
-pub(crate) struct Setup {
-    pub(crate) round: u64,
-    pub(crate) active: Vec<String>,
-    pub(crate) offers: Vec<Offer>,
-    pub(crate) clones: CloneIndex,
+pub struct Setup {
+    pub round: u64,
+    pub active: Vec<String>,
+    pub offers: Vec<Offer>,
+    pub clones: CloneIndex,
 }
 
 #[derive(Debug)]
-pub(crate) enum Msg {
+pub enum Msg {
     Answer(Box<RepoAnswer>),
     /// The account-wide rows of one integration.
     Account(Box<AccountAnswer>),
@@ -144,7 +143,7 @@ struct Round {
     force: bool,
 }
 
-pub(crate) struct RadarWorker {
+pub struct RadarWorker {
     tx: mpsc::Sender<Round>,
     rx: mpsc::Receiver<Msg>,
     current: Arc<AtomicU64>,
@@ -152,7 +151,7 @@ pub(crate) struct RadarWorker {
 }
 
 impl RadarWorker {
-    pub(crate) fn spawn(factory: Arc<dyn ClientFactory>, prepare: Arc<dyn Prepare>) -> Self {
+    pub fn spawn(factory: Arc<dyn ClientFactory>, prepare: Arc<dyn Prepare>) -> Self {
         let (tx, round_rx) = mpsc::channel::<Round>();
         let (msg_tx, rx) = mpsc::channel::<Msg>();
         let current = Arc::new(AtomicU64::new(0));
@@ -188,7 +187,7 @@ impl RadarWorker {
     /// `force`: the account-wide lists are asked again whatever their age
     /// (the Refresh button); otherwise a cache younger than five minutes is
     /// reused.
-    pub(crate) fn start(&mut self, jobs: Vec<Job>, force: bool) -> u64 {
+    pub fn start(&mut self, jobs: Vec<Job>, force: bool) -> u64 {
         self.next += 1;
         // Tells a running round to stop asking at once.
         self.current.store(self.next, Ordering::SeqCst);
@@ -200,7 +199,7 @@ impl RadarWorker {
         self.next
     }
 
-    pub(crate) fn try_recv(&self) -> Option<Msg> {
+    pub fn try_recv(&self) -> Option<Msg> {
         self.rx.try_recv().ok()
     }
 }
@@ -638,11 +637,11 @@ fn answer_of(
 /// The providers whose pull / merge requests the Radar lists per repository:
 /// GitHub, GitLab, Gitea and Forgejo (with checks, conflicts and mentions),
 /// and, lists only, Azure DevOps, Bitbucket and Gerrit when built in.
-fn lists_requests(kind: gitpoulpi_config::IntegrationKind) -> bool {
+pub fn lists_requests(kind: gitpoulpi_config::IntegrationKind) -> bool {
     match kind.family() {
         ApiFamily::Github | ApiFamily::Gitlab | ApiFamily::Gitea => true,
         ApiFamily::AzureDevops | ApiFamily::Bitbucket | ApiFamily::Gerrit => {
-            crate::build_features::kind_built(kind)
+            gitpoulpi_app::features::kind_built(kind)
         }
         _ => false,
     }
@@ -705,92 +704,9 @@ fn remember(prepared: &Prepared, snap: &HostingSnapshot) {
     }
 }
 
-// -- production wiring ---------------------------------------------------
-
-/// Reads each repository's own state, remotes and the configured providers.
-#[derive(Default)]
-pub(crate) struct FsPrepare {
-    /// The providers and the state directory: `config.toml` is read once for
-    /// the round, not twice per repository.
-    config: PerRound<(Vec<Integration>, String)>,
-    /// Where the Radar's own files live (recents, workspaces, the account
-    /// cache).
-    config_dir: Option<PathBuf>,
-}
-
-impl FsPrepare {
-    pub(crate) fn new(config_dir: Option<PathBuf>) -> Self {
-        Self {
-            config: PerRound::default(),
-            config_dir,
-        }
-    }
-}
-
-impl Prepare for FsPrepare {
-    fn begin_round(&self) {
-        self.config.reset();
-    }
-
-    fn accounts(&self) -> AccountPlan {
-        super::account_fs::plan_of(
-            crate::pull_request::load_integrations(),
-            self.config_dir.as_deref(),
-        )
-    }
-
-    fn known_clones(&self, scope: &[PathBuf]) -> CloneIndex {
-        super::account_fs::known_clones(scope, self.config_dir.as_deref())
-    }
-
-    fn prepare(&self, repo: &Path) -> Prepared {
-        let state =
-            gitpoulpi_session::RepoState::load(&crate::remotes_ui::repo_state_path(repo)).ok();
-        let remotes = crate::repo_probe::git_config_path(repo)
-            .and_then(|config| std::fs::read_to_string(config).ok())
-            .map(|raw| crate::repo_probe::parse_remote_urls(&raw))
-            .unwrap_or_default()
-            .into_iter()
-            .map(|(name, url)| ResolveRemote::new(name, url))
-            .collect();
-        // GitHub and GitLab (maintainer rule 6), plus the local Markdown issue
-        // source, which is the repository's own.
-        let config = self.config.get(|| {
-            let integrations: Vec<Integration> = crate::pull_request::load_integrations()
-                .into_iter()
-                .filter(|i| lists_requests(i.kind) || i.kind.family() == ApiFamily::LocalMarkdown)
-                .collect();
-            let state_dir = gitpoulpi_config::Settings::resolve_ambient()
-                .map(|s| s.config().session.per_repo_state_dir.clone())
-                .unwrap_or_else(|_| gitpoulpi_config::DEFAULT_REPO_DATA_LOCATION.to_string());
-            (integrations, state_dir)
-        });
-        let (integrations, state_dir) = (config.0.clone(), config.1.as_str());
-        let issues_source = crate::hosting_task::resolve_local_source(
-            repo,
-            &integrations,
-            state.as_ref().and_then(|s| s.issues_source.clone()),
-        );
-        Prepared {
-            request: HostingRequest {
-                remotes,
-                integrations,
-                override_id: state.as_ref().and_then(|s| s.hosting_integration.clone()),
-                head_branch: None,
-                pr_view: PrView::Open,
-                issue_view: IssueView::Open,
-                issues_source,
-                pulls_source: state.and_then(|s| s.pulls_source),
-                repo_root: repo.to_path_buf(),
-            },
-            cache: Some(cache_path(repo, state_dir)),
-        }
-    }
-}
-
 /// The repositories whose hosting the worker would ask: everything that is
 /// not a duplicate path.
-pub(crate) fn unique_jobs(repos: impl IntoIterator<Item = (PathBuf, String)>) -> Vec<Job> {
+pub fn unique_jobs(repos: impl IntoIterator<Item = (PathBuf, String)>) -> Vec<Job> {
     let mut seen: HashSet<String> = HashSet::new();
     repos
         .into_iter()
@@ -799,8 +715,9 @@ pub(crate) fn unique_jobs(repos: impl IntoIterator<Item = (PathBuf, String)>) ->
         .collect()
 }
 
-#[cfg(test)]
-pub(crate) fn empty_snapshot() -> HostingSnapshot {
+/// An empty snapshot, for a frontend's tests.
+#[cfg(any(test, feature = "test-support"))]
+pub fn empty_snapshot() -> HostingSnapshot {
     HostingSnapshot::empty(
         0,
         &HostingRequest {

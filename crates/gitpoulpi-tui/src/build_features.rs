@@ -11,7 +11,9 @@
 // The feature vocabulary and the build flags live in `gitpoulpi-app`, which
 // every frontend shares; this crate forwards its cargo features of the same
 // names to it.
-pub use gitpoulpi_app::features::{offered, offered_with, radar_enabled, FLAGS};
+pub use gitpoulpi_app::features::{
+    family_built, kind_built, offered, offered_with, radar_enabled, FLAGS,
+};
 pub use gitpoulpi_app::features::{
     Feature, AI, AVATAR_FETCH, AZURE_DEVOPS, BITBUCKET, BOARD, CONVERSATION, GERRIT, GITEA, GITHUB,
     GITLAB, GLOBAL_SEARCH, HISTORY_REWRITE, HOSTING, IMAGE_VIEW, JIRA, LFS, LINEAR, LOCAL_ISSUES,
@@ -35,25 +37,6 @@ pub const PROVIDER_KINDS: &[gitpoulpi_config::IntegrationKind] = {
     }
 };
 
-/// Whether this build has the client of an API family.
-pub const fn family_built(family: gitpoulpi_config::ApiFamily) -> bool {
-    use gitpoulpi_config::ApiFamily as F;
-    match family {
-        F::Github => GITHUB,
-        F::Gitlab => GITLAB,
-        F::AzureDevops => AZURE_DEVOPS,
-        F::Bitbucket => BITBUCKET,
-        F::Jira => JIRA,
-        F::Trello => TRELLO,
-        F::Gitea => GITEA,
-        F::Linear => LINEAR,
-        F::YouTrack => YOUTRACK,
-        F::Redmine => REDMINE,
-        F::Gerrit => GERRIT,
-        F::LocalMarkdown => LOCAL_ISSUES,
-    }
-}
-
 /// The kinds the Integrations page offers: `IMPLEMENTED` filtered by the
 /// families this build has. Supersedes [`PROVIDER_KINDS`], which stays only
 /// for its slice-shaped callers until the Integrations page moves over.
@@ -63,12 +46,6 @@ pub fn provider_kinds() -> Vec<gitpoulpi_config::IntegrationKind> {
         .copied()
         .filter(|k| family_built(k.family()))
         .collect()
-}
-
-/// Whether this build has a client for `kind` (a profile of a kind that is
-/// not built stays in the config but is never used).
-pub fn kind_built(kind: gitpoulpi_config::IntegrationKind) -> bool {
-    gitpoulpi_config::IntegrationKind::IMPLEMENTED.contains(&kind) && family_built(kind.family())
 }
 
 /// `ai.enabled` in the config AND the feature built.

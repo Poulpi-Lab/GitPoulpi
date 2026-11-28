@@ -81,13 +81,23 @@ pub mod activity;
 pub mod binary_hint;
 pub mod commit_settings;
 pub mod diff_recode;
+#[cfg(feature = "hosting")]
+pub mod hosting_rows;
+#[cfg(feature = "hosting")]
+pub mod hosting_task;
+#[cfg(all(feature = "conversation", feature = "hosting"))]
+pub mod item_target;
 pub mod lfs_ui;
 pub mod live_settings;
 pub mod no_repository;
 pub mod oid_text;
+#[cfg(all(feature = "radar", feature = "hosting"))]
+pub mod radar;
 pub mod redraw;
 pub mod rename_pairs;
 pub mod repo_state_path;
+#[cfg(all(feature = "review", feature = "hosting"))]
+pub mod review_model;
 pub mod ui_viewer;
 pub mod undo_label;
 pub mod undo_ui;

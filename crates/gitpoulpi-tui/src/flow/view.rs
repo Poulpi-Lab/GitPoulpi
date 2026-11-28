@@ -131,15 +131,6 @@ pub(crate) fn grouped_rows(
     gitpoulpi_app::flow::view::grouped_rows(&*configured()?, names, kind, collapsed)
 }
 
-/// The branches of `names` that sit under the group folder `path` (what
-/// "hide / solo this folder" acts on).
-pub(crate) fn group_members(names: &[String], path: &str) -> Vec<String> {
-    match configured() {
-        Some(view) => gitpoulpi_app::flow::view::group_members(&view, names, path),
-        None => Vec::new(),
-    }
-}
-
 /// The tooltip lines of a sidebar branch, `None` when no workflow is
 /// configured or the branch is unknown to the report.
 pub(crate) fn branch_tooltip(full_name: &str) -> Option<Vec<String>> {

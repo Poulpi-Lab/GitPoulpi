@@ -28,16 +28,6 @@ fn four() -> Vec<Ref> {
 }
 
 #[test]
-fn each_tag_is_told_apart_by_where_it_lives() {
-    let snap = snapshot_of(&four());
-    assert_eq!(snap["only-here"].place, TagWhere::Local);
-    assert_eq!(snap["only-there"].place, TagWhere::Remote);
-    assert_eq!(snap["both"].place, TagWhere::Both);
-    assert_eq!(snap["moved"].place, TagWhere::Differs);
-    assert_eq!(snap["moved"].all_remotes(), vec!["origin".to_string()]);
-}
-
-#[test]
 fn the_four_markers_are_distinct_text_glyphs() {
     let glyphs: Vec<&str> = [
         TagWhere::Local,

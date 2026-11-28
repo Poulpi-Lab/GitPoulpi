@@ -891,8 +891,18 @@ pub fn load_ref_visibility(repo_root: &Path) -> (HashSet<String>, HashSet<String
 /// `repo-state.toml` as it was (load-modify-save, like `save_collapsed`). A
 /// ref that is neither hidden nor soloed is absent from the map rather than
 /// written as `Shown`: the file records only deviations from the default.
-#[cfg(test)]
-pub fn save_ref_visibility(repo_root: &Path, hidden: &HashSet<String>, solo: &HashSet<String>) {
+///
+/// This writes the file directly: no daemon is told, so no other frontend
+/// learns of the change until it reloads. A frontend connected to the daemon
+/// (the terminal UI is) should send `OperationKind::SetRefVisibility` instead
+/// (`split_hidden` gives the request's `hidden` / `hidden_remotes` halves),
+/// which writes the same file and broadcasts `Event::RefVisibilityChanged`.
+/// Use this one when there is no daemon to ask.
+pub fn save_ref_visibility(
+    repo_root: &Path,
+    hidden: &HashSet<String>,
+    solo: &HashSet<String>,
+) -> gitpoulpi_session::Result<()> {
     let path = repo_state_path(repo_root);
     let mut state = RepoState::load(&path).unwrap_or_default();
     let mut map: BTreeMap<String, RefVisibility> = BTreeMap::new();
@@ -909,7 +919,7 @@ pub fn save_ref_visibility(repo_root: &Path, hidden: &HashSet<String>, solo: &Ha
         map.insert(name.clone(), RefVisibility::Solo);
     }
     state.ref_visibility = map;
-    let _ = state.save(&path);
+    state.save(&path)
 }
 
 #[cfg(test)]
@@ -924,7 +934,7 @@ mod ref_visibility_persistence_tests {
         hidden.insert("origin/main".to_string());
         let mut solo = HashSet::new();
         solo.insert("main".to_string());
-        save_ref_visibility(dir.path(), &hidden, &solo);
+        save_ref_visibility(dir.path(), &hidden, &solo).unwrap();
 
         let (back_hidden, back_solo) = load_ref_visibility(dir.path());
         assert_eq!(back_hidden, hidden);
@@ -937,7 +947,7 @@ mod ref_visibility_persistence_tests {
         let mut hidden = HashSet::new();
         assert!(toggle_remote_hidden(&mut hidden, "archive"));
         hidden.insert("side".to_string());
-        save_ref_visibility(dir.path(), &hidden, &HashSet::new());
+        save_ref_visibility(dir.path(), &hidden, &HashSet::new()).unwrap();
         let state = RepoState::load(&repo_state_path(dir.path())).unwrap();
         assert_eq!(state.hidden_remotes, ["archive"]);
         assert_eq!(
@@ -1085,7 +1095,7 @@ mod ref_visibility_persistence_tests {
 
         let mut hidden = HashSet::new();
         hidden.insert("feature/x".to_string());
-        save_ref_visibility(dir.path(), &hidden, &HashSet::new());
+        save_ref_visibility(dir.path(), &hidden, &HashSet::new()).unwrap();
 
         let back = RepoState::load(&path).unwrap();
         assert_eq!(back.preferences.encoding.as_deref(), Some("utf-8"));
@@ -1102,11 +1112,11 @@ mod ref_visibility_persistence_tests {
         let dir = tempfile::tempdir().unwrap();
         let mut hidden = HashSet::new();
         hidden.insert("feature/x".to_string());
-        save_ref_visibility(dir.path(), &hidden, &HashSet::new());
+        save_ref_visibility(dir.path(), &hidden, &HashSet::new()).unwrap();
         assert!(load_ref_visibility(dir.path()).0.contains("feature/x"));
 
         hidden.remove("feature/x");
-        save_ref_visibility(dir.path(), &hidden, &HashSet::new());
+        save_ref_visibility(dir.path(), &hidden, &HashSet::new()).unwrap();
         assert!(load_ref_visibility(dir.path()).0.is_empty());
     }
 }
@@ -1388,5 +1398,336 @@ mod checkout_tests {
                 local: "main".into()
             }
         );
+    }
+}
+
+// -- grouping, filtering and bulk membership for the Refs sections ---------
+//
+// The pure half of what the sidebar does with the flat `refs()` list before
+// `ref_display_rows` shapes it: split into LOCAL / REMOTE / TAGS, filter,
+// sort; the leaf names under a folder row; the "hide / solo this folder"
+// toggle; and the pane's title.
+
+/// A ref's display/lookup name exactly as [`group_refs`] formats it (a local
+/// branch or tag's bare name, a remote branch's `remote/name`), shared so
+/// the hidden and solo sets' keys (built from `RefTreeRow::Leaf::full_name`)
+/// match what this computes from a raw `Ref`.
+pub fn ref_full_name(r: &Ref) -> String {
+    match &r.kind {
+        RefKind::LocalBranch { name } => name.clone(),
+        RefKind::RemoteBranch { remote, name } => format!("{remote}/{name}"),
+        RefKind::Tag { name } => name.clone(),
+    }
+}
+
+/// The Refs sidebar's three sections' filtered+sorted ref names. Each is
+/// rendered as its own bordered sub-pane, so each needs its own `Vec`.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct RefsGroups {
+    pub local: Vec<String>,
+    pub remote: Vec<String>,
+    pub tags: Vec<String>,
+}
+
+impl RefsGroups {
+    pub fn names(&self, kind: RefRowKind) -> &[String] {
+        match kind {
+            RefRowKind::Local => &self.local,
+            RefRowKind::Remote => &self.remote,
+            RefRowKind::Tag => &self.tags,
+        }
+    }
+}
+
+/// Splits refs into LOCAL/REMOTE/TAGS groups, sorted by name
+/// within each, keeping only names containing `filter` (case-insensitive;
+/// empty keeps everything). This is the sidebar's search field.
+pub fn group_refs(refs: &[Ref], filter: &str) -> RefsGroups {
+    let mut groups = RefsGroups::default();
+    collect_groups(refs, filter, None, &mut groups);
+    groups
+}
+
+/// `group_refs(refs, filter).names(kind)` for one section only: per-event
+/// callers (row counts, hit tests, the selected leaf) need a single
+/// section's names, and the other two are pure waste on a repo with
+/// thousands of refs.
+pub fn group_refs_kind(refs: &[Ref], filter: &str, kind: RefRowKind) -> Vec<String> {
+    let mut groups = RefsGroups::default();
+    collect_groups(refs, filter, Some(kind), &mut groups);
+    match kind {
+        RefRowKind::Local => groups.local,
+        RefRowKind::Remote => groups.remote,
+        RefRowKind::Tag => groups.tags,
+    }
+}
+
+/// Shared body of `group_refs` / `group_refs_kind`: `only` limits the work
+/// to one kind (the others stay empty).
+fn collect_groups(refs: &[Ref], filter: &str, only: Option<RefRowKind>, groups: &mut RefsGroups) {
+    let filter_lower = filter.to_lowercase();
+    let matches =
+        |name: &str| filter_lower.is_empty() || name.to_lowercase().contains(&filter_lower);
+    let want = |k: RefRowKind| only.is_none_or(|o| o == k);
+
+    for r in refs {
+        match &r.kind {
+            RefKind::LocalBranch { name } if want(RefRowKind::Local) && matches(name) => {
+                groups.local.push(name.clone())
+            }
+            RefKind::RemoteBranch { remote: rem, name } if want(RefRowKind::Remote) => {
+                let full = format!("{rem}/{name}");
+                if matches(&full) {
+                    groups.remote.push(full);
+                }
+            }
+            RefKind::Tag { name } if want(RefRowKind::Tag) && matches(name) => {
+                groups.tags.push(name.clone())
+            }
+            _ => {}
+        }
+    }
+    groups.local.sort_unstable();
+    groups.remote.sort_unstable();
+    groups.tags.sort_unstable();
+}
+
+/// Every leaf ref's full name reachable beneath a folder or remote-root row
+/// at `path`: what "hide/solo this whole folder" (or "this whole remote")
+/// operates on.
+///
+/// A remote's own node and a `/`-derived folder are the same shape here:
+/// both are a `RefTreeRow::Folder` whose `path` is a prefix every descendant
+/// leaf's `full_name` starts with, followed by `/` (a remote's path is its
+/// bare name, so `origin/main` and `origin/feature/login` both qualify).
+/// `names` is one section's full ref-name list (`RefsGroups::names`), not the
+/// display rows: collapse state plays no part in which refs a bulk hide/solo
+/// touches. A workflow-group path resolves through `flow`, and to nothing
+/// when `flow` is `None`.
+pub fn refs_under_folder(
+    flow: Option<&crate::flow::view::FlowView>,
+    names: &[String],
+    path: &str,
+) -> Vec<String> {
+    if crate::flow::view::is_group_path(path) {
+        return match flow {
+            Some(view) => crate::flow::view::group_members(view, names, path),
+            None => Vec::new(),
+        };
+    }
+    let prefix = format!("{path}/");
+    names
+        .iter()
+        .filter(|n| n.starts_with(&prefix))
+        .cloned()
+        .collect()
+}
+
+/// Whether every ref in `refs` (as [`refs_under_folder`] returns) is already
+/// in `set`: the folder/remote row's "fully hidden" or "fully soloed" state,
+/// which decides whether its bulk toggle hides or shows (see
+/// [`toggle_folder_membership`]). An empty list is never "all hidden".
+pub fn folder_fully_in(set: &HashSet<String>, refs: &[String]) -> bool {
+    !refs.is_empty() && refs.iter().all(|r| set.contains(r))
+}
+
+/// Hides (or reveals) every ref in `refs` at once ("click the
+/// folder's eye"): if every descendant is already in `set` this removes them
+/// all (a second click undoes the first), otherwise it adds every one, so the
+/// folder always ends up in exactly one state. Shared by "hide this folder"
+/// and "solo this folder"; which set it mutates is the only difference.
+pub fn toggle_folder_membership(set: &mut HashSet<String>, refs: &[String]) {
+    if refs.is_empty() {
+        return;
+    }
+    let all_in = folder_fully_in(set, refs);
+    for r in refs {
+        if all_in {
+            set.remove(r);
+        } else {
+            set.insert(r.clone());
+        }
+    }
+}
+
+/// The Refs pane's title-bar text: `(left, action)`. `left` is plain
+/// `"Refs"` normally, `"Soloing X/Y"` while Solo is active, `"Hidden n"`
+/// while at least one ref is hidden and nothing is soloed, or both joined
+/// when both are active. `action` is the label of the right-aligned button
+/// (or menu entry), localised, `None` when there is nothing to undo.
+///
+/// The action favours "Stop Soloing" when soloing is active, the louder
+/// state to be stuck in since it hides every commit that is not an ancestor
+/// of the soloed refs. "Show All" takes that slot only when nothing is
+/// soloed. Either way "Refs: Show All Hidden Refs" in the command palette
+/// reaches it. How the parts are laid out and styled is the frontend's.
+pub fn refs_title(
+    soloed: usize,
+    total_refs: usize,
+    hidden: usize,
+) -> (String, Option<&'static str>) {
+    use gitpoulpi_i18n::msg::sidebar as msg;
+    let soloing = soloed > 0;
+    let any_hidden = hidden > 0;
+    let left = match (soloing, any_hidden) {
+        (true, true) => msg::title_soloing_hidden(soloed, total_refs, hidden),
+        (true, false) => msg::title_soloing(soloed, total_refs),
+        (false, true) => msg::title_hidden(hidden),
+        (false, false) => msg::TITLE_REFS.get().to_string(),
+    };
+    let right = if soloing {
+        Some(msg::STOP_SOLOING.get())
+    } else if any_hidden {
+        Some(msg::SHOW_ALL.get())
+    } else {
+        None
+    };
+    (left, right)
+}
+
+#[cfg(test)]
+mod grouping_tests {
+    use super::*;
+    use gitpoulpi_core::domain::{Oid, RefVisibility};
+    use gitpoulpi_i18n::msg::sidebar as msg;
+
+    fn r(kind: RefKind) -> Ref {
+        Ref {
+            kind,
+            target: Oid([1; 20]),
+            visibility: RefVisibility::Shown,
+            is_head: false,
+            upstream: None,
+            tag_sync: None,
+            multi_remote: None,
+        }
+    }
+
+    fn sample() -> Vec<Ref> {
+        vec![
+            r(RefKind::LocalBranch {
+                name: "zeta".into(),
+            }),
+            r(RefKind::LocalBranch {
+                name: "Alpha".into(),
+            }),
+            r(RefKind::RemoteBranch {
+                remote: "origin".into(),
+                name: "main".into(),
+            }),
+            r(RefKind::Tag { name: "v1".into() }),
+        ]
+    }
+
+    #[test]
+    fn refs_split_into_sorted_sections_and_the_filter_is_case_insensitive() {
+        let g = group_refs(&sample(), "");
+        assert_eq!(g.local, vec!["Alpha".to_string(), "zeta".to_string()]);
+        assert_eq!(g.remote, vec!["origin/main".to_string()]);
+        assert_eq!(g.tags, vec!["v1".to_string()]);
+        let g = group_refs(&sample(), "ALPH");
+        assert_eq!(g.local, vec!["Alpha".to_string()]);
+        assert!(g.remote.is_empty() && g.tags.is_empty());
+        // The remote name takes part in a remote branch's match.
+        assert_eq!(group_refs(&sample(), "origin").remote.len(), 1);
+    }
+
+    #[test]
+    fn one_section_gives_the_same_names_as_the_full_grouping() {
+        let refs = sample();
+        for kind in [RefRowKind::Local, RefRowKind::Remote, RefRowKind::Tag] {
+            assert_eq!(
+                group_refs_kind(&refs, "", kind),
+                group_refs(&refs, "").names(kind).to_vec()
+            );
+        }
+        assert_eq!(ref_full_name(&refs[2]), "origin/main");
+    }
+
+    #[test]
+    fn folder_refs_match_by_prefix_and_a_group_path_needs_a_workflow_view() {
+        let names = vec![
+            "origin/main".to_string(),
+            "origin/feature/login".to_string(),
+            "origin2/main".to_string(),
+        ];
+        assert_eq!(
+            refs_under_folder(None, &names, "origin"),
+            vec![
+                "origin/main".to_string(),
+                "origin/feature/login".to_string()
+            ]
+        );
+        let group = format!("{}x", crate::flow::view::GROUP_PREFIX);
+        assert!(refs_under_folder(None, &names, &group).is_empty());
+    }
+
+    #[test]
+    fn refs_title_is_plain_refs_with_nothing_hidden_or_soloed() {
+        assert_eq!(refs_title(0, 5, 0), ("Refs".to_string(), None));
+    }
+
+    #[test]
+    fn refs_title_shows_hidden_count_and_a_show_all_button() {
+        assert_eq!(
+            refs_title(0, 5, 2),
+            (" Hidden 2 ".to_string(), Some(msg::SHOW_ALL.get()))
+        );
+    }
+
+    #[test]
+    fn refs_title_shows_soloing_and_a_stop_soloing_button_unchanged() {
+        assert_eq!(
+            refs_title(1, 5, 0),
+            (" Soloing 1/5 ".to_string(), Some(msg::STOP_SOLOING.get()))
+        );
+    }
+
+    /// Both active at once: the left side names both counts, and the
+    /// right-aligned button favours Stop Soloing (the documented choice in
+    /// `refs_title`, with "Show All" still reachable via the palette).
+    #[test]
+    fn refs_title_combines_both_when_both_are_active() {
+        assert_eq!(
+            refs_title(1, 5, 2),
+            (
+                " Soloing 1/5 \u{00B7} Hidden 2 ".to_string(),
+                Some(msg::STOP_SOLOING.get())
+            )
+        );
+    }
+
+    #[test]
+    fn toggling_a_folder_hides_every_descendant_then_shows_them_all_again() {
+        let refs = vec!["origin/main".to_string(), "origin/dev".to_string()];
+        let mut hidden = HashSet::new();
+        // Nothing hidden yet: the first toggle hides everything.
+        assert!(!folder_fully_in(&hidden, &refs));
+        toggle_folder_membership(&mut hidden, &refs);
+        assert_eq!(hidden, refs.iter().cloned().collect::<HashSet<_>>());
+        assert!(folder_fully_in(&hidden, &refs));
+
+        // Fully hidden: the second toggle reveals everything.
+        toggle_folder_membership(&mut hidden, &refs);
+        assert!(hidden.is_empty());
+    }
+
+    /// A folder only *partly* hidden reads as "not fully hidden" and a
+    /// toggle hides the rest rather than revealing the one that already was,
+    /// so the folder always ends up in exactly one state.
+    #[test]
+    fn toggling_a_partially_hidden_folder_hides_the_rest_rather_than_revealing() {
+        let refs = vec!["origin/main".to_string(), "origin/dev".to_string()];
+        let mut hidden = HashSet::new();
+        hidden.insert("origin/main".to_string());
+        assert!(!folder_fully_in(&hidden, &refs));
+
+        toggle_folder_membership(&mut hidden, &refs);
+        assert_eq!(hidden, refs.iter().cloned().collect::<HashSet<_>>());
+    }
+
+    #[test]
+    fn folder_fully_in_is_false_for_an_empty_folder() {
+        assert!(!folder_fully_in(&HashSet::new(), &[]));
     }
 }

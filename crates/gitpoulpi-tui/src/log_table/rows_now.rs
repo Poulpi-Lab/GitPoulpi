@@ -5,7 +5,7 @@
 use gitpoulpi_core::domain::{CommitNode, Oid, WorkingTree};
 
 use crate::graph;
-use crate::refs_sidebar::ref_full_name;
+pub(crate) use gitpoulpi_app::graph::{solo_filter_nodes, solo_target_oid};
 
 /// Whether stash rows are drawn in the Log: `ui.graph_show_stashes`, and
 /// never while soloing. Solo shows the soloed refs' ancestry and nothing
@@ -42,15 +42,6 @@ pub(crate) fn log_rows_now(
         .ok()
         .and_then(|g| solo_shown_indices(&g.nodes, solo_refs, refs_result));
     graph::LogRows::new(has_wip_row(status_result), slots).with_shown(shown)
-}
-
-/// Resolves one soloed ref (its full name, as stored in `solo_refs`) down
-/// to the commit oid it points at right now - `None` if the ref no longer
-/// exists (e.g. it was deleted or renamed while soloed).
-pub(crate) fn solo_target_oid(solo_ref: &str, refs: &[gitpoulpi_core::domain::Ref]) -> Option<Oid> {
-    refs.iter()
-        .find(|r| ref_full_name(r) == solo_ref)
-        .map(|r| r.target)
 }
 
 /// What the last [`solo_shown_indices`] answer was computed from.
@@ -127,34 +118,6 @@ pub(crate) fn solo_shown_indices(
         *memo = Some((key, value.clone()));
         value
     })
-}
-
-/// Every commit reachable from any oid in `targets` by walking `parents`
-/// (both a first-parent mainline and every merge parent) - the ancestry
-/// Solo mode shows the definition of "this branch's own
-/// commit line", unioned across every currently-soloed ref: Solo
-/// accumulates (soloing a second branch adds its ancestry to the view
-/// instead of replacing the first one's), so the reachability walk seeds
-/// its stack with every target at once rather than being called
-/// separately per ref and merged after the fact - same result, one pass.
-pub(crate) fn solo_filter_nodes(nodes: &[CommitNode], targets: &[Oid]) -> Vec<CommitNode> {
-    let by_id: std::collections::HashMap<Oid, &CommitNode> =
-        nodes.iter().map(|c| (c.id, c)).collect();
-    let mut reachable: std::collections::HashSet<Oid> = std::collections::HashSet::new();
-    let mut stack: Vec<Oid> = targets.to_vec();
-    while let Some(id) = stack.pop() {
-        if !reachable.insert(id) {
-            continue;
-        }
-        if let Some(c) = by_id.get(&id) {
-            stack.extend(c.parents.iter().copied());
-        }
-    }
-    nodes
-        .iter()
-        .filter(|c| reachable.contains(&c.id))
-        .cloned()
-        .collect()
 }
 
 /// Whether the working tree has uncommitted changes, i.e. whether the Log
